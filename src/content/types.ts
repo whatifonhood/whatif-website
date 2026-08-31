@@ -290,6 +290,32 @@ export interface SiteCopy {
       odds: string;
       openGenerator: string;
     };
+    holdings: {
+      title: string;
+      eyebrow: string;
+      heading: SplitHeading;
+      intro: string;
+      inputLabel: string;
+      check: string;
+      /** Stated before anyone types, because it is the first question asked. */
+      privacy: string;
+      download: string;
+      postOnX: string;
+      /** `{tokens}` and `{symbol}` are replaced at runtime. */
+      shareText: string;
+      /** Holding bands. No rank is claimed — no public endpoint gives one. */
+      bands: { whale: string; shark: string; holder: string; curious: string; empty: string };
+      verdicts: { whale: string; shark: string; holder: string; curious: string; empty: string };
+      /** Says what is wrong with what was pasted, rather than returning zero. */
+      errors: {
+        empty: string;
+        ens: string;
+        txHash: string;
+        prefix: string;
+        shape: string;
+        network: string;
+      };
+    };
     notFound: {
       title: string;
       eyebrow: string;

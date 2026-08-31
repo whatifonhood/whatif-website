@@ -19,6 +19,7 @@ const PAGES = [
   { name: 'machine', path: '/machine/' },
   { name: 'meme maker', path: '/memes/make/' },
   { name: 'a single meme', path: '/memes/meme-two-buttons-sell-or-hold/' },
+  { name: 'wallet lookup', path: '/holdings/' },
   { name: '404', path: '/404' },
 ];
 
@@ -315,4 +316,43 @@ test('top-level pages do not all share one social card', async ({ page }) => {
     cards.add(card ?? '');
   }
   expect(cards.size, 'every top-level page should have its own card').toBeGreaterThan(6);
+});
+
+test.describe('the wallet lookup', () => {
+  test('says what is wrong instead of returning a confusing zero', async ({ page }) => {
+    await page.goto('/holdings/');
+    const cases = [
+      { value: 'vitalik.eth', expect: /0x address/i },
+      { value: `0x${'a'.repeat(64)}`, expect: /transaction hash/i },
+      { value: 'hello', expect: /starts with 0x/i },
+    ];
+    for (const item of cases) {
+      await page.locator('[data-holdings-input]').fill(item.value);
+      await page.locator('[data-holdings-form] button').click();
+      await expect(page.locator('[data-holdings-error]')).toBeVisible();
+      await expect(page.locator('[data-holdings-error]')).toHaveText(item.expect);
+    }
+  });
+
+  test('never asks anyone to connect a wallet', async ({ page }) => {
+    await page.goto('/holdings/');
+    const text = (await page.locator('main').textContent()) ?? '';
+    expect(text).not.toMatch(/connect (your )?wallet/i);
+    // The promise the page makes has to stay on the page.
+    expect(text).toMatch(/never requested from a wallet/i);
+  });
+});
+
+test('analytics stays first-party', async ({ page }) => {
+  const thirdParty: string[] = [];
+  page.on('request', (request) => {
+    const host = new URL(request.url()).host;
+    if (host && !host.startsWith('localhost') && !host.startsWith('127.')) {
+      thirdParty.push(host);
+    }
+  });
+  await page.goto('/');
+  await page.waitForTimeout(1200);
+  // Whatever else the page does, it must not load a tracker from someone else.
+  expect(thirdParty.filter((h) => /plausible|google|segment|hotjar/i.test(h))).toEqual([]);
 });

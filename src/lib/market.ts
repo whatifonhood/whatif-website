@@ -273,3 +273,38 @@ export async function getRecentBurns(sinceBlock: number): Promise<{ tokens: numb
   }
   return burns;
 }
+
+/**
+ * The $IF balance of any address.
+ *
+ * A read of a public ledger: `eth_call` signs nothing, costs nothing, and needs
+ * no permission from the address being read. This is why the wallet lookup asks
+ * for an address typed by hand instead of asking anyone to connect a wallet.
+ *
+ * `0x70a08231` is the four-byte selector for `balanceOf(address)`, with the
+ * argument left-padded to a 32-byte word.
+ */
+export async function getBalanceOf(address: string): Promise<number | undefined> {
+  // Checked again here even though the caller checks it: this value goes into a
+  // request body, and a boundary is only a boundary if it is enforced at it.
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) return undefined;
+
+  const padded = address.slice(2).toLowerCase().padStart(64, '0');
+  const body = await fetchJson(DATA_APIS.rpc, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'eth_call',
+      params: [{ to: TOKEN.address, data: `0x70a08231${padded}` }, 'latest'],
+    }),
+  });
+
+  if (!isRecord(body) || typeof body.result !== 'string') return undefined;
+  if (!/^0x[0-9a-fA-F]*$/.test(body.result)) return undefined;
+  if (body.result === '0x' || body.result === '0x0') return 0;
+
+  // BigInt keeps full precision; dividing by the decimals gives whole tokens.
+  return Number(BigInt(body.result) / 10n ** BigInt(TOKEN.decimals));
+}

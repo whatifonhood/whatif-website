@@ -105,7 +105,9 @@ const organizationSchema = {
       import { initCopyButtons } from '../scripts/copy.ts';
       import { initReveal } from '../scripts/reveal.ts';
       import { initToolsMenu } from '../scripts/tools-menu.ts';
+      import { initAnalytics } from '../lib/analytics.ts';
 
+      initAnalytics();
       initNav();
       initCopyButtons();
       initReveal();

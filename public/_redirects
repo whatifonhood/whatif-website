@@ -1,0 +1,14 @@
+# Analytics, proxied through this domain.
+#
+# Serving the counter and receiving its events from our own origin is what lets
+# public/_headers keep `script-src 'self'` and `connect-src 'self'` — no
+# third-party origin is ever contacted by the browser.
+#
+# TO TURN ON: replace pa-XXXXXXXX with the script id from the Plausible
+# dashboard, then set `enabled: true` in src/config/analytics.ts.
+#
+# Netlify's Asset optimization (Bundle JS / Minify JS) must stay OFF, or it
+# rewrites the script src to a CDN URL and the proxy silently breaks.
+
+/js/script.js   https://plausible.io/js/pa-XXXXXXXX.js   200
+/api/event      https://plausible.io/api/event           200
