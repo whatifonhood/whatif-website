@@ -57,6 +57,9 @@ const metrics = [
     data-dashboard
     data-timeframe="day"
     data-chart-type="candles"
+    data-label-holders-updated={page.holdersUpdated}
+    data-label-check-pass={page.checkPass}
+    data-label-window={page.windowHours}
     data-label-buy={page.buyLabel}
     data-label-sell={page.sellLabel}
     data-label-view={page.viewTx}
@@ -155,24 +158,41 @@ const metrics = [
                 </button>
               ))
             }
+            <button
+              type="button"
+              data-chart-log
+              aria-pressed="false"
+              class="chart-toggle"
+              title={page.logScale}
+            >
+              {page.logScale}
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="relative border-t border-line">
+      <div data-chart-wrap class="relative border-t border-line">
         <svg
           data-chart
           data-direction="up"
-          viewBox="0 0 1000 260"
+          viewBox="0 0 1000 320"
           preserveAspectRatio="none"
-          class="chart h-56 w-full sm:h-72"
+          class="chart h-64 w-full sm:h-80"
           role="img"
           aria-label={`${page.chartTitle} chart`}
         >
           <g data-candles></g>
+          <!-- Volume sits in its own lane under the price. -->
+          <g data-volume></g>
+          <line data-crosshair class="crosshair" x1="0" x2="0" y1="0" y2="320" opacity="0"></line>
         </svg>
         <span data-chart-high class="chart-bound top-3">—</span>
         <span data-chart-low class="chart-bound bottom-3">—</span>
+        <!--
+          The tooltip is HTML, not SVG: the chart stretches to fit its box
+          (preserveAspectRatio="none"), which would distort any text inside it.
+        -->
+        <div data-tip class="chart-tip" hidden></div>
       </div>
     </div>
 
@@ -231,30 +251,145 @@ const metrics = [
         <div data-flow-bar class="flow-bar mt-5" aria-hidden="true"></div>
       </div>
 
-      <!-- Biggest buy -->
-      <div data-biggest hidden class="card border-lime/30 p-6 sm:p-8">
-        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.biggestBuy}</p>
+      <!--
+        Biggest trade both ways.
+
+        These come from a size-filtered query, which reaches much further back
+        than the recent-trades list — but a size filter is not a time window, so
+        the span actually covered is printed rather than assumed.
+      -->
+      {
+        (['buy', 'sell'] as const).map((side) => (
+          <div
+            data-biggest={side}
+            hidden
+            class:list={['card p-6 sm:p-8', side === 'buy' ? 'border-lime/30' : 'border-warn/30']}
+          >
+            <p
+              class:list={[
+                'font-mono text-[11px] uppercase tracking-[0.16em]',
+                side === 'buy' ? 'text-lime' : 'text-warn',
+              ]}
+            >
+              {side === 'buy' ? page.biggestBuy : page.biggestSell}
+            </p>
+            <p
+              data-biggest-tokens
+              class="mt-3 font-display text-3xl font-black italic tabular-nums tracking-tight text-ink sm:text-4xl"
+            />
+            <p class="mt-2 font-mono text-sm text-muted">
+              <span data-biggest-usd class:list={[side === 'buy' ? 'text-lime' : 'text-warn']} />
+              {' · '}
+              <span data-biggest-wallet />
+              {' · '}
+              <span data-biggest-time />
+            </p>
+            <p
+              data-biggest-window
+              class="mt-1 font-mono text-[10px] uppercase tracking-wider text-faint"
+            />
+            <a
+              data-biggest-link
+              href={MARKETS.contract}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
+            >
+              {page.viewTx}
+              <Icons name="arrow-up-right" size={11} />
+            </a>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Who holds it -->
+    <div class="mt-3 grid gap-3 lg:grid-cols-2">
+      <div class="card p-6 sm:p-8">
+        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          {page.holdersTitle}
+        </p>
         <p
-          data-biggest-tokens
-          class="mt-3 font-display text-3xl font-black italic tabular-nums tracking-tight text-ink sm:text-4xl"
+          data-metric="holders"
+          class="mt-3 font-display text-4xl font-black italic tabular-nums tracking-tight text-ink"
         >
+          {formatCount(TOKEN_SNAPSHOT.holders, 'en')}
         </p>
-        <p class="mt-2 font-mono text-sm text-muted">
-          <span data-biggest-usd class="text-lime"></span>
-          {' · '}<span data-biggest-wallet></span>
-          {' · '}<span data-biggest-time></span>
+        <p class="mt-2 font-mono text-[11px] uppercase tracking-wider text-faint">
+          <span data-holders-updated></span>
         </p>
-        <a
-          data-biggest-link
-          href={MARKETS.contract}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
-        >
-          {page.viewTx}
-          <Icons name="arrow-up-right" size={11} />
-        </a>
       </div>
+
+      <!--
+        Concentration. The most useful safety number a holder can read, and one
+        we could not show at all until the count stopped coming from a snapshot.
+      -->
+      <div data-concentration hidden class="card p-6 sm:p-8">
+        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          {page.concentration}
+        </p>
+        <div class="conc-bar mt-4" aria-hidden="true">
+          <span data-band="top10"></span>
+          <span data-band="next20"></span>
+          <span data-band="next20More"></span>
+          <span data-band="rest"></span>
+        </div>
+        <ul class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+          {
+            (['top10', 'next20', 'next20More', 'rest'] as const).map((band) => (
+              <li class="flex items-center justify-between gap-2 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 text-muted">
+                  <i class="conc-key" data-key={band} />
+                  {page.bands[band]}
+                </span>
+                <span data-band-value={band} class="tabular-nums text-ink" />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Hourly pressure -->
+    <div data-pressure hidden class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.pressureTitle}
+      </p>
+      <svg
+        data-pressure-chart
+        viewBox="0 0 1000 160"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={page.pressureTitle}
+        class="mt-5 h-32 w-full"
+      >
+        <g data-pressure-bars></g>
+      </svg>
+      <p class="mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">
+        {page.pressureNote}
+      </p>
+    </div>
+
+    <!-- Burn history -->
+    <div class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.burnHistoryTitle}
+      </p>
+      <svg
+        data-burns
+        viewBox="0 0 1000 200"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={page.burnHistoryTitle}
+        class="mt-5 h-40 w-full"
+      >
+        <path data-burns-area class="burn-area"></path>
+        <path data-burns-line class="burn-line"></path>
+        <g data-burns-dots></g>
+      </svg>
+      <p class="mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">
+        {page.burnHistoryNote}
+      </p>
     </div>
 
     <!-- Live trades -->
@@ -313,6 +448,32 @@ const metrics = [
       </div>
     </div>
 
+    <!--
+      Attested checks.
+
+      Everything here is asserted by somebody who is not us and links to where it
+      can be re-run. The LP-lock and renounce claims are deliberately absent —
+      they were removed for lack of proof and do not come back without one.
+    -->
+    <div class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.trustTitle}</p>
+      <ul data-trust class="mt-5 grid gap-2.5 sm:grid-cols-2">
+        {
+          (['verified', 'honeypot', 'supply', 'burn'] as const).map((check) => (
+            <li data-check={check} class="trust-row">
+              <span class="trust-mark" data-state="unknown" aria-hidden="true" />
+              <span class="min-w-0 flex-1 text-sm text-ink">{page.checks[check]}</span>
+              <span
+                data-check-state
+                class="font-mono text-[10px] uppercase tracking-wider text-faint"
+              />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-5 text-xs leading-relaxed text-faint">{page.trustNote}</p>
+    </div>
+
     <!-- Verify it yourself -->
     <div class="mt-10 grid gap-3 lg:grid-cols-2">
       <CopyField
@@ -366,6 +527,113 @@ const metrics = [
 </PageLayout>
 
 <style>
+  .crosshair {
+    stroke: var(--color-lime);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .chart-tip {
+    position: absolute;
+    top: 0.75rem;
+    z-index: 2;
+    min-width: 8.5rem;
+    transform: translateX(-50%);
+    border-radius: 0.6rem;
+    border: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-void) 92%, transparent);
+    padding: 0.55rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-ink);
+    pointer-events: none;
+    backdrop-filter: blur(6px);
+  }
+
+  /* Concentration bar */
+  .conc-bar {
+    display: flex;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+  }
+  .conc-bar span {
+    width: var(--share, 0%);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .conc-bar [data-band='top10'] {
+    background: var(--color-lime);
+  }
+  .conc-bar [data-band='next20'] {
+    background: var(--color-lime-mid);
+  }
+  .conc-bar [data-band='next20More'] {
+    background: var(--color-lime-deep);
+  }
+  .conc-bar [data-band='rest'] {
+    background: var(--color-line);
+  }
+
+  .conc-key {
+    height: 8px;
+    width: 8px;
+    flex: none;
+    border-radius: 2px;
+  }
+  .conc-key[data-key='top10'] {
+    background: var(--color-lime);
+  }
+  .conc-key[data-key='next20'] {
+    background: var(--color-lime-mid);
+  }
+  .conc-key[data-key='next20More'] {
+    background: var(--color-lime-deep);
+  }
+  .conc-key[data-key='rest'] {
+    background: var(--color-line);
+  }
+
+  /* Attested checks */
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.7rem 0.9rem;
+  }
+  .trust-mark {
+    height: 9px;
+    width: 9px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--color-line);
+  }
+  .trust-mark[data-state='pass'] {
+    background: var(--color-lime);
+    box-shadow: 0 0 0 3px rgb(143 206 2 / 0.16);
+  }
+  .trust-mark[data-state='fail'] {
+    background: var(--color-warn, #f0a06a);
+  }
+
+  /* Burn curve */
+  .burn-line {
+    fill: none;
+    stroke: var(--color-lime);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  .burn-area {
+    fill: rgb(143 206 2 / 0.12);
+    stroke: none;
+  }
+
   /* Timeframe and change chips */
   .tf-chip,
   .change-chip {
@@ -605,3 +873,61 @@ const metrics = [
   void initLiveStats(locale);
   initDashboard(locale);
 </script>
+
+<style is:global>
+  /*
+   * Created by src/scripts/dashboard.ts at runtime, so these cannot be scoped —
+   * Astro only scopes what appears in the template above.
+   */
+  .pressure-bar[data-kind='buy'] {
+    fill: var(--color-lime);
+    opacity: 0.85;
+  }
+  .pressure-bar[data-kind='sell'] {
+    fill: var(--color-warn, #f0a06a);
+    opacity: 0.7;
+  }
+  .pressure-axis {
+    stroke: var(--color-line);
+    stroke-width: 1;
+  }
+  .burn-dot {
+    fill: var(--color-void);
+    stroke: var(--color-lime);
+    stroke-width: 2;
+    transition: r 0.15s ease;
+  }
+  .burn-dot:hover {
+    r: 5;
+    fill: var(--color-lime);
+  }
+</style>
+
+<style is:global>
+  /* Drawn at runtime — see the note on the other global block. */
+  .chart-tip b {
+    display: block;
+    color: var(--color-faint);
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .chart-tip [data-tip-change] {
+    margin-left: 0.4rem;
+  }
+  .chart-tip [data-tip-change][data-direction='up'] {
+    color: var(--color-lime);
+  }
+  .chart-tip [data-tip-change][data-direction='down'] {
+    color: var(--color-warn, #f0a06a);
+  }
+  .vol-bar[data-rising='true'] {
+    fill: var(--color-lime);
+    opacity: 0.45;
+  }
+  .vol-bar[data-rising='false'] {
+    fill: var(--color-warn, #f0a06a);
+    opacity: 0.4;
+  }
+</style>

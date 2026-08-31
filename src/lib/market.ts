@@ -9,7 +9,7 @@
  * request has a timeout, and a failure leaves the page showing what it already
  * had. The site holds no API keys, so there is nothing here to leak.
  */
-import { TOKEN } from '../config/site.ts';
+import { DATA_APIS, TOKEN } from '../config/site.ts';
 import { asPositiveNumber, fetchJson, isRecord } from './token-stats.ts';
 
 const GECKO = `https://api.geckoterminal.com/api/v2/networks/robinhood/pools/${TOKEN.primaryPool.toLowerCase()}`;
@@ -120,7 +120,11 @@ export async function getPriceHistory(timeframe: Timeframe): Promise<Candle[]> {
 
 /** The most recent trades on the pool, newest first. */
 export async function getRecentTrades(): Promise<Trade[]> {
-  const body = await fetchJson(`${GECKO}/trades`);
+  return parseTrades(await fetchJson(`${GECKO}/trades`));
+}
+
+/** Shared by both trade endpoints, which return the same shape. */
+function parseTrades(body: unknown): Trade[] {
   if (!isRecord(body) || !Array.isArray(body.data)) return [];
 
   const trades: Trade[] = [];
@@ -148,4 +152,124 @@ export async function getRecentTrades(): Promise<Trade[]> {
     trades.push({ kind, usd, tokens, time, wallet, txHash });
   }
   return trades;
+}
+
+/**
+ * Trades above a size floor.
+ *
+ * The recent-trades endpoint returns the last few hundred fills, which on a busy
+ * day is only a couple of hours — not enough to answer "biggest buy today"
+ * honestly. Filtering by size instead returns only significant trades, which
+ * reaches much further back for the same number of rows.
+ *
+ * Because it is a size filter and not a time window, the span it covers varies
+ * with how busy the day was. Callers must check the timestamps before claiming
+ * any particular window.
+ */
+export async function getLargeTrades(minUsd = 500): Promise<Trade[]> {
+  const body = await fetchJson(`${GECKO}/trades?trade_volume_in_usd_greater_than=${minUsd}`);
+  return parseTrades(body);
+}
+
+export interface TokenInfo {
+  holders?: number;
+  /** Share of supply held by each band, as percentages. */
+  distribution?: { top10: number; next20: number; next20More: number; rest: number };
+  /** When the holder figures were last recalculated, in unix seconds. */
+  holdersUpdated?: number;
+  /** Third-party checks. Attributed on the page, never stated in our own voice. */
+  isHoneypot?: boolean;
+  isVerified?: boolean;
+}
+
+/**
+ * Holder count, concentration and third-party safety checks.
+ *
+ * This replaces the build-time holder snapshot. Blockscout blocks bots and sends
+ * no CORS header, so the count could never be read from a browser; this endpoint
+ * is keyless, CORS-open, and already allowed by the Content-Security-Policy.
+ *
+ * The response also carries mint and freeze authority, which are Solana concepts
+ * and come back null on this chain — they are deliberately not read here, because
+ * rendering a null as a passing check would be a false claim.
+ */
+export async function getTokenInfo(): Promise<TokenInfo> {
+  const body = await fetchJson(
+    `https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/${TOKEN.address}/info`,
+  );
+  if (!isRecord(body) || !isRecord(body.data) || !isRecord(body.data.attributes)) return {};
+  const a = body.data.attributes;
+
+  const info: TokenInfo = {};
+
+  if (isRecord(a.holders)) {
+    info.holders = asPositiveNumber(a.holders.count);
+
+    const share = a.holders.distribution_percentage;
+    if (isRecord(share)) {
+      const top10 = asPositiveNumber(share.top_10);
+      const next20 = asPositiveNumber(share['11_30']);
+      const next20More = asPositiveNumber(share['31_50']);
+      const rest = asPositiveNumber(share.rest);
+      if ([top10, next20, next20More, rest].every((v) => v !== undefined)) {
+        info.distribution = {
+          top10: top10 as number,
+          next20: next20 as number,
+          next20More: next20More as number,
+          rest: rest as number,
+        };
+      }
+    }
+
+    if (typeof a.holders.last_updated === 'string') {
+      const parsed = Date.parse(a.holders.last_updated);
+      if (Number.isFinite(parsed)) info.holdersUpdated = Math.round(parsed / 1000);
+    }
+  }
+
+  if (typeof a.is_honeypot === 'boolean') info.isHoneypot = a.is_honeypot;
+  if (typeof a.gt_verified === 'boolean') info.isVerified = a.gt_verified;
+
+  return info;
+}
+
+/**
+ * Burns newer than the committed history.
+ *
+ * src/config/burns.ts holds everything up to the block it was built at; this
+ * asks the chain only for what has happened since, so a fresh burn appears
+ * without waiting for a deploy.
+ */
+export async function getRecentBurns(sinceBlock: number): Promise<{ tokens: number }[]> {
+  const transfer = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const dead = `0x${TOKEN.burnAddress.slice(2).toLowerCase().padStart(64, '0')}`;
+
+  const body = await fetchJson(DATA_APIS.rpc, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'eth_getLogs',
+      params: [
+        {
+          fromBlock: `0x${sinceBlock.toString(16)}`,
+          toBlock: 'latest',
+          address: TOKEN.address,
+          topics: [transfer, null, dead],
+        },
+      ],
+    }),
+  });
+
+  if (!isRecord(body) || !Array.isArray(body.result)) return [];
+
+  const burns: { tokens: number }[] = [];
+  for (const log of body.result) {
+    if (!isRecord(log) || typeof log.data !== 'string') continue;
+    if (!/^0x[0-9a-fA-F]+$/.test(log.data)) continue;
+    const tokens = Number(BigInt(log.data) / 10n ** BigInt(TOKEN.decimals));
+    if (Number.isFinite(tokens) && tokens > 0) burns.push({ tokens });
+  }
+  return burns;
 }
