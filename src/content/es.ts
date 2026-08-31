@@ -305,7 +305,7 @@ export const es: SiteCopy = {
       openExplorer: 'Abrir el contrato',
       openChart: 'Abrir el gráfico',
       timeframes: { day: '24 H', week: '7 D', month: '30 D', quarter: '90D', all: 'TODO' },
-      expandChart: 'Ampliar',
+      resizeChart: 'Arrastra para redimensionar el gráfico',
       chartTypes: { candles: 'Velas', line: 'Línea' },
       logScale: 'Log',
       chartTitle: 'Precio',

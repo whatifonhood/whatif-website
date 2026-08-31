@@ -698,31 +698,83 @@ export function initDashboard(locale: string): void {
   wrap?.addEventListener('pointercancel', hideCrosshair);
 
   /**
-   * Making the chart bigger.
+   * Resizing the chart by dragging.
    *
-   * The default height suits a page you are scrolling past; reading a ninety-day
-   * range on it does not work. This only changes the box — the SVG scales to
-   * whatever it is given, so nothing needs redrawing.
+   * A fixed "expand" button gives you one other size, which is rarely the one
+   * you want. The grip lets you set any height between a glance and most of the
+   * screen, and remembers it.
+   *
+   * It is a real slider element underneath, so arrow keys work and a screen
+   * reader announces it — a bare draggable div would be neither.
    */
-  const expandButton = root.querySelector<HTMLButtonElement>('[data-chart-expand]');
-  expandButton?.addEventListener('click', () => {
-    const next = root.dataset.chartExpanded !== 'true';
-    root.dataset.chartExpanded = String(next);
-    expandButton.setAttribute('aria-pressed', String(next));
-    try {
-      localStorage.setItem('whatif.chartExpanded', String(next));
-    } catch {
-      /* storage unavailable — the choice just will not persist */
-    }
-  });
+  const MIN_H = 240;
+  const MAX_H = 760;
+  const grip = root.querySelector<HTMLElement>('[data-chart-grip]');
+  const chartWrap = root.querySelector<HTMLElement>('[data-chart-wrap]');
 
-  try {
-    if (localStorage.getItem('whatif.chartExpanded') === 'true') {
-      root.dataset.chartExpanded = 'true';
-      expandButton?.setAttribute('aria-pressed', 'true');
+  const applyHeight = (height: number) => {
+    const clamped = Math.round(Math.min(MAX_H, Math.max(MIN_H, height)));
+    root.style.setProperty('--chart-height', `${clamped}px`);
+    grip?.setAttribute('aria-valuenow', String(clamped));
+    try {
+      localStorage.setItem('whatif.chartHeight', String(clamped));
+    } catch {
+      /* storage unavailable — the size just will not persist */
     }
-  } catch {
-    /* storage unavailable */
+    return clamped;
+  };
+
+  if (grip && chartWrap) {
+    let dragging = false;
+
+    const onMove = (event: PointerEvent) => {
+      if (!dragging) return;
+      // Height is the pointer's distance from the top of the plot, so the edge
+      // stays under the finger however far it travels.
+      applyHeight(event.clientY - chartWrap.getBoundingClientRect().top);
+    };
+
+    const stop = () => {
+      dragging = false;
+      grip.removeAttribute('data-dragging');
+      window.removeEventListener('pointermove', onMove);
+    };
+
+    grip.addEventListener('pointerdown', (event) => {
+      dragging = true;
+      grip.dataset.dragging = 'true';
+      // Listener first: if capture throws the drag must still work, and capture
+      // is only an optimisation for keeping events on the grip.
+      window.addEventListener('pointermove', onMove);
+      try {
+        grip.setPointerCapture(event.pointerId);
+      } catch {
+        /* not supported here; the window listener covers it */
+      }
+      event.preventDefault();
+    });
+    // Releasing outside the grip must end the drag too.
+    window.addEventListener('pointerup', stop);
+    grip.addEventListener('pointerup', stop);
+    grip.addEventListener('pointercancel', stop);
+
+    grip.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? 60 : 20;
+      const current = Number(grip.getAttribute('aria-valuenow')) || MIN_H;
+      if (event.key === 'ArrowUp') applyHeight(current - step);
+      else if (event.key === 'ArrowDown') applyHeight(current + step);
+      else if (event.key === 'Home') applyHeight(MIN_H);
+      else if (event.key === 'End') applyHeight(MAX_H);
+      else return;
+      event.preventDefault();
+    });
+
+    try {
+      const saved = Number(localStorage.getItem('whatif.chartHeight'));
+      if (Number.isFinite(saved) && saved > 0) applyHeight(saved);
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   const logButton = root.querySelector<HTMLButtonElement>('[data-chart-log]');

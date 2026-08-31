@@ -289,7 +289,7 @@ export const zh: SiteCopy = {
       openExplorer: '打开合约',
       openChart: '打开图表',
       timeframes: { day: '24小时', week: '7天', month: '30天', quarter: '90天', all: '全部' },
-      expandChart: '放大',
+      resizeChart: '拖动以调整图表高度',
       chartTypes: { candles: 'K线', line: '折线' },
       logScale: '对数',
       chartTitle: '价格',

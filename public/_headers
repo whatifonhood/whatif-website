@@ -14,7 +14,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Cross-Origin-Opener-Policy: same-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; manifest-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com https://api.coingecko.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; manifest-src 'self'; upgrade-insecure-requests
 
 # The PFP generator draws its share cards on a canvas and hands them to the
 # browser as blob: URLs, so it needs that one extra image source. Everything
@@ -25,7 +25,7 @@
 # The wallet lookup draws a card and hands it over as a blob: URL, exactly like
 # the two generators above.
 /holdings/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com https://api.coingecko.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
 
 # The generator's artwork is content-addressed by name and never edited in place.
 /pfp/img/*
