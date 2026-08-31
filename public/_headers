@@ -22,12 +22,6 @@
 /pfp/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
 
-# The meme generator draws on a canvas and hands the result to the share sheet
-# or a download as a blob: URL, exactly like the PFP generator above. Same one
-# extra image source, nothing else widened.
-/memes/make/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
-
 # The wallet lookup draws a card and hands it over as a blob: URL, exactly like
 # the two generators above.
 /holdings/*

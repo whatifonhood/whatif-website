@@ -1,6 +1,7 @@
 ---
 title: How to read the dashboard
 summary: What each figure on the stats page means, and which ones actually matter.
+category: basics
 order: 5
 updated: 2026-08-31
 ---

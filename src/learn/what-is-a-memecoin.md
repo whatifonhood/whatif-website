@@ -1,6 +1,7 @@
 ---
 title: What a meme coin actually is
 summary: No utility, no roadmap, no revenue — and why people buy them anyway.
+category: basics
 order: 3
 updated: 2026-08-31
 ---

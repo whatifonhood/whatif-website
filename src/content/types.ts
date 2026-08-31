@@ -1,5 +1,4 @@
-import type { ToolId } from '../config/navigation.ts';
-import type { BackdropId, FieldId, PoseId } from '../config/meme-templates.ts';
+import type { ToolGroup, ToolId } from '../config/navigation.ts';
 
 /**
  * The shape of every word on the site.
@@ -34,6 +33,10 @@ export interface SiteCopy {
     toolsLabel: string;
     /** One entry per route in src/config/navigation.ts. */
     tools: Record<ToolId, { label: string; blurb: string }>;
+    /** Headings inside the tools dropdown. */
+    toolGroups: Record<ToolGroup, string>;
+    /** The language dropdown's button and label. */
+    languageMenu: string;
     buy: string;
     pfp: string;
     openMenu: string;
@@ -305,6 +308,11 @@ export interface SiteCopy {
       intro: string;
       backToIndex: string;
       next: string;
+      previous: string;
+      /** Section headings on the index. */
+      categories: { safety: string; basics: string; token: string };
+      /** Shown under the title on a page, e.g. "Updated". */
+      updatedLabel: string;
     };
     updates: {
       title: string;
@@ -359,33 +367,6 @@ export interface SiteCopy {
       more: string;
       backToVault: string;
       shareText: (title: string) => string;
-    };
-    memeMaker: {
-      title: string;
-      heading: SplitHeading;
-      intro: string;
-      /** Group headings above each row of controls. */
-      templateLabel: string;
-      poseLabel: string;
-      backdropLabel: string;
-      /** One per template in src/config/meme-templates.ts. */
-      templates: Record<string, string>;
-      /** Input labels, shared across templates so copy stays generic. */
-      fields: Record<FieldId, string>;
-      poses: Record<PoseId, string>;
-      backdrops: Record<BackdropId, string>;
-      download: string;
-      share: string;
-      shuffle: string;
-      /** Confirmation after the file is written. */
-      saved: string;
-      failed: string;
-      /** Offered as the X post when the image is shared. */
-      shareText: string;
-      /** Says plainly that nothing is uploaded. */
-      privacy: string;
-      /** Link from the vault page. */
-      cta: string;
     };
   };
 

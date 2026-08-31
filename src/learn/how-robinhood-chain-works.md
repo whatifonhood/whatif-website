@@ -1,6 +1,7 @@
 ---
 title: How Robinhood Chain works
 summary: What the chain is, how to get ETH onto it, and where people get stuck.
+category: basics
 order: 4
 updated: 2026-08-31
 ---

@@ -34,12 +34,6 @@ export const UPDATES: Update[] = [
   },
   {
     date: '2026-08-31',
-    title: 'Make your own memes',
-    body: 'Eight formats, four poses, your words. It renders on your own device and saves as a PNG — nothing is uploaded.',
-    href: '/memes/make/',
-  },
-  {
-    date: '2026-08-31',
     title: 'Every meme has its own page',
     body: 'The vault used to hand you a raw image file. Now each meme has a real page and its own preview card, so a shared meme carries a way back.',
     href: '/memes/',

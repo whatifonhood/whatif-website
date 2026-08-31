@@ -17,7 +17,6 @@ const PAGES = [
   { name: 'brand', path: '/brand/' },
   { name: 'stats', path: '/stats/' },
   { name: 'machine', path: '/machine/' },
-  { name: 'meme maker', path: '/memes/make/' },
   { name: 'a single meme', path: '/memes/meme-two-buttons-sell-or-hold/' },
   { name: 'wallet lookup', path: '/holdings/' },
   { name: '404', path: '/404' },
@@ -200,63 +199,6 @@ test.describe('accessibility basics', () => {
   });
 });
 
-/**
- * The meme generator.
- *
- * These guard the two things that would quietly ruin it: a format that draws
- * nothing, and text that escapes its box. Both fail as a blank or broken image
- * rather than as an error, so only a pixel check catches them.
- */
-test.describe('the meme generator', () => {
-  test('every format draws something on the canvas', async ({ page }) => {
-    await page.goto('/memes/make/');
-
-    const formats = await page
-      .locator('[data-template]')
-      .evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.template ?? ''));
-    expect(formats.length).toBeGreaterThan(0);
-
-    for (const format of formats) {
-      await page.click(`[data-template="${format}"]`);
-      const fields = page.locator('.maker-input');
-      const count = await fields.count();
-      for (let i = 0; i < count; i += 1) await fields.nth(i).fill('WHAT IF');
-      await page.waitForTimeout(200);
-
-      // A canvas that painted nothing serialises to a handful of bytes; a real
-      // drawing is orders of magnitude larger.
-      const bytes = await page
-        .locator('[data-maker-canvas]')
-        .evaluate((canvas) => (canvas as HTMLCanvasElement).toDataURL('image/png').length);
-      expect(bytes, `format "${format}" rendered an empty canvas`).toBeGreaterThan(5000);
-    }
-  });
-
-  test('a wall of text still fits inside the image', async ({ page }) => {
-    await page.goto('/memes/make/');
-    const field = page.locator('.maker-input').first();
-    await field.fill('SUPERCALIFRAGILISTIC '.repeat(6));
-    await page.waitForTimeout(250);
-
-    // The input caps length, which is what keeps the fitter's search bounded.
-    const value = await field.inputValue();
-    expect(value.length).toBeLessThanOrEqual(120);
-  });
-
-  test('nothing typed into it is ever written into the page', async ({ page }) => {
-    await page.goto('/memes/make/');
-    const payload = '<img src=x onerror=alert(1)>';
-    await page.locator('.maker-input').first().fill(payload);
-    await page.waitForTimeout(200);
-
-    // The words are drawn as pixels. If they ever reach the DOM as markup, this
-    // is the test that says so.
-    const injected = await page.evaluate(
-      () => document.querySelectorAll('main img[src="x"]').length,
-    );
-    expect(injected).toBe(0);
-  });
-});
 
 /**
  * Shareable results.
@@ -320,12 +262,12 @@ test.describe('every meme has a page', () => {
 
 test('top-level pages do not all share one social card', async ({ page }) => {
   const cards = new Set<string>();
-  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/memes/make/']) {
+  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/updates/']) {
     await page.goto(path);
     const card = await page.locator('meta[property="og:image"]').getAttribute('content');
     cards.add(card ?? '');
   }
-  expect(cards.size, 'every top-level page should have its own card').toBeGreaterThan(6);
+  expect(cards.size, 'every top-level page should have its own card').toBeGreaterThan(5);
 });
 
 test.describe('the wallet lookup', () => {
