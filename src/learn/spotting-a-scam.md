@@ -1,6 +1,7 @@
 ---
 title: How to spot a scam
 summary: The handful of checks that catch almost everything, and the one mistake that costs people the most.
+category: safety
 order: 1
 updated: 2026-08-31
 ---

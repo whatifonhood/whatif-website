@@ -1,6 +1,7 @@
 ---
 title: Self-custody basics
 summary: What a wallet actually is, what the recovery phrase does, and the mistakes that are not recoverable.
+category: safety
 order: 2
 updated: 2026-08-31
 ---

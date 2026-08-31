@@ -16,15 +16,6 @@
       ]
     },
     {
-      "source": "/memes/make/:path*",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; manifest-src 'self'; upgrade-insecure-requests; img-src 'self' data: blob:"
-        }
-      ]
-    },
-    {
       "source": "/holdings/:path*",
       "headers": [
         {

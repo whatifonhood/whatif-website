@@ -52,12 +52,6 @@ const PAGES = [
     sub: 'Full resolution, no watermark, no credit needed',
   },
   {
-    file: 'og-maker.jpg',
-    kicker: 'Meme maker',
-    title: 'Make one. Post it.',
-    sub: 'Eight formats, four poses, your words',
-  },
-  {
     file: 'og-pfp.jpg',
     kicker: 'The pool',
     title: 'Find the coin that is you',

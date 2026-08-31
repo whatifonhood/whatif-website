@@ -4,7 +4,7 @@
  * Each is a plain inline SVG: no icon library, no extra request.
  */
 interface Props {
-  name: 'x' | 'telegram' | 'arrow-up-right' | 'menu' | 'close' | 'chevron-down';
+  name: 'x' | 'telegram' | 'arrow-up-right' | 'menu' | 'close' | 'chevron-down' | 'globe';
   size?: number;
   class?: string;
 }
@@ -19,6 +19,14 @@ const { name, size = 16, class: className = '' } = Astro.props;
   aria-hidden="true"
   class:list={[className]}
 >
+  {
+    name === 'globe' && (
+      <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
+      </g>
+    )
+  }
   {
     name === 'x' && (
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644Z" />

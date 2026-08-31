@@ -1,6 +1,7 @@
 ---
 title: The $IF specifics
 summary: The contract, the supply, the burn, and every claim with the link that proves it.
+category: token
 order: 6
 updated: 2026-08-31
 ---

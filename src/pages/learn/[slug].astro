@@ -4,6 +4,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import { SITE } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import { getLearnPages } from '../../lib/learn.ts';
+import Icons from '../../components/ui/Icons.astro';
 
 /**
  * One Learn page.
@@ -27,6 +28,7 @@ const all = getLearnPages();
 const entry = all.find((page) => page.slug === slug);
 const index = all.findIndex((page) => page.slug === slug);
 const next = all[index + 1];
+const previous = all[index - 1];
 
 const key = Object.keys(entries).find((path) => path.endsWith(`/${slug}.md`));
 const Content = key ? entries[key]?.Content : undefined;
@@ -42,28 +44,62 @@ const Content = key ? entries[key]?.Content : undefined;
   socialImage={`${SITE.url}/og-default.jpg`}
 >
   <div class="mx-auto w-full max-w-2xl px-5 py-12 sm:px-8">
+    <!--
+      A way out at the top, not only at the bottom. Somebody who opens a page and
+      realises it is not the one they wanted should not have to scroll a
+      thousand words to get back.
+    -->
+    <a
+      href="/learn/"
+      class="mb-8 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-lime"
+    >
+      <Icons name="arrow-up-right" size={11} class="-rotate-[135deg]" />
+      {copy.pages.learn.backToIndex}
+    </a>
+
     <article class="prose-if">
       {Content && <Content />}
     </article>
 
-    <nav class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-8">
+    <nav class="mt-14 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
+      {
+        previous ? (
+          <a
+            href={`/learn/${previous.slug}/`}
+            class="card p-4 transition-colors hover:border-lime/50"
+          >
+            <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+              {copy.pages.learn.previous}
+            </span>
+            <span class="mt-1 block text-sm font-semibold text-ink">{previous.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a
+            href={`/learn/${next.slug}/`}
+            class="card p-4 text-right transition-colors hover:border-lime/50 sm:col-start-2"
+          >
+            <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+              {copy.pages.learn.next}
+            </span>
+            <span class="mt-1 block text-sm font-semibold text-ink">{next.title}</span>
+          </a>
+        )
+      }
+    </nav>
+
+    <p class="mt-8 text-center">
       <a
         href="/learn/"
         class="font-mono text-[11px] uppercase tracking-wider text-faint hover:text-lime"
       >
         {copy.pages.learn.backToIndex}
       </a>
-      {
-        next && (
-          <a
-            href={`/learn/${next.slug}/`}
-            class="font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
-          >
-            {copy.pages.learn.next} {next.title}
-          </a>
-        )
-      }
-    </nav>
+    </p>
   </div>
 </PageLayout>
 

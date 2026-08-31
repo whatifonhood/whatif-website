@@ -1,16 +1,10 @@
 ---
-import {
-  LINKS,
-  LOCALE_NAMES,
-  LOCALE_PATHS,
-  LOCALES,
-  MARKETS,
-  type Locale,
-} from '../../config/site.ts';
+import { LINKS, LOCALE_PATHS, MARKETS, type Locale } from '../../config/site.ts';
 import { TOOL_ROUTES } from '../../config/navigation.ts';
 import { getCopy } from '../../content/index.ts';
 import Button from '../ui/Button.astro';
 import ToolsMenu from '../ui/ToolsMenu.astro';
+import LanguageMenu from '../ui/LanguageMenu.astro';
 import Icons from '../ui/Icons.astro';
 import Wordmark from '../../assets/wordmark.svg';
 
@@ -72,21 +66,7 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
       <ToolsMenu locale={locale} />
 
       <div class="mx-1 flex items-center gap-0.5" role="group" aria-label={copy.nav.languageLabel}>
-        {
-          LOCALES.map((code) => (
-            <a
-              href={LOCALE_PATHS[code]}
-              hreflang={code}
-              aria-current={code === locale ? 'page' : undefined}
-              class:list={[
-                'rounded-md px-2 py-1.5 font-mono text-[11px] uppercase transition-colors',
-                code === locale ? 'bg-surface-2 text-lime' : 'text-faint hover:text-ink',
-              ]}
-            >
-              {LOCALE_NAMES[code]}
-            </a>
-          ))
-        }
+        <LanguageMenu locale={locale} />
       </div>
 
       <a
@@ -152,21 +132,7 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
         role="group"
         aria-label={copy.nav.languageLabel}
       >
-        {
-          LOCALES.map((code) => (
-            <a
-              href={LOCALE_PATHS[code]}
-              hreflang={code}
-              aria-current={code === locale ? 'page' : undefined}
-              class:list={[
-                'rounded-md border border-line px-3 py-1.5 font-mono text-[11px] uppercase',
-                code === locale ? 'bg-surface-2 text-lime' : 'text-faint',
-              ]}
-            >
-              {LOCALE_NAMES[code]}
-            </a>
-          ))
-        }
+        <LanguageMenu locale={locale} inline />
       </div>
 
       <Button
