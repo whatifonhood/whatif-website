@@ -1,6 +1,5 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { CATEGORIES } from '../../config/what-if.ts';
 import { SITE, type Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import Icons from '../ui/Icons.astro';
@@ -36,22 +35,8 @@ const page = copy.pages.ask;
     data-label-copied={page.copied}
     class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
   >
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-2">
-      <button type="button" data-ask-category="all" aria-pressed="true" class="ask-chip">
-        {page.categories.all}
-      </button>
-      {
-        CATEGORIES.map((category) => (
-          <button type="button" data-ask-category={category} aria-pressed="false" class="ask-chip">
-            {page.categories[category]}
-          </button>
-        ))
-      }
-    </div>
-
     <!-- The question -->
-    <div class="mt-8 rounded-2xl border border-line bg-surface p-8 sm:p-12">
+    <div class="rounded-2xl border border-line bg-surface p-8 sm:p-12">
       <p data-ask-question aria-live="polite" class="ask-question"></p>
     </div>
 

@@ -390,14 +390,6 @@ export const zh: SiteCopy = {
       possibilities: '种可能的问题',
       hint: '按空格换一个',
       shareText: '{question}\n\n还在问。',
-      categories: {
-        all: '全部',
-        money: '钱',
-        cosmic: '宇宙',
-        dread: '焦虑',
-        absurd: '荒诞',
-        degen: 'Degen',
-      },
     },
     learn: {
       title: '了解',

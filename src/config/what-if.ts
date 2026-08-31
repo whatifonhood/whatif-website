@@ -1,54 +1,39 @@
 /**
  * The question generator.
  *
- * Patterns with slots, filled from word banks. Every pattern is written so that
- * any combination of its slots reads as a real sentence — the alternative, one
- * generic pattern with everything poured through it, produces nonsense about
- * nine times in ten.
+ * THE RULE THIS FILE EXISTS TO ENFORCE: only vary what is interchangeable
+ * within a single idea, and never join two ideas.
  *
- * The total is computed from the banks rather than typed in, so the count on the
- * page is always true. Adding a word to a bank raises it automatically.
+ * The first version combined freely across slots and joined clauses with "and".
+ * Every sentence was grammatical and most were nonsense — "What if my portfolio
+ * is a personality test and none of it mattered?" — because meaning does not
+ * compose the way grammar does. Two ideas glued together are not a thought.
  *
- * Written in English only for now. Generating grammatical sentences by
- * combination in a language nobody here can check would produce confident
- * nonsense, so the interface is translated and the questions are not.
+ * So there are two kinds of question here and nothing else:
+ *
+ *   PATTERNS  one idea with slots where every value is equally sensible. An
+ *             amount, a coin, a date: swap any of them and the question still
+ *             means something. These generate the volume.
+ *
+ *   LINES     one idea, written whole. Jokes and thoughts cannot be decomposed
+ *             into slots without losing the thing that made them land, so they
+ *             are not.
+ *
+ * Adding to LINES is the way to make this better. Adding another free-combining
+ * slot is the way to make it worse, which is how it went wrong the first time.
  */
 
-/**
- * Slots where saying nothing should usually win.
- *
- * The opener and the tail are seasoning. Picked evenly they land on nearly
- * every question at once, which is how "3am thought. What if I say exactly the
- * wrong thing and nothing happens at all, and the answer changes nothing?"
- * happens. The value is the chance of leaving the slot empty.
- */
-export const SPARSE_SLOTS: Record<string, number> = {
-  opener: 0.74,
-  tail: 0.62,
-};
-
-export const CATEGORIES = ['money', 'cosmic', 'dread', 'absurd', 'degen'] as const;
+/** Kept for balance when picking, not shown as a filter. */
+export const CATEGORIES = ['deep', 'money', 'market'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-/** Slot banks, referenced from patterns as {name}. */
+/**
+ * Slot banks.
+ *
+ * Every entry has to read correctly in every pattern that uses its slot. If a
+ * word only works in one of them, it belongs in a LINE instead.
+ */
 export const BANKS: Record<string, string[]> = {
-  /**
-   * What comes before the question.
-   *
-   * The brand phrase itself never changes — this only sets the voice it is
-   * asked in, and multiplies across every pattern.
-   */
-  opener: [
-    '',
-    'But ',
-    'Okay but ',
-    'Hear me out. ',
-    'Seriously though. ',
-    '3am thought. ',
-    'Genuine question. ',
-    'Nobody asked, but ',
-  ],
-
   amount: [
     'my rent',
     'my lunch money',
@@ -60,6 +45,8 @@ export const BANKS: Record<string, string[]> = {
     'my Christmas bonus',
     'the emergency fund',
     'a tenner',
+    'the deposit',
+    'a month of coffees',
   ],
   asset: [
     '$IF',
@@ -68,14 +55,12 @@ export const BANKS: Record<string, string[]> = {
     'the frog one',
     'the one with the terrible logo',
     'the thing everyone said was a scam',
-    'literally anything',
-    'the one I screenshotted and never bought',
     'the one with a cat on it',
     'the coin named after a typo',
-    'whatever was trending that week',
-    'the one my barber mentioned',
     'the ticker I could not pronounce',
     'the thing I called a bubble',
+    'whatever was trending that week',
+    'the one my barber mentioned',
   ],
   when: [
     'at launch',
@@ -87,61 +72,20 @@ export const BANKS: Record<string, string[]> = {
     'the day I first heard about it',
     'when it was still funny',
     'before the group chat found it',
-    'the week I nearly did',
     'back when it cost nothing',
-    'the night I could not sleep',
+    'the week I nearly did',
   ],
   consequence: [
-    'it ten-xed overnight',
-    'it keeps going',
-    'it doubles by Friday',
     'it never comes back',
     'that was the bottom',
+    'it doubles by Friday',
     'everyone finds out',
     'nothing happens at all',
-    'I have to explain it at Christmas',
-    'the chart does the thing',
     'I am the last one holding',
-    'it turns out I was early',
+    'the chart does the thing',
     'somebody screenshots it',
+    'I was early after all',
     'the group chat goes quiet',
-  ],
-
-  /**
-   * A closing clause that reads correctly after almost any question above.
-   *
-   * This is where most of the variety comes from: one bank multiplying across
-   * every pattern beats writing hundreds of patterns by hand. The empty string
-   * is deliberate — sometimes the question is better on its own.
-   */
-  tail: [
-    '',
-    ', and nobody notices',
-    ', and that was the whole point',
-    ', and we never speak of it again',
-    ', and it was always going to be fine',
-    ', and I still would not change it',
-    ', and the answer changes nothing',
-    ', and everyone already knew',
-    ', and it only matters to me',
-    ', and that is somehow worse',
-    ', and I find out on a Tuesday',
-    ', and it is funnier that way',
-    ', and I would still ask again',
-  ],
-  profound: [
-    'the universe is just checking',
-    'we were always going to end up here',
-    'hope was never the lie',
-    'the answer was the question',
-    'somebody is having this exact thought right now',
-    'this is the timeline that works',
-    'the point was the asking',
-    'none of it mattered and that was fine',
-    'the version of me that did it is doing fine',
-    'every door was open and I only tried one',
-    'the good ending needed no decision at all',
-    'we are early to something that is not money',
   ],
   dread: [
     'get hit by a car',
@@ -150,40 +94,22 @@ export const BANKS: Record<string, string[]> = {
     'finally check my balance',
     'run into them',
     'forget the password',
-    'get found out',
     'read the group chat',
-    'have to explain this to my mother',
     'open the app',
+    'get found out',
+    'answer honestly',
   ],
-  absurd: [
-    'the cat has been the dev this whole time',
-    'we are all in the same group chat',
-    'my portfolio is a personality test',
-    'the chart is watching me back',
-    'the whitepaper was a menu',
-    'every candle is a tiny biography',
-    'the moon is right there and nobody checked',
-    'the bear market was a rehearsal',
-    'somebody is holding one token out of politeness',
-    'the roadmap was written in the past tense',
-  ],
-  degen: [
+  market: [
     'the bottom',
     'the top',
     'the one',
     'exactly what it looks like',
-    'a bull trap wearing a bull costume',
     'the last good entry',
-    'a rounding error in someone else’s week',
-    'the part of the story people retell',
+    'the part people retell later',
+    'a bull trap in a bull costume',
+    'the quiet bit before it moves',
   ],
-  /**
-   * Neutral actors only.
-   *
-   * Anything self-describing ("the person who sold") contradicts half the verb
-   * bank and produces lines like "the person who sold never sold". Every entry
-   * here has to read correctly with every verb below.
-   */
+  /** Neutral subjects: every one reads correctly with every verb below. */
   person: [
     'I',
     'we',
@@ -192,18 +118,12 @@ export const BANKS: Record<string, string[]> = {
     'the last buyer',
     'the quiet one in the group chat',
     'whoever is reading this',
-    'the version of me that waited',
     'my ex',
     'the smartest person I know',
     'the one who never posts',
+    'the person who talked me out of it',
   ],
-  /**
-   * Past tense, no copula, no negation.
-   *
-   * "was early" agrees with "I" and not with "we"; "never sold" turns "nobody"
-   * into a double negative. Everything here reads correctly after every subject
-   * above, which is the only way a generator can promise a grammatical sentence.
-   */
+  /** Past tense, no copula, no negation — see the note on `person`. */
   verb: [
     'got it right',
     'got there early',
@@ -212,66 +132,153 @@ export const BANKS: Record<string, string[]> = {
     'sold at the top',
     'knew all along',
     'just got lucky',
-    'guessed and got away with it',
-    'stopped checking and slept fine',
     'saw it coming',
     'called it and told nobody',
     'looked away at the wrong moment',
+    'guessed and got away with it',
   ],
 };
 
 export interface Pattern {
   category: Category;
-  /** Slot names in braces, e.g. "What $IF I had put {amount} into {asset}?" */
+  /** One idea. Slots only where any value is equally sensible. */
   text: string;
 }
 
+/**
+ * Every pattern is a single idea.
+ *
+ * None of these join two clauses. "What if I sell and {consequence}?" is one
+ * thought — a cause and its result — not two ideas stapled together, which is
+ * why it survives every combination.
+ */
 export const PATTERNS: Pattern[] = [
-  // Money — the regret the whole site is built on.
-  { category: 'money', text: '{opener}What if I had put {amount} into {asset} {when}{tail}?' },
-  { category: 'money', text: '{opener}What if {amount} into {asset} was all it ever took{tail}?' },
-  { category: 'money', text: '{opener}What if I sell {asset} and {consequence}?' },
-  { category: 'money', text: '{opener}What if I hold and {consequence}?' },
-  {
-    category: 'money',
-    text: '{opener}What if the only difference was buying {asset} {when}{tail}?',
-  },
-  { category: 'money', text: '{opener}What if I had spent {amount} on {asset} instead{tail}?' },
-  { category: 'money', text: '{opener}What if {person} put {amount} into {asset} {when}?' },
+  { category: 'money', text: 'What if I had put {amount} into {asset} {when}?' },
+  { category: 'money', text: 'What if I had bought {asset} {when}?' },
+  { category: 'money', text: 'What if {amount} into {asset} was all it took?' },
+  { category: 'money', text: 'What if I sell and {consequence}?' },
+  { category: 'money', text: 'What if I hold and {consequence}?' },
+  { category: 'money', text: 'What if I had spent {amount} on {asset} instead?' },
 
-  // Cosmic — the register the landing page opens in.
-  { category: 'cosmic', text: '{opener}What if {profound}{tail}?' },
-  { category: 'cosmic', text: '{opener}What if {profound}, and nobody had to be told?' },
-  { category: 'cosmic', text: '{opener}What if {person} {verb}{tail}?' },
-  { category: 'cosmic', text: '{opener}What if {person} {verb} and {profound}?' },
+  { category: 'deep', text: 'What if I {dread} tomorrow?' },
+  { category: 'deep', text: 'What if today is the day I {dread}?' },
+  { category: 'deep', text: 'What if I never {dread} again?' },
 
-  // Dread — ordinary anxiety, which is where the question usually starts.
-  { category: 'dread', text: '{opener}What if I {dread} tomorrow{tail}?' },
-  { category: 'dread', text: '{opener}What if I {dread} and {consequence}?' },
-  { category: 'dread', text: '{opener}What if today is the day I {dread}{tail}?' },
-  { category: 'dread', text: '{opener}What if I {dread} and {person} {verb}?' },
-
-  // Absurd.
-  { category: 'absurd', text: '{opener}What if {absurd}{tail}?' },
-  { category: 'absurd', text: '{opener}What if {absurd}, and {person} {verb}?' },
-  { category: 'absurd', text: '{opener}What if {absurd} and {consequence}?' },
-
-  { category: 'cosmic', text: '{opener}What if {profound} and {person} {verb}?' },
-  { category: 'dread', text: '{opener}What if I {dread} and {person} {verb}?' },
-  { category: 'absurd', text: '{opener}What if {absurd} and {profound}?' },
-
-  // Degen.
-  { category: 'degen', text: '{opener}What if this is {degen}{tail}?' },
-  { category: 'degen', text: '{opener}What if this is {degen} and {person} {verb}?' },
-  { category: 'degen', text: '{opener}What if {person} {verb} because this was {degen}?' },
-  { category: 'degen', text: '{opener}What if this is {degen} and {consequence}?' },
+  { category: 'market', text: 'What if this is {market}?' },
+  { category: 'market', text: 'What if that was {market}?' },
+  { category: 'market', text: 'What if {person} {verb}?' },
 ];
 
-/** How many distinct questions the banks can produce. Counted, never guessed. */
-export function countPossibilities(patterns: Pattern[] = PATTERNS): number {
-  return patterns.reduce((total, pattern) => {
+/**
+ * Questions written whole.
+ *
+ * These are the ones with a joke or a thought in them, which is exactly what a
+ * slot destroys. Adding here is how this gets better — it costs nothing and
+ * cannot produce nonsense.
+ */
+export const LINES: { category: Category; text: string }[] = [
+  // ---------------------------------------------------------------- deep
+  // The register the landing page opens in, and the one the coin is actually
+  // about. The 3am question, not the trading-desk one.
+  {
+    category: 'deep',
+    text: 'What if every choice made another version of you, and they are all fine?',
+  },
+  { category: 'deep', text: 'What if the point was never to arrive?' },
+  {
+    category: 'deep',
+    text: 'What if someone is alive because of something you have forgotten doing?',
+  },
+  {
+    category: 'deep',
+    text: 'What if you have already met the most important person you will ever meet?',
+  },
+  {
+    category: 'deep',
+    text: 'What if the day you cannot remember was the one that changed everything?',
+  },
+  { category: 'deep', text: 'What if being forgotten is not the same as not mattering?' },
+  { category: 'deep', text: 'What if kindness is the only thing that compounds?' },
+  { category: 'deep', text: 'What if you are already the person you were trying to become?' },
+  { category: 'deep', text: 'What if nobody is coming, and that is the good news?' },
+  { category: 'deep', text: 'What if the fear was borrowed from someone who is gone?' },
+  { category: 'deep', text: 'What if the waiting was the life?' },
+  { category: 'deep', text: 'What if you are the ancestor somebody thanks?' },
+  { category: 'deep', text: 'What if meaning is made and never found?' },
+  { category: 'deep', text: 'What if the universe is not indifferent, only quiet?' },
+  { category: 'deep', text: 'What if every stranger is mid-sentence in a story as long as yours?' },
+  { category: 'deep', text: 'What if you could see the whole of it and still choose this?' },
+  { category: 'deep', text: 'What if regret is just proof you cared about the outcome?' },
+  { category: 'deep', text: 'What if the road not taken was worse?' },
+  { category: 'deep', text: 'What if you are somebody else’s what if?' },
+  { category: 'deep', text: 'What if the last time happened and nobody announced it?' },
+  { category: 'deep', text: 'What if love outlives every single one of us?' },
+  { category: 'deep', text: 'What if one voice was enough to end it?' },
+  { category: 'deep', text: 'What if the broken become the builders?' },
+  { category: 'deep', text: 'What if hope was never the stupid option?' },
+  { category: 'deep', text: 'What if a child’s idea rewrites the next hundred years?' },
+  { category: 'deep', text: 'What if mercy is stronger than power and always was?' },
+  { category: 'deep', text: 'What if we remembered every name?' },
+  { category: 'deep', text: 'What if the darkest hour is holding the dawn?' },
+  { category: 'deep', text: 'What if forgiving them was the cure?' },
+  { category: 'deep', text: 'What if nobody had to grieve alone?' },
+  { category: 'deep', text: 'What if you could save one life without ever knowing?' },
+  { category: 'deep', text: 'What if the small kindness was the enormous one?' },
+  { category: 'deep', text: 'What if certainty was the thing holding you back?' },
+  { category: 'deep', text: 'What if doubt is how thinking feels from the inside?' },
+  { category: 'deep', text: 'What if time is not running out, only running?' },
+  { category: 'deep', text: 'What if you are allowed to change your mind?' },
+  { category: 'deep', text: 'What if the question is better company than the answer?' },
+  { category: 'deep', text: 'What if there is no lesson in it, only weather?' },
+  { category: 'deep', text: 'What if the good ending needed no decision at all?' },
+  { category: 'deep', text: 'What if you already have enough and nobody told you?' },
+  { category: 'deep', text: 'What if the thing you are avoiding takes ten minutes?' },
+  { category: 'deep', text: 'What if everyone else is guessing too?' },
+  { category: 'deep', text: 'What if the story is better because you did not know?' },
+  { category: 'deep', text: 'What if being early feels exactly like being wrong?' },
+  { category: 'deep', text: 'What if you only regret the ones you did not try?' },
+  { category: 'deep', text: 'What if somebody needed you to speak first?' },
+  { category: 'deep', text: 'What if the universe is just checking?' },
+  { category: 'deep', text: 'What if this is the good part and you are busy?' },
+  { category: 'deep', text: 'What if the worst thing already happened and you survived it?' },
+  { category: 'deep', text: 'What if none of it mattered, and that was fine?' },
+  { category: 'deep', text: 'What if you go to bed instead, and it is still there tomorrow?' },
+  { category: 'deep', text: 'What if the door was open the whole time?' },
+  { category: 'deep', text: 'What if you asked for exactly what you wanted?' },
+  { category: 'deep', text: 'What if nobody is actually watching?' },
+  { category: 'deep', text: 'What if you are not the problem, and never were?' },
+  { category: 'deep', text: 'What if it works out and you have no story to tell?' },
+
+  // ---------------------------------------------------------------- money
+  { category: 'money', text: 'What if the money was never the point?' },
+  { category: 'money', text: 'What if you only ever needed one good decision?' },
+  { category: 'money', text: 'What if you already made it and did not notice?' },
+  { category: 'money', text: 'What if the sensible choice was the expensive one?' },
+  { category: 'money', text: 'What if I make a million and nothing changes?' },
+  { category: 'money', text: 'What if I make a million and everything does?' },
+  { category: 'money', text: 'What if the person who sold was right?' },
+  { category: 'money', text: 'What if I stopped checking for a year?' },
+  { category: 'money', text: 'What if I bought the top and it did not matter?' },
+  { category: 'money', text: 'What if enough arrived and I kept going anyway?' },
+
+  // ---------------------------------------------------------------- market
+  { category: 'market', text: 'What if the chart is watching me back?' },
+  { category: 'market', text: 'What if the whitepaper was a menu?' },
+  { category: 'market', text: 'What if the bear market was a rehearsal?' },
+  { category: 'market', text: 'What if we are early to something that is not money?' },
+  { category: 'market', text: 'What if the moon is right there and nobody checked?' },
+  { category: 'market', text: 'What if every candle is a tiny biography?' },
+  { category: 'market', text: 'What if the meme was the fundamentals?' },
+  { category: 'market', text: 'What if nobody knows what they are doing?' },
+  { category: 'market', text: 'What if this one is different, for once?' },
+  { category: 'market', text: 'What if the answer arrives on a Tuesday?' },
+];
+
+/** How many distinct questions exist. Counted, never guessed. */
+export function countPossibilities(): number {
+  const fromPatterns = PATTERNS.reduce((total, pattern) => {
     const slots = [...pattern.text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
-    const product = slots.reduce((n, slot) => n * (BANKS[slot]?.length ?? 1), 1);
-    return total + product;
+    return total + slots.reduce((n, slot) => n * (BANKS[slot]?.length ?? 1), 1);
   }, 0);
+  return fromPatterns + LINES.length;
 }

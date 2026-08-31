@@ -412,14 +412,6 @@ export const es: SiteCopy = {
       possibilities: 'preguntas posibles',
       hint: 'pulsa espacio para otra',
       shareText: '{question}\n\nSeguimos preguntando.',
-      categories: {
-        all: 'Todo',
-        money: 'Dinero',
-        cosmic: 'Cósmico',
-        dread: 'Angustia',
-        absurd: 'Absurdo',
-        degen: 'Degen',
-      },
     },
     learn: {
       title: 'Aprende',

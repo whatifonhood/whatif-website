@@ -403,14 +403,6 @@ export const tr: SiteCopy = {
       possibilities: 'olası soru',
       hint: 'yenisi için boşluğa bas',
       shareText: '{question}\n\nHâlâ soruyoruz.',
-      categories: {
-        all: 'Hepsi',
-        money: 'Para',
-        cosmic: 'Kozmik',
-        dread: 'Endişe',
-        absurd: 'Absürt',
-        degen: 'Degen',
-      },
     },
     learn: {
       title: 'Öğren',

@@ -385,6 +385,10 @@ test.describe('the question generator', () => {
       if (/ {2}| ,| \?/.test(text)) problems.push(`spacing: ${text}`);
       if (!text.endsWith('?')) problems.push(`not a question: ${text}`);
       if (/\{\w+\}/.test(text)) problems.push(`unfilled slot: ${text}`);
+      // The failure this generator was rebuilt to remove: two unrelated ideas
+      // stapled together, which is grammatical and meaningless.
+      if ((text.match(/ and /g) ?? []).length > 1) problems.push(`two ideas: ${text}`);
+      if (text.length > 90) problems.push(`too long: ${text}`);
       // Agreement: "we was early", "I is still asking".
       if (/\b(we|they) was\b|\bI is\b|\beveryone were\b/.test(text)) {
         problems.push(`agreement: ${text}`);
@@ -398,21 +402,6 @@ test.describe('the question generator', () => {
     expect(problems.slice(0, 3)).toEqual([]);
     // Repeats are possible but should be vanishingly rare with a million options.
     expect(seen.size, 'the generator is repeating itself').toBeGreaterThan(30);
-  });
-
-  test('a category filter changes what comes out', async ({ page }) => {
-    await page.goto('/ask/');
-    await page.locator('[data-ask-category="dread"]').click();
-
-    const question = page.locator('[data-ask-question]');
-    for (let i = 0; i < 6; i += 1) {
-      await expect(question).not.toBeEmpty();
-      await page.locator('[data-ask-again]').click();
-    }
-    await expect(page.locator('[data-ask-category="dread"]')).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
   });
 
   test('the count on the page is the real one', async ({ page }) => {

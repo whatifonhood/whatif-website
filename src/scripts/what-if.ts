@@ -1,81 +1,75 @@
 /**
  * The question generator.
  *
- * Picks a pattern, fills its slots, draws the result. Everything happens on the
- * visitor's device — there is no request, so it works offline and instantly.
+ * Draws a question and draws a card for it. Everything happens on the visitor's
+ * device — no request, so it is instant and works offline.
  *
- * Patterns are picked uniformly rather than in proportion to how many
- * combinations each can produce. Weighting by combinations would bury the short,
- * funny categories under the money ones, which have the most slots and would
- * otherwise appear nine times in ten.
+ * The rule that keeps the output sensible lives in src/config/what-if.ts: vary
+ * only what is interchangeable within one idea, and never join two ideas. This
+ * file picks and renders.
  */
-import {
-  BANKS,
-  CATEGORIES,
-  PATTERNS,
-  SPARSE_SLOTS,
-  countPossibilities,
-  type Category,
-} from '../config/what-if.ts';
+import { BANKS, LINES, PATTERNS, countPossibilities, type Category } from '../config/what-if.ts';
 import { track } from '../lib/analytics.ts';
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 675;
 
 /** How many recent questions to avoid repeating. */
-const MEMORY = 40;
+const MEMORY = 30;
+
+/**
+ * How often each register comes up.
+ *
+ * The philosophical one leads: it is the question the whole coin is built on and
+ * the one worth reading twice. Money is the regret the Machine already answers
+ * in detail, and the market jokes are garnish, so they take the smallest share.
+ */
+const WEIGHTS: Record<Category, number> = { deep: 0.62, money: 0.24, market: 0.14 };
 
 function pick<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)]!;
 }
 
-/**
- * Fills a pattern's slots.
- *
- * The capital on "What" has to follow whatever the opener left behind: "But
- * what if…" but "Hear me out. What if…". Without this every prefixed question
- * reads "Okay but What if", which is the sort of detail that makes a generator
- * feel generated.
- */
+/** Fills a pattern's slots. */
 function fill(text: string): string {
-  const filled = text
-    .replace(/\{(\w+)\}/g, (_, slot: string) => {
-      const bank = BANKS[slot];
-      if (!bank) return '';
-      // Seasoning slots stay empty most of the time — see SPARSE_SLOTS. Picked
-      // evenly they land on nearly every question at once and it reads as a
-      // run-on rather than a thought.
-      const skipChance = SPARSE_SLOTS[slot];
-      if (skipChance !== undefined) {
-        if (Math.random() < skipChance) return '';
-        const real = bank.filter((entry) => entry !== '');
-        return real.length > 0 ? pick(real) : '';
-      }
-      return pick(bank);
-    })
-    // An empty tail or opener can leave a doubled space behind it.
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s+([,?])/g, '$1')
-    .trim();
-
-  // Mid-sentence when the opener runs on, capitalised when it ended.
-  return filled.replace(/(^|[.!?]\s+)What if|(\S\s+)What if/g, (_match, start, midway) =>
-    midway ? `${midway}what if` : `${start}What if`,
-  );
+  return text.replace(/\{(\w+)\}/g, (_, slot: string) => {
+    const bank = BANKS[slot];
+    return bank ? pick(bank) : '';
+  });
 }
 
-/** A question, capitalised however the opener left it. */
-function generate(category: Category | 'all', recent: string[]): string {
-  const pool = category === 'all' ? PATTERNS : PATTERNS.filter((p) => p.category === category);
-  const patterns = pool.length > 0 ? pool : PATTERNS;
+function pickCategory(): Category {
+  let roll = Math.random();
+  for (const entry of Object.entries(WEIGHTS) as [Category, number][]) {
+    roll -= entry[1];
+    if (roll <= 0) return entry[0];
+  }
+  return 'deep';
+}
 
-  // Try a few times to avoid something already on screen. With a million
-  // combinations a collision is rare, so this gives up rather than looping.
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const text = fill(pick(patterns).text);
+/**
+ * One question.
+ *
+ * Written lines and fillable patterns sit in the same pool for the chosen
+ * register, so a hand-written thought is as likely to come up as a generated
+ * one — which keeps the average quality up where the written ones are.
+ */
+function generate(recent: string[]): string {
+  const draw = (): string => {
+    const category = pickCategory();
+    const pool = [
+      ...LINES.filter((line) => line.category === category).map((line) => line.text),
+      ...PATTERNS.filter((pattern) => pattern.category === category).map((p) => p.text),
+    ];
+    return fill(pool.length > 0 ? pick(pool) : pick(LINES).text);
+  };
+
+  // Repeats are possible in a set this size, so a few attempts are worth making.
+  for (let attempt = 0; attempt < 14; attempt += 1) {
+    const text = draw();
     if (!recent.includes(text)) return text;
   }
-  return fill(pick(patterns).text);
+  return draw();
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -106,8 +100,8 @@ function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: number)
 /**
  * The share card.
  *
- * The question is the whole design: sized to fill the space it has, so a short
- * one lands hard and a long one still fits.
+ * Set as prose, not as a headline. Uppercase black italic at this size reads as
+ * shouting, and these are meant to be read rather than announced.
  */
 async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<void> {
   const context = canvas.getContext('2d');
@@ -116,18 +110,18 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   canvas.height = CARD_HEIGHT;
 
   const PAD = 84;
-  const boxWidth = CARD_WIDTH - PAD * 2;
+  const boxWidth = CARD_WIDTH - PAD * 2 - 110;
 
   context.fillStyle = '#080B07';
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  const glow = context.createRadialGradient(600, 300, 0, 600, 300, 660);
-  glow.addColorStop(0, 'rgba(143,206,2,0.17)');
+  const glow = context.createRadialGradient(560, 300, 0, 560, 300, 640);
+  glow.addColorStop(0, 'rgba(143,206,2,0.15)');
   glow.addColorStop(1, 'rgba(8,11,7,0)');
   context.fillStyle = glow;
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  context.strokeStyle = 'rgba(34,48,18,0.32)';
+  context.strokeStyle = 'rgba(34,48,18,0.3)';
   context.lineWidth = 1;
   for (let x = 0; x < CARD_WIDTH; x += 80) {
     context.beginPath();
@@ -139,30 +133,28 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
 
-  // Set as prose rather than as a headline: sentence case at a normal weight,
-  // with room between the lines. Uppercase black italic at this size reads as
-  // shouting, and a long question becomes a wall of it.
-  let size = 62;
+  // Short questions get to be large; long ones step down until they fit.
+  let size = 66;
   let lines: string[] = [];
-  const maxHeight = 340;
-  while (size > 24) {
+  const maxHeight = 320;
+  while (size > 26) {
     context.font = `600 ${size}px Archivo, sans-serif`;
     lines = wrap(context, question, boxWidth);
-    if (lines.length <= 5 && lines.length * size * 1.32 <= maxHeight) break;
+    if (lines.length <= 5 && lines.length * size * 1.3 <= maxHeight) break;
     size -= 2;
   }
 
-  const lineHeight = size * 1.32;
-  let y = 208 + (maxHeight - lines.length * lineHeight) / 2;
+  const lineHeight = size * 1.3;
+  let y = 218 + (maxHeight - lines.length * lineHeight) / 2;
   context.fillStyle = '#E9F0DD';
   for (const line of lines) {
     context.fillText(line, PAD, y);
     y += lineHeight;
   }
 
-  context.font = '700 21px "JetBrains Mono", monospace';
+  context.font = '700 20px "JetBrains Mono", monospace';
   context.fillStyle = '#8FCE02';
-  context.fillText('STILL ASKING.', PAD, 128);
+  context.fillText('STILL ASKING.', PAD, 126);
 
   context.strokeStyle = 'rgba(34,48,18,0.9)';
   context.lineWidth = 1;
@@ -171,15 +163,15 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   context.lineTo(CARD_WIDTH - PAD, CARD_HEIGHT - 112);
   context.stroke();
 
-  context.font = '700 20px "JetBrains Mono", monospace';
+  context.font = '700 19px "JetBrains Mono", monospace';
   context.fillStyle = '#8FCE02';
   context.fillText('WHATIFONHOOD.COM/ASK', PAD, CARD_HEIGHT - 62);
 
   try {
     const figure = await loadImage('/machine/poses/thinking.webp');
-    const height = 190;
+    const height = 200;
     const width = (figure.width / figure.height) * height;
-    context.drawImage(figure, CARD_WIDTH - width - PAD, CARD_HEIGHT - height - 30, width, height);
+    context.drawImage(figure, CARD_WIDTH - width - PAD, CARD_HEIGHT - height - 28, width, height);
   } catch {
     /* the question reads fine on its own */
   }
@@ -203,12 +195,11 @@ export function initWhatIf(): void {
     shareTemplate: root.dataset.shareText ?? '',
   };
 
-  let category: Category | 'all' = 'all';
   const recent: string[] = [];
   let cardUrl: string | null = null;
 
   const ask = () => {
-    const question = generate(category, recent);
+    const question = generate(recent);
     recent.push(question);
     if (recent.length > MEMORY) recent.shift();
 
@@ -237,23 +228,10 @@ export function initWhatIf(): void {
       });
     }
 
-    track('Question Asked', { category });
+    track('Question Asked');
   };
 
   again?.addEventListener('click', ask);
-
-  root.addEventListener('click', (event) => {
-    const button = (event.target as HTMLElement | null)?.closest<HTMLElement>(
-      '[data-ask-category]',
-    );
-    if (!button) return;
-    const next = button.dataset.askCategory ?? 'all';
-    category = (CATEGORIES as readonly string[]).includes(next) ? (next as Category) : 'all';
-    for (const other of root.querySelectorAll<HTMLElement>('[data-ask-category]')) {
-      other.setAttribute('aria-pressed', String(other === button));
-    }
-    ask();
-  });
 
   copyButton?.addEventListener('click', async () => {
     try {
