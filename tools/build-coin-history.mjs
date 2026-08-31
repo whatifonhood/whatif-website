@@ -54,7 +54,7 @@ const COINGECKO_HEADERS = COINGECKO_KEY
   : {};
 
 /** How many coins to include, ordered by how much they actually trade. */
-const MAX_COINS = Number(env.MACHINE_COIN_COUNT) || 200;
+const MAX_COINS = Number(env.MACHINE_COIN_COUNT) || 600;
 const MIN_QUOTE_VOLUME_USD = 300_000;
 /** A coin needs enough history for the question to be interesting. */
 const MIN_MONTHS = 6;
@@ -133,7 +133,7 @@ process.stdout.write(
 );
 process.stdout.write('Reading CoinGecko for names, ranks and logos…\n');
 const meta = new Map();
-for (const page of [1, 2, 3]) {
+for (const page of [1, 2, 3, 4]) {
   const rows = await getJson(
     `${COINGECKO_BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}`,
     1,

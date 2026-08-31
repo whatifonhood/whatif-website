@@ -53,6 +53,14 @@ export interface SiteCopy {
     statsNote: string;
   };
 
+  /** The wall of posts. Hidden entirely when there is nothing to show. */
+  posts: {
+    eyebrow: string;
+    heading: SplitHeading;
+    intro: string;
+    follow: string;
+  };
+
   /** Words that scroll across the band under the hero. */
   marquee: string[];
 
@@ -289,6 +297,14 @@ export interface SiteCopy {
       shareText: (name: string, tier: string) => string;
       odds: string;
       openGenerator: string;
+    };
+    updates: {
+      title: string;
+      eyebrow: string;
+      heading: SplitHeading;
+      intro: string;
+      open: string;
+      feed: string;
     };
     holdings: {
       title: string;

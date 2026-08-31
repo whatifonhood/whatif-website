@@ -38,6 +38,13 @@ export const en: SiteCopy = {
     statsNote: 'Live from the chain. Refreshed when you load the page.',
   },
 
+  posts: {
+    eyebrow: 'From the timeline',
+    heading: { lead: 'People are', accent: 'still asking.' },
+    intro: 'What the community is posting. Rendered here, not embedded — no tracker, no iframe.',
+    follow: 'Follow on X',
+  },
+
   marquee: [
     'What $IF',
     'you aped earlier?',
@@ -373,6 +380,14 @@ export const en: SiteCopy = {
       shareText: (name, tier) => `I pulled ${name} — ${tier}.\n\nWhat $IF this one's you?`,
       odds: 'odds',
       openGenerator: 'Pull your own',
+    },
+    updates: {
+      title: 'Updates',
+      eyebrow: 'What changed',
+      heading: { lead: 'What $IF', accent: 'you missed something?' },
+      intro: 'Everything that has changed on the site, newest first.',
+      open: 'Take a look',
+      feed: 'RSS feed',
     },
     holdings: {
       title: 'Wallet lookup',

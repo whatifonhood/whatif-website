@@ -21,6 +21,7 @@
     "og": "node tools/render-og.mjs",
     "cards": "node tools/render-og.mjs --memes",
     "burns": "node tools/build-burns.mjs",
+    "tweets": "node tools/build-tweets.mjs",
     "memes": "node tools/build-memes.mjs",
     "history": "node tools/build-coin-history.mjs",
     "snapshot": "node tools/update-snapshot.mjs",
