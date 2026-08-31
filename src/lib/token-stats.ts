@@ -40,12 +40,35 @@ export function asPositiveNumber(value: unknown): number | undefined {
   return parsed;
 }
 
+/**
+ * Set while a public API is rate-limiting us, so the page stops asking.
+ *
+ * These endpoints answer 429 when a client is too eager. Continuing to poll
+ * through it keeps the limit tripped and helps nobody, so a 429 puts every
+ * caller on this origin on hold and the page keeps showing what it already had.
+ */
+let throttledUntil = 0;
+
+/** How long a 429 stops us asking. */
+const BACKOFF_MS = 60_000;
+
+export function isThrottled(): boolean {
+  return Date.now() < throttledUntil;
+}
+
 export async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
+  if (isThrottled()) throw new Error('rate-limited; holding off');
+
   const response = await fetch(url, {
     ...init,
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: { accept: 'application/json', ...(init?.headers ?? {}) },
   });
+
+  if (response.status === 429) {
+    throttledUntil = Date.now() + BACKOFF_MS;
+    throw new Error(`${url} responded 429`);
+  }
   if (!response.ok) throw new Error(`${url} responded ${response.status}`);
   return response.json();
 }

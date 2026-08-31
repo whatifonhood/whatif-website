@@ -1,16 +1,21 @@
 ---
+import { ROADMAP } from '../../config/roadmap.ts';
 import type { Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import Section from '../ui/Section.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Icons from '../ui/Icons.astro';
 
 /**
- * The roadmap section, which is a joke, which is also the disclaimer.
+ * The roadmap, in short.
  *
- * A meme coin with a serious roadmap is lying. Saying so as a gag gets the
- * warning read — and screenshotted — in a way a paragraph of legal text never is.
- * The real disclaimer follows in the footer.
+ * This used to be a joke — a blank PDF and four quarters of "still asking".
+ * The joke was good while there was nothing to show. There is now, so the
+ * section shows the real thing and keeps the stamp.
+ *
+ * Only live and next work appears here; the full list, including everything
+ * already shipped, is on /roadmap/.
  */
 interface Props {
   locale: Locale;
@@ -18,54 +23,75 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getCopy(locale);
+const page = copy.pages.roadmap;
+
+const building = ROADMAP.filter((item) => item.status === 'building');
+const next = ROADMAP.filter((item) => item.status === 'next').slice(0, 3);
+const shipped = ROADMAP.filter((item) => item.status === 'shipped').length;
 ---
 
 <Section id="roadmap" divider>
-  <div class="mx-auto max-w-3xl text-center">
-    <Eyebrow>{copy.roadmap.eyebrow}</Eyebrow>
-    <SectionHeading heading={copy.roadmap.heading} class="mt-4" />
+  <div class="max-w-2xl">
+    <Eyebrow>{page.eyebrow}</Eyebrow>
+    <SectionHeading heading={page.heading} class="mt-4" />
+    <p class="mt-5 text-lg leading-relaxed text-muted">{page.intro}</p>
   </div>
 
-  <div class="relative mx-auto mt-12 max-w-2xl" data-reveal>
-    <!-- A document window, tilted a degree so it reads as an object on the page -->
-    <div class="card -rotate-1 overflow-hidden shadow-[8px_8px_0_0] shadow-lime/20">
-      <div class="flex items-center gap-2 border-b border-line bg-surface-2 px-4 py-3">
-        <span class="h-2.5 w-2.5 rounded-full bg-faint/40"></span>
-        <span class="h-2.5 w-2.5 rounded-full bg-faint/40"></span>
-        <span class="h-2.5 w-2.5 rounded-full bg-faint/40"></span>
-        <p class="ml-2 truncate font-mono text-[11px] text-muted">{copy.roadmap.fileName}</p>
-      </div>
-
-      <div class="px-6 py-8 sm:px-10 sm:py-10">
-        <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
-          {copy.roadmap.lastEdited}
-        </p>
-        <ul class="mt-6 flex flex-col gap-3">
-          {
-            copy.roadmap.quarters.map((quarter) => (
-              <li class="flex items-center gap-3 font-mono text-sm text-muted">
-                <span class="grid h-4 w-4 shrink-0 place-items-center border border-line text-transparent">
-                  x
-                </span>
-                {quarter}
+  <div class="mt-12 grid gap-3 lg:grid-cols-2" data-reveal>
+    {
+      [
+        { key: 'building', items: building },
+        { key: 'next', items: next },
+      ].map((column) => (
+        <div class="card p-6 sm:p-7">
+          <h3 class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+            <span class="road-dot" data-status={column.key} aria-hidden="true" />
+            {page.statuses[column.key as 'building' | 'next']}
+          </h3>
+          <ul class="mt-5 flex flex-col gap-4">
+            {column.items.map((item) => (
+              <li>
+                <p class="font-semibold text-ink">{item.title}</p>
+                <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
               </li>
-            ))
-          }
-        </ul>
-      </div>
-    </div>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
 
-    <!-- The verdict -->
-    <p
-      class="stamp absolute -bottom-4 right-2 rotate-[-8deg] rounded-lg border-2 border-lime px-4 py-2 font-display text-lg font-black italic uppercase tracking-tight text-lime sm:right-8 sm:text-2xl"
+  <div class="mt-8 flex flex-wrap items-center gap-4">
+    <a
+      href="/roadmap/"
+      class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
     >
-      {copy.roadmap.stamp}
+      {page.title}
+      <Icons name="arrow-up-right" size={14} />
+    </a>
+    <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+      <span class="text-lime">{shipped}</span>
+      {page.shippedCount}
     </p>
   </div>
 
-  <p
-    class="mx-auto mt-14 max-w-xl text-center font-mono text-[11px] uppercase tracking-[0.14em] text-faint"
-  >
-    {copy.roadmap.footnote}
+  <p class="mt-8 max-w-2xl font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+    {copy.roadmap.stamp}
   </p>
 </Section>
+
+<style>
+  .road-dot {
+    height: 8px;
+    width: 8px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--color-lime);
+  }
+  .road-dot[data-status='building'] {
+    box-shadow: 0 0 0 4px rgb(143 206 2 / 0.18);
+  }
+  .road-dot[data-status='next'] {
+    background: var(--color-lime-mid, #86b50b);
+  }
+</style>

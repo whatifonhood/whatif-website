@@ -58,6 +58,12 @@ const PAGES = [
     sub: 'Four rarities. Every pull is free.',
   },
   {
+    file: 'og-roadmap.jpg',
+    kicker: 'Roadmap',
+    title: 'What is built, and what is next',
+    sub: 'Everything shipped stays on the page',
+  },
+  {
     file: 'og-brand.jpg',
     kicker: 'Brand',
     title: 'The marks, and how to use them',

@@ -3,4 +3,4 @@
 // this file records only what the build produced.
 
 export const HISTORY_CAPTURED = '2026-08-31';
-export const HISTORY_COIN_COUNT = 491;
+export const HISTORY_COIN_COUNT = 492;

@@ -262,7 +262,7 @@ test.describe('every meme has a page', () => {
 
 test('top-level pages do not all share one social card', async ({ page }) => {
   const cards = new Set<string>();
-  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/updates/']) {
+  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/roadmap/']) {
     await page.goto(path);
     const card = await page.locator('meta[property="og:image"]').getAttribute('content');
     cards.add(card ?? '');
