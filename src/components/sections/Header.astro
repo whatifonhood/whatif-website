@@ -25,6 +25,14 @@ interface Props {
 const { locale } = Astro.props;
 const copy = getCopy(locale);
 const home = LOCALE_PATHS[locale];
+
+/**
+ * The header's section links are in-page anchors, which point at nothing from a
+ * sub-page — pressing "The thesis" on /stats/ used to do nothing at all. Off the
+ * landing page they need the landing page in front of them, in this language.
+ */
+const onLanding = Astro.url.pathname.replace(/\/$/, '') === home.replace(/\/$/, '');
+const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace(/^\//, '')}`);
 ---
 
 <header
@@ -53,7 +61,7 @@ const home = LOCALE_PATHS[locale];
       {
         copy.nav.links.map((link) => (
           <a
-            href={link.href}
+            href={sectionHref(link.href)}
             class="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink"
           >
             {link.label}
@@ -123,7 +131,7 @@ const home = LOCALE_PATHS[locale];
     <div class="flex flex-col gap-1 px-5 py-4">
       {
         copy.nav.links.map((link) => (
-          <a href={link.href} class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface">
+          <a href={sectionHref(link.href)} class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface">
             {link.label}
           </a>
         ))
