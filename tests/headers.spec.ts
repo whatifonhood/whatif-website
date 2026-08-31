@@ -56,3 +56,50 @@ test.describe('security headers', () => {
     expect(headers).toContain('max-age=0, must-revalidate');
   });
 });
+
+/**
+ * The site can be hosted on either Netlify or Vercel, and they read completely
+ * different files: public/_headers and vercel.json. A directive added to one and
+ * forgotten in the other would mean the site quietly ships without it on the
+ * other host — which is exactly the kind of failure nobody notices.
+ */
+test.describe('the two hosting configs agree', () => {
+  const parse = (policy: string) =>
+    Object.fromEntries(
+      policy
+        .split(';')
+        .map((directive) => directive.trim())
+        .filter(Boolean)
+        .map((directive) => {
+          const [name, ...values] = directive.split(/\s+/);
+          return [name, values.join(' ')];
+        }),
+    );
+
+  test('the Content-Security-Policy is the same on both hosts', async () => {
+    const { readFileSync } = await import('node:fs');
+
+    const netlify = readFileSync('public/_headers', 'utf8');
+    const netlifyPolicy = /^ {2}Content-Security-Policy: (.+)$/m.exec(netlify)?.[1];
+    expect(netlifyPolicy, 'no site-wide policy in public/_headers').toBeTruthy();
+
+    const vercel = JSON.parse(readFileSync('vercel.json', 'utf8'));
+    const vercelPolicy = vercel.headers
+      .find((rule: { source: string }) => rule.source === '/(.*)')
+      ?.headers.find((header: { key: string }) => header.key === 'Content-Security-Policy')?.value;
+    expect(vercelPolicy, 'no site-wide policy in vercel.json').toBeTruthy();
+
+    expect(parse(vercelPolicy), 'the two hosts disagree on the policy').toEqual(
+      parse(netlifyPolicy as string),
+    );
+  });
+
+  test('neither host allows inline scripts', async () => {
+    const { readFileSync } = await import('node:fs');
+    for (const file of ['public/_headers', 'vercel.json']) {
+      const contents = readFileSync(file, 'utf8');
+      expect(contents, `${file} allows unsafe-inline`).not.toContain("'unsafe-inline'");
+      expect(contents, `${file} allows unsafe-eval`).not.toContain("'unsafe-eval'");
+    }
+  });
+});

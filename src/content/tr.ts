@@ -18,6 +18,7 @@ export const tr: SiteCopy = {
       maker: { label: 'Meme yapıcı', blurb: 'On saniyede bir tane yap' },
       stats: { label: 'Veriler', blurb: 'Her rakam canlı' },
       holdings: { label: 'Cüzdan sorgusu', blurb: 'Bağlantı gerekmez' },
+      learn: { label: 'Öğren', blurb: 'Güvenlik, temeller ve kanıt' },
       brand: { label: 'Marka', blurb: 'Logolar ve görseller' },
     },
     buy: '$IF Al',
@@ -383,6 +384,15 @@ export const tr: SiteCopy = {
       shareText: (name, tier) => `${name} çektim — ${tier}.\n\nYa bu seninkiyse?`,
       odds: 'olasılık',
       openGenerator: 'Kendi paranı çek',
+    },
+    learn: {
+      title: 'Öğren',
+      eyebrow: 'Öğren',
+      heading: { lead: 'Ne yaptığını', accent: 'bil.' },
+      intro:
+        'Bunun nasıl işlediği, paranı nasıl güvende tutacağın ve bu sitedeki her iddiayı kendin nasıl kontrol edeceğin. Önce güvenlik.',
+      backToIndex: 'Tüm sayfalar',
+      next: 'Sonraki:',
     },
     updates: {
       title: 'Güncellemeler',

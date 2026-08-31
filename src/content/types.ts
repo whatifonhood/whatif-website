@@ -298,6 +298,14 @@ export interface SiteCopy {
       odds: string;
       openGenerator: string;
     };
+    learn: {
+      title: string;
+      eyebrow: string;
+      heading: SplitHeading;
+      intro: string;
+      backToIndex: string;
+      next: string;
+    };
     updates: {
       title: string;
       eyebrow: string;

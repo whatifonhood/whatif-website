@@ -30,6 +30,7 @@ export const es: SiteCopy = {
       maker: { label: 'Generador de memes', blurb: 'Haz uno en diez segundos' },
       stats: { label: 'Datos', blurb: 'Cada número, en vivo' },
       holdings: { label: 'Consulta de wallet', blurb: 'Sin conectar nada' },
+      learn: { label: 'Aprende', blurb: 'Seguridad, bases y pruebas' },
       brand: { label: 'Marca', blurb: 'Logos y material gráfico' },
     },
     buy: 'Compra $IF',
@@ -392,6 +393,15 @@ export const es: SiteCopy = {
       shareText: (name, tier) => `Me salió ${name} — ${tier}.\n\n¿Y $IF esta eres tú?`,
       odds: 'de probabilidad',
       openGenerator: 'Saca la tuya',
+    },
+    learn: {
+      title: 'Aprende',
+      eyebrow: 'Aprende',
+      heading: { lead: 'Entiende', accent: 'lo que haces.' },
+      intro:
+        'Cómo funciona esto, cómo mantener tu dinero a salvo y cómo verificar por ti mismo cada afirmación de este sitio. La seguridad primero.',
+      backToIndex: 'Todas las páginas',
+      next: 'Siguiente:',
     },
     updates: {
       title: 'Novedades',
