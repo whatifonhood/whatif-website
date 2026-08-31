@@ -9,7 +9,7 @@
 import {
   getCoinHistory,
   getCoinIndex,
-  searchCoins,
+  searchAllCoins,
   type CoinEntry,
   type PricePoint,
 } from '../lib/machine.ts';
@@ -434,8 +434,14 @@ export function initMachine(locale: string): void {
     if (node) node.textContent = value;
   };
 
-  const renderResults = (query: string) => {
-    const matches = searchCoins(coins, query);
+  /** Guards against an older, slower search overwriting a newer one. */
+  let searchToken = 0;
+
+  const renderResults = async (query: string) => {
+    const token = ++searchToken;
+    const matches = await searchAllCoins(coins, query);
+    // A slow long-tail lookup must not clobber what the user has since typed.
+    if (token !== searchToken) return;
     results.replaceChildren();
 
     if (matches.length === 0) {
@@ -480,7 +486,7 @@ export function initMachine(locale: string): void {
   };
 
   const choose = async (coin: CoinEntry, preset?: { month?: string; amount?: number }) => {
-    const history = await getCoinHistory(coin.symbol);
+    const history = await getCoinHistory(coin.symbol, coin.coingeckoId);
     if (history.length < 2) return;
 
     selection = { coin, history };
@@ -592,8 +598,8 @@ export function initMachine(locale: string): void {
     }
   };
 
-  search.addEventListener('input', () => renderResults(search.value));
-  search.addEventListener('focus', () => renderResults(search.value));
+  search.addEventListener('input', () => void renderResults(search.value));
+  search.addEventListener('focus', () => void renderResults(search.value));
   document.addEventListener('click', (event) => {
     if (!root.contains(event.target as Node)) results.hidden = true;
   });

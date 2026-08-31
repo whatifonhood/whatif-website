@@ -164,15 +164,6 @@ const metrics = [
             }
             <button
               type="button"
-              data-chart-expand
-              aria-pressed="false"
-              class="chart-toggle"
-              title={page.expandChart}
-            >
-              {page.expandChart}
-            </button>
-            <button
-              type="button"
               data-chart-log
               aria-pressed="false"
               class="chart-toggle"
@@ -190,7 +181,7 @@ const metrics = [
           data-direction="up"
           viewBox="0 0 1000 320"
           preserveAspectRatio="none"
-          class="chart h-64 w-full transition-[height] duration-300 sm:h-80"
+          class="chart w-full"
           role="img"
           aria-label={`${page.chartTitle} chart`}
         >
@@ -206,6 +197,23 @@ const metrics = [
           (preserveAspectRatio="none"), which would distort any text inside it.
         -->
         <div data-tip class="chart-tip" hidden></div>
+      </div>
+
+      <!--
+        Drag to resize. A real slider underneath, so it also works with a
+        keyboard and is announced properly — the grip is the visible handle.
+      -->
+      <div
+        data-chart-grip
+        role="slider"
+        tabindex="0"
+        aria-label={page.resizeChart}
+        aria-valuemin="240"
+        aria-valuemax="760"
+        aria-valuenow="320"
+        class="chart-grip"
+      >
+        <span class="chart-grip-bar" aria-hidden="true"></span>
       </div>
     </div>
 
@@ -541,6 +549,46 @@ const metrics = [
 </PageLayout>
 
 <style>
+  .chart-grip {
+    display: flex;
+    height: 18px;
+    cursor: ns-resize;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+    touch-action: none;
+  }
+  .chart-grip:hover .chart-grip-bar,
+  .chart-grip:focus-visible .chart-grip-bar,
+  .chart-grip[data-dragging='true'] .chart-grip-bar {
+    background: var(--color-lime);
+    width: 64px;
+  }
+  .chart-grip:focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: -2px;
+  }
+  .chart-grip-bar {
+    height: 3px;
+    width: 40px;
+    border-radius: 999px;
+    background: var(--color-line);
+    transition:
+      background-color 0.15s ease,
+      width 0.15s ease;
+  }
+
+  /* Height is driven by the grip; the SVG scales to whatever box it gets. */
+  .chart {
+    height: var(--chart-height, 16rem);
+  }
+  @media (min-width: 640px) {
+    .chart {
+      height: var(--chart-height, 20rem);
+    }
+  }
+
   /* The expanded chart. Height only — the SVG scales to whatever box it gets. */
   [data-chart-expanded='true'] .chart {
     height: 30rem;

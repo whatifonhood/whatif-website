@@ -19,7 +19,8 @@
     "test": "playwright test",
     "test:install": "playwright install chromium",
     "og": "node tools/render-og.mjs",
-    "cards": "node tools/render-og.mjs --memes",
+    "cards": "node tools/render-og.mjs --memes --coins",
+    "coincards": "node tools/render-og.mjs --coins",
     "burns": "node tools/build-burns.mjs",
     "tweets": "node tools/build-tweets.mjs",
     "memes": "node tools/build-memes.mjs",
@@ -28,6 +29,7 @@
     "serve": "node tools/serve-dist.mjs",
     "favicons": "node tools/build-favicons.mjs",
     "coins": "node tools/build-coins.mjs",
+    "coinlist": "node tools/build-coin-list.mjs",
     "brandkit": "node tools/build-brand-kit.mjs"
   },
   "dependencies": {

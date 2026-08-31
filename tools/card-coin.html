@@ -1,0 +1,224 @@
+<!doctype html>
+<!--
+  Source for the per-coin sharing cards (public/coins/og/<slug>.jpg).
+
+  Rendered by `npm run coincards`, which passes the coin in the query string:
+    card-coin.html?slug=3am&name=3AM&tier=Uncommon&odds=27&index=38&total=150
+
+  The count in "#38 of 150" is why every card is regenerated when artwork is
+  added rather than only the new ones — the old cards would otherwise keep
+  claiming a total that is no longer true.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Archivo';
+        font-style: italic;
+        font-weight: 900;
+        src: url('../node_modules/@fontsource/archivo/files/archivo-latin-900-italic.woff2')
+          format('woff2');
+      }
+      @font-face {
+        font-family: 'Archivo';
+        font-weight: 600;
+        src: url('../node_modules/@fontsource/archivo/files/archivo-latin-600-normal.woff2')
+          format('woff2');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-weight: 700;
+        src: url('../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2')
+          format('woff2');
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #080b07;
+        position: relative;
+        font-family: 'Archivo', sans-serif;
+      }
+      .glow {
+        position: absolute;
+        right: -120px;
+        top: 50%;
+        width: 820px;
+        height: 820px;
+        transform: translateY(-50%);
+        background: radial-gradient(circle, var(--glow, rgba(143, 206, 2, 0.26)), rgba(8, 11, 7, 0) 66%);
+      }
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(34, 48, 18, 0.4) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(34, 48, 18, 0.4) 1px, transparent 1px);
+        background-size: 80px 80px;
+      }
+      .row {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        padding: 54px 62px;
+      }
+      .text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        border: 1px solid #223012;
+        border-radius: 999px;
+        padding: 7px 15px;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #8fce02;
+      }
+      .pill.tier {
+        border-color: var(--tier, #8fce02);
+        color: var(--tier, #8fce02);
+      }
+      h1 {
+        font-style: italic;
+        font-weight: 900;
+        font-size: 82px;
+        line-height: 0.92;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: #ffffff;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      .ask {
+        font-weight: 600;
+        font-size: 27px;
+        color: #e9f0dd;
+      }
+      .ask b {
+        color: #8fce02;
+        font-weight: 600;
+      }
+      .meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #7d8c6e;
+      }
+      .foot {
+        position: absolute;
+        left: 62px;
+        bottom: 46px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #9aa889;
+      }
+      .foot .mark {
+        font-family: 'Archivo', sans-serif;
+        font-style: italic;
+        font-weight: 900;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+      }
+      .foot .mark span {
+        color: #8fce02;
+      }
+      .coin {
+        width: 430px;
+        height: 430px;
+        flex: none;
+        position: relative;
+      }
+      .coin::before {
+        content: '';
+        position: absolute;
+        inset: -18px;
+        border-radius: 50%;
+        border: 1px solid var(--tier, #8fce02);
+        opacity: 0.4;
+      }
+      .coin img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <div class="grid"></div>
+    <div class="row">
+      <div class="text">
+        <div class="pills">
+          <span class="pill">PFP Generator</span>
+          <span class="pill tier" id="tier">Common</span>
+        </div>
+        <h1 id="name">Coin</h1>
+        <p class="ask">What <b>$IF</b> this one's you?</p>
+        <p class="meta" id="meta"></p>
+      </div>
+      <div class="coin"><img id="art" alt="" /></div>
+    </div>
+    <p class="foot">
+      <span class="mark">WHAT <span>$IF</span></span>
+      whatifonhood.com/pfp
+    </p>
+
+    <script>
+      const p = new URLSearchParams(location.search);
+      const tier = p.get('tier') ?? 'Common';
+
+      // Each rarity gets its own accent, the same colours the site uses.
+      const TIER_COLOUR = {
+        common: '#8fce02',
+        uncommon: '#c4dc43',
+        rare: '#5bc8f5',
+        legendary: '#e4d98e',
+      };
+      const colour = TIER_COLOUR[tier.toLowerCase()] ?? '#8fce02';
+      document.body.style.setProperty('--tier', colour);
+      document.body.style.setProperty('--glow', `${colour}38`);
+
+      document.getElementById('tier').textContent = tier;
+      document.getElementById('name').textContent = p.get('name') ?? 'Coin';
+      document.getElementById('meta').textContent =
+        `#${p.get('index')} of ${p.get('total')} · ${p.get('odds')}% pull`;
+      document.getElementById('art').src = `../public/coins/full/${p.get('slug')}.webp`;
+
+      // Long names step down rather than spilling out of the card.
+      const h = document.getElementById('name');
+      for (let s = 82; s > 34 && h.scrollHeight > h.clientHeight + 2; s -= 3) {
+        h.style.fontSize = `${s}px`;
+      }
+    </script>
+  </body>
+</html>

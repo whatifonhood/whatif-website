@@ -7,9 +7,14 @@
  *   public/og-default.jpg        the site-wide card        (tools/og-card.html)
  *   public/og-<page>.jpg         one per top-level page    (tools/card-page.html)
  *   public/memes/og/<slug>.jpg   one per meme              (tools/card-meme.html)
+ *   public/coins/og/<slug>.jpg   one per coin              (tools/card-coin.html)
  *
- * Run with `npm run og`. Add `--memes` to also rebuild the per-meme set, which
- * takes a minute and only changes when the vault changes.
+ * Run with `npm run og`. Add `--memes` or `--coins` to also rebuild those sets,
+ * which take a minute each and only change when the artwork does.
+ *
+ * The coin cards carry "#38 of 150", so ALL of them are rebuilt when artwork is
+ * added — leaving the old ones alone would leave them claiming a total that is
+ * no longer true.
  *
  * The meme list is read from src/config/memes.ts — the same file the site reads,
  * so a card can never describe a meme that is not in the vault.
@@ -20,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 import { MEMES } from '../src/config/memes.ts';
+import { COINS, COIN_TIERS } from '../src/config/coins.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -72,6 +78,7 @@ const PAGES = [
 ];
 
 const wantMemes = process.argv.includes('--memes');
+const wantCoins = process.argv.includes('--coins');
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
@@ -123,6 +130,32 @@ if (wantMemes) {
   process.stdout.write(`\n${MEMES.length} meme cards written\n`);
 } else {
   console.warn('Skipped meme cards — pass --memes to rebuild them.');
+}
+
+// 4. One per coin.
+if (wantCoins) {
+  const coinDir = join(publicDir, 'coins', 'og');
+  mkdirSync(coinDir, { recursive: true });
+
+  for (const [index, coin] of COINS.entries()) {
+    const tier = COIN_TIERS[coin.tier];
+    await shoot(
+      'card-coin.html',
+      {
+        slug: coin.slug,
+        name: coin.name,
+        tier: tier.label,
+        odds: String(tier.weight),
+        index: String(index + 1),
+        total: String(COINS.length),
+      },
+      join(coinDir, `${coin.slug}.jpg`),
+    );
+    process.stdout.write(`\r  ${index + 1}/${COINS.length} ${coin.slug.padEnd(28)}`);
+  }
+  process.stdout.write(`\n${COINS.length} coin cards written\n`);
+} else {
+  console.warn('Skipped coin cards — pass --coins to rebuild them.');
 }
 
 await browser.close();

@@ -293,7 +293,7 @@ export const en: SiteCopy = {
       openExplorer: 'Open the contract',
       openChart: 'Open the chart',
       timeframes: { day: '24H', week: '7D', month: '30D', quarter: '90D', all: 'ALL' },
-      expandChart: 'Expand',
+      resizeChart: 'Drag to resize the chart',
       chartTypes: { candles: 'Candles', line: 'Line' },
       logScale: 'Log',
       chartTitle: 'Price',

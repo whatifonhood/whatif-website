@@ -14,6 +14,14 @@ export interface CoinEntry {
   rank: number;
   /** First month with a price, "YYYY-MM". */
   firstMonth: string;
+  /**
+   * Set for coins without local history.
+   *
+   * These are the long tail — every other coin CoinGecko lists. Their prices are
+   * fetched live when picked, and the free listing only reaches back a year, so
+   * the page says so rather than pretending the series is complete.
+   */
+  coingeckoId?: string;
 }
 
 /** [month, closing price in USD], oldest first. */
@@ -26,6 +34,33 @@ async function fetchLocalJson(path: string): Promise<unknown> {
   const response = await fetch(path, { signal: AbortSignal.timeout(15_000) });
   if (!response.ok) throw new Error(`${path} -> ${response.status}`);
   return response.json();
+}
+
+let tailPromise: Promise<CoinEntry[]> | null = null;
+
+/**
+ * The long tail: everything CoinGecko lists that we do not ship history for.
+ *
+ * Roughly eighteen thousand coins, so it is a separate file fetched only when
+ * somebody searches past the ones we hold locally — the common case never pays
+ * for it.
+ */
+function getTailIndex(): Promise<CoinEntry[]> {
+  tailPromise ??= fetchLocalJson('/machine/all.json')
+    .then((body) => {
+      if (!Array.isArray(body)) return [];
+      return body.flatMap((row): CoinEntry[] => {
+        if (!Array.isArray(row) || row.length < 3) return [];
+        const [symbol, name, id] = row;
+        if (typeof symbol !== 'string' || typeof name !== 'string' || typeof id !== 'string') {
+          return [];
+        }
+        // Ranked last so coins with deep history always win a tie.
+        return [{ symbol, name, rank: 99_999, firstMonth: '', coingeckoId: id }];
+      });
+    })
+    .catch(() => []);
+  return tailPromise;
 }
 
 /** The searchable list. Fetched once, then reused. */
@@ -45,10 +80,46 @@ export function getCoinIndex(): Promise<CoinEntry[]> {
   return indexPromise;
 }
 
-/** One coin's monthly prices. */
-export async function getCoinHistory(symbol: string): Promise<PricePoint[]> {
+/**
+ * A year of daily prices, straight from CoinGecko.
+ *
+ * Used for coins we do not ship history for. The endpoint is keyless and sends
+ * an open CORS header, so the browser can ask for it directly — no key to leak
+ * and no server to run. The free listing caps at 365 days, which is why these
+ * coins offer a shorter window than the ones held locally.
+ */
+async function fetchLiveHistory(coingeckoId: string): Promise<PricePoint[]> {
+  // The id comes from our own listing, never from typed input, but it goes into
+  // a URL so it is checked against the shape CoinGecko uses anyway.
+  if (!/^[a-z0-9-]{1,80}$/.test(coingeckoId)) return [];
+
+  const body = await fetchLocalJson(
+    `https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=usd&days=365&interval=daily`,
+  );
+  if (typeof body !== 'object' || body === null) return [];
+  const prices = (body as { prices?: unknown }).prices;
+  if (!Array.isArray(prices)) return [];
+
+  const byDay = new Map<string, number>();
+  for (const row of prices) {
+    if (!Array.isArray(row) || row.length < 2) continue;
+    const [ms, price] = row;
+    if (typeof ms !== 'number' || typeof price !== 'number' || !(price > 0)) continue;
+    byDay.set(new Date(ms).toISOString().slice(0, 10), price);
+  }
+  return [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+}
+
+/** One coin's prices, from disk where we have them and from CoinGecko where we do not. */
+export async function getCoinHistory(symbol: string, coingeckoId?: string): Promise<PricePoint[]> {
   const cached = historyCache.get(symbol);
   if (cached) return cached;
+
+  if (coingeckoId) {
+    const live = await fetchLiveHistory(coingeckoId).catch(() => []);
+    if (live.length >= 2) historyCache.set(symbol, live);
+    return live;
+  }
 
   // The symbol comes from our own index, never from user input, but it goes
   // into a URL — so it is checked against the shape we generate anyway.
@@ -103,4 +174,25 @@ export function searchCoins(coins: CoinEntry[], query: string, limit = 8): CoinE
 
   scored.sort((a, b) => a.score - b.score || a.coin.rank - b.coin.rank);
   return scored.slice(0, limit).map((entry) => entry.coin);
+}
+
+/**
+ * Search everything, falling through to the long tail.
+ *
+ * The local set answers instantly and covers what most people ask for. Only when
+ * it cannot fill the list does the eighteen-thousand-coin file get loaded, so
+ * the usual search never waits for it.
+ */
+export async function searchAllCoins(
+  local: CoinEntry[],
+  query: string,
+  limit = 8,
+): Promise<CoinEntry[]> {
+  const found = searchCoins(local, query, limit);
+  if (found.length >= limit || query.trim().length < 2) return found;
+
+  const tail = await getTailIndex();
+  const seen = new Set(found.map((coin) => coin.symbol));
+  const extra = searchCoins(tail, query, limit).filter((coin) => !seen.has(coin.symbol));
+  return [...found, ...extra].slice(0, limit);
 }

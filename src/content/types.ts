@@ -200,8 +200,8 @@ export interface SiteCopy {
       openChart: string;
       /** Chart timeframe buttons. */
       timeframes: { day: string; week: string; month: string; quarter: string; all: string };
-      /** Makes the chart taller. */
-      expandChart: string;
+      /** The drag handle that sets the chart's height. */
+      resizeChart: string;
       /** Candles or a line. */
       chartTypes: { candles: string; line: string };
       /** Toggles the price axis between linear and logarithmic. */

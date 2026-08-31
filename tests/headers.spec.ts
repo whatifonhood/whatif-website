@@ -35,8 +35,18 @@ test.describe('security headers', () => {
   test('only the public read-only data APIs may be contacted', () => {
     const connectSrc = headers.match(/connect-src ([^;]+);/)?.[1] ?? '';
     const allowed = connectSrc.trim().split(/\s+/).sort();
+    // Every entry here is a public, keyless, read-only endpoint, and each one
+    // earns its place:
+    //   dexscreener   price, liquidity and volume
+    //   geckoterminal candles, trades, holders and concentration
+    //   rpc           the chain itself, for the burn and wallet balances
+    //   coingecko     price history for the eighteen thousand coins in the
+    //                 Machine that are too many to ship as files
+    // Adding a fifth is a decision, not a detail — this test exists to make
+    // sure one cannot arrive by accident.
     expect(allowed).toEqual([
       "'self'",
+      'https://api.coingecko.com',
       'https://api.dexscreener.com',
       'https://api.geckoterminal.com',
       'https://rpc.mainnet.chain.robinhood.com',

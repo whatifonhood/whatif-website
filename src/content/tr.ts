@@ -298,7 +298,7 @@ export const tr: SiteCopy = {
       openExplorer: 'Kontratı aç',
       openChart: 'Grafiği aç',
       timeframes: { day: '24S', week: '7G', month: '30G', quarter: '90D', all: 'TÜMÜ' },
-      expandChart: 'Büyüt',
+      resizeChart: 'Grafiği yeniden boyutlandırmak için sürükle',
       chartTypes: { candles: 'Mum', line: 'Çizgi' },
       logScale: 'Log',
       chartTitle: 'Fiyat',
