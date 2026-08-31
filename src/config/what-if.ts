@@ -14,6 +14,19 @@
  * nonsense, so the interface is translated and the questions are not.
  */
 
+/**
+ * Slots where saying nothing should usually win.
+ *
+ * The opener and the tail are seasoning. Picked evenly they land on nearly
+ * every question at once, which is how "3am thought. What if I say exactly the
+ * wrong thing and nothing happens at all, and the answer changes nothing?"
+ * happens. The value is the chance of leaving the slot empty.
+ */
+export const SPARSE_SLOTS: Record<string, number> = {
+  opener: 0.74,
+  tail: 0.62,
+};
+
 export const CATEGORIES = ['money', 'cosmic', 'dread', 'absurd', 'degen'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
@@ -44,9 +57,7 @@ export const BANKS: Record<string, string[]> = {
     'my last fifty',
     'the car deposit',
     'everything I had',
-    'the money I said I would not touch',
     'my Christmas bonus',
-    'what I spend on coffee in a year',
     'the emergency fund',
     'a tenner',
   ],
@@ -55,7 +66,6 @@ export const BANKS: Record<string, string[]> = {
     'the one I laughed at',
     'the dog one',
     'the frog one',
-    'the coin my mate would not shut up about',
     'the one with the terrible logo',
     'the thing everyone said was a scam',
     'literally anything',
@@ -66,7 +76,6 @@ export const BANKS: Record<string, string[]> = {
     'the one my barber mentioned',
     'the ticker I could not pronounce',
     'the thing I called a bubble',
-    'the one I set an alert for and ignored',
   ],
   when: [
     'at launch',
@@ -81,8 +90,6 @@ export const BANKS: Record<string, string[]> = {
     'the week I nearly did',
     'back when it cost nothing',
     'the night I could not sleep',
-    'while I was arguing it would never work',
-    'on the day I chose the sensible thing',
   ],
   consequence: [
     'it ten-xed overnight',
@@ -98,7 +105,6 @@ export const BANKS: Record<string, string[]> = {
     'it turns out I was early',
     'somebody screenshots it',
     'the group chat goes quiet',
-    'it was the right call for the wrong reason',
   ],
 
   /**
@@ -121,7 +127,6 @@ export const BANKS: Record<string, string[]> = {
     ', and that is somehow worse',
     ', and I find out on a Tuesday',
     ', and it is funnier that way',
-    ', and I was asking the wrong thing',
     ', and I would still ask again',
   ],
   profound: [
@@ -183,7 +188,6 @@ export const BANKS: Record<string, string[]> = {
     'I',
     'we',
     'everyone',
-    'nobody',
     'my future self',
     'the last buyer',
     'the quiet one in the group chat',
@@ -193,19 +197,26 @@ export const BANKS: Record<string, string[]> = {
     'the smartest person I know',
     'the one who never posts',
   ],
+  /**
+   * Past tense, no copula, no negation.
+   *
+   * "was early" agrees with "I" and not with "we"; "never sold" turns "nobody"
+   * into a double negative. Everything here reads correctly after every subject
+   * above, which is the only way a generator can promise a grammatical sentence.
+   */
   verb: [
-    'was right',
-    'was early',
-    'was late',
-    'never sold',
+    'got it right',
+    'got there early',
+    'got there late',
+    'held the whole way',
     'sold at the top',
     'knew all along',
     'just got lucky',
-    'is still asking',
     'guessed and got away with it',
-    'read the same chart and saw something else',
-    'was never going to be talked out of it',
     'stopped checking and slept fine',
+    'saw it coming',
+    'called it and told nobody',
+    'looked away at the wrong moment',
   ],
 };
 
@@ -219,8 +230,8 @@ export const PATTERNS: Pattern[] = [
   // Money — the regret the whole site is built on.
   { category: 'money', text: '{opener}What if I had put {amount} into {asset} {when}{tail}?' },
   { category: 'money', text: '{opener}What if {amount} into {asset} was all it ever took{tail}?' },
-  { category: 'money', text: '{opener}What if I sell {asset} and {consequence}{tail}?' },
-  { category: 'money', text: '{opener}What if I hold and {consequence}{tail}?' },
+  { category: 'money', text: '{opener}What if I sell {asset} and {consequence}?' },
+  { category: 'money', text: '{opener}What if I hold and {consequence}?' },
   {
     category: 'money',
     text: '{opener}What if the only difference was buying {asset} {when}{tail}?',
@@ -236,7 +247,7 @@ export const PATTERNS: Pattern[] = [
 
   // Dread — ordinary anxiety, which is where the question usually starts.
   { category: 'dread', text: '{opener}What if I {dread} tomorrow{tail}?' },
-  { category: 'dread', text: '{opener}What if I {dread} and {consequence}{tail}?' },
+  { category: 'dread', text: '{opener}What if I {dread} and {consequence}?' },
   { category: 'dread', text: '{opener}What if today is the day I {dread}{tail}?' },
   { category: 'dread', text: '{opener}What if I {dread} and {person} {verb}?' },
 
@@ -245,15 +256,15 @@ export const PATTERNS: Pattern[] = [
   { category: 'absurd', text: '{opener}What if {absurd}, and {person} {verb}?' },
   { category: 'absurd', text: '{opener}What if {absurd} and {consequence}?' },
 
-  { category: 'cosmic', text: '{opener}What if {profound} and {person} {verb}{tail}?' },
+  { category: 'cosmic', text: '{opener}What if {profound} and {person} {verb}?' },
   { category: 'dread', text: '{opener}What if I {dread} and {person} {verb}?' },
-  { category: 'absurd', text: '{opener}What if {absurd} and {profound}{tail}?' },
+  { category: 'absurd', text: '{opener}What if {absurd} and {profound}?' },
 
   // Degen.
   { category: 'degen', text: '{opener}What if this is {degen}{tail}?' },
   { category: 'degen', text: '{opener}What if this is {degen} and {person} {verb}?' },
   { category: 'degen', text: '{opener}What if {person} {verb} because this was {degen}?' },
-  { category: 'degen', text: '{opener}What if this is {degen} and {consequence}{tail}?' },
+  { category: 'degen', text: '{opener}What if this is {degen} and {consequence}?' },
 ];
 
 /** How many distinct questions the banks can produce. Counted, never guessed. */

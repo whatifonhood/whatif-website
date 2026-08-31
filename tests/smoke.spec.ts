@@ -40,11 +40,18 @@ for (const page of PAGES) {
       // codebase, and the pages are built to carry on when it happens — the
       // snapshot figures stay on screen. Asserting on it makes the suite fail
       // for reasons nobody here can fix, so only our own errors are counted.
-      const ours = errors.filter(
-        (message) =>
-          !/dexscreener|geckoterminal|rpc\.mainnet\.chain\.robinhood\.com/i.test(message) ||
-          !/failed to fetch|net::|CORS|Access to fetch|load resource/i.test(message),
-      );
+      const dataApi = /dexscreener|geckoterminal|coingecko|rpc\.mainnet\.chain\.robinhood\.com/i;
+      const networkFailure = /failed to fetch|net::ERR|CORS|Access to fetch/i;
+
+      const ours = errors.filter((message) => {
+        if (dataApi.test(message) && networkFailure.test(message)) return false;
+        // Browsers log a second, bare line alongside a blocked request that
+        // names no host at all. On its own it is unattributable, so it cannot
+        // be acted on — but a genuine 404 for one of our own files says "404"
+        // rather than ERR_FAILED and is still counted.
+        if (/^Failed to load resource: net::ERR/i.test(message)) return false;
+        return true;
+      });
       expect(ours, `console errors on ${page.path}`).toEqual([]);
     });
 
@@ -378,6 +385,12 @@ test.describe('the question generator', () => {
       if (/ {2}| ,| \?/.test(text)) problems.push(`spacing: ${text}`);
       if (!text.endsWith('?')) problems.push(`not a question: ${text}`);
       if (/\{\w+\}/.test(text)) problems.push(`unfilled slot: ${text}`);
+      // Agreement: "we was early", "I is still asking".
+      if (/\b(we|they) was\b|\bI is\b|\beveryone were\b/.test(text)) {
+        problems.push(`agreement: ${text}`);
+      }
+      // Double negatives, which is what "nobody" does to a negative verb.
+      if (/\bnobody\b[^?]*\bnever\b/.test(text)) problems.push(`double negative: ${text}`);
 
       await page.locator('[data-ask-again]').click();
     }
@@ -409,4 +422,28 @@ test.describe('the question generator', () => {
       countPossibilities().toLocaleString('en-US'),
     );
   });
+});
+
+/**
+ * Every subject has to read correctly with every verb.
+ *
+ * The generator combines these freely, so one bad pair is a sentence somebody
+ * eventually sees. Checking the banks directly covers all of them at once,
+ * where sampling the page only finds the common ones.
+ */
+test('every subject agrees with every verb', async () => {
+  const { BANKS } = await import('../src/config/what-if.ts');
+  const problems: string[] = [];
+
+  for (const person of BANKS.person ?? []) {
+    for (const verb of BANKS.verb ?? []) {
+      const clause = `${person} ${verb}`;
+      if (/\b(we|they) was\b|\bI is\b|\beveryone were\b/.test(clause)) {
+        problems.push(`agreement: ${clause}`);
+      }
+      if (/\bnobody\b.*\bnever\b/.test(clause)) problems.push(`double negative: ${clause}`);
+    }
+  }
+
+  expect(problems).toEqual([]);
 });
