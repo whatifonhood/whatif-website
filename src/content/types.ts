@@ -318,14 +318,6 @@ export interface SiteCopy {
       hint: string;
       /** `{question}` is replaced with the generated line. */
       shareText: string;
-      categories: {
-        all: string;
-        money: string;
-        cosmic: string;
-        dread: string;
-        absurd: string;
-        degen: string;
-      };
     };
     learn: {
       title: string;

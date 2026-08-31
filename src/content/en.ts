@@ -400,14 +400,6 @@ export const en: SiteCopy = {
       possibilities: 'possible questions',
       hint: 'press space for another',
       shareText: '{question}\n\nStill asking.',
-      categories: {
-        all: 'Everything',
-        money: 'Money',
-        cosmic: 'Cosmic',
-        dread: 'Dread',
-        absurd: 'Absurd',
-        degen: 'Degen',
-      },
     },
     learn: {
       title: 'Learn',
