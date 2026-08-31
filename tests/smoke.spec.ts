@@ -19,6 +19,7 @@ const PAGES = [
   { name: 'machine', path: '/machine/' },
   { name: 'a single meme', path: '/memes/meme-two-buttons-sell-or-hold/' },
   { name: 'wallet lookup', path: '/holdings/' },
+  { name: 'the generator', path: '/ask/' },
   { name: '404', path: '/404' },
 ];
 
@@ -199,7 +200,6 @@ test.describe('accessibility basics', () => {
   });
 });
 
-
 /**
  * Shareable results.
  *
@@ -347,6 +347,66 @@ test.describe('the header gets you home', () => {
     await expect(page.locator('header a[href$="#thesis"]').first()).toHaveAttribute(
       'href',
       '#thesis',
+    );
+  });
+});
+
+/**
+ * The question generator.
+ *
+ * A combinatorial generator fails by producing sentences that are wrong rather
+ * than by throwing, so the only useful test reads what it actually writes. These
+ * are the mistakes it has already made once: a capital W mid-sentence after an
+ * opener, and a subject contradicting its own verb.
+ */
+test.describe('the question generator', () => {
+  test('writes sentences that read correctly', async ({ page }) => {
+    await page.goto('/ask/');
+    const question = page.locator('[data-ask-question]');
+    await expect(question).not.toBeEmpty();
+
+    const problems: string[] = [];
+    const seen = new Set<string>();
+
+    for (let i = 0; i < 40; i += 1) {
+      const text = (await question.textContent())?.trim() ?? '';
+      seen.add(text);
+
+      // Case-sensitive on purpose: "Okay but What if" is the bug.
+      if (/[a-z,] What if/.test(text)) problems.push(`capitalised mid-sentence: ${text}`);
+      if (/(sold|held)[^?]*never sold/.test(text)) problems.push(`contradiction: ${text}`);
+      if (/ {2}| ,| \?/.test(text)) problems.push(`spacing: ${text}`);
+      if (!text.endsWith('?')) problems.push(`not a question: ${text}`);
+      if (/\{\w+\}/.test(text)) problems.push(`unfilled slot: ${text}`);
+
+      await page.locator('[data-ask-again]').click();
+    }
+
+    expect(problems.slice(0, 3)).toEqual([]);
+    // Repeats are possible but should be vanishingly rare with a million options.
+    expect(seen.size, 'the generator is repeating itself').toBeGreaterThan(30);
+  });
+
+  test('a category filter changes what comes out', async ({ page }) => {
+    await page.goto('/ask/');
+    await page.locator('[data-ask-category="dread"]').click();
+
+    const question = page.locator('[data-ask-question]');
+    for (let i = 0; i < 6; i += 1) {
+      await expect(question).not.toBeEmpty();
+      await page.locator('[data-ask-again]').click();
+    }
+    await expect(page.locator('[data-ask-category="dread"]')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  test('the count on the page is the real one', async ({ page }) => {
+    const { countPossibilities } = await import('../src/config/what-if.ts');
+    await page.goto('/ask/');
+    await expect(page.locator('[data-ask-total]')).toHaveText(
+      countPossibilities().toLocaleString('en-US'),
     );
   });
 });

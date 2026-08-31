@@ -12,6 +12,7 @@ export const en: SiteCopy = {
     ],
     toolsLabel: 'Tools',
     tools: {
+      ask: { label: 'Ask a better question', blurb: 'A million ways to wonder' },
       pfp: { label: 'Find your coin', blurb: 'Four rarities, one is yours' },
       machine: { label: 'The What $IF Machine', blurb: 'What you would have made' },
       memes: { label: 'The vault', blurb: 'Free to steal' },
@@ -384,6 +385,29 @@ export const en: SiteCopy = {
       shareText: (name, tier) => `I pulled ${name} — ${tier}.\n\nWhat $IF this one's you?`,
       odds: 'odds',
       openGenerator: 'Pull your own',
+    },
+    ask: {
+      title: 'Ask a better question',
+      eyebrow: 'The generator',
+      heading: { lead: 'What $IF', accent: 'anything?' },
+      intro:
+        'The whole coin is one question. Here it is, over and over, and never quite the same one twice.',
+      again: 'Ask another',
+      copy: 'Copy',
+      copied: 'Copied.',
+      postOnX: 'Post on X',
+      download: 'Download card',
+      possibilities: 'possible questions',
+      hint: 'press space for another',
+      shareText: '{question}\n\nStill asking.',
+      categories: {
+        all: 'Everything',
+        money: 'Money',
+        cosmic: 'Cosmic',
+        dread: 'Dread',
+        absurd: 'Absurd',
+        degen: 'Degen',
+      },
     },
     learn: {
       title: 'Learn',

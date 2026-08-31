@@ -12,6 +12,7 @@ export const tr: SiteCopy = {
     ],
     toolsLabel: 'Araçlar',
     tools: {
+      ask: { label: 'Daha iyi bir soru sor', blurb: 'Merak etmenin bir milyon yolu' },
       pfp: { label: 'Kendi paranı bul', blurb: 'Dört nadirlik, biri senin' },
       machine: { label: 'What $IF Makinesi', blurb: 'Ne kazanacaktın' },
       memes: { label: 'Kasa', blurb: 'Çalması serbest' },
@@ -387,6 +388,29 @@ export const tr: SiteCopy = {
       shareText: (name, tier) => `${name} çektim — ${tier}.\n\nYa bu seninkiyse?`,
       odds: 'olasılık',
       openGenerator: 'Kendi paranı çek',
+    },
+    ask: {
+      title: 'Daha iyi bir soru sor',
+      eyebrow: 'Üretici',
+      heading: { lead: 'Ya', accent: 'her şey mümkünse?' },
+      intro:
+        'Bütün coin tek bir sorudan ibaret. İşte o soru, tekrar tekrar, ve neredeyse hiç aynısı çıkmadan.',
+      again: 'Bir tane daha',
+      copy: 'Kopyala',
+      copied: 'Kopyalandı.',
+      postOnX: "X'te paylaş",
+      download: 'Kartı indir',
+      possibilities: 'olası soru',
+      hint: 'yenisi için boşluğa bas',
+      shareText: '{question}\n\nHâlâ soruyoruz.',
+      categories: {
+        all: 'Hepsi',
+        money: 'Para',
+        cosmic: 'Kozmik',
+        dread: 'Endişe',
+        absurd: 'Absürt',
+        degen: 'Degen',
+      },
     },
     learn: {
       title: 'Öğren',

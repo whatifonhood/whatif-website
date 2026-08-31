@@ -18,7 +18,7 @@ export const COIN_TIERS: Record<CoinTier, { label: string; line: string; weight:
   legendary: { label: 'Legendary', line: 'Jackpot', weight: 2 },
 };
 
-export const COIN_TIER_ORDER: CoinTier[] = ["common","uncommon","rare","legendary"];
+export const COIN_TIER_ORDER: CoinTier[] = ['common', 'uncommon', 'rare', 'legendary'];
 
 export const COINS: Coin[] = [
   { slug: 'godface', name: 'Godface', tier: 'common' },
@@ -90,7 +90,7 @@ export const COINS: Coin[] = [
   { slug: 'explosion', name: 'Never Looks Back', tier: 'rare' },
   { slug: 'hot-tub', name: 'Hot Tub', tier: 'rare' },
   { slug: 'king', name: 'King of Memecoins', tier: 'rare' },
-  { slug: 'its-ok-anon', name: 'It\'s OK Anon', tier: 'rare' },
+  { slug: 'its-ok-anon', name: "It's OK Anon", tier: 'rare' },
   { slug: 'ice-cold', name: 'Ice Cold', tier: 'rare' },
   { slug: 'lava-forge', name: 'Lava Forge', tier: 'rare' },
   { slug: 'neon', name: 'Neon', tier: 'rare' },

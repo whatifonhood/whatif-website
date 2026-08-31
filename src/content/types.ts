@@ -303,6 +303,30 @@ export interface SiteCopy {
       odds: string;
       openGenerator: string;
     };
+    ask: {
+      title: string;
+      eyebrow: string;
+      heading: SplitHeading;
+      intro: string;
+      again: string;
+      copy: string;
+      copied: string;
+      postOnX: string;
+      download: string;
+      /** Follows the counted total, e.g. "possible questions". */
+      possibilities: string;
+      hint: string;
+      /** `{question}` is replaced with the generated line. */
+      shareText: string;
+      categories: {
+        all: string;
+        money: string;
+        cosmic: string;
+        dread: string;
+        absurd: string;
+        degen: string;
+      };
+    };
     learn: {
       title: string;
       eyebrow: string;
