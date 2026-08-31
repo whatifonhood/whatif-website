@@ -20,6 +20,7 @@
     "test:install": "playwright install chromium",
     "og": "node tools/render-og.mjs",
     "cards": "node tools/render-og.mjs --memes",
+    "burns": "node tools/build-burns.mjs",
     "memes": "node tools/build-memes.mjs",
     "history": "node tools/build-coin-history.mjs",
     "snapshot": "node tools/update-snapshot.mjs",

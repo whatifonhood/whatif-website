@@ -191,6 +191,8 @@ export interface SiteCopy {
       timeframes: { day: string; week: string; month: string; all: string };
       /** Candles or a line. */
       chartTypes: { candles: string; line: string };
+      /** Toggles the price axis between linear and logarithmic. */
+      logScale: string;
       chartTitle: string;
       feedTitle: string;
       biggestBuy: string;
@@ -203,6 +205,29 @@ export interface SiteCopy {
       failed: string;
       /** Shown above the trade feed to say how far back it reaches. */
       feedNote: string;
+      /** The other side of the biggest-trade pair. */
+      biggestSell: string;
+      /**
+       * How far back the biggest-trade figures actually reach. The size filter
+       * is not a time window, so the page states the span it really has.
+       * `{hours}` is replaced at runtime.
+       */
+      windowHours: string;
+      holdersTitle: string;
+      concentration: string;
+      /** Holder bands, largest first. */
+      bands: { top10: string; next20: string; next20More: string; rest: string };
+      /** When the holder figures were last recalculated by the source. */
+      holdersUpdated: string;
+      pressureTitle: string;
+      pressureNote: string;
+      burnHistoryTitle: string;
+      burnHistoryNote: string;
+      trustTitle: string;
+      /** Says who is attesting, because we are not. */
+      trustNote: string;
+      checks: { verified: string; honeypot: string; supply: string; burn: string };
+      checkPass: string;
     };
     machine: {
       title: string;

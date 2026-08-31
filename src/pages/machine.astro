@@ -187,8 +187,17 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
             }
           </dl>
 
-          <canvas data-machine-card width="1200" height="675" class="sr-only" aria-hidden="true"
-          ></canvas>
+          <!--
+            The card is the best thing the machine makes, so it is shown as soon
+            as a result exists rather than only appearing in the downloaded file.
+          -->
+          <canvas
+            data-machine-card
+            width="1200"
+            height="675"
+            role="img"
+            aria-label={page.title}
+            class="mt-7 w-full rounded-xl border border-line bg-surface shadow-2xl"></canvas>
 
           <div class="mt-6 flex flex-wrap gap-3">
             <a
