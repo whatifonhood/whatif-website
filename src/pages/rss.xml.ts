@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { SITE } from '../config/site.ts';
-import { UPDATES } from '../config/updates.ts';
+import { ROADMAP } from '../config/roadmap.ts';
 
 /**
  * The updates feed.
@@ -12,16 +12,19 @@ const escape = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export const GET: APIRoute = () => {
-  const items = UPDATES.map((update) => {
-    const link = update.href ? new URL(update.href, SITE.url).href : `${SITE.url}/updates/`;
-    return `    <item>
+  // Only shipped work goes in the feed; plans are not news.
+  const items = ROADMAP.filter((item) => item.date)
+    .map((update) => {
+      const link = update.href ? new URL(update.href, SITE.url).href : `${SITE.url}/roadmap/`;
+      return `    <item>
       <title>${escape(update.title)}</title>
       <link>${escape(link)}</link>
-      <guid isPermaLink="false">${escape(`${update.date}-${update.title}`)}</guid>
-      <pubDate>${new Date(`${update.date}T12:00:00Z`).toUTCString()}</pubDate>
+      <guid isPermaLink="false">${escape(`${update.date as string}-${update.title}`)}</guid>
+      <pubDate>${new Date(`${update.date as string}T12:00:00Z`).toUTCString()}</pubDate>
       <description>${escape(update.body)}</description>
     </item>`;
-  }).join('\n');
+    })
+    .join('\n');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">

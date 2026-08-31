@@ -22,6 +22,8 @@
  * Refresh with `npm run history`.
  */
 import { execFileSync } from 'node:child_process';
+
+import { TOKEN } from '../src/config/site.ts';
 import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -267,6 +269,53 @@ for (const [position, coin] of candidates.entries()) {
   process.stdout.write(`\r  ${position + 1}/${candidates.length} ${coin.symbol.padEnd(10)}`);
   // Only CoinGecko calls need pacing; the free tier allows 30 a minute.
   await sleep(usedCoinGecko ? (COINGECKO_PRO ? 200 : 2200) : 120);
+}
+
+/**
+ * $IF itself.
+ *
+ * The whole site asks "what if you had bought earlier", so the one coin it must
+ * be able to answer that about is this one. It is not on any exchange the loop
+ * above reads, so it comes straight from its own pool.
+ *
+ * It is also too young for monthly points — two of them would be useless — so
+ * this writes DAILY points. The key shape "YYYY-MM-DD" is understood alongside
+ * "YYYY-MM" everywhere the dataset is read.
+ */
+try {
+  process.stdout.write('\nReading $IF from its own pool…\n');
+  const pool = TOKEN.primaryPool.toLowerCase();
+  const body = await getJson(
+    `https://api.geckoterminal.com/api/v2/networks/robinhood/pools/${pool}/ohlcv/day?aggregate=1&limit=1000`,
+  );
+
+  const rows = body?.data?.attributes?.ohlcv_list ?? [];
+  const points = rows
+    .map((row) => [new Date(Number(row[0]) * 1000).toISOString().slice(0, 10), Number(row[4])])
+    .filter(([, price]) => Number.isFinite(price) && price > 0)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  if (points.length >= 2) {
+    writeFileSync(join(outDir, 'h', `${TOKEN.symbol}.json`), JSON.stringify(points));
+    // Rank 0 so it sorts to the top of an empty search box.
+    index.push({ s: TOKEN.symbol, n: 'What $IF', r: 0, f: points[0][0] });
+
+    // Its logo is already in the repo; the coin master is the same mark.
+    execFileSync('magick', [
+      join(root, 'public', 'favicon-192.png'),
+      '-resize',
+      '64x64',
+      '-quality',
+      '80',
+      '-strip',
+      join(outDir, 'logos', `${TOKEN.symbol}.webp`),
+    ]);
+    process.stdout.write(`  ${points.length} daily points, from ${points[0][0]}\n`);
+  } else {
+    process.stdout.write('  not enough history yet; skipped\n');
+  }
+} catch (error) {
+  process.stdout.write(`  could not read the $IF pool: ${error.message}\n`);
 }
 
 index.sort((a, b) => a.r - b.r);

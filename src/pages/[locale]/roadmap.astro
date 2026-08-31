@@ -1,12 +1,10 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import Updates from '../../components/pages/Updates.astro';
+import RoadmapPage from '../../components/pages/RoadmapPage.astro';
 import { LOCALES, type Locale } from '../../config/site.ts';
 
 /**
- * Updates in every language except English, which is served from the root.
- *
- * The body lives in the component so the two routes cannot drift apart.
+ * The roadmap in every language except English, which is served from the root.
  */
 export const getStaticPaths = (() =>
   LOCALES.filter((locale) => locale !== 'en').map((locale) => ({
@@ -17,4 +15,4 @@ export const getStaticPaths = (() =>
 const { locale } = Astro.props as { locale: Locale };
 ---
 
-<Updates locale={locale} />
+<RoadmapPage locale={locale} />

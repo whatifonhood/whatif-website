@@ -23,7 +23,7 @@ import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/for
 import { BURNS, BURNS_SCANNED_TO } from '../config/burns.ts';
 import { CHAIN, TOKEN } from '../config/site.ts';
 
-const REFRESH_MS = 20_000;
+const REFRESH_MS = 15_000;
 
 /** Transaction hashes already on screen, so new ones can be highlighted. */
 const seenTrades = new Set<string>();
@@ -333,6 +333,13 @@ export function initDashboard(locale: string): void {
     });
 
     feed.replaceChildren(...rows);
+
+    // Re-triggering the pulse animation is what makes the page read as live.
+    for (const pulse of root.querySelectorAll<HTMLElement>('[data-live-pulse]')) {
+      pulse.classList.remove('is-beating');
+      void pulse.offsetWidth;
+      pulse.classList.add('is-beating');
+    }
 
     const stamp = root.querySelector<HTMLElement>('[data-feed-updated]');
     if (stamp) {
@@ -690,6 +697,34 @@ export function initDashboard(locale: string): void {
   wrap?.addEventListener('pointerleave', hideCrosshair);
   wrap?.addEventListener('pointercancel', hideCrosshair);
 
+  /**
+   * Making the chart bigger.
+   *
+   * The default height suits a page you are scrolling past; reading a ninety-day
+   * range on it does not work. This only changes the box — the SVG scales to
+   * whatever it is given, so nothing needs redrawing.
+   */
+  const expandButton = root.querySelector<HTMLButtonElement>('[data-chart-expand]');
+  expandButton?.addEventListener('click', () => {
+    const next = root.dataset.chartExpanded !== 'true';
+    root.dataset.chartExpanded = String(next);
+    expandButton.setAttribute('aria-pressed', String(next));
+    try {
+      localStorage.setItem('whatif.chartExpanded', String(next));
+    } catch {
+      /* storage unavailable — the choice just will not persist */
+    }
+  });
+
+  try {
+    if (localStorage.getItem('whatif.chartExpanded') === 'true') {
+      root.dataset.chartExpanded = 'true';
+      expandButton?.setAttribute('aria-pressed', 'true');
+    }
+  } catch {
+    /* storage unavailable */
+  }
+
   const logButton = root.querySelector<HTMLButtonElement>('[data-chart-log]');
   logButton?.addEventListener('click', () => {
     const next = root.dataset.logScale !== 'true';
@@ -712,13 +747,50 @@ export function initDashboard(locale: string): void {
     /* storage unavailable */
   }
 
+  /**
+   * Keeping the page live without anyone reloading it.
+   *
+   * Polling on a timer alone is not enough: a tab left in the background for an
+   * hour comes back showing hour-old numbers, and the timer keeps firing the
+   * whole time it is hidden, which is both wasteful and the fastest way to get
+   * rate-limited by a public API.
+   *
+   * So the loop stops while the tab is hidden and refreshes the moment it comes
+   * back — which is the point at which somebody is actually looking.
+   */
+  let timer: number | undefined;
+
+  const start = () => {
+    if (timer !== undefined) return;
+    timer = window.setInterval(() => void refresh(), REFRESH_MS);
+  };
+
+  const stop = () => {
+    if (timer === undefined) return;
+    window.clearInterval(timer);
+    timer = undefined;
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stop();
+    } else {
+      void refresh();
+      start();
+    }
+  });
+
+  // Coming back from another window, or from sleep, is the same situation.
+  window.addEventListener('focus', () => void refresh());
+  window.addEventListener('online', () => void refresh());
+
   void refresh();
-  // The burn curve is committed history plus a small top-up; it does not need
-  // to be redrawn every twenty seconds.
+  // The burn curve is committed history plus a small live top-up, so it does
+  // not need redrawing on every tick.
   void renderBurns().catch(() => {
     /* The committed history still drew; only the live top-up was missed. */
   });
-  window.setInterval(() => void refresh(), REFRESH_MS);
+  start();
 }
 
 export type { Trade };

@@ -68,15 +68,28 @@ export async function getCoinHistory(symbol: string): Promise<PricePoint[]> {
   return points;
 }
 
+/**
+ * Strips everything that is not a letter or a digit.
+ *
+ * Names in this set are full of punctuation — "What $IF", "yearn.finance",
+ * "0x". Somebody typing "what if" should find "What $IF", and without this they
+ * do not, because the dollar sign sits in the middle of the word.
+ */
+function normalise(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 /** Ranks matches: exact ticker first, then name starts-with, then contains. */
 export function searchCoins(coins: CoinEntry[], query: string, limit = 8): CoinEntry[] {
-  const needle = query.trim().toLowerCase();
+  const raw = query.trim().toLowerCase();
+  if (raw === '') return coins.slice(0, limit);
+  const needle = normalise(raw);
   if (needle === '') return coins.slice(0, limit);
 
   const scored = coins
     .map((coin) => {
-      const symbol = coin.symbol.toLowerCase();
-      const name = coin.name.toLowerCase();
+      const symbol = normalise(coin.symbol);
+      const name = normalise(coin.name);
       let score = -1;
       if (symbol === needle) score = 0;
       else if (name === needle) score = 1;

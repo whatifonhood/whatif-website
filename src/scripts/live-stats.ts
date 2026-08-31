@@ -11,10 +11,39 @@ import { getLiveStats } from '../lib/token-stats.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/format.ts';
 import { TOKEN } from '../config/site.ts';
 
+/** How often the landing figures refresh while the tab is being looked at. */
+const REFRESH_MS = 30_000;
+
 export async function initLiveStats(locale: string): Promise<void> {
   const nodes = document.querySelectorAll<HTMLElement>('[data-stat]');
   if (nodes.length === 0) return;
 
+  await update(nodes, locale);
+
+  // Same reasoning as the dashboard: poll only while the tab is visible, and
+  // refresh the moment it comes back rather than showing stale figures.
+  let timer: number | undefined;
+  const start = () => {
+    timer ??= window.setInterval(() => void update(nodes, locale), REFRESH_MS);
+  };
+  const stop = () => {
+    if (timer !== undefined) window.clearInterval(timer);
+    timer = undefined;
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stop();
+    } else {
+      void update(nodes, locale);
+      start();
+    }
+  });
+  window.addEventListener('focus', () => void update(nodes, locale));
+  start();
+}
+
+async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<void> {
   let stats;
   try {
     stats = await getLiveStats();

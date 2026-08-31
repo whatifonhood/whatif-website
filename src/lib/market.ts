@@ -47,13 +47,14 @@ export interface Trade {
   txHash: string;
 }
 
-export type Timeframe = 'day' | 'week' | 'month' | 'all';
+export type Timeframe = 'day' | 'week' | 'month' | 'quarter' | 'all';
 
 /** GeckoTerminal's endpoint and candle count for each timeframe we offer. */
 const TIMEFRAMES: Record<Timeframe, { path: string; limit: number }> = {
   day: { path: 'hour?aggregate=1', limit: 24 },
   week: { path: 'hour?aggregate=4', limit: 42 },
   month: { path: 'day?aggregate=1', limit: 30 },
+  quarter: { path: 'day?aggregate=1', limit: 90 },
   // Everything the pool has. It opened in July 2026, so this is currently about
   // fifty daily candles; the limit is set high so it keeps working as it ages.
   all: { path: 'day?aggregate=1', limit: 1000 },

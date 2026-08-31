@@ -199,7 +199,9 @@ export interface SiteCopy {
       openExplorer: string;
       openChart: string;
       /** Chart timeframe buttons. */
-      timeframes: { day: string; week: string; month: string; all: string };
+      timeframes: { day: string; week: string; month: string; quarter: string; all: string };
+      /** Makes the chart taller. */
+      expandChart: string;
       /** Candles or a line. */
       chartTypes: { candles: string; line: string };
       /** Toggles the price axis between linear and logarithmic. */
@@ -314,13 +316,18 @@ export interface SiteCopy {
       /** Shown under the title on a page, e.g. "Updated". */
       updatedLabel: string;
     };
-    updates: {
+    roadmap: {
       title: string;
       eyebrow: string;
       heading: SplitHeading;
       intro: string;
       open: string;
-      feed: string;
+      /** Column headings, keyed by status. */
+      statuses: { shipped: string; building: string; next: string; later: string };
+      /** Follows the number of shipped items, e.g. "things shipped". */
+      shippedCount: string;
+      /** Explains why nothing unshipped carries a date. */
+      note: string;
     };
     holdings: {
       title: string;
