@@ -18,6 +18,7 @@ export const zh: SiteCopy = {
       maker: { label: '梗图生成器', blurb: '十秒做一张' },
       stats: { label: '数据', blurb: '每个数字都是实时的' },
       holdings: { label: '钱包查询', blurb: '无需连接' },
+      learn: { label: '了解', blurb: '安全、基础与证据' },
       brand: { label: '品牌', blurb: '标识与素材' },
     },
     buy: '购买 $IF',
@@ -371,6 +372,14 @@ export const zh: SiteCopy = {
       shareText: (name, tier) => `我抽到了 ${name} —— ${tier}。\n\n如果这一枚就是你呢？`,
       odds: '概率',
       openGenerator: '抽你自己的',
+    },
+    learn: {
+      title: '了解',
+      eyebrow: '了解',
+      heading: { lead: '搞清楚你在', accent: '做什么。' },
+      intro: '这一切是怎么运作的、如何保护好你的钱，以及如何自己核实本站的每一项说法。安全第一。',
+      backToIndex: '全部页面',
+      next: '下一篇：',
     },
     updates: {
       title: '更新',

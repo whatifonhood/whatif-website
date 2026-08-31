@@ -1,0 +1,426 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE, type Locale } from '../../config/site.ts';
+import { HISTORY_CAPTURED } from '../../config/coin-history.ts';
+import { MARKETS } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Button from '../../components/ui/Button.astro';
+import Icons from '../../components/ui/Icons.astro';
+
+/**
+ * The What $IF Machine.
+ *
+ * Prices are a build-time snapshot served from this origin, so the page makes no
+ * third-party request and cannot be rate-limited. See tools/build-coin-history.mjs.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.machine;
+
+const AMOUNT_CHIPS = [100, 500, 1000, 10000];
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow="The machine"
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-machine.jpg`}
+>
+  <p slot="header-extra" class="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
+    {page.coinCount}
+  </p>
+
+  <div
+    data-machine
+    data-verdicts={JSON.stringify(page.verdicts)}
+    class="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8"
+  >
+    <div class="grid gap-3 lg:grid-cols-[1.1fr_1fr]">
+      <!-- Inputs -->
+      <div class="card p-6 sm:p-8">
+        <!-- Coin search -->
+        <label class="block">
+          <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+            {page.coinLabel}
+          </span>
+          <div class="relative mt-3">
+            <input
+              data-machine-search
+              type="search"
+              autocomplete="off"
+              placeholder={page.searchPlaceholder}
+              class="w-full rounded-xl border border-line bg-void/60 px-4 py-3 text-ink placeholder:text-faint focus:border-lime/50"
+            />
+            <ul data-machine-results hidden data-no-results={page.noResults} class="results"></ul>
+          </div>
+        </label>
+
+        <div
+          data-machine-chosen
+          hidden
+          class="mt-3 flex items-center gap-3 rounded-xl border border-lime/30 bg-lime/[0.06] px-4 py-3"
+        >
+          <img data-chosen-logo src="" alt="" width="28" height="28" class="h-7 w-7 rounded-full" />
+          <span data-chosen-name class="font-display font-semibold text-ink"></span>
+          <span data-chosen-ticker class="font-mono text-[11px] uppercase tracking-wider text-lime"
+          ></span>
+        </div>
+
+        <!-- Amount -->
+        <div class="mt-7">
+          <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+            {page.amountLabel}
+          </span>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="font-mono text-lg text-faint">$</span>
+            <input
+              data-machine-amount
+              type="number"
+              min="1"
+              max="1000000"
+              value="500"
+              class="w-full rounded-xl border border-line bg-void/60 px-4 py-3 font-mono text-ink focus:border-lime/50"
+            />
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            {
+              AMOUNT_CHIPS.map((value) => (
+                <button type="button" data-amount-chip={value} class="amount-chip">
+                  ${value.toLocaleString('en-US')}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Month -->
+        <div class="mt-7">
+          <div class="flex items-baseline justify-between gap-4">
+            <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+              {page.dateLabel}
+            </span>
+            <span data-machine-month-label class="font-display text-lg font-semibold text-lime"
+            ></span>
+          </div>
+          <input
+            data-machine-month
+            type="range"
+            min="0"
+            max="1"
+            value="0"
+            disabled
+            aria-label={page.dateLabel}
+            class="month-range mt-3 w-full"
+          />
+        </div>
+
+        <button
+          type="button"
+          data-machine-run
+          disabled
+          class="mt-7 w-full rounded-full bg-lime px-6 py-3.5 font-display font-bold text-void transition-all duration-300 hover:-translate-y-0.5 hover:bg-lime-pale disabled:opacity-50"
+        >
+          {page.calculate}
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div class="flex flex-col gap-3">
+        <p
+          data-machine-empty
+          class="card flex flex-1 items-center justify-center p-8 text-center text-muted"
+        >
+          {page.emptyState}
+        </p>
+
+        <div data-machine-output hidden data-direction="up" class="card ring-anim p-6 sm:p-8">
+          <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+            {page.worthLabel}
+          </p>
+          <p
+            data-out="value"
+            class="mt-2 font-display text-4xl font-black italic tabular-nums leading-none tracking-tight text-lime sm:text-6xl"
+          >
+          </p>
+          <p
+            data-out="multiple"
+            class="mt-3 font-display text-2xl font-black italic tabular-nums text-ink"
+          >
+          </p>
+
+          <svg
+            data-machine-spark
+            viewBox="0 0 600 120"
+            preserveAspectRatio="none"
+            class="spark mt-6 h-24 w-full"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="spark-top"></stop>
+                <stop offset="100%" class="spark-bottom"></stop>
+              </linearGradient>
+            </defs>
+            <path data-spark-area class="spark-area" d=""></path>
+            <path data-spark-line class="spark-line" d=""></path>
+            <circle data-spark-entry class="spark-entry" r="5" cx="-10" cy="-10"></circle>
+          </svg>
+
+          <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 font-mono text-xs">
+            {
+              (
+                [
+                  ['invested', page.investedLabel],
+                  ['tokens', page.boughtLabel],
+                  ['entry', page.entryLabel],
+                  ['today', page.todayLabel],
+                ] as const
+              ).map(([key, label]) => (
+                <div class="flex items-baseline justify-between gap-3 border-b border-line pb-2">
+                  <dt class="uppercase tracking-wider text-faint">{label}</dt>
+                  <dd data-out={key} class="tabular-nums text-ink" />
+                </div>
+              ))
+            }
+          </dl>
+
+          <!--
+            The card is the best thing the machine makes, so it is shown as soon
+            as a result exists rather than only appearing in the downloaded file.
+          -->
+          <canvas
+            data-machine-card
+            width="1200"
+            height="675"
+            role="img"
+            aria-label={page.title}
+            class="mt-7 w-full rounded-xl border border-line bg-surface shadow-2xl"></canvas>
+
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              data-machine-share
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-template={page.shareText(
+                '{amount}',
+                '{coin}',
+                '{month}',
+                '{value}',
+                '{multiple}',
+              )}
+              class="inline-flex items-center gap-2 rounded-full bg-lime px-5 py-3 text-sm font-semibold text-void transition-colors hover:bg-lime-pale"
+            >
+              <Icons name="x" size={13} />
+              {page.shareOnX}
+            </a>
+            <a
+              data-machine-download
+              href="#"
+              download
+              class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-lime/50"
+            >
+              {copy.pages.memes.download}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The turn back towards the point of the site -->
+    <div class="card mt-3 border-lime/25 p-6 sm:p-8">
+      <p class="display-heading text-2xl sm:text-3xl">{page.pivot}</p>
+      <Button
+        href={MARKETS.uniswap}
+        external
+        externalLabel={copy.common.externalLink}
+        size="lg"
+        class="mt-5"
+      >
+        {page.pivotCta}
+        <Icons name="arrow-up-right" size={16} />
+      </Button>
+    </div>
+
+    <p class="mt-8 max-w-2xl font-mono text-[11px] leading-relaxed text-faint">
+      {page.disclaimer} · Prices captured {HISTORY_CAPTURED}.
+    </p>
+  </div>
+</PageLayout>
+
+<style>
+  /* Search results.
+     The list scrolls, so it gets a scrollbar styled in the site's own colours —
+     a default grey one in the middle of a lime-on-black panel looks broken. */
+  .results {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% + 0.5rem);
+    z-index: 30;
+    max-height: 19rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 0.9rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.35rem;
+    box-shadow: 0 28px 70px -24px rgb(0 0 0 / 0.8);
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-lime) 40%, transparent) transparent;
+  }
+  .results::-webkit-scrollbar {
+    width: 8px;
+  }
+  .results::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .results::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-lime) 32%, transparent);
+    border: 2px solid var(--color-surface);
+  }
+  .results::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-lime) 55%, transparent);
+  }
+
+  .amount-chip {
+    border-radius: 9999px;
+    border: 1px solid var(--color-line);
+    padding: 0.3rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+  }
+  .amount-chip:hover {
+    border-color: color-mix(in srgb, var(--color-lime) 45%, transparent);
+    color: var(--color-lime);
+  }
+
+  /* Month slider */
+  .month-range {
+    appearance: none;
+    height: 0.35rem;
+    border-radius: 9999px;
+    background: var(--color-line);
+  }
+  .month-range::-webkit-slider-thumb {
+    appearance: none;
+    height: 1.2rem;
+    width: 1.2rem;
+    border-radius: 9999px;
+    background: var(--color-lime);
+    border: 3px solid var(--color-void);
+    cursor: pointer;
+  }
+  .month-range::-moz-range-thumb {
+    height: 1.2rem;
+    width: 1.2rem;
+    border: 3px solid var(--color-void);
+    border-radius: 9999px;
+    background: var(--color-lime);
+    cursor: pointer;
+  }
+  .month-range:disabled {
+    opacity: 0.4;
+  }
+
+  /* Result sparkline */
+  .spark {
+    --spark-colour: var(--color-lime);
+  }
+  [data-direction='down'] .spark {
+    --spark-colour: #f0a06a;
+  }
+  .spark-line {
+    fill: none;
+    stroke: var(--spark-colour);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+  .spark-area {
+    fill: url('#spark-fill');
+  }
+  .spark-top {
+    stop-color: var(--spark-colour);
+    stop-opacity: 0.25;
+  }
+  .spark-bottom {
+    stop-color: var(--spark-colour);
+    stop-opacity: 0;
+  }
+  .spark-entry {
+    fill: var(--color-ink);
+    stroke: var(--spark-colour);
+    stroke-width: 2;
+  }
+</style>
+
+<!-- These elements are created by JavaScript at runtime, so Astro's scoped
+     styles never reach them (scoping is applied to markup in the template).
+     They have to be global. -->
+<style is:global>
+  .result-row {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.7rem;
+    text-align: left;
+    transition: background-color 0.15s ease;
+  }
+  .result-row:hover,
+  .result-row:focus-visible {
+    background: var(--color-surface-2);
+  }
+  .result-logo {
+    height: 1.75rem;
+    width: 1.75rem;
+    border-radius: 9999px;
+    background: var(--color-surface-2);
+  }
+  .result-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-ink);
+    font-size: 0.9rem;
+  }
+  .result-ticker {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-faint);
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: var(--color-surface-2);
+  }
+  .result-row:hover .result-ticker {
+    color: var(--color-lime);
+  }
+  .result-empty {
+    display: block;
+    padding: 1.1rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-faint);
+  }
+</style>
+
+<script>
+  import { initMachine } from '../../scripts/machine.ts';
+  initMachine(document.documentElement.lang || 'en');
+</script>

@@ -18,6 +18,7 @@ export const en: SiteCopy = {
       maker: { label: 'Meme maker', blurb: 'Make one in ten seconds' },
       stats: { label: 'Stats', blurb: 'Every number, live' },
       holdings: { label: 'Wallet lookup', blurb: 'No connection needed' },
+      learn: { label: 'Learn', blurb: 'Safety, basics, and proof' },
       brand: { label: 'Brand', blurb: 'Logos and artwork' },
     },
     buy: 'Buy $IF',
@@ -380,6 +381,15 @@ export const en: SiteCopy = {
       shareText: (name, tier) => `I pulled ${name} — ${tier}.\n\nWhat $IF this one's you?`,
       odds: 'odds',
       openGenerator: 'Pull your own',
+    },
+    learn: {
+      title: 'Learn',
+      eyebrow: 'Learn',
+      heading: { lead: 'Know what', accent: 'you are doing.' },
+      intro:
+        'How this works, how to keep your money safe, and how to check every claim on this site for yourself. Safety first.',
+      backToIndex: 'All pages',
+      next: 'Next:',
     },
     updates: {
       title: 'Updates',

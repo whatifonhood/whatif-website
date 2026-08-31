@@ -1,0 +1,49 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import { getLearnPages } from '../../lib/learn.ts';
+
+/**
+ * The Learn index.
+ *
+ * Safety pages come first, deliberately: they are what a newcomer actually
+ * needs, and on a site about a financial asset they are the part that has to be
+ * right.
+ */
+const locale = 'en' as const;
+const copy = getCopy(locale);
+const page = copy.pages.learn;
+const pages = getLearnPages();
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-default.jpg`}
+>
+  <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
+    <ol class="grid gap-3 sm:grid-cols-2">
+      {
+        pages.map((entry, index) => (
+          <li>
+            <a
+              href={`/learn/${entry.slug}/`}
+              class="card flex h-full flex-col gap-2 p-6 transition-colors hover:border-lime/50"
+            >
+              <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span class="text-lg font-semibold text-ink">{entry.title}</span>
+              <span class="text-sm leading-relaxed text-muted">{entry.summary}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</PageLayout>

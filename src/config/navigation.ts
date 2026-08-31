@@ -12,6 +12,7 @@ export const TOOL_ROUTES = [
   { id: 'maker', href: '/memes/make/' },
   { id: 'stats', href: '/stats/' },
   { id: 'holdings', href: '/holdings/' },
+  { id: 'learn', href: '/learn/' },
   { id: 'brand', href: '/brand/' },
 ] as const;
 
