@@ -202,6 +202,13 @@ export interface SiteCopy {
       timeframes: { day: string; week: string; month: string; quarter: string; all: string };
       /** The drag handle that sets the chart's height. */
       resizeChart: string;
+      zoomIn: string;
+      zoomOut: string;
+      resetZoom: string;
+      /** Moving-average overlay toggle. */
+      average: string;
+      /** Explains that the chart can be dragged and scrolled. */
+      chartHint: string;
       /** Candles or a line. */
       chartTypes: { candles: string; line: string };
       /** Toggles the price axis between linear and logarithmic. */

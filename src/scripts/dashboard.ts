@@ -189,6 +189,78 @@ function drawLine(
   return { high: max, low: min };
 }
 
+/**
+ * A moving average over the visible candles.
+ *
+ * Averaged over the window on screen, so zooming in gives a line that follows
+ * what you are actually looking at rather than one computed once and stretched.
+ */
+function drawAverage(
+  svg: SVGSVGElement,
+  candles: Candle[],
+  y: (value: number) => number,
+  period: number,
+): void {
+  const layer = svg.querySelector('[data-average]');
+  if (!layer) return;
+  layer.replaceChildren();
+  if (candles.length < period) return;
+
+  const width = 1000;
+  const step = width / candles.length;
+  const points: string[] = [];
+
+  for (let i = period - 1; i < candles.length; i += 1) {
+    let sum = 0;
+    for (let back = 0; back < period; back += 1) sum += candles[i - back]!.close;
+    points.push(`${(step * (i + 0.5)).toFixed(2)},${y(sum / period).toFixed(2)}`);
+  }
+  if (points.length < 2) return;
+
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', `M${points.join(' L')}`);
+  path.setAttribute('class', 'ma-line');
+  layer.append(path);
+}
+
+/**
+ * Burns, marked where they happened.
+ *
+ * Only the ones inside the visible window, so zooming in reveals individual
+ * burns rather than a smear of ticks across the whole axis.
+ */
+function drawBurnMarks(
+  svg: SVGSVGElement,
+  candles: Candle[],
+  burns: { time: number; tokens: number }[],
+): void {
+  const layer = svg.querySelector('[data-burn-marks]');
+  if (!layer || candles.length < 2) return;
+
+  const first = candles[0]!.time;
+  const last = candles[candles.length - 1]!.time;
+  const span = last - first || 1;
+
+  const marks = burns
+    .filter((burn) => burn.time >= first && burn.time <= last)
+    .map((burn) => {
+      const x = ((burn.time - first) / span) * 1000;
+      const mark = document.createElementNS(SVG_NS, 'line');
+      mark.setAttribute('x1', x.toFixed(2));
+      mark.setAttribute('x2', x.toFixed(2));
+      mark.setAttribute('y1', String(PLOT_H - 16));
+      mark.setAttribute('y2', String(PLOT_H));
+      mark.setAttribute('class', 'burn-mark');
+
+      const title = document.createElementNS(SVG_NS, 'title');
+      title.textContent = `${Math.round(burn.tokens).toLocaleString()} burned`;
+      mark.append(title);
+      return mark;
+    });
+
+  layer.replaceChildren(...marks);
+}
+
 function shortWallet(address: string): string {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
@@ -271,9 +343,29 @@ export function initDashboard(locale: string): void {
     }
   };
 
-  const renderChart = async (timeframe: Timeframe) => {
-    if (!chart) return;
-    const candles = await getPriceHistory(timeframe);
+  /**
+   * The window on screen, as indices into the fetched candles.
+   *
+   * Zoom and pan move this rather than refetching: the whole series is already
+   * in memory, so navigating is instant and costs the API nothing.
+   */
+  let loaded: Candle[] = [];
+  let view = { start: 0, end: 0 };
+
+  const clampView = () => {
+    const MIN = 8;
+    const total = loaded.length;
+    if (total === 0) return;
+    let { start, end } = view;
+    if (end - start < MIN) end = Math.min(total, start + MIN);
+    if (end - start < MIN) start = Math.max(0, end - MIN);
+    view = { start: Math.max(0, Math.floor(start)), end: Math.min(total, Math.ceil(end)) };
+  };
+
+  const paint = () => {
+    if (!chart || loaded.length < 2) return;
+    clampView();
+    const candles = loaded.slice(view.start, view.end);
     if (candles.length < 2) return;
 
     shown = candles;
@@ -282,13 +374,54 @@ export function initDashboard(locale: string): void {
     const bounds =
       type === 'line' ? drawLine(chart, candles, log) : drawCandles(chart, candles, log);
     drawVolume(chart, candles);
+
+    // Overlays read the same scale the price was drawn with, so they line up.
+    const scale = makeScale(bounds.low, bounds.high, log);
+    if (root.dataset.showAverage === 'true') {
+      drawAverage(chart, candles, scale, Math.max(3, Math.round(candles.length / 8)));
+    } else {
+      chart.querySelector('[data-average]')?.replaceChildren();
+    }
+    drawBurnMarks(chart, candles, BURNS);
+
     chart.dataset.type = type;
+    // Only offer "reset" when there is something to reset to.
+    root.dataset.zoomed = String(view.start > 0 || view.end < loaded.length);
+
     if (chartHigh) chartHigh.textContent = formatUsd(bounds.high, locale);
     if (chartLow) chartLow.textContent = formatUsd(bounds.low, locale);
-
-    // Lime when the window closed up, warm when it closed down.
     const rising = (candles.at(-1)?.close ?? 0) >= (candles[0]?.open ?? 0);
     chart.dataset.direction = rising ? 'up' : 'down';
+  };
+
+  /**
+   * Fetches a timeframe and draws it.
+   *
+   * `keepView` is what stops the twenty-second refresh throwing away a zoom
+   * somebody is in the middle of reading. New candles arrive at the right-hand
+   * edge, so the window is shifted by however many were added and the view stays
+   * pointed at the same moment in time.
+   */
+  const renderChart = async (timeframe: Timeframe, keepView = false) => {
+    if (!chart) return;
+    const candles = await getPriceHistory(timeframe);
+    if (candles.length < 2) return;
+
+    const zoomed = view.end - view.start < loaded.length;
+    if (keepView && zoomed && loaded.length > 0) {
+      const added = candles.length - loaded.length;
+      const atRightEdge = view.end >= loaded.length;
+      const span = Math.min(view.end - view.start, candles.length);
+      const start = atRightEdge
+        ? Math.max(0, candles.length - span)
+        : Math.max(0, Math.min(candles.length - span, view.start + Math.max(0, added)));
+      view = { start, end: start + span };
+    } else {
+      view = { start: 0, end: candles.length };
+    }
+
+    loaded = candles;
+    paint();
   };
 
   const renderTrades = async () => {
@@ -581,7 +714,9 @@ export function initDashboard(locale: string): void {
     const results = await Promise.allSettled([
       renderSnapshot(),
       // Redrawing under a pointer makes the chart jump while it is being read.
-      holding ? Promise.resolve() : renderChart((root.dataset.timeframe as Timeframe) ?? 'day'),
+      holding || panFrom
+        ? Promise.resolve()
+        : renderChart((root.dataset.timeframe as Timeframe) ?? 'day', true),
       renderTrades(),
       renderExtremes(),
       renderTokenInfo(),
@@ -651,6 +786,8 @@ export function initDashboard(locale: string): void {
 
   const moveCrosshair = (event: PointerEvent) => {
     if (!wrap || !chart || !crosshair || !tip || shown.length === 0) return;
+    // While dragging, the pointer is moving the chart, not reading it.
+    if (wrap.dataset.panning === 'true') return;
     const box = wrap.getBoundingClientRect();
     const ratio = Math.min(0.999, Math.max(0, (event.clientX - box.left) / box.width));
     const index = Math.min(shown.length - 1, Math.floor(ratio * shown.length));
@@ -691,6 +828,109 @@ export function initDashboard(locale: string): void {
     const clamped = Math.min(box.width - 80, Math.max(80, event.clientX - box.left));
     tip.style.left = `${clamped}px`;
   };
+
+  /**
+   * Zooming and panning.
+   *
+   * The whole series is already in memory, so both just move the window and
+   * redraw — no request, no waiting, and the API is untouched however much
+   * somebody scrubs around.
+   */
+  const zoomAt = (ratio: number, factor: number) => {
+    const total = loaded.length;
+    if (total < 2) return;
+
+    const span = view.end - view.start;
+    // Work out the new width first, then place it — clamping the width and the
+    // position separately is what keeps this in range. Clamping the two edges
+    // independently could leave start past end, which drew an empty chart.
+    const width = Math.max(8, Math.min(total, Math.round(span * factor)));
+    const anchorIndex = view.start + ratio * span;
+    const start = Math.max(0, Math.min(total - width, Math.round(anchorIndex - ratio * width)));
+
+    view = { start, end: start + width };
+    paint();
+  };
+
+  wrap?.addEventListener(
+    'wheel',
+    (event) => {
+      if (loaded.length < 2) return;
+      // Only take over the page scroll when there is something to zoom.
+      event.preventDefault();
+      const box = wrap.getBoundingClientRect();
+      const ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
+      zoomAt(ratio, event.deltaY > 0 ? 1.18 : 0.85);
+    },
+    { passive: false },
+  );
+
+  let panFrom: { x: number; start: number; end: number } | null = null;
+
+  wrap?.addEventListener('pointerdown', (event) => {
+    if (loaded.length < 2) return;
+    panFrom = { x: event.clientX, start: view.start, end: view.end };
+    wrap.dataset.panning = 'true';
+  });
+
+  wrap?.addEventListener('pointermove', (event) => {
+    if (!panFrom || !wrap) return;
+    const box = wrap.getBoundingClientRect();
+    const span = panFrom.end - panFrom.start;
+    // Move by whole candles, in the opposite direction to the drag.
+    const shift = ((panFrom.x - event.clientX) / box.width) * span;
+    // Move the window, then clamp its position — never its edges separately.
+    const start = Math.max(0, Math.min(loaded.length - span, panFrom.start + shift));
+    view = { start, end: start + span };
+    paint();
+  });
+
+  const endPan = () => {
+    panFrom = null;
+    if (wrap) delete wrap.dataset.panning;
+  };
+  wrap?.addEventListener('pointerup', endPan);
+  wrap?.addEventListener('pointercancel', endPan);
+  wrap?.addEventListener('pointerleave', endPan);
+
+  // Double-click is the universal "put it back".
+  wrap?.addEventListener('dblclick', () => {
+    view = { start: 0, end: loaded.length };
+    paint();
+  });
+
+  root.querySelector('[data-chart-reset]')?.addEventListener('click', () => {
+    view = { start: 0, end: loaded.length };
+    paint();
+  });
+
+  for (const button of root.querySelectorAll<HTMLButtonElement>('[data-chart-zoom]')) {
+    button.addEventListener('click', () => {
+      zoomAt(0.5, button.dataset.chartZoom === 'in' ? 0.7 : 1.4);
+    });
+  }
+
+  const averageButton = root.querySelector<HTMLButtonElement>('[data-chart-average]');
+  averageButton?.addEventListener('click', () => {
+    const next = root.dataset.showAverage !== 'true';
+    root.dataset.showAverage = String(next);
+    averageButton.setAttribute('aria-pressed', String(next));
+    try {
+      localStorage.setItem('whatif.chartAverage', String(next));
+    } catch {
+      /* storage unavailable */
+    }
+    paint();
+  });
+
+  try {
+    if (localStorage.getItem('whatif.chartAverage') === 'true') {
+      root.dataset.showAverage = 'true';
+      averageButton?.setAttribute('aria-pressed', 'true');
+    }
+  } catch {
+    /* storage unavailable */
+  }
 
   wrap?.addEventListener('pointermove', moveCrosshair);
   wrap?.addEventListener('pointerdown', moveCrosshair);

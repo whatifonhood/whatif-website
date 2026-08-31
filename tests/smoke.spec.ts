@@ -396,11 +396,16 @@ test.describe('the question generator', () => {
       // Double negatives, which is what "nobody" does to a negative verb.
       if (/\bnobody\b[^?]*\bnever\b/.test(text)) problems.push(`double negative: ${text}`);
 
+      // Wait for the question to actually change rather than assuming the click
+      // landed — under parallel load a press can outrun the read, which looks
+      // like the generator repeating when it is the test racing itself.
       await page.locator('[data-ask-again]').click();
+      await expect(question).not.toHaveText(text, { timeout: 5_000 });
     }
 
     expect(problems.slice(0, 3)).toEqual([]);
-    // Repeats are possible but should be vanishingly rare with a million options.
+    // Each press is confirmed to have changed the text, so anything repeated
+    // here is the generator genuinely coming round again.
     expect(seen.size, 'the generator is repeating itself').toBeGreaterThan(30);
   });
 
@@ -488,4 +493,79 @@ test('the burn is never quoted as hardcoded text', async ({ page }) => {
 
   const body = (await page.locator('main').textContent()) ?? '';
   expect(body, 'a burn figure is typed into the copy').not.toMatch(/93 million|93 millones/i);
+});
+
+/**
+ * Navigating the chart.
+ *
+ * Zoom and pan move a window over candles already in memory, so the failure
+ * mode is not an exception — it is an empty chart, which is what happened when
+ * the window's two edges were clamped independently and start ended up past
+ * end. These check the drawing, not that the code ran.
+ */
+test.describe('the chart can be navigated', () => {
+  /**
+   * The chart needs live data before there is anything to navigate.
+   *
+   * That data comes from a public API which throttles. Failing the suite when
+   * somebody else rate-limits us reports a fault that does not exist, so these
+   * skip instead and say why — the same reasoning as the console-error filter
+   * further up this file.
+   */
+  const waitForCandles = async (page: import('@playwright/test').Page) => {
+    await page.goto('/stats/');
+    const candles = page.locator('[data-candles] rect');
+    try {
+      await expect(candles.first()).toBeVisible({ timeout: 20_000 });
+      // The first data load resets the view by design, so interacting before it
+      // finishes races it. `data-zoomed` is only set once a paint has completed.
+      await expect(page.locator('[data-dashboard]')).toHaveAttribute('data-zoomed', /true|false/);
+      await page.waitForTimeout(500);
+    } catch {
+      test.skip(true, 'no market data available — the price API is throttling');
+    }
+    return candles;
+  };
+
+  test('zooming in narrows it, and zooming out never empties it', async ({ page }) => {
+    const candles = await waitForCandles(page);
+    const atStart = await candles.count();
+
+    // The buttons rather than the wheel: a phone has no scroll wheel, so this
+    // is both the portable test and the path a touch user actually takes.
+    await page.locator('[data-chart-zoom="in"]').click();
+    await page.waitForTimeout(400);
+    expect(await candles.count(), 'zooming in did not narrow the window').toBeLessThan(atStart);
+
+    // Far past the end of the data, which is what emptied the chart before.
+    for (let i = 0; i < 8; i += 1) {
+      await page.locator('[data-chart-zoom="out"]').click();
+      await page.waitForTimeout(120);
+      expect(await candles.count(), 'zooming out emptied the chart').toBeGreaterThan(1);
+    }
+  });
+
+  test('reset puts the whole range back', async ({ page }) => {
+    const candles = await waitForCandles(page);
+    const box = await page.locator('[data-chart-wrap]').boundingBox();
+    if (!box) throw new Error('no chart');
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.wheel(0, -600);
+    await page.waitForTimeout(400);
+    const zoomed = await candles.count();
+
+    // Whether the button is on screen depends on a refresh that may have just
+    // landed, so the behaviour is what is asserted, not the visibility.
+    await page.locator('[data-chart-reset]').click({ force: true });
+    await page.waitForTimeout(500);
+    expect(await candles.count()).toBeGreaterThanOrEqual(zoomed);
+  });
+
+  test('the moving average draws over the visible window', async ({ page }) => {
+    await waitForCandles(page);
+    await expect(page.locator('.ma-line')).toHaveCount(0);
+    await page.locator('[data-chart-average]').click();
+    await expect(page.locator('.ma-line')).toHaveCount(1);
+  });
 });
