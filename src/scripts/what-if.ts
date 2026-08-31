@@ -13,6 +13,7 @@ import {
   BANKS,
   CATEGORIES,
   PATTERNS,
+  SPARSE_SLOTS,
   countPossibilities,
   type Category,
 } from '../config/what-if.ts';
@@ -40,7 +41,17 @@ function fill(text: string): string {
   const filled = text
     .replace(/\{(\w+)\}/g, (_, slot: string) => {
       const bank = BANKS[slot];
-      return bank ? pick(bank) : '';
+      if (!bank) return '';
+      // Seasoning slots stay empty most of the time — see SPARSE_SLOTS. Picked
+      // evenly they land on nearly every question at once and it reads as a
+      // run-on rather than a thought.
+      const skipChance = SPARSE_SLOTS[slot];
+      if (skipChance !== undefined) {
+        if (Math.random() < skipChance) return '';
+        const real = bank.filter((entry) => entry !== '');
+        return real.length > 0 ? pick(real) : '';
+      }
+      return pick(bank);
     })
     // An empty tail or opener can leave a doubled space behind it.
     .replace(/\s{2,}/g, ' ')
@@ -128,19 +139,21 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
 
-  // Largest size at which the question fits four lines in the space available.
-  let size = 76;
+  // Set as prose rather than as a headline: sentence case at a normal weight,
+  // with room between the lines. Uppercase black italic at this size reads as
+  // shouting, and a long question becomes a wall of it.
+  let size = 62;
   let lines: string[] = [];
-  const maxHeight = 330;
-  while (size > 26) {
-    context.font = `italic 900 ${size}px Archivo, sans-serif`;
-    lines = wrap(context, question.toUpperCase(), boxWidth);
-    if (lines.length <= 4 && lines.length * size * 1.06 <= maxHeight) break;
-    size -= 3;
+  const maxHeight = 340;
+  while (size > 24) {
+    context.font = `600 ${size}px Archivo, sans-serif`;
+    lines = wrap(context, question, boxWidth);
+    if (lines.length <= 5 && lines.length * size * 1.32 <= maxHeight) break;
+    size -= 2;
   }
 
-  const lineHeight = size * 1.06;
-  let y = 200 + (maxHeight - lines.length * lineHeight) / 2;
+  const lineHeight = size * 1.32;
+  let y = 208 + (maxHeight - lines.length * lineHeight) / 2;
   context.fillStyle = '#E9F0DD';
   for (const line of lines) {
     context.fillText(line, PAD, y);
