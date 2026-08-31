@@ -249,6 +249,158 @@ export const LINES: { category: Category; text: string }[] = [
   { category: 'deep', text: 'What if you are not the problem, and never were?' },
   { category: 'deep', text: 'What if it works out and you have no story to tell?' },
 
+  { category: 'deep', text: 'What if the life you have is the one you were hoping for?' },
+  { category: 'deep', text: 'What if you are in the middle of the good years right now?' },
+  { category: 'deep', text: 'What if nothing is wasted, only used differently?' },
+  { category: 'deep', text: 'What if the detour was the route?' },
+  { category: 'deep', text: 'What if you are further along than the version of you who set out?' },
+  {
+    category: 'deep',
+    text: 'What if the thing you call luck is just other people helping quietly?',
+  },
+  {
+    category: 'deep',
+    text: "What if you have been someone's answered prayer without hearing about it?",
+  },
+  { category: 'deep', text: 'What if you are remembered for the thing you did not think counted?' },
+  { category: 'deep', text: 'What if the smallest promise you kept held someone together?' },
+  {
+    category: 'deep',
+    text: 'What if the person you were short with was carrying something enormous?',
+  },
+  { category: 'deep', text: 'What if everyone you envy is envying someone too?' },
+  { category: 'deep', text: 'What if nobody has it figured out, and that is the shared secret?' },
+  { category: 'deep', text: 'What if confidence is just the willingness to be wrong in public?' },
+  { category: 'deep', text: 'What if you are allowed to start again on a Wednesday?' },
+  { category: 'deep', text: 'What if the deadline was invented and you agreed to it?' },
+  { category: 'deep', text: 'What if you outlive the thing you are worried about?' },
+  { category: 'deep', text: 'What if the fear never fully goes and you go anyway?' },
+  { category: 'deep', text: 'What if courage is mostly just doing it while afraid?' },
+  { category: 'deep', text: 'What if the hardest year taught you the thing you now use daily?' },
+  { category: 'deep', text: 'What if pain is not a lesson and does not have to be?' },
+  { category: 'deep', text: 'What if you are allowed to be tired without earning it?' },
+  { category: 'deep', text: 'What if rest is not the reward for the work but part of it?' },
+  { category: 'deep', text: 'What if enough arrived years ago and nobody rang a bell?' },
+  { category: 'deep', text: 'What if wanting more is not a flaw but a feature you can aim?' },
+  { category: 'deep', text: 'What if the ambition was borrowed and you can give it back?' },
+  {
+    category: 'deep',
+    text: 'What if success looked nothing like the picture and you got it anyway?',
+  },
+  { category: 'deep', text: 'What if the ordinary day is the one you will miss?' },
+  { category: 'deep', text: 'What if this is the story you tell your grandchildren?' },
+  { category: 'deep', text: 'What if the boring years are the ones that hold everything up?' },
+  { category: 'deep', text: 'What if the good life is mostly maintenance?' },
+  { category: 'deep', text: 'What if love is a decision you make repeatedly and quietly?' },
+  { category: 'deep', text: 'What if being known is worth more than being admired?' },
+  { category: 'deep', text: 'What if the friendship you did not maintain was still real?' },
+  { category: 'deep', text: 'What if they think about you as often as you think about them?' },
+  { category: 'deep', text: 'What if the message you never sent was the one they needed?' },
+  { category: 'deep', text: 'What if forgiveness is something you do for your own future?' },
+  { category: 'deep', text: 'What if you can love someone and still let them go?' },
+  { category: 'deep', text: 'What if grief is love with nowhere left to put itself?' },
+  { category: 'deep', text: 'What if the ones we lost are still doing work through us?' },
+  { category: 'deep', text: 'What if you carry more of them than you realise?' },
+  { category: 'deep', text: 'What if remembering someone properly is a form of keeping them?' },
+  { category: 'deep', text: 'What if the last conversation was ordinary and that was a mercy?' },
+  { category: 'deep', text: 'What if you get to decide what your life was about?' },
+  { category: 'deep', text: 'What if meaning is not discovered but assembled?' },
+  { category: 'deep', text: 'What if the point of the question is that it keeps you moving?' },
+  { category: 'deep', text: 'What if certainty would have been a smaller life?' },
+  { category: 'deep', text: 'What if doubt is what honesty feels like from the inside?' },
+  { category: 'deep', text: 'What if changing your mind is the whole skill?' },
+  { category: 'deep', text: 'What if being wrong in public is cheaper than being wrong quietly?' },
+  { category: 'deep', text: 'What if the truth was available the entire time and inconvenient?' },
+  { category: 'deep', text: 'What if you already know and are waiting for permission?' },
+  { category: 'deep', text: 'What if nobody is going to give you permission?' },
+  { category: 'deep', text: 'What if you gave it to yourself this afternoon?' },
+  { category: 'deep', text: 'What if the version of you in ten years is grateful for today?' },
+  { category: 'deep', text: 'What if the version of you from ten years ago would be amazed?' },
+  { category: 'deep', text: "What if you are somebody's proof that it can be done?" },
+  { category: 'deep', text: 'What if consistency beats intensity every single time?' },
+  { category: 'deep', text: 'What if the compound interest was never about money?' },
+  { category: 'deep', text: 'What if attention is the most valuable thing you own?' },
+  { category: 'deep', text: 'What if what you look at is what you become?' },
+  { category: 'deep', text: 'What if the algorithm is not choosing for you unless you let it?' },
+  { category: 'deep', text: 'What if you closed the app and nothing bad happened?' },
+  { category: 'deep', text: 'What if the news does not need you to hold it every hour?' },
+  { category: 'deep', text: 'What if you are allowed to not have an opinion?' },
+  { category: 'deep', text: 'What if silence is a position?' },
+  { category: 'deep', text: 'What if listening is the rarer talent?' },
+  { category: 'deep', text: 'What if the person who changed your life does not know?' },
+  { category: 'deep', text: 'What if you told them this week?' },
+  { category: 'deep', text: 'What if gratitude is a practice and not a mood?' },
+  { category: 'deep', text: 'What if noticing is most of it?' },
+  { category: 'deep', text: 'What if the walk is the answer more often than the thinking?' },
+  { category: 'deep', text: 'What if your body has been telling you for months?' },
+  { category: 'deep', text: 'What if sleep fixes more than strategy?' },
+  { category: 'deep', text: 'What if you are one honest conversation away from lighter?' },
+  { category: 'deep', text: 'What if the thing you are avoiding is smaller than the avoiding?' },
+  { category: 'deep', text: 'What if starting badly is the only way to start?' },
+  { category: 'deep', text: 'What if the first draft is supposed to be embarrassing?' },
+  { category: 'deep', text: 'What if nobody remembers your worst day but you?' },
+  { category: 'deep', text: 'What if the humiliation you replay was invisible to everyone else?' },
+  { category: 'deep', text: 'What if you are the only one keeping score?' },
+  { category: 'deep', text: 'What if the universe is large enough for this to matter anyway?' },
+  { category: 'deep', text: 'What if scale is not the same as significance?' },
+  { category: 'deep', text: 'What if a single life is the correct unit?' },
+  { category: 'deep', text: 'What if you are a rounding error and still the whole point?' },
+  { category: 'deep', text: 'What if consciousness happening at all is the strange part?' },
+  { category: 'deep', text: 'What if the odds against you existing make this a windfall?' },
+  { category: 'deep', text: 'What if every person alive is a coincidence that worked?' },
+  { category: 'deep', text: 'What if being here at all was the improbable bit?' },
+  { category: 'deep', text: 'What if there is no plan and it is still worth doing well?' },
+  { category: 'deep', text: 'What if the absence of a script is the freedom?' },
+  { category: 'deep', text: 'What if you get to choose what counts?' },
+  { category: 'deep', text: 'What if the meaning was in the making and not the made?' },
+  { category: 'deep', text: 'What if the cathedral builders were fine never seeing it?' },
+  { category: 'deep', text: 'What if you plant something you will not sit under?' },
+  { category: 'deep', text: 'What if the future is people you will never meet?' },
+  { category: 'deep', text: 'What if you owe them the same thing you were given?' },
+  { category: 'deep', text: 'What if progress is just a lot of people refusing to quit?' },
+  { category: 'deep', text: 'What if the world got better and nobody announced it?' },
+  { category: 'deep', text: 'What if the good news is quiet by nature?' },
+  { category: 'deep', text: 'What if despair is a habit and not an analysis?' },
+  { category: 'deep', text: 'What if hope is the more rigorous position?' },
+  { category: 'deep', text: 'What if optimism is a discipline rather than a temperament?' },
+  { category: 'deep', text: 'What if cynicism is just fear wearing a clever coat?' },
+  { category: 'deep', text: 'What if trying and looking stupid is the price of everything good?' },
+  { category: 'deep', text: 'What if the people who changed things were also unsure?' },
+  { category: 'deep', text: 'What if they did it anyway and that is the entire trick?' },
+  { category: 'deep', text: 'What if you are early and it feels identical to being wrong?' },
+  { category: 'deep', text: 'What if patience is a form of belief?' },
+  { category: 'deep', text: 'What if the seed does nothing visible for a long time?' },
+  { category: 'deep', text: 'What if you are in the part before it shows?' },
+  { category: 'deep', text: 'What if the work counts even when nobody claps?' },
+  { category: 'deep', text: 'What if craft is its own payment?' },
+  { category: 'deep', text: 'What if you would do it anyway, and that is how you know?' },
+  { category: 'deep', text: 'What if the thing you do when procrastinating is the actual thing?' },
+  { category: 'deep', text: 'What if your taste is ahead of your ability and that is normal?' },
+  { category: 'deep', text: 'What if the gap closes only by continuing?' },
+  { category: 'deep', text: 'What if talent is mostly staying interested for longer?' },
+  { category: 'deep', text: 'What if the ones who made it just did not stop?' },
+  { category: 'deep', text: 'What if quitting the right thing is also brave?' },
+  { category: 'deep', text: 'What if leaving well is a skill nobody teaches?' },
+  { category: 'deep', text: 'What if the door you closed needed closing?' },
+  { category: 'deep', text: 'What if no was the kindest word available?' },
+  { category: 'deep', text: 'What if boundaries are how you keep loving people?' },
+  { category: 'deep', text: 'What if you can be generous and still finite?' },
+  { category: 'deep', text: 'What if you are not required to be available?' },
+  { category: 'deep', text: 'What if the guilt is old and belongs to someone else?' },
+  { category: 'deep', text: 'What if you inherited a fear that was never yours?' },
+  { category: 'deep', text: 'What if the story about you was written by someone who left?' },
+  { category: 'deep', text: 'What if you can revise it?' },
+  { category: 'deep', text: 'What if you already have, and have not updated the label?' },
+  { category: 'deep', text: 'What if the identity you defend is out of date?' },
+  { category: 'deep', text: 'What if you are allowed to outgrow the thing that saved you?' },
+  { category: 'deep', text: 'What if you contain more than one true version?' },
+  { category: 'deep', text: 'What if consistency is overrated and integrity is not?' },
+  { category: 'deep', text: 'What if you can hold two things and not resolve them?' },
+  { category: 'deep', text: 'What if the paradox is the accurate description?' },
+  { category: 'deep', text: 'What if not knowing is a legitimate place to stand?' },
+  { category: 'deep', text: 'What if the honest answer is I do not know yet?' },
+  { category: 'deep', text: 'What if that is the beginning of every good thing?' },
+
   // ---------------------------------------------------------------- money
   { category: 'money', text: 'What if the money was never the point?' },
   { category: 'money', text: 'What if you only ever needed one good decision?' },
@@ -281,4 +433,144 @@ export function countPossibilities(): number {
     return total + slots.reduce((n, slot) => n * (BANKS[slot]?.length ?? 1), 1);
   }, 0);
   return fromPatterns + LINES.length;
+}
+
+// ---------------------------------------------------------------------------
+// Choosing a question
+// ---------------------------------------------------------------------------
+
+/**
+ * How often each register comes up.
+ *
+ * The philosophical one leads: it is the question the whole coin is built on.
+ * Money is the regret the Machine already answers in detail, and the market
+ * jokes are garnish, so they take the smallest share.
+ */
+export const WEIGHTS: Record<Category, number> = { deep: 0.62, money: 0.24, market: 0.14 };
+
+export interface Question {
+  text: string;
+  /**
+   * A short, opaque handle for this exact question, used in the share URL.
+   *
+   * Indices, never the text itself. A URL carrying raw words would let anyone
+   * render whatever they liked onto a card wearing our branding — which is a
+   * way to make $IF appear to say anything. Decoding checks every index against
+   * the real data, so a tampered link falls back to a fresh question.
+   */
+  id: string;
+}
+
+/** Deterministic generator, so a date always produces the same question. */
+function seeded(seed: number): () => number {
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function hash(text: string): number {
+  let value = 2166136261;
+  for (let i = 0; i < text.length; i += 1) {
+    value ^= text.charCodeAt(i);
+    value = Math.imul(value, 16777619);
+  }
+  return value >>> 0;
+}
+
+/** Builds one question from a source of randomness, so date and dice share code. */
+function build(random: () => number): Question {
+  let roll = random();
+  let category: Category = 'deep';
+  for (const entry of Object.entries(WEIGHTS) as [Category, number][]) {
+    roll -= entry[1];
+    if (roll <= 0) {
+      category = entry[0];
+      break;
+    }
+  }
+
+  const lines = LINES.map((line, index) => ({ line, index })).filter(
+    (entry) => entry.line.category === category,
+  );
+  const patterns = PATTERNS.map((pattern, index) => ({ pattern, index })).filter(
+    (entry) => entry.pattern.category === category,
+  );
+
+  const total = lines.length + patterns.length;
+  if (total === 0) return { text: LINES[0]!.text, id: 'l0' };
+
+  const choice = Math.floor(random() * total);
+
+  if (choice < lines.length) {
+    const entry = lines[choice]!;
+    return { text: entry.line.text, id: `l${entry.index}` };
+  }
+
+  const entry = patterns[choice - lines.length]!;
+  const slots = [...entry.pattern.text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+  const picked: number[] = [];
+  const text = slots.reduce((current, slot) => {
+    const bank = BANKS[slot] ?? [];
+    const index = Math.floor(random() * bank.length);
+    picked.push(index);
+    return current.replace(`{${slot}}`, bank[index] ?? '');
+  }, entry.pattern.text);
+
+  return { text, id: `p${entry.index}.${picked.join('.')}` };
+}
+
+/** A question at random. */
+export function randomQuestion(): Question {
+  return build(Math.random);
+}
+
+/**
+ * The question for a given day.
+ *
+ * Everyone who opens the site on the same date sees the same one, which is what
+ * makes it worth posting about together. `iso` is a plain YYYY-MM-DD string so
+ * the caller decides the timezone rather than this guessing.
+ */
+export function questionForDate(iso: string): Question {
+  return build(seeded(hash(iso)));
+}
+
+/**
+ * Rebuilds the exact question behind an id.
+ *
+ * Every index is checked against the real data. Anything malformed, out of
+ * range, or invented returns null and the caller shows a fresh question.
+ */
+export function questionFromId(id: string): Question | null {
+  if (typeof id !== 'string' || !/^[lp][0-9.]{1,40}$/.test(id)) return null;
+
+  if (id.startsWith('l')) {
+    const index = Number(id.slice(1));
+    const line = LINES[index];
+    if (!Number.isInteger(index) || !line) return null;
+    return { text: line.text, id };
+  }
+
+  const parts = id.slice(1).split('.').map(Number);
+  const patternIndex = parts[0];
+  if (patternIndex === undefined || !Number.isInteger(patternIndex)) return null;
+  const pattern = PATTERNS[patternIndex];
+  if (!pattern) return null;
+
+  const slots = [...pattern.text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+  if (parts.length - 1 !== slots.length) return null;
+
+  let text = pattern.text;
+  for (const [position, slot] of slots.entries()) {
+    const bank = BANKS[slot] ?? [];
+    const index = parts[position + 1];
+    if (index === undefined || !Number.isInteger(index) || !bank[index]) return null;
+    text = text.replace(`{${slot}}`, bank[index]);
+  }
+
+  return { text, id };
 }

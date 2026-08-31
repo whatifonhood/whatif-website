@@ -1,0 +1,48 @@
+---
+import { BURNED_PERCENT, TOKEN_SNAPSHOT, type Locale } from '../../config/site.ts';
+import { formatCompact, formatPercent } from '../../lib/format.ts';
+
+/**
+ * Prose with live figures in it.
+ *
+ * Copy that quotes a number goes stale, and a stale number on a finance site is
+ * a false claim rather than a cosmetic problem. The FAQ used to say "more than
+ * 93 million $IF" as plain text, typed by hand.
+ *
+ * Write `{burned}` or `{burnedPercent}` in the copy instead. Each becomes a span
+ * carrying the build-time figure, which src/scripts/live-stats.ts then replaces
+ * with the live one — so the sentence is complete before any script runs and
+ * correct after it.
+ */
+interface Props {
+  locale: Locale;
+  /** Copy containing {burned} and/or {burnedPercent}. */
+  text: string;
+  class?: string;
+}
+
+const { locale, text, class: className = '' } = Astro.props;
+
+const VALUES: Record<string, string> = {
+  burned: formatCompact(TOKEN_SNAPSHOT.burnedTokens, locale),
+  burnedPercent: formatPercent(BURNED_PERCENT, locale),
+};
+
+/** Splits the copy into plain runs and the placeholders between them. */
+const parts = text.split(/(\{burned\}|\{burnedPercent\})/g).filter((part) => part !== '');
+---
+
+<p class={className}>
+  {
+    parts.map((part) => {
+      const key = part.startsWith('{') ? part.slice(1, -1) : null;
+      return key && VALUES[key] !== undefined ? (
+        <span data-stat={key} class="tabular-nums">
+          {VALUES[key]}
+        </span>
+      ) : (
+        part
+      );
+    })
+  }
+</p>

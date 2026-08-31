@@ -96,7 +96,7 @@ export const en: SiteCopy = {
       },
       {
         title: 'Nine percent already gone',
-        body: 'Over 93 million $IF sits in a burn address nobody holds the keys to. That is not a promise — it is a balance you can read yourself.',
+        body: '{burned} $IF — {burnedPercent} of the supply — sits in a burn address nobody holds the keys to. That is not a promise — it is a balance you can read yourself.',
       },
       {
         title: 'Check everything',
@@ -231,7 +231,7 @@ export const en: SiteCopy = {
       },
       {
         q: 'What has been burned?',
-        a: 'More than 93 million $IF — over 9% of the total supply — sits at 0x…dEaD, an address with no private key. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
+        a: 'More than {burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address with no private key. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
       },
       {
         q: 'Where is the community?',
@@ -393,8 +393,12 @@ export const en: SiteCopy = {
       intro:
         'The whole coin is one question. Here it is, over and over, and never quite the same one twice.',
       again: 'Ask another',
-      copy: 'Copy',
+      copyLink: 'Copy link',
       copied: 'Copied.',
+      linkCopied: 'Link copied.',
+      today: 'Today’s question',
+      answerLabel: 'Your answer',
+      answerPlaceholder: 'Say what you think. It goes on the card.',
       postOnX: 'Post on X',
       download: 'Download card',
       possibilities: 'possible questions',

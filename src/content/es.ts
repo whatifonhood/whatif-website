@@ -109,7 +109,7 @@ export const es: SiteCopy = {
       },
       {
         title: 'Nueve por ciento ya quemado',
-        body: 'Más de 93 millones de $IF están en una dirección de quema cuyas claves no tiene nadie. Eso no es una promesa: es un saldo que puedes leer tú mismo.',
+        body: '{burned} $IF — {burnedPercent} del suministro — están en una dirección de quema cuyas claves no tiene nadie. Eso no es una promesa: es un saldo que puedes leer tú mismo.',
       },
       {
         title: 'Verifícalo todo',
@@ -243,7 +243,7 @@ export const es: SiteCopy = {
       },
       {
         q: '¿Qué se ha quemado?',
-        a: 'Más de 93 millones de $IF — más del 9 % del suministro total — están en 0x…dEaD, una dirección sin clave privada. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
+        a: 'Más de {burned} $IF — {burnedPercent} del suministro total — están en 0x…dEaD, una dirección sin clave privada. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
       },
       {
         q: '¿Dónde está la comunidad?',
@@ -405,8 +405,12 @@ export const es: SiteCopy = {
       intro:
         'Toda la moneda es una sola pregunta. Aquí la tienes, una y otra vez, y nunca exactamente la misma.',
       again: 'Otra pregunta',
-      copy: 'Copiar',
+      copyLink: 'Copiar enlace',
       copied: 'Copiado.',
+      linkCopied: 'Enlace copiado.',
+      today: 'La pregunta de hoy',
+      answerLabel: 'Tu respuesta',
+      answerPlaceholder: 'Di lo que piensas. Va en la tarjeta.',
       postOnX: 'Publicar en X',
       download: 'Descargar tarjeta',
       possibilities: 'preguntas posibles',

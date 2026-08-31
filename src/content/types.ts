@@ -309,8 +309,12 @@ export interface SiteCopy {
       heading: SplitHeading;
       intro: string;
       again: string;
-      copy: string;
+      copyLink: string;
       copied: string;
+      linkCopied: string;
+      today: string;
+      answerLabel: string;
+      answerPlaceholder: string;
       postOnX: string;
       download: string;
       /** Follows the counted total, e.g. "possible questions". */

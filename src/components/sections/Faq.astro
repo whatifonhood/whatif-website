@@ -1,5 +1,6 @@
 ---
 import type { Locale } from '../../config/site.ts';
+import LiveText from '../ui/LiveText.astro';
 import { getCopy } from '../../content/index.ts';
 import Section from '../ui/Section.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -45,7 +46,7 @@ const copy = getCopy(locale);
                 </svg>
               </span>
             </summary>
-            <p class="px-5 pb-5 leading-relaxed text-muted">{item.a}</p>
+            <LiveText locale={locale} text={item.a} class="px-5 pb-5 leading-relaxed text-muted" />
           </details>
         ))
       }

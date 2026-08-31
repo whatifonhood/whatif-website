@@ -33,19 +33,46 @@ const page = copy.pages.ask;
     data-ask
     data-share-text={page.shareText}
     data-label-copied={page.copied}
+    data-label-link-copied={page.linkCopied}
     class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
   >
     <!-- The question -->
+    <!--
+      One question a day, the same one for everybody, so there is something to
+      answer together rather than everyone holding a different card.
+    -->
+    <section class="mb-10 rounded-2xl border border-lime/30 bg-surface p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.today}</p>
+      <p data-ask-daily class="ask-daily mt-3"></p>
+    </section>
+
     <div class="rounded-2xl border border-line bg-surface p-8 sm:p-12">
       <p data-ask-question aria-live="polite" class="ask-question"></p>
     </div>
+
+    <!--
+      Answering turns this from a fortune cookie into a post. The text is drawn
+      onto the canvas and never inserted into the page, so there is nothing to
+      escape and nothing to store.
+    -->
+    <label class="mt-5 block">
+      <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.answerLabel}
+      </span>
+      <textarea
+        data-ask-answer
+        rows="2"
+        maxlength="140"
+        placeholder={page.answerPlaceholder}
+        class="ask-answer mt-2"></textarea>
+    </label>
 
     <div class="mt-6 flex flex-wrap items-center gap-3">
       <button type="button" data-ask-again class="ask-primary">
         {page.again}
       </button>
       <button type="button" data-ask-copy class="ask-secondary">
-        {page.copy}
+        {page.copyLink}
       </button>
       <a data-ask-share href="#" target="_blank" rel="noopener noreferrer" class="ask-secondary">
         <Icons name="x" size={14} />
@@ -80,6 +107,37 @@ const page = copy.pages.ask;
 </script>
 
 <style>
+  .ask-daily {
+    font-family: var(--font-sans);
+    font-size: clamp(1.125rem, 0.9rem + 1vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-ink);
+    text-wrap: pretty;
+  }
+
+  .ask-answer {
+    width: 100%;
+    resize: none;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.75rem 0.9rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    transition: border-color 0.15s ease;
+  }
+  .ask-answer::placeholder {
+    color: var(--color-faint);
+  }
+  .ask-answer:focus {
+    border-color: var(--color-lime);
+    outline: 2px solid color-mix(in srgb, var(--color-lime) 35%, transparent);
+    outline-offset: 1px;
+  }
+
   /*
    * Set as prose, not as a headline: sentence case, normal weight, room to
    * breathe. The size follows the viewport but stops well short of the display

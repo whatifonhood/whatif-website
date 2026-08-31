@@ -1,5 +1,6 @@
 ---
 import { MARKETS, type Locale } from '../../config/site.ts';
+import LiveText from '../ui/LiveText.astro';
 import { getCopy } from '../../content/index.ts';
 import Section from '../ui/Section.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -41,7 +42,11 @@ const proofFor: Record<number, { href: string; label: string }> = {
             <span class="font-mono text-xs text-faint">{String(index + 1).padStart(2, '0')}</span>
             <div class="mt-8">
               <h3 class="font-display text-xl font-semibold text-ink">{pillar.title}</h3>
-              <p class="mt-2 leading-relaxed text-muted">{pillar.body}</p>
+              <LiveText
+                locale={locale}
+                text={pillar.body}
+                class="mt-2 leading-relaxed text-muted"
+              />
               {proof && (
                 <a
                   href={proof.href}
