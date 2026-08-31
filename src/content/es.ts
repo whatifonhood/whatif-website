@@ -24,6 +24,7 @@ export const es: SiteCopy = {
     ],
     toolsLabel: 'Herramientas',
     tools: {
+      ask: { label: 'Hazte una pregunta mejor', blurb: 'Un millón de formas de dudar' },
       pfp: { label: 'Encuentra tu moneda', blurb: 'Cuatro rarezas, una es tuya' },
       machine: { label: 'La Máquina What $IF', blurb: 'Lo que habrías ganado' },
       memes: { label: 'La bóveda', blurb: 'Róbalos, son gratis' },
@@ -396,6 +397,29 @@ export const es: SiteCopy = {
       shareText: (name, tier) => `Me salió ${name} — ${tier}.\n\n¿Y $IF esta eres tú?`,
       odds: 'de probabilidad',
       openGenerator: 'Saca la tuya',
+    },
+    ask: {
+      title: 'Hazte una pregunta mejor',
+      eyebrow: 'El generador',
+      heading: { lead: '¿Y $IF', accent: 'cualquier cosa?' },
+      intro:
+        'Toda la moneda es una sola pregunta. Aquí la tienes, una y otra vez, y nunca exactamente la misma.',
+      again: 'Otra pregunta',
+      copy: 'Copiar',
+      copied: 'Copiado.',
+      postOnX: 'Publicar en X',
+      download: 'Descargar tarjeta',
+      possibilities: 'preguntas posibles',
+      hint: 'pulsa espacio para otra',
+      shareText: '{question}\n\nSeguimos preguntando.',
+      categories: {
+        all: 'Todo',
+        money: 'Dinero',
+        cosmic: 'Cósmico',
+        dread: 'Angustia',
+        absurd: 'Absurdo',
+        degen: 'Degen',
+      },
     },
     learn: {
       title: 'Aprende',

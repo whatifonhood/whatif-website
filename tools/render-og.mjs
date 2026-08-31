@@ -64,6 +64,12 @@ const PAGES = [
     sub: 'Four rarities. Every pull is free.',
   },
   {
+    file: 'og-ask.jpg',
+    kicker: 'The generator',
+    title: 'Ask a better question',
+    sub: 'Over a million ways to wonder',
+  },
+  {
     file: 'og-roadmap.jpg',
     kicker: 'Roadmap',
     title: 'What is built, and what is next',

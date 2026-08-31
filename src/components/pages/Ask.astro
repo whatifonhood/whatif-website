@@ -1,0 +1,176 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CATEGORIES } from '../../config/what-if.ts';
+import { SITE, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The question generator.
+ *
+ * The coin is a question, so this is the most on-brand thing the site can do:
+ * hand you another one, forever. Everything runs on the device — no request, so
+ * it is instant and works offline.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.ask;
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-ask.jpg`}
+>
+  <div
+    data-ask
+    data-share-text={page.shareText}
+    data-label-copied={page.copied}
+    class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
+  >
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2">
+      <button type="button" data-ask-category="all" aria-pressed="true" class="ask-chip">
+        {page.categories.all}
+      </button>
+      {
+        CATEGORIES.map((category) => (
+          <button type="button" data-ask-category={category} aria-pressed="false" class="ask-chip">
+            {page.categories[category]}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- The question -->
+    <div class="mt-8 rounded-2xl border border-line bg-surface p-8 sm:p-12">
+      <p
+        data-ask-question
+        aria-live="polite"
+        class="ask-question display-heading text-3xl sm:text-5xl"
+      >
+      </p>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button type="button" data-ask-again class="ask-primary">
+        {page.again}
+      </button>
+      <button type="button" data-ask-copy class="ask-secondary">
+        {page.copy}
+      </button>
+      <a data-ask-share href="#" target="_blank" rel="noopener noreferrer" class="ask-secondary">
+        <Icons name="x" size={14} />
+        {page.postOnX}
+      </a>
+      <a data-ask-download href="#" download="what-if.png" class="ask-secondary">
+        {page.download}
+      </a>
+      <p data-ask-status role="status" aria-live="polite" class="text-xs text-lime"></p>
+    </div>
+
+    <p class="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+      <span data-ask-total class="text-lime">—</span>
+      {' '}{page.possibilities} · {page.hint}
+    </p>
+
+    <!-- The card, shown as soon as there is a question rather than only on download. -->
+    <canvas
+      data-ask-card
+      width="1200"
+      height="675"
+      role="img"
+      aria-label={page.title}
+      class="mt-10 w-full rounded-xl border border-line bg-surface shadow-2xl"></canvas>
+  </div>
+</PageLayout>
+
+<script>
+  import { initWhatIf } from '../../scripts/what-if.ts';
+
+  initWhatIf();
+</script>
+
+<style>
+  .ask-question {
+    min-height: 4.5rem;
+    text-wrap: balance;
+  }
+  .ask-question.is-new {
+    animation: ask-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes ask-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ask-question.is-new {
+      animation: none;
+    }
+  }
+
+  .ask-chip {
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .ask-chip:hover {
+    border-color: color-mix(in srgb, var(--color-lime) 50%, transparent);
+    color: var(--color-ink);
+  }
+  .ask-chip[aria-pressed='true'] {
+    border-color: var(--color-lime);
+    background: color-mix(in srgb, var(--color-lime) 12%, transparent);
+    color: var(--color-lime);
+  }
+
+  .ask-primary {
+    border-radius: 999px;
+    background: var(--color-lime);
+    padding: 0.85rem 1.8rem;
+    font-weight: 600;
+    color: var(--color-void);
+    transition: filter 0.15s ease;
+  }
+  .ask-primary:hover {
+    filter: brightness(1.08);
+  }
+
+  .ask-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.85rem 1.4rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    transition: border-color 0.15s ease;
+  }
+  .ask-secondary:hover {
+    border-color: color-mix(in srgb, var(--color-lime) 50%, transparent);
+  }
+</style>

@@ -24,6 +24,9 @@
 
 # The wallet lookup draws a card and hands it over as a blob: URL, exactly like
 # the two generators above.
+/ask/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+
 /holdings/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com https://api.coingecko.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
 

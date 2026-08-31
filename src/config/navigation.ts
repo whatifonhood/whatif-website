@@ -15,6 +15,7 @@ export type ToolGroup = (typeof TOOL_GROUPS)[number];
 export const TOOL_ROUTES = [
   { id: 'stats', href: '/stats/', group: 'data' },
   { id: 'holdings', href: '/holdings/', group: 'data' },
+  { id: 'ask', href: '/ask/', group: 'play' },
   { id: 'pfp', href: '/pfp/', group: 'play' },
   { id: 'machine', href: '/machine/', group: 'play' },
   { id: 'memes', href: '/memes/', group: 'assets' },
