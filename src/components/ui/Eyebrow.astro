@@ -1,0 +1,9 @@
+---
+/** The small mono label above a heading. It names the section in the brand voice. */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<p class:list={['eyebrow', className]}><slot /></p>

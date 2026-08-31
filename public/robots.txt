@@ -1,0 +1,5 @@
+# Everything here is public. Crawl it.
+User-agent: *
+Allow: /
+
+Sitemap: https://whatifonhood.com/sitemap-index.xml

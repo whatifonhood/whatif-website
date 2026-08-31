@@ -1,0 +1,62 @@
+---
+import { MARKETS, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * Why $IF exists, in four cards. Two of them make factual claims, so both carry
+ * a link to the on-chain proof — the rule for this site is that a claim either
+ * links to evidence or does not appear.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+
+/** Proof links, matched to pillars by index. */
+const proofFor: Record<number, { href: string; label: string }> = {
+  2: { href: MARKETS.burn, label: copy.numbers.viewOnExplorer },
+  3: { href: MARKETS.contract, label: copy.numbers.viewOnExplorer },
+};
+---
+
+<Section id="thesis" divider>
+  <div class="max-w-2xl">
+    <Eyebrow>{copy.thesis.eyebrow}</Eyebrow>
+    <SectionHeading heading={copy.thesis.heading} class="mt-4" />
+    <p class="mt-5 text-lg leading-relaxed text-muted">{copy.thesis.intro}</p>
+  </div>
+
+  <div class="mt-14 grid gap-4 sm:grid-cols-2" data-reveal>
+    {
+      copy.thesis.pillars.map((pillar, index) => {
+        const proof = proofFor[index];
+        return (
+          <article class="card card-hover shimmer group flex flex-col justify-between p-6">
+            <span class="font-mono text-xs text-faint">{String(index + 1).padStart(2, '0')}</span>
+            <div class="mt-8">
+              <h3 class="font-display text-xl font-semibold text-ink">{pillar.title}</h3>
+              <p class="mt-2 leading-relaxed text-muted">{pillar.body}</p>
+              {proof && (
+                <a
+                  href={proof.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
+                >
+                  {proof.label}
+                  <Icons name="arrow-up-right" size={12} />
+                </a>
+              )}
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+</Section>

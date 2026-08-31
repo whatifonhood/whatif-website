@@ -1,0 +1,175 @@
+---
+import {
+  LINKS,
+  LOCALE_NAMES,
+  LOCALE_PATHS,
+  LOCALES,
+  MARKETS,
+  type Locale,
+} from '../../config/site.ts';
+import { TOOL_ROUTES } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import Button from '../ui/Button.astro';
+import ToolsMenu from '../ui/ToolsMenu.astro';
+import Icons from '../ui/Icons.astro';
+import Wordmark from '../../assets/wordmark.svg';
+
+/**
+ * The fixed header. Two persistent calls to action — one to the generator, one
+ * to buying — plus in-page links and the language switcher.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const home = LOCALE_PATHS[locale];
+---
+
+<header
+  data-header
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300"
+>
+  <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+    <div class="flex items-center gap-4">
+      <a href={home} class="flex items-center" aria-label={`${copy.nav.buy} — home`}>
+        <Wordmark width={116} height={26} role="img" aria-label="What $IF" />
+      </a>
+      <span
+        class="hidden items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-lime sm:inline-flex"
+      >
+        <span class="relative flex h-1.5 w-1.5">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime opacity-75"
+          ></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-lime"></span>
+        </span>
+        {copy.hero.liveOn}
+      </span>
+    </div>
+
+    <div class="hidden items-center gap-1 md:flex">
+      {
+        copy.nav.links.map((link) => (
+          <a
+            href={link.href}
+            class="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+
+      <ToolsMenu locale={locale} />
+
+      <div class="mx-1 flex items-center gap-0.5" role="group" aria-label={copy.nav.languageLabel}>
+        {
+          LOCALES.map((code) => (
+            <a
+              href={LOCALE_PATHS[code]}
+              hreflang={code}
+              aria-current={code === locale ? 'page' : undefined}
+              class:list={[
+                'rounded-md px-2 py-1.5 font-mono text-[11px] uppercase transition-colors',
+                code === locale ? 'bg-surface-2 text-lime' : 'text-faint hover:text-ink',
+              ]}
+            >
+              {LOCALE_NAMES[code]}
+            </a>
+          ))
+        }
+      </div>
+
+      <a
+        href={LINKS.x}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={copy.footer.follow}
+        class="grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-ink"
+      >
+        <Icons name="x" size={14} />
+      </a>
+      <a
+        href={LINKS.telegram}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={copy.footer.telegram}
+        class="grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-ink"
+      >
+        <Icons name="telegram" size={15} />
+      </a>
+
+      <Button href={MARKETS.uniswap} external externalLabel={copy.common.externalLink} class="ml-1">
+        {copy.nav.buy}
+      </Button>
+    </div>
+
+    <button
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label={copy.nav.openMenu}
+      data-label-open={copy.nav.openMenu}
+      data-label-close={copy.nav.closeMenu}
+      class="grid h-10 w-10 place-items-center rounded-lg text-ink transition-colors hover:bg-surface md:hidden"
+    >
+      <Icons name="menu" size={20} />
+    </button>
+  </nav>
+
+  <div id="mobile-menu" data-menu hidden class="glass border-t border-line md:hidden">
+    <div class="flex flex-col gap-1 px-5 py-4">
+      {
+        copy.nav.links.map((link) => (
+          <a href={link.href} class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface">
+            {link.label}
+          </a>
+        ))
+      }
+      <p class="mt-3 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+        {copy.nav.toolsLabel}
+      </p>
+      {
+        TOOL_ROUTES.map((tool) => (
+          <a href={tool.href} class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface">
+            {copy.nav.tools[tool.id].label}
+          </a>
+        ))
+      }
+
+      <div
+        class="mt-2 flex items-center gap-2 px-3"
+        role="group"
+        aria-label={copy.nav.languageLabel}
+      >
+        {
+          LOCALES.map((code) => (
+            <a
+              href={LOCALE_PATHS[code]}
+              hreflang={code}
+              aria-current={code === locale ? 'page' : undefined}
+              class:list={[
+                'rounded-md border border-line px-3 py-1.5 font-mono text-[11px] uppercase',
+                code === locale ? 'bg-surface-2 text-lime' : 'text-faint',
+              ]}
+            >
+              {LOCALE_NAMES[code]}
+            </a>
+          ))
+        }
+      </div>
+
+      <Button
+        href={MARKETS.uniswap}
+        external
+        externalLabel={copy.common.externalLink}
+        class="mt-3 w-full"
+        size="lg"
+      >
+        {copy.nav.buy}
+      </Button>
+    </div>
+  </div>
+</header>

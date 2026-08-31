@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import uniswap from '../../assets/logos/uniswap.png';
+import dexscreener from '../../assets/logos/dexscreener.png';
+import coingecko from '../../assets/logos/coingecko.png';
+import coinmarketcap from '../../assets/logos/coinmarketcap.png';
+import blockscout from '../../assets/logos/blockscout.png';
+import metamask from '../../assets/logos/metamask.png';
+import robinhood from '../../assets/logos/robinhood.png';
+
+/**
+ * A third-party logo, served from this origin.
+ *
+ * We never hotlink someone else's image: it would leak our visitors to them and
+ * put a URL we do not control into the page. Add a logo by dropping the file in
+ * src/assets/logos and adding one line here.
+ *
+ * Robinhood is a lettermark rather than their feather, which the brand sheet
+ * rules out reproducing.
+ */
+export type LogoName =
+  | 'uniswap'
+  | 'dexscreener'
+  | 'coingecko'
+  | 'coinmarketcap'
+  | 'blockscout'
+  | 'metamask'
+  | 'robinhood';
+
+interface Props {
+  name: LogoName;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 28, class: className = '' } = Astro.props;
+
+const LOGOS = { uniswap, dexscreener, coingecko, coinmarketcap, blockscout, metamask, robinhood };
+---
+
+<Image
+  src={LOGOS[name]}
+  alt=""
+  width={size}
+  height={size}
+  format="webp"
+  loading="lazy"
+  class:list={['object-contain', className]}
+/>

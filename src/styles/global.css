@@ -1,0 +1,362 @@
+/*
+ * The design system, in one file.
+ *
+ * Every colour, font and spacing step the site uses is declared here as a token
+ * and consumed through Tailwind utility classes (`bg-void`, `text-lime`,
+ * `font-display`). No component contains a raw hex value or a magic pixel number,
+ * so re-skinning the site means editing this file and nothing else.
+ *
+ * Values come from the locked brand sheet: what-if-meme/brand-pack/brand-sheet.html
+ */
+
+@import 'tailwindcss';
+
+/* Self-hosted. No third-party font host, no extra DNS lookup, no tracking.
+   Each file carries a unicode-range, so English pages fetch only latin. */
+@import '@fontsource/archivo/400.css';
+@import '@fontsource/archivo/600.css';
+@import '@fontsource/archivo/900-italic.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
+@theme {
+  /* Tailwind ships its own `lime` scale. Removing it means `text-lime-400`
+     fails loudly instead of quietly shipping an off-brand green. */
+  --color-lime-*: initial;
+
+  /* ---- Brand palette (locked) ------------------------------------------ */
+  --color-void: #080b07; /* page background */
+  --color-lime: #8fce02; /* primary accent */
+  --color-lime-mid: #86b50b; /* support */
+  --color-lime-deep: #305b05; /* shadow */
+  --color-lime-pale: #c4dc43; /* highlight */
+  --color-gold: #e4d98e; /* galaxy cores and rare accents only */
+
+  /* ---- Surfaces and text (neutrals biased green, never pure grey) ------- */
+  --color-surface: #10160a;
+  --color-surface-2: #151d0e;
+  --color-line: #223012;
+  --color-ink: #e9f0dd; /* body text */
+  --color-muted: #9aa889; /* secondary text */
+  /* Lightened from #6f7c62 so 10px labels clear WCAG AA (4.5:1) on every
+     surface in this palette — checked against void, surface and surface-2. */
+  --color-faint: #7d8c6e; /* labels, captions */
+
+  /* ---- Type ------------------------------------------------------------ */
+  /* Archivo Black Italic 900 for every headline; JetBrains Mono for anything
+     exact or copyable — a contract address never goes in a display face. */
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---- Motion ---------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-marquee: marquee 34s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-glow: glow 4s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes glow {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.75;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes stamp {
+    0% {
+      opacity: 0;
+      transform: rotate(-8deg) scale(0.4);
+    }
+    70% {
+      opacity: 1;
+      transform: rotate(-8deg) scale(1.08);
+    }
+    100% {
+      opacity: 1;
+      transform: rotate(-8deg) scale(1);
+    }
+  }
+}
+
+/* ---- Base ------------------------------------------------------------- */
+/* The brand is black space and acid lime. The site commits to that one world
+   rather than offering a light theme, so colours are painted explicitly. */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Anchored sections clear the fixed header. */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-void);
+}
+
+/* A visible, brand-coloured focus ring on every interactive element. */
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---- Reusable pieces --------------------------------------------------- */
+@utility display-heading {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+/* Small uppercase mono label that names a section. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-lime);
+}
+
+/* A card that reads as a physical object: hard border, offset shadow. */
+@utility card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+}
+
+/* Frosted header bar. Applied only where it is actually seen, because
+   backdrop-filter is expensive on cheap phones. */
+@utility glass {
+  background-color: color-mix(in srgb, var(--color-void) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Fine grid, used behind the hero. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Sections fade up as they enter the viewport. Progressive enhancement:
+   without JavaScript the class is never added and everything is simply visible. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s var(--ease-out-expo),
+    transform 0.7s var(--ease-out-expo);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Motion -----------------------------------------------------------
+ * Restrained on purpose. One orchestrated entrance on the hero, and motion
+ * elsewhere only in response to something the visitor did. Nothing loops
+ * forever except the marquee and one slow ambient float, because a page where
+ * everything is always moving is a page nobody can read.
+ *
+ * The reduced-motion rule near the top of this file switches all of it off.
+ */
+
+/* The hero plays its parts in sequence on load.
+ *
+ * The headline is deliberately excluded: it is the Largest Contentful Paint
+ * element, and fading it in delayed the page's LCP by about 0.6s. It paints
+ * immediately; everything around it rises in. */
+.enter {
+  animation: rise 0.7s var(--ease-out-expo) both;
+}
+.enter-1 {
+  animation-delay: 0.05s;
+}
+.enter-2 {
+  animation-delay: 0.14s;
+}
+.enter-3 {
+  animation-delay: 0.23s;
+}
+.enter-4 {
+  animation-delay: 0.32s;
+}
+.enter-5 {
+  animation-delay: 0.42s;
+}
+
+/* Cards lift and warm up under the pointer. */
+.card {
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s var(--ease-out-expo),
+    transform 0.35s var(--ease-out-expo);
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--color-lime) 35%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-lime) 12%, transparent),
+      0 24px 60px -24px color-mix(in srgb, var(--color-lime) 30%, transparent);
+  }
+}
+
+/* A light sweeps across the element once, on hover. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.13) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.7s var(--ease-out-expo);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .shimmer:hover::after {
+    transform: translateX(120%);
+  }
+}
+
+/* A lime arc travelling around the border. Used once, on the contract card.
+ *
+ * The angle of the gradient is animated rather than the element being rotated:
+ * a rotating box changes its own bounding box, which pushed the page a few
+ * pixels wider on phones and made the whole document scroll sideways.
+ */
+@property --ring-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.ring-anim {
+  position: relative;
+}
+.ring-anim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--ring-angle),
+    transparent 0deg,
+    color-mix(in srgb, var(--color-lime) 55%, transparent) 70deg,
+    color-mix(in srgb, var(--color-lime-pale) 30%, transparent) 150deg,
+    transparent 230deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: ring-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes ring-spin {
+  to {
+    --ring-angle: 360deg;
+  }
+}
+
+/* The roadmap verdict lands like a rubber stamp when it scrolls into view. */
+.is-visible .stamp {
+  animation: stamp 0.55s var(--ease-out-expo) 0.25s both;
+}
+
+/* One slow ambient drift, for the teaser tiles. */
+.float-slow {
+  animation: float 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .is-visible .stamp,
+  .float-slow,
+  .ring-anim::before {
+    animation: none;
+  }
+  .enter {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,23 @@
+---
+/**
+ * A page section: consistent vertical rhythm, an anchor id for the nav, and the
+ * scroll-reveal hook. Every section on the landing page uses this.
+ */
+interface Props {
+  id?: string;
+  /** Adds a hairline rule above the section. */
+  divider?: boolean;
+  class?: string;
+}
+
+const { id, divider = false, class: className = '' } = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={['relative py-20 sm:py-28', divider && 'border-t border-line', className]}
+>
+  <div class="mx-auto w-full max-w-7xl px-5 sm:px-8">
+    <slot />
+  </div>
+</section>

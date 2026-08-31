@@ -1,0 +1,61 @@
+---
+import type { Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+/**
+ * The FAQ, built on <details>/<summary>.
+ *
+ * Native disclosure elements are keyboard accessible, announced correctly by
+ * screen readers, findable with the browser's own in-page search, and cost zero
+ * JavaScript. A hand-rolled accordion would be worse in all four ways.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+---
+
+<Section id="faq" divider>
+  <div class="mx-auto max-w-3xl">
+    <div class="text-center">
+      <Eyebrow>{copy.faq.eyebrow}</Eyebrow>
+      <SectionHeading heading={copy.faq.heading} class="mt-4" />
+    </div>
+
+    <div class="mt-12 flex flex-col gap-3" data-reveal>
+      {
+        copy.faq.items.map((item, index) => (
+          <details class="card group overflow-hidden open:border-lime/30" open={index === 0}>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-surface-2">
+              <span class="font-display text-lg font-semibold text-ink">{item.q}</span>
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-lime/15 text-lime transition-transform group-open:rotate-45">
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 5v14M5 12h14"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <p class="px-5 pb-5 leading-relaxed text-muted">{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</Section>
+
+<style>
+  /* Remove the default disclosure triangle in Safari. */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

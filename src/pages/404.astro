@@ -1,0 +1,61 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { TOOL_ROUTES } from '../config/navigation.ts';
+import { getCopy } from '../content/index.ts';
+
+/**
+ * The page nobody means to land on.
+ *
+ * Netlify serves 404.html automatically for a static site, so this needs no
+ * redirect rule. It keeps the header and footer, because the whole job of this
+ * page is to put somebody back on a route that exists.
+ */
+const locale = 'en' as const;
+const copy = getCopy(locale);
+const page = copy.pages.notFound;
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+>
+  <div class="mx-auto w-full max-w-4xl px-5 py-14 sm:px-8">
+    <div class="flex flex-col items-center text-center">
+      <img
+        src="/machine/poses/thinking.webp"
+        alt=""
+        width="700"
+        height="700"
+        loading="eager"
+        decoding="async"
+        class="w-40 max-w-[45vw] sm:w-52"
+      />
+      <p class="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {copy.roadmap.stamp}
+      </p>
+    </div>
+
+    <nav class="mt-14 border-t border-line pt-10" aria-label={page.title}>
+      <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">{page.tryThese}</h2>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+        {
+          TOOL_ROUTES.map((tool) => (
+            <li>
+              <a
+                href={tool.href}
+                class="card flex flex-col gap-1 p-4 transition-colors hover:border-lime/50"
+              >
+                <span class="font-semibold text-ink">{copy.nav.tools[tool.id].label}</span>
+                <span class="text-sm text-muted">{copy.nav.tools[tool.id].blurb}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</PageLayout>

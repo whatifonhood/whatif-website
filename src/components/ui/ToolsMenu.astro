@@ -1,0 +1,94 @@
+---
+import type { Locale } from '../../config/site.ts';
+import { TOOL_ROUTES } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from './Icons.astro';
+
+/**
+ * The header dropdown holding the tools.
+ *
+ * A real <button> with aria-expanded and a real list, so it works with a
+ * keyboard and is announced correctly. It opens on click, and on hover only
+ * where hover is a real input (never on touch, where hover-open menus trap you).
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+---
+
+<div class="tools-menu relative">
+  <button
+    type="button"
+    data-tools-toggle
+    aria-expanded="false"
+    aria-controls="tools-menu"
+    class="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink aria-expanded:bg-surface aria-expanded:text-ink"
+  >
+    {copy.nav.toolsLabel}
+    <Icons name="chevron-down" size={13} class="transition-transform duration-200" />
+  </button>
+
+  <div
+    id="tools-menu"
+    data-tools-panel
+    class="tools-panel absolute right-0 top-full z-50 w-72 pt-2"
+  >
+    <ul class="card overflow-hidden p-1.5 shadow-2xl shadow-black/60">
+      {
+        TOOL_ROUTES.map((tool) => (
+          <li>
+            <a
+              href={tool.href}
+              class="group flex flex-col gap-0.5 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-2"
+            >
+              <span class="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                {copy.nav.tools[tool.id].label}
+                <Icons
+                  name="arrow-up-right"
+                  size={11}
+                  class="text-faint opacity-0 transition-opacity group-hover:opacity-100"
+                />
+              </span>
+              <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+                {copy.nav.tools[tool.id].blurb}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  /* Closed by default; opened by the toggle's aria-expanded state. */
+  .tools-panel {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s var(--ease-out-expo),
+      visibility 0.18s;
+  }
+  .tools-menu:has([aria-expanded='true']) .tools-panel {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tools-menu:has([aria-expanded='true']) [data-tools-toggle] svg:last-child {
+    transform: rotate(180deg);
+  }
+
+  /* Hover-to-open, but only with a real pointer. */
+  @media (hover: hover) and (pointer: fine) {
+    .tools-menu:hover .tools-panel {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

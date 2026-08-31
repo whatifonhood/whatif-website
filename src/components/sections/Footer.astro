@@ -1,0 +1,122 @@
+---
+import { Image } from 'astro:assets';
+import { LINKS, MARKETS, SITE, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Button from '../ui/Button.astro';
+import Icons from '../ui/Icons.astro';
+import coin from '../../assets/coin.png';
+
+/**
+ * The footer carries the closing call to action, the one line that names our
+ * only real domain (so a phishing clone is easy to spot), and the disclaimer.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const year = new Date().getFullYear();
+
+// The spaces belong to the strings — see Hero.astro.
+const headingLead = `${copy.footer.heading.lead} `;
+const headingTail = ` ${copy.footer.heading.accent}`;
+---
+
+<footer class="relative overflow-hidden border-t border-line pb-10 pt-20">
+  <div
+    class="pointer-events-none absolute -bottom-40 left-1/2 h-72 w-[80vw] max-w-3xl -translate-x-1/2 rounded-full bg-lime/10 blur-[120px]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="relative mx-auto w-full max-w-7xl px-5 sm:px-8">
+    <div class="mx-auto mb-16 max-w-2xl text-center">
+      <h2 class="display-heading text-4xl sm:text-6xl">
+        {headingLead}<span class="text-lime">$IF</span>{headingTail}
+      </h2>
+      <p class="mt-4 text-muted">{copy.footer.subtitle}</p>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <Button href={MARKETS.uniswap} external externalLabel={copy.common.externalLink} size="lg">
+          {copy.footer.buy}
+          <Icons name="arrow-up-right" size={16} />
+        </Button>
+        <Button
+          href={LINKS.telegram}
+          variant="secondary"
+          size="lg"
+          external
+          externalLabel={copy.common.externalLink}
+        >
+          <Icons name="telegram" size={15} />
+          {copy.footer.telegram}
+        </Button>
+        <Button
+          href={LINKS.x}
+          variant="secondary"
+          size="lg"
+          external
+          externalLabel={copy.common.externalLink}
+        >
+          <Icons name="x" size={14} />
+          {copy.footer.follow}
+        </Button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-8 border-t border-line pt-8">
+      <div class="flex flex-wrap items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <Image
+            src={coin}
+            alt=""
+            width={36}
+            height={36}
+            format="webp"
+            loading="lazy"
+            class="h-9 w-9 rounded-full"
+          />
+          <div>
+            <p class="font-display font-bold text-ink">
+              {SITE.ticker}<span class="text-lime">.</span>
+            </p>
+            <p class="font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+              {SITE.mantra}
+            </p>
+          </div>
+        </div>
+
+        <nav class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+          <a href="/pfp/" class="hover:text-ink">{copy.nav.pfp}</a>
+          <a href="/memes/" class="hover:text-ink">{copy.pages.memes.title}</a>
+          <a href="/stats/" class="hover:text-ink">{copy.pages.stats.title}</a>
+          <a href="/machine/" class="hover:text-ink">{copy.pages.machine.title}</a>
+          <a href="/brand/" class="hover:text-ink">{copy.pages.brand.title}</a>
+          <a
+            href={MARKETS.contract}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-ink"
+          >
+            {copy.numbers.viewOnExplorer}
+          </a>
+        </nav>
+      </div>
+
+      <!-- Anti-phishing: name the one real domain, every page, every language. -->
+      <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-lime/80">
+        {copy.footer.canonical}
+      </p>
+
+      <div
+        class="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <p class="max-w-2xl text-xs leading-relaxed text-faint">{copy.footer.disclaimer}</p>
+        <p class="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          © {year} · {copy.footer.builtBy}
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
