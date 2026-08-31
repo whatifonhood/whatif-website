@@ -1,0 +1,70 @@
+---
+import { TWEET_CARDS } from '../../config/tweet-cards.ts';
+import { LINKS, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The wall of posts.
+ *
+ * Text and author are fetched at build time by `npm run tweets` and rendered
+ * here in our own type and colours. No third-party script runs, no iframe
+ * loads, and the security policy is untouched.
+ *
+ * The whole section disappears when there is nothing to show, so an empty list
+ * never leaves a hole on the landing page.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const section = copy.posts;
+
+const cards = TWEET_CARDS.slice(0, 6);
+---
+
+{
+  cards.length > 0 && (
+    <Section id="posts" divider>
+      <div class="max-w-2xl">
+        <Eyebrow>{section.eyebrow}</Eyebrow>
+        <SectionHeading heading={section.heading} class="mt-4" />
+        <p class="mt-5 text-lg leading-relaxed text-muted">{section.intro}</p>
+      </div>
+
+      <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <li class="card flex flex-col gap-4 p-6">
+            <p class="whitespace-pre-line leading-relaxed text-ink">{card.text}</p>
+            <a
+              href={card.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-auto inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-lime"
+            >
+              <Icons name="x" size={12} />
+              {card.authorName}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8 text-center">
+        <a
+          href={LINKS.x}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+        >
+          <Icons name="x" size={14} />
+          {section.follow}
+        </a>
+      </div>
+    </Section>
+  )
+}

@@ -50,6 +50,14 @@ export const es: SiteCopy = {
     statsNote: 'En vivo desde la cadena. Se actualiza cada vez que cargas la página.',
   },
 
+  posts: {
+    eyebrow: 'Desde la timeline',
+    heading: { lead: 'La gente sigue', accent: 'preguntando.' },
+    intro:
+      'Lo que publica la comunidad. Se muestra aquí, no se incrusta — sin rastreadores, sin iframes.',
+    follow: 'Síguenos en X',
+  },
+
   marquee: [
     '¿Y $IF',
     'hubieras entrado antes?',
@@ -384,6 +392,14 @@ export const es: SiteCopy = {
       shareText: (name, tier) => `Me salió ${name} — ${tier}.\n\n¿Y $IF esta eres tú?`,
       odds: 'de probabilidad',
       openGenerator: 'Saca la tuya',
+    },
+    updates: {
+      title: 'Novedades',
+      eyebrow: 'Qué ha cambiado',
+      heading: { lead: '¿Y $IF', accent: 'te perdiste algo?' },
+      intro: 'Todo lo que ha cambiado en el sitio, lo más reciente primero.',
+      open: 'Échale un vistazo',
+      feed: 'Feed RSS',
     },
     holdings: {
       title: 'Consulta de wallet',

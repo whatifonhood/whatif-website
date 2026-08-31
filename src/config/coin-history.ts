@@ -2,5 +2,5 @@
 // The dataset itself lives in public/machine/ and is fetched by the page;
 // this file records only what the build produced.
 
-export const HISTORY_CAPTURED = '2026-08-29';
-export const HISTORY_COIN_COUNT = 177;
+export const HISTORY_CAPTURED = '2026-08-31';
+export const HISTORY_COIN_COUNT = 491;

@@ -2,10 +2,16 @@
  * Builds the browser icons from the brand pack master.
  *
  * The coin carries a lot of detail, and a plain downsample turns it to mush in a
- * browser tab. Two things fix that: crop the empty field so the figure fills more
- * of the frame, then sharpen after resizing. The .ico deliberately contains no
- * 16px frame — a browser downscaling our good 32px image beats a hand-made 16px
- * one, which is all mud whatever you do to it.
+ * browser tab, so the icons are sharpened after resizing. The .ico deliberately
+ * contains no 16px frame — a browser downscaling our good 32px image beats a
+ * hand-made 16px one, which is all mud whatever you do to it.
+ *
+ * THE CROP IS THE THING THAT GOES WRONG. The coin fills 1832px of the 2048px
+ * master, so any fixed percentage crop smaller than that slices through the rim
+ * and the circle comes out with flat sides. A previous version cropped to 80%
+ * (1638px) and did exactly that. So the crop is measured, not guessed: trim to
+ * the artwork's own bounding box, then fill the square exactly. The rim is what
+ * makes the mark read as a coin — it must survive intact.
  *
  * Run with `npm run favicons` (needs ImageMagick 7).
  */
@@ -25,20 +31,34 @@ const master = resolve(
 );
 const outDir = join(root, 'public');
 
-/** Crop away the dead field, lift contrast a touch, then resize and sharpen. */
+/**
+ * Trim to the artwork, fill the square, sharpen.
+ *
+ * `-fuzz 10% -trim` finds the coin's real edges instead of assuming them, so the
+ * circle arrives whole. It is then scaled to INSET, not to fill: a circle drawn
+ * exactly to the frame edge has its outermost arc clipped at top, bottom, left
+ * and right, and reads as a circle with four flat sides. The margin below is
+ * what makes it read as round.
+ */
+const COIN_SHARE = 0.88;
 function render(size, output, sharpen) {
   execFileSync('magick', [
     master,
-    '-gravity',
-    'center',
-    '-crop',
-    '80%x80%+0+0',
+    '-fuzz',
+    '10%',
+    '-trim',
     '+repage',
     '-modulate',
     '106,118,100',
     '-filter',
     'Lanczos',
     '-resize',
+    `${Math.round(size * COIN_SHARE)}x${Math.round(size * COIN_SHARE)}`,
+    '-background',
+    '#080B07',
+    '-gravity',
+    'center',
+    '-extent',
     `${size}x${size}`,
     '-unsharp',
     sharpen,

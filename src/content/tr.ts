@@ -38,6 +38,13 @@ export const tr: SiteCopy = {
     statsNote: 'Veriler zincirden geliyor, sayfayı her açtığında yenilenir.',
   },
 
+  posts: {
+    eyebrow: 'Akıştan',
+    heading: { lead: 'İnsanlar hâlâ', accent: 'soruyor.' },
+    intro: 'Topluluğun paylaştıkları. Gömülmüyor, burada çiziliyor — takip kodu yok, iframe yok.',
+    follow: "X'te takip et",
+  },
+
   marquee: [
     'Ya $IF',
     'daha önce alsaydın?',
@@ -376,6 +383,14 @@ export const tr: SiteCopy = {
       shareText: (name, tier) => `${name} çektim — ${tier}.\n\nYa bu seninkiyse?`,
       odds: 'olasılık',
       openGenerator: 'Kendi paranı çek',
+    },
+    updates: {
+      title: 'Güncellemeler',
+      eyebrow: 'Ne değişti',
+      heading: { lead: 'Ya bir şeyi', accent: 'kaçırdıysan?' },
+      intro: 'Sitede değişen her şey, en yenisi en üstte.',
+      open: 'Bir bak',
+      feed: 'RSS akışı',
     },
     holdings: {
       title: 'Cüzdan sorgusu',

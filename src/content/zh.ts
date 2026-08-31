@@ -38,6 +38,13 @@ export const zh: SiteCopy = {
     statsNote: '数据来自链上，每次打开页面时刷新。',
   },
 
+  posts: {
+    eyebrow: '来自时间线',
+    heading: { lead: '大家还在', accent: '问。' },
+    intro: '社区正在发布的内容。在这里呈现，而不是嵌入 —— 没有追踪器，没有 iframe。',
+    follow: '在 X 上关注',
+  },
+
   marquee: [
     '如果 $IF',
     '你早点买入？',
@@ -364,6 +371,14 @@ export const zh: SiteCopy = {
       shareText: (name, tier) => `我抽到了 ${name} —— ${tier}。\n\n如果这一枚就是你呢？`,
       odds: '概率',
       openGenerator: '抽你自己的',
+    },
+    updates: {
+      title: '更新',
+      eyebrow: '有什么变化',
+      heading: { lead: '如果你', accent: '错过了什么？' },
+      intro: '网站上所有的变化，最新的在最前面。',
+      open: '去看看',
+      feed: 'RSS 订阅',
     },
     holdings: {
       title: '钱包查询',
