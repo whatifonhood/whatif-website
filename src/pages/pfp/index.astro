@@ -1,0 +1,313 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE } from '../../config/site.ts';
+import { COINS, COIN_TIERS, COIN_TIER_ORDER } from '../../config/coins.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from '../../components/ui/Icons.astro';
+
+/**
+ * The PFP generator, as a page of this site rather than a separate app.
+ *
+ * The whole pool is rendered server-side and locked with CSS; a coin unlocks
+ * when this browser has pulled it. That keeps the page useful without
+ * JavaScript (you can still see every coin exists) and means the grid needs no
+ * client-side templating.
+ */
+const locale = 'en' as const;
+const copy = getCopy(locale);
+const page = copy.pages.pfp;
+
+const tierLabels = {
+  common: page.tiers.common,
+  uncommon: page.tiers.uncommon,
+  rare: page.tiers.rare,
+  legendary: page.tiers.legendary,
+};
+
+/**
+ * The "found N of M" line has to be re-rendered in the browser as coins are
+ * pulled, so it is turned into a template here. Sentinel numbers that cannot
+ * appear in the translated string are swapped for placeholders.
+ */
+const foundTemplate = page.found(-1, -2).replace('-1', '{found}').replace('-2', '{total}');
+
+const byTier = COIN_TIER_ORDER.map((tier) => ({
+  tier,
+  label: tierLabels[tier],
+  weight: COIN_TIERS[tier].weight,
+  coins: COINS.filter((coin) => coin.tier === tier),
+}));
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={copy.pfpTeaser.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-pfp.jpg`}
+>
+  <p slot="header-extra" class="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
+    {page.subline}
+  </p>
+
+  <div
+    data-pfp
+    data-tiers={JSON.stringify(tierLabels)}
+    class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
+  >
+    <!-- The coin -->
+    <div class="flex flex-col items-center">
+      <div class="pfp-stage" data-pfp-coin data-tier="none">
+        <img
+          data-pfp-img
+          src={`/coins/full/${COINS[0]!.slug}.webp`}
+          alt={COINS[0]!.name}
+          width="800"
+          height="800"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="pfp-coin-img"
+        />
+      </div>
+
+      <!-- Result -->
+      <div data-pfp-result hidden class="mt-8 flex flex-col items-center gap-3">
+        <h2 data-pfp-name class="display-heading text-3xl sm:text-4xl"></h2>
+        <span
+          data-pfp-tier
+          class="pfp-tier-chip rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em]"
+        ></span>
+      </div>
+
+      <button
+        type="button"
+        data-pfp-generate
+        data-label-generate={page.generate}
+        data-label-again={page.again}
+        class="mt-8 rounded-full bg-lime px-8 py-4 font-display text-base font-bold text-void transition-all duration-300 hover:-translate-y-0.5 hover:bg-lime-pale hover:shadow-[0_12px_36px_-12px_rgba(143,206,2,0.6)] disabled:opacity-60"
+      >
+        {page.generate}
+      </button>
+
+      <p class="mt-4 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-faint">
+        {page.hint}
+      </p>
+
+      <div data-pfp-actions hidden class="mt-6 flex flex-wrap justify-center gap-3">
+        <a
+          data-pfp-download
+          href="#"
+          download
+          class="inline-flex items-center gap-2 rounded-full bg-lime px-5 py-3 text-sm font-semibold text-void transition-colors hover:bg-lime-pale"
+        >
+          {page.download}
+        </a>
+        <a
+          data-pfp-card
+          href="#"
+          download
+          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-lime/50"
+        >
+          {page.shareCard}
+        </a>
+        <a
+          data-pfp-x
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-template={page.shareText('{name}', '{tier}')}
+          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-lime/50"
+        >
+          <Icons name="x" size={13} />
+          {page.postOnX}
+        </a>
+      </div>
+
+      <canvas data-pfp-canvas width="1200" height="675" class="sr-only" aria-hidden="true"></canvas>
+    </div>
+
+    <!-- The pool -->
+    <div class="card mt-16 overflow-hidden">
+      <div class="flex items-center justify-between gap-4 px-5 py-4">
+        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          <span class="text-lime">{copy.pfpTeaser.eyebrow}</span>
+          {' · '}
+          <span data-pfp-found data-template={foundTemplate}>
+            {page.found(0, COINS.length)}
+          </span>
+        </p>
+        <button
+          type="button"
+          data-pfp-pool-toggle
+          data-label-show={page.showPool}
+          data-label-hide={page.hidePool}
+          aria-expanded="false"
+          aria-controls="pfp-pool"
+          class="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-lime"
+        >
+          <span data-pool-label>{page.showPool}</span>
+          <Icons name="chevron-down" size={12} />
+        </button>
+      </div>
+
+      <div id="pfp-pool" data-pfp-pool hidden class="border-t border-line px-5 py-6">
+        {
+          byTier.map((group) => (
+            <section class="mb-8 last:mb-0">
+              <h3 class="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                <span data-tier-dot={group.tier} class="pfp-dot" />
+                {group.label} · {group.coins.length} · {group.weight}% {page.odds}
+              </h3>
+              <ul class="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+                {group.coins.map((coin) => (
+                  <li data-coin-slug={coin.slug} class="pfp-pool-item" title={coin.name}>
+                    <a href={`/pfp/${coin.slug}`} class="block">
+                      <img
+                        src={`/coins/thumb/${coin.slug}.webp`}
+                        alt={coin.name}
+                        width="200"
+                        height="200"
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full rounded-full"
+                      />
+                      <span class="pfp-pool-lock" aria-hidden="true">
+                        ?
+                      </span>
+                      <span class="sr-only">{page.locked}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  /* The coin sits in a perspective box so it can spin on its Y axis. */
+  .pfp-stage {
+    position: relative;
+    width: min(72vw, 380px);
+    aspect-ratio: 1;
+    perspective: 1100px;
+    display: grid;
+    place-items: center;
+  }
+  .pfp-stage::before {
+    content: '';
+    position: absolute;
+    inset: -12%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--tier-glow, rgb(143 206 2 / 0.28)), transparent 68%);
+    animation: glow 4s ease-in-out infinite;
+  }
+  .pfp-coin-img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transform: rotateY(var(--spin, 0deg));
+    filter: blur(var(--spin-blur, 0px));
+    /* WebKit drops border-radius clipping on 3D-transformed elements, so the
+       shape is enforced three ways. */
+    clip-path: circle(50% at 50% 50%);
+    -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+    will-change: transform;
+  }
+
+  /* Rarity tints the glow and the chip. */
+  [data-tier='uncommon'] {
+    --tier-glow: rgb(196 220 67 / 0.3);
+  }
+  [data-tier='rare'] {
+    --tier-glow: rgb(91 200 245 / 0.32);
+  }
+  [data-tier='legendary'] {
+    --tier-glow: rgb(228 217 142 / 0.4);
+  }
+  [data-tier='none'] {
+    --tier-glow: rgb(143 206 2 / 0.12);
+  }
+
+  .pfp-tier-chip[data-tier='common'] {
+    color: #8fce02;
+    border-color: rgb(143 206 2 / 0.4);
+  }
+  .pfp-tier-chip[data-tier='uncommon'] {
+    color: #c4dc43;
+    border-color: rgb(196 220 67 / 0.4);
+  }
+  .pfp-tier-chip[data-tier='rare'] {
+    color: #5bc8f5;
+    border-color: rgb(91 200 245 / 0.4);
+  }
+  .pfp-tier-chip[data-tier='legendary'] {
+    color: #e4d98e;
+    border-color: rgb(228 217 142 / 0.45);
+  }
+
+  .pfp-dot {
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: var(--color-lime);
+  }
+  [data-tier-dot='uncommon'] {
+    background: #c4dc43;
+  }
+  [data-tier-dot='rare'] {
+    background: #5bc8f5;
+  }
+  [data-tier-dot='legendary'] {
+    background: #e4d98e;
+  }
+
+  /* Coins start locked and unlock once this browser has pulled them. */
+  .pfp-pool-item {
+    position: relative;
+  }
+  .pfp-pool-item img {
+    filter: grayscale(1) brightness(0.13) contrast(0.75);
+    transition:
+      filter 0.4s ease,
+      transform 0.4s var(--ease-out-expo);
+  }
+  .pfp-pool-lock {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: color-mix(in srgb, var(--color-lime) 45%, transparent);
+    pointer-events: none;
+  }
+  .pfp-pool-item[data-found] img {
+    filter: none;
+  }
+  .pfp-pool-item[data-found] .pfp-pool-lock {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pfp-pool-item[data-found]:hover img {
+      transform: scale(1.08);
+    }
+  }
+</style>
+
+<script>
+  import { initPfp } from '../../scripts/pfp.ts';
+  initPfp();
+</script>

@@ -1,0 +1,152 @@
+---
+import {
+  BURNED_PERCENT,
+  CHAIN,
+  MARKETS,
+  TOKEN,
+  TOKEN_SNAPSHOT,
+  type Locale,
+} from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Button from '../ui/Button.astro';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The contract address and the token's live figures.
+ *
+ * The address is rendered in full, in mono, with a copy button and an
+ * instruction to verify it — this is the single most attacked surface on any
+ * meme coin site, and a shortened address is how people lose money.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+
+const figures = [
+  {
+    key: 'liquidity',
+    label: copy.numbers.stats.liquidity,
+    value: formatUsd(TOKEN_SNAPSHOT.liquidityUsd, locale),
+  },
+  {
+    key: 'volume',
+    label: copy.numbers.stats.volume,
+    value: formatUsd(TOKEN_SNAPSHOT.volume24hUsd, locale),
+  },
+  {
+    key: 'supply',
+    label: copy.numbers.stats.supply,
+    value: formatCompact(TOKEN.totalSupply, locale),
+  },
+  { key: 'chain', label: copy.numbers.stats.chain, value: CHAIN.name },
+];
+---
+
+<Section id="numbers" divider>
+  <div class="grid min-w-0 items-start gap-12 lg:grid-cols-2">
+    <div class="order-2 min-w-0 lg:order-1" data-reveal>
+      <!-- Contract card -->
+      <div class="card ring-anim p-6 sm:p-8">
+        <div class="flex items-center justify-between gap-4">
+          <h3 class="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+            {copy.numbers.contractLabel}
+          </h3>
+          <span
+            class="rounded-full bg-lime/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-lime"
+          >
+            {CHAIN.name}
+          </span>
+        </div>
+
+        <code
+          class="mt-4 block overflow-x-auto rounded-xl border border-line bg-void/60 px-4 py-4 font-mono text-xs leading-relaxed text-ink sm:text-sm"
+          >{TOKEN.address}</code
+        >
+
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="js-copy inline-flex items-center gap-2 rounded-full bg-lime px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-void transition-colors hover:bg-lime-pale"
+            data-copy-value={TOKEN.address}
+            data-copy-label={copy.numbers.copy}
+            data-copied-label={copy.numbers.copied}
+            aria-label={`${copy.numbers.copy} ${copy.numbers.contractLabel}`}
+          >
+            {copy.numbers.copy}
+          </button>
+          <Button
+            href={MARKETS.contract}
+            variant="secondary"
+            external
+            externalLabel={copy.common.externalLink}
+            class="!px-4 !py-2 !text-[11px] font-mono uppercase tracking-wider"
+          >
+            {copy.numbers.viewOnExplorer}
+            <Icons name="arrow-up-right" size={12} />
+          </Button>
+        </div>
+
+        <p class="mt-4 text-sm leading-relaxed text-muted">{copy.numbers.verifyNote}</p>
+      </div>
+
+      <!-- Burn certificate -->
+      <div class="card mt-4 border-lime/25 p-6 sm:p-8">
+        <p
+          data-stat="burnedExact"
+          class="font-display text-4xl font-black italic tabular-nums leading-none tracking-tight text-lime sm:text-5xl"
+        >
+          {formatCount(TOKEN_SNAPSHOT.burnedTokens, locale)}
+        </p>
+        <p class="mt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          <span data-stat="burnedPercent">{formatPercent(BURNED_PERCENT, locale)}</span>
+          {' · '}{copy.numbers.burnHeadline}
+        </p>
+        <p class="mt-4 text-sm leading-relaxed text-muted">{copy.numbers.burnBody}</p>
+        <code class="mt-4 block break-all font-mono text-[11px] text-faint"
+          >{TOKEN.burnAddress}</code
+        >
+      </div>
+    </div>
+
+    <div class="order-1 min-w-0 lg:order-2">
+      <Eyebrow>{copy.numbers.eyebrow}</Eyebrow>
+      <SectionHeading heading={copy.numbers.heading} class="mt-4" />
+      <p class="mt-5 text-lg leading-relaxed text-muted">{copy.numbers.intro}</p>
+
+      <dl class="mt-10 grid grid-cols-2 gap-3">
+        {
+          figures.map((figure) => (
+            <div class="card card-hover p-5 text-center">
+              <dd
+                data-stat={figure.key}
+                class="font-display text-2xl font-black italic tabular-nums tracking-tight text-lime"
+              >
+                {figure.value}
+              </dd>
+              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+                {figure.label}
+              </dt>
+            </div>
+          ))
+        }
+      </dl>
+
+      <p
+        data-stat-freshness
+        class="mt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-faint"
+      >
+        <span data-freshness-snapshot>{copy.numbers.asOf} {TOKEN_SNAPSHOT.capturedAt}</span>
+        <span data-freshness-live hidden class="inline-flex items-center gap-1.5 text-lime">
+          <span class="h-1.5 w-1.5 rounded-full bg-lime"></span>{copy.numbers.live}
+        </span>
+      </p>
+    </div>
+  </div>
+</Section>

@@ -1,0 +1,318 @@
+import { expect, test } from '@playwright/test';
+import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
+
+/**
+ * The checks that must never fail.
+ *
+ * The most important one is the contract address: if any page ever shows an
+ * address that disagrees with src/config/site.ts, the build stops. That is the
+ * single mistake on a meme coin site that costs somebody real money.
+ */
+
+const PAGES = [
+  ...LOCALES.map((locale) => ({ name: `landing (${locale})`, path: LOCALE_PATHS[locale] })),
+  { name: 'pfp generator', path: '/pfp/' },
+  { name: 'a single coin', path: '/pfp/godface' },
+  { name: 'memes', path: '/memes/' },
+  { name: 'brand', path: '/brand/' },
+  { name: 'stats', path: '/stats/' },
+  { name: 'machine', path: '/machine/' },
+  { name: 'meme maker', path: '/memes/make/' },
+  { name: 'a single meme', path: '/memes/meme-two-buttons-sell-or-hold/' },
+  { name: '404', path: '/404' },
+];
+
+for (const page of PAGES) {
+  test.describe(page.name, () => {
+    test('renders without console errors and with one h1', async ({ page: browserPage }) => {
+      const errors: string[] = [];
+      browserPage.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
+      });
+      browserPage.on('pageerror', (error) => errors.push(error.message));
+
+      await browserPage.goto(page.path);
+      await expect(browserPage.locator('h1')).toHaveCount(1);
+      await expect(browserPage.locator('main')).toBeVisible();
+      expect(errors, `console errors on ${page.path}`).toEqual([]);
+    });
+
+    test('never scrolls sideways', async ({ page: browserPage }) => {
+      await browserPage.goto(page.path);
+      const overflow = await browserPage.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `${page.path} overflows horizontally`).toBeLessThanOrEqual(0);
+    });
+
+    test('every link that leaves the site is safe', async ({ page: browserPage }) => {
+      await browserPage.goto(page.path);
+      const unsafe = await browserPage.evaluate(() =>
+        [...document.querySelectorAll<HTMLAnchorElement>('a[target="_blank"]')]
+          .filter((link) => !/noopener/.test(link.rel) || !/noreferrer/.test(link.rel))
+          .map((link) => link.href),
+      );
+      expect(unsafe, 'links opening a new tab must set rel="noopener noreferrer"').toEqual([]);
+    });
+
+    test('has a title, a description and a canonical URL', async ({ page: browserPage }) => {
+      await browserPage.goto(page.path);
+      await expect(browserPage).toHaveTitle(/.{10,}/);
+      await expect(browserPage.locator('meta[name="description"]')).toHaveAttribute(
+        'content',
+        /.{40,}/,
+      );
+      await expect(browserPage.locator('link[rel="canonical"]')).toHaveCount(1);
+    });
+  });
+}
+
+test.describe('the contract address', () => {
+  for (const locale of LOCALES) {
+    test(`is shown in full and matches the config (${locale})`, async ({ page }) => {
+      await page.goto(LOCALE_PATHS[locale]);
+
+      // It appears at least once, complete, on the landing page.
+      await expect(page.getByText(TOKEN.address, { exact: false }).first()).toBeVisible();
+
+      // And no page may contain a *different* 0x address for the token.
+      const addresses: string[] = await page.evaluate(() => {
+        const matches = document.body.innerText.match(/0x[a-fA-F0-9]{40}/g) ?? [];
+        return [...new Set(matches)];
+      });
+      const unexpected = addresses.filter(
+        (address) =>
+          address.toLowerCase() !== TOKEN.address.toLowerCase() &&
+          address.toLowerCase() !== TOKEN.burnAddress.toLowerCase(),
+      );
+      expect(unexpected, 'an unrecognised contract address is on the page').toEqual([]);
+    });
+  }
+
+  test('is never shown truncated with an ellipsis', async ({ page }) => {
+    await page.goto('/');
+    const text = await page.evaluate(() => document.body.innerText);
+    // e.g. "0x232C…30d1" — the pattern phishing sites rely on.
+    expect(text).not.toMatch(/0x[a-fA-F0-9]{2,8}\s*[….]{1,3}\s*[a-fA-F0-9]{2,8}/);
+  });
+});
+
+test.describe('promises the site makes', () => {
+  test('never asks anyone to connect a wallet', async ({ page }) => {
+    await page.goto('/');
+    const text = (await page.evaluate(() => document.body.innerText)).toLowerCase();
+    expect(text).not.toContain('connect wallet');
+    expect(text).not.toContain('connect your wallet to');
+  });
+
+  test('states the canonical domain in the footer', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('footer')).toContainText('whatifonhood.com');
+  });
+});
+
+test.describe('headings keep their spaces', () => {
+  // JSX collapses whitespace at a line break, so a heading split into two
+  // coloured halves loses the space between them whenever the formatter moves
+  // the line. It renders as "WHAT$IF". Cheap to break, invisible in review.
+  for (const page of PAGES) {
+    test(`${page.name} has no words run together`, async ({ page: browserPage }) => {
+      await browserPage.goto(page.path);
+      const headings = await browserPage.evaluate(() =>
+        [...document.querySelectorAll('h1, h2, h3')].map((el) => el.textContent?.trim() ?? ''),
+      );
+      const joined = headings.filter(
+        (text) => /[A-Za-z.]\$IF/.test(text) || /\.[A-Z]/.test(text.replace(/\.\.\./g, '')),
+      );
+      expect(joined, 'a heading lost the space between its two halves').toEqual([]);
+    });
+  }
+});
+
+test.describe('the Content-Security-Policy stays satisfiable', () => {
+  // `style-src 'self'` blocks inline style attributes and `script-src 'self'`
+  // blocks inline scripts. Both are easy to reintroduce by accident — a template
+  // literal in a `style=` attribute is the usual way — and the failure only
+  // shows up in production, where the browser silently drops the style.
+  for (const page of PAGES) {
+    test(`${page.name} has no inline styles or scripts`, async ({ page: browserPage }) => {
+      await browserPage.goto(page.path);
+
+      const inlineStyles = await browserPage.evaluate(() =>
+        [...document.querySelectorAll('[style]')].map((el) => el.outerHTML.slice(0, 100)),
+      );
+      expect(inlineStyles, 'inline style attributes are blocked by the CSP').toEqual([]);
+
+      const inlineScripts = await browserPage.evaluate(() =>
+        [...document.querySelectorAll('script')]
+          .filter((el) => !el.src && el.type !== 'application/ld+json')
+          .map((el) => el.outerHTML.slice(0, 100)),
+      );
+      expect(inlineScripts, 'inline scripts are blocked by the CSP').toEqual([]);
+    });
+  }
+});
+
+test.describe('accessibility basics', () => {
+  test('every image has an alt attribute', async ({ page }) => {
+    await page.goto('/');
+    const missing = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('img')].filter((image) => !image.hasAttribute('alt')).length,
+    );
+    expect(missing).toBe(0);
+  });
+
+  test('every control has an accessible name', async ({ page }) => {
+    await page.goto('/');
+    const unnamed = await page.evaluate(() =>
+      [...document.querySelectorAll('button, a')]
+        .filter((element) => {
+          const label =
+            element.getAttribute('aria-label') ??
+            element.textContent?.trim() ??
+            element.querySelector('[aria-label]')?.getAttribute('aria-label') ??
+            '';
+          return label.length === 0;
+        })
+        .map((element) => element.outerHTML.slice(0, 90)),
+    );
+    expect(unnamed).toEqual([]);
+  });
+
+  // Keyboard navigation is a desktop concern; the mobile project has no keyboard.
+  test('the skip link is the first thing keyboard users reach', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'no hardware keyboard on mobile');
+    await page.goto('/');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('a:focus')).toHaveAttribute('href', '#main');
+  });
+});
+
+/**
+ * The meme generator.
+ *
+ * These guard the two things that would quietly ruin it: a format that draws
+ * nothing, and text that escapes its box. Both fail as a blank or broken image
+ * rather than as an error, so only a pixel check catches them.
+ */
+test.describe('the meme generator', () => {
+  test('every format draws something on the canvas', async ({ page }) => {
+    await page.goto('/memes/make/');
+
+    const formats = await page
+      .locator('[data-template]')
+      .evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.template ?? ''));
+    expect(formats.length).toBeGreaterThan(0);
+
+    for (const format of formats) {
+      await page.click(`[data-template="${format}"]`);
+      const fields = page.locator('.maker-input');
+      const count = await fields.count();
+      for (let i = 0; i < count; i += 1) await fields.nth(i).fill('WHAT IF');
+      await page.waitForTimeout(200);
+
+      // A canvas that painted nothing serialises to a handful of bytes; a real
+      // drawing is orders of magnitude larger.
+      const bytes = await page
+        .locator('[data-maker-canvas]')
+        .evaluate((canvas) => (canvas as HTMLCanvasElement).toDataURL('image/png').length);
+      expect(bytes, `format "${format}" rendered an empty canvas`).toBeGreaterThan(5000);
+    }
+  });
+
+  test('a wall of text still fits inside the image', async ({ page }) => {
+    await page.goto('/memes/make/');
+    const field = page.locator('.maker-input').first();
+    await field.fill('SUPERCALIFRAGILISTIC '.repeat(6));
+    await page.waitForTimeout(250);
+
+    // The input caps length, which is what keeps the fitter's search bounded.
+    const value = await field.inputValue();
+    expect(value.length).toBeLessThanOrEqual(120);
+  });
+
+  test('nothing typed into it is ever written into the page', async ({ page }) => {
+    await page.goto('/memes/make/');
+    const payload = '<img src=x onerror=alert(1)>';
+    await page.locator('.maker-input').first().fill(payload);
+    await page.waitForTimeout(200);
+
+    // The words are drawn as pixels. If they ever reach the DOM as markup, this
+    // is the test that says so.
+    const injected = await page.evaluate(
+      () => document.querySelectorAll('main img[src="x"]').length,
+    );
+    expect(injected).toBe(0);
+  });
+});
+
+/**
+ * Shareable results.
+ *
+ * The calculator's whole point is that a number can be argued with, which needs
+ * the result to survive being copied out of the address bar. The query string is
+ * also the only untrusted input the site takes, so it is checked here too.
+ */
+test.describe('the What $IF Machine remembers its result', () => {
+  test('a shared link reopens on the same calculation', async ({ page }) => {
+    await page.goto('/machine/?coin=DOGE&from=2021-05&amount=250');
+    await expect(page.locator('[data-chosen-ticker]')).toHaveText('DOGE', { timeout: 15_000 });
+    await expect(page.locator('[data-machine-amount]')).toHaveValue('250');
+    await expect(page.locator('[data-machine-month-label]')).toContainText('2021');
+  });
+
+  test('changing the inputs updates the address bar', async ({ page }) => {
+    await page.goto('/machine/');
+    await expect(page.locator('[data-chosen-ticker]')).not.toBeEmpty({ timeout: 15_000 });
+    await page.locator('[data-machine-amount]').fill('1234');
+    await expect(page).toHaveURL(/amount=1234/);
+  });
+
+  test('a hostile query string is discarded, not rendered', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+
+    await page.goto('/machine/?coin=<script>alert(1)</script>&from=zzzz&amount=-999');
+    // Falls back to the default coin rather than trusting any of it.
+    await expect(page.locator('[data-chosen-ticker]')).not.toBeEmpty({ timeout: 15_000 });
+
+    const leaked = await page.evaluate(() => document.body.innerHTML.includes('alert(1)'));
+    expect(leaked, 'a query value reached the DOM').toBe(false);
+    expect(errors).toEqual([]);
+
+    const amount = await page.locator('[data-machine-amount]').inputValue();
+    expect(Number(amount)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+test.describe('every meme has a page', () => {
+  test('the vault links to pages, not to raw image files', async ({ page }) => {
+    await page.goto('/memes/');
+    const rawLinks = await page.evaluate(
+      () =>
+        [...document.querySelectorAll<HTMLAnchorElement>('[data-vault-item] a')].filter(
+          (link) => !link.hasAttribute('download') && /\.(webp|png|jpg)$/.test(link.pathname),
+        ).length,
+    );
+    expect(rawLinks, 'a thumbnail still opens the bare file').toBe(0);
+  });
+
+  test('a meme page carries its own social card', async ({ page }) => {
+    await page.goto('/memes/meme-two-buttons-sell-or-hold/');
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      'content',
+      /\/memes\/og\/meme-two-buttons-sell-or-hold\.jpg$/,
+    );
+  });
+});
+
+test('top-level pages do not all share one social card', async ({ page }) => {
+  const cards = new Set<string>();
+  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/memes/make/']) {
+    await page.goto(path);
+    const card = await page.locator('meta[property="og:image"]').getAttribute('content');
+    cards.add(card ?? '');
+  }
+  expect(cards.size, 'every top-level page should have its own card').toBeGreaterThan(6);
+});

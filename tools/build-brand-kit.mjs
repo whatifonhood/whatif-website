@@ -1,0 +1,156 @@
+/**
+ * Builds the downloadable brand kit at public/brand/what-if-brand-kit.zip.
+ *
+ * The site does not display the kit's contents — it hands over one file for
+ * anyone making $IF content. Everything comes from the canonical brand pack in
+ * ../what-if-meme/brand-pack, so the kit can never drift from the source.
+ *
+ * Run with `npm run brandkit`.
+ */
+import { execFileSync } from 'node:child_process';
+import { cpSync, mkdirSync, rmSync, writeFileSync, existsSync, statSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, '..');
+const pack = resolve(root, '..', 'what-if-meme', 'brand-pack');
+const staging = resolve(root, '.brand-kit-build');
+const outFile = join(root, 'public', 'brand', 'what-if-brand-kit.zip');
+
+/** [source in the brand pack, destination in the kit] */
+const CONTENTS = [
+  ['token-logo/if-token-logo-master-2048.png', '01-token-logo/if-token-logo-2048.png'],
+  ['token-logo/if-token-logo-512.png', '01-token-logo/if-token-logo-512.png'],
+  ['token-logo/if-token-logo-256.png', '01-token-logo/if-token-logo-256.png'],
+  [
+    'token-logo/if-token-logo-transparent-2048.png',
+    '01-token-logo/if-token-logo-transparent-2048.png',
+  ],
+  [
+    'token-logo/if-token-logo-transparent-512.png',
+    '01-token-logo/if-token-logo-transparent-512.png',
+  ],
+
+  ['x-avatar/if-x-avatar-zoom-800.png', '02-avatar/if-avatar-800.png'],
+  ['x-avatar/if-x-avatar-coin-alt-800.png', '02-avatar/if-avatar-coin-800.png'],
+
+  ['wordmark/if-wordmark-on-dark.svg', '03-wordmark/if-wordmark-dark.svg'],
+  ['wordmark/if-wordmark-on-light.svg', '03-wordmark/if-wordmark-light.svg'],
+  ['wordmark/if-wordmark-transparent-for-dark.png', '03-wordmark/if-wordmark-dark.png'],
+  ['wordmark/if-wordmark-transparent-for-light.png', '03-wordmark/if-wordmark-light.png'],
+  ['wordmark/if-monogram-on-dark.svg', '03-wordmark/if-monogram-dark.svg'],
+  ['wordmark/if-monogram-on-light.svg', '03-wordmark/if-monogram-light.svg'],
+
+  ['favicon/favicon.ico', '04-favicon/favicon.ico'],
+  ['favicon/favicon-512.png', '04-favicon/favicon-512.png'],
+  ['favicon/apple-touch-icon.png', '04-favicon/apple-touch-icon.png'],
+
+  [
+    'character-reference/if-man-reference-sheet-4k.png',
+    '05-character/if-man-reference-sheet-4k.png',
+  ],
+  [
+    'character-reference/if-man-reference-sheet-2k.png',
+    '05-character/if-man-reference-sheet-2k.png',
+  ],
+  ['character-reference/IF-MAN-PROMPT-KIT.md', '05-character/IF-MAN-PROMPT-KIT.md'],
+
+  ['x-banner/if-x-banner-cosmic-wordmark-3000x1000.png', '06-banners/banner-cosmic-wordmark.png'],
+  ['x-banner/if-x-banner-scene-3000x1000.png', '06-banners/banner-scene.png'],
+  ['x-banner/if-x-banner-dark-tiles-3000x1000.png', '06-banners/banner-dark-tiles.png'],
+
+  ['meme-pack/if-man-thinking-transparent.png', '07-character-cutouts/if-man-thinking.png'],
+  ['meme-pack/if-man-pointing-transparent.png', '07-character-cutouts/if-man-pointing.png'],
+  ['meme-pack/if-man-shrug-transparent.png', '07-character-cutouts/if-man-shrug.png'],
+  ['meme-pack/if-man-facepalm-transparent.png', '07-character-cutouts/if-man-facepalm.png'],
+  ['meme-pack/if-man-victory-transparent.png', '07-character-cutouts/if-man-victory.png'],
+  ['meme-pack/if-man-arms-crossed-transparent.png', '07-character-cutouts/if-man-arms-crossed.png'],
+];
+
+const README = `WHAT $IF — BRAND KIT
+====================
+
+Everything you need to make $IF content. Take it, use it, no permission needed.
+
+WHAT IS IN HERE
+  01-token-logo        The coin. Use for the token: DEX listings, wallets,
+                       token lists, price trackers. Always the full coin
+                       WITH its rim — the rim is what makes it read as currency.
+  02-avatar            The character, cropped so it fills a circular crop.
+                       Use for profile pictures.
+  03-wordmark          The name, as true vector. Use for headers, overlays,
+                       merch and partner placements. The two four-point stars
+                       off the F are part of the mark — keep them.
+  04-favicon           Browser and app icons.
+  05-character         The IF Man reference sheet and the prompt kit. Attach the
+                       sheet as an image reference in any AI tool and pair it
+                       with the prompt blocks. Generate from the reference,
+                       never from memory.
+  06-banners           Ready-made social banners.
+  07-character-cutouts Transparent poses for memes.
+
+THE PALETTE
+  Void Black    #080B07   background
+  Bright Lime   #8FCE02   primary
+  Mid Lime      #86B50B   support
+  Deep Green    #305B05   shadow
+  Pale Lime     #C4DC43   highlight
+  Galaxy Gold   #E4D98E   accent, sparingly
+
+THE TYPE
+  Archivo Black Italic 900, uppercase, tight tracking — headlines and wordmark.
+  JetBrains Mono — anything exact or copyable. Never set a contract address in
+  a display face.
+
+THE CHARACTER — ALWAYS
+  Bald, clean-shaven, lean-athletic, long neck and limbs.
+  Flat acid-lime skin, thick black contour, horizontal engraving on skull/neck.
+  Black space, green nebulae, gold-white galaxy cores, four-point stars.
+  Calm and restrained. He wonders. He does not mug.
+
+THE CHARACTER — NEVER
+  Hair, beard, stubble or hair-like eyebrows.
+  Suits, armour, jewellery, footwear, capes.
+  Glossy 3D or photoreal skin. The coin's metallic render is the one exception.
+  The Robinhood feather logo — write "on Robinhood Chain" instead.
+
+VOICE
+  Curious, cosmic, slightly deadpan. The question is the brand: leave it open,
+  do not answer it.
+
+THE ONLY OFFICIAL SITE IS whatifonhood.com
+Contract: 0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1
+Always verify the contract address against whatifonhood.com and @WhatIFonHOOD.
+
+$IF is a meme coin with no intrinsic value. Not financial advice.
+`;
+
+rmSync(staging, { recursive: true, force: true });
+mkdirSync(staging, { recursive: true });
+
+let copied = 0;
+const missing = [];
+for (const [from, to] of CONTENTS) {
+  const source = join(pack, from);
+  if (!existsSync(source)) {
+    missing.push(from);
+    continue;
+  }
+  const destination = join(staging, to);
+  mkdirSync(dirname(destination), { recursive: true });
+  cpSync(source, destination);
+  copied += 1;
+}
+
+writeFileSync(join(staging, 'README.txt'), README);
+
+rmSync(outFile, { force: true });
+mkdirSync(dirname(outFile), { recursive: true });
+execFileSync('zip', ['-r', '-q', outFile, '.'], { cwd: staging });
+rmSync(staging, { recursive: true, force: true });
+
+const size = (statSync(outFile).size / 1024 / 1024).toFixed(1);
+process.stdout.write(`${copied} files -> ${outFile} (${size} MB)\n`);
+if (missing.length)
+  process.stdout.write(`  missing from the brand pack:\n   - ${missing.join('\n   - ')}\n`);

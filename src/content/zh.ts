@@ -1,0 +1,418 @@
+import type { SiteCopy } from './types.ts';
+
+export const zh: SiteCopy = {
+  htmlLang: 'zh-CN',
+
+  nav: {
+    links: [
+      { label: '核心理念', href: '#thesis' },
+      { label: '数据', href: '#numbers' },
+      { label: '如何购买', href: '#buy' },
+      { label: '常见问题', href: '#faq' },
+    ],
+    toolsLabel: '工具',
+    tools: {
+      pfp: { label: '找到你的币', blurb: '四种稀有度，总有一枚是你' },
+      machine: { label: 'What $IF 机器', blurb: '你本可以赚到多少' },
+      memes: { label: '迷因库', blurb: '随便拿' },
+      maker: { label: '梗图生成器', blurb: '十秒做一张' },
+      stats: { label: '数据', blurb: '每个数字都是实时的' },
+      brand: { label: '品牌', blurb: '标识与素材' },
+    },
+    buy: '购买 $IF',
+    pfp: '找到你的币',
+    openMenu: '打开菜单',
+    closeMenu: '关闭菜单',
+    languageLabel: '语言',
+  },
+
+  hero: {
+    liveOn: '已在 Robinhood Chain 上线',
+    titleLead: '如果',
+    titleTail: '这就是那一个？',
+    description:
+      '为永远好奇的人打造的迷因币。如果你早点买入会怎样？如果你一直持有会怎样？如果这就是那一个会怎样？',
+    buy: '购买 $IF',
+    chart: '图表',
+    statsNote: '数据来自链上，每次打开页面时刷新。',
+  },
+
+  marquee: [
+    '如果 $IF',
+    '你早点买入？',
+    '如果',
+    '你一直持有？',
+    '如果',
+    '这就是那一个？',
+    '如果',
+    '我们从不卖出？',
+    '如果',
+    '它冲上十亿？',
+  ],
+
+  cosmic: {
+    kicker: '如果',
+    statements: [
+      '如果我能拯救一条生命？',
+      '如果我能用一个愿望治愈癌症？',
+      '如果爱比我们所有人都长久？',
+      '如果一个声音能终结一场战争？',
+      '如果破碎的人成为了建造者？',
+      '如果希望从来不是谎言？',
+      '如果一个孩子的梦想改写了明天？',
+      '如果仁慈比权力更强大？',
+      '如果我们记得每一个名字？',
+      '如果最黑暗的夜里藏着黎明？',
+      '如果宽恕就是解药？',
+      '如果没有人独自悲伤？',
+    ],
+  },
+
+  thesis: {
+    eyebrow: '核心理念',
+    heading: { lead: '一个问题。', accent: '无限可能。' },
+    intro:
+      '$IF 不是实用型代币，也不是治理代币。它是每个人凌晨三点都会冒出的那个念头，被铸造在了这条最新的公链上。',
+    pillars: [
+      {
+        title: '一切始于一个问题',
+        body: '你后悔过的每一笔交易，都始于「如果当初」。$IF 只是认真到把这个问题放上了链。',
+      },
+      {
+        title: '构建于 Robinhood Chain',
+        body: '出块快、手续费低，还有那个把一代人拉进市场的名字。Robinhood 当初也是一个「如果」。',
+      },
+      {
+        title: '9% 已经消失',
+        body: '超过 9300 万枚 $IF 躺在一个没有人持有私钥的销毁地址里。这不是承诺——这是一个你可以自己去读的余额。',
+      },
+      {
+        title: '一切自己核实',
+        body: '合约、流动性池、销毁记录和持有人数量全部公开，我们把每一个都附上了链接。不要相信任何网站——包括这一个。',
+      },
+    ],
+  },
+
+  numbers: {
+    eyebrow: '数据',
+    heading: { lead: '没有套路。', accent: '只有数字。' },
+    intro: '十亿枚代币、一份公开合约，以及一个任何人都能审计的销毁地址。所以这一节很短。',
+    contractLabel: '合约地址',
+    verifyNote: '购买前请对照我们的 X 和 Telegram，逐个字符核对。',
+    copy: '复制',
+    copied: '已复制',
+    viewOnExplorer: '在 Blockscout 查看',
+    stats: {
+      price: '价格',
+      marketCap: '市值',
+      liquidity: '流动性',
+      volume: '24 小时成交量',
+      supply: '总供应量',
+      burned: '已销毁',
+      holders: '持有人',
+      chain: '公链',
+    },
+    burnHeadline: '已销毁且无法找回',
+    burnBody:
+      '发送到 0x…dEaD —— 一个没有私钥的地址。没有人能再动这些代币，团队不能，你不能，任何人都不能。',
+    asOf: '截至',
+    live: '实时',
+  },
+
+  buy: {
+    eyebrow: '上车',
+    heading: { lead: '三步。', accent: '就这么多。' },
+    intro: '你需要一个钱包、一点在 Robinhood Chain 上的 ETH，以及三十秒。全部流程如下。',
+    steps: [
+      {
+        title: '准备钱包',
+        body: '电脑上用 MetaMask、OKX 或 Trust，手机上用 Robinhood Wallet。第一次访问用到 Robinhood Chain 的页面时，钱包会引导你添加该网络。',
+        action: '获取 MetaMask',
+      },
+      {
+        title: '把 ETH 转到 Robinhood Chain',
+        body: '在 Robinhood App 中提取 ETH 并选择 Robinhood Chain 网络。ETH 在别的链上？Robinhood 官方文档列出了跨链路径。',
+        action: '跨链指南',
+      },
+      {
+        title: '在 Uniswap 兑换',
+        body: '打开时已在 Robinhood Chain 上预选 $IF。确认交易前，请把那个页面上的地址和上面的地址对一遍。',
+        action: '在 Uniswap 兑换',
+      },
+    ],
+    venuesTitle: '追踪、看图、核实',
+    venues: [
+      { label: 'Uniswap', blurb: '主要的 IF/WETH 流动性池。' },
+      { label: 'DexScreener', blurb: '实时价格与流动性。' },
+      { label: 'CoinGecko', blurb: '市场数据与历史。' },
+      { label: 'CoinMarketCap', blurb: '排名与供应量。' },
+      { label: 'Blockscout', blurb: '合约本身。' },
+    ],
+    safetyNote:
+      '本站永远不会要求你连接钱包、签名或输入助记词。如果有页面自称 $IF 并这样要求，那不是我们。',
+  },
+
+  pfpTeaser: {
+    eyebrow: '币池',
+    heading: { lead: '找到属于', accent: '你的那一枚。' },
+    body: '手工制作的 $IF 币，四种稀有度。点一下就能获得，直接用作头像。无需钱包、无需注册、无需连接任何东西。',
+    cta: '打开生成器',
+  },
+
+  vaultTeaser: {
+    eyebrow: '迷因库',
+    heading: { lead: '每一张迷因图。', accent: '随便拿。' },
+    body: '我们做过的每一张迷因图，全分辨率，随时可发。它们本来就是为此而生的。请负责任地右键保存。',
+    cta: '打开迷因库',
+  },
+
+  ecosystem: {
+    eyebrow: '生态系统',
+    heading: { lead: '我们真正', accent: '在用的工具。' },
+    intro: '我们就是这样交易、追踪和核实 $IF 的。每个链接都指向官方页面。',
+    blurbs: {
+      Uniswap: '在这条链的主要 DEX 上用 ETH 兑换 $IF。',
+      DexScreener: '实时价格、流动性与每一笔交易。',
+      CoinGecko: '价格历史、市值与社区数据。',
+      CoinMarketCap: '排名、供应量与市场数据。',
+      Blockscout: '合约、持有人与销毁记录。',
+      MetaMask: '大多数人已经在用的 EVM 钱包。',
+      'Robinhood Wallet': '在手机上原生支持 Robinhood Chain。',
+    },
+  },
+
+  roadmap: {
+    eyebrow: '投资者总在问',
+    heading: { lead: '那么…', accent: '路线图呢？' },
+    fileName: 'if_roadmap_final_v3.pdf',
+    lastEdited: '1 页 · 上次编辑：从未',
+    quarters: ['Q1 —— 如果', 'Q2 —— 如果', 'Q3 —— 还在问', 'Q4 —— 大概是迷因'],
+    stamp: '还在问。',
+    footnote: '没有路线图，没有实用功能，没有承诺。仅供娱乐。',
+  },
+
+  faq: {
+    eyebrow: '没有蠢问题',
+    heading: { lead: '问题，', accent: '已解答。' },
+    items: [
+      {
+        q: '$IF 是什么？',
+        a: '$IF 是 Robinhood Chain 上的一枚迷因币，围绕每个交易者凌晨三点都会问自己的那个问题打造：如果当初会怎样？没有产品路线图，也没有实用功能。有的是一个问题、一个社区和一张图表。',
+      },
+      {
+        q: '怎么把 ETH 转到 Robinhood Chain？',
+        a: '这是大多数新手卡住的地方。最简单的方式是在 Robinhood App 里提取 ETH 并选择 Robinhood Chain 网络。如果你的 ETH 在别的链上，Robinhood 官方文档列出了可用的跨链桥。无论哪种方式，都要留一点 ETH 付手续费。',
+      },
+      {
+        q: '在哪里购买？',
+        a: '在 Robinhood Chain 上的 Uniswap，使用本页的合约地址。深度最好的是 IF/WETH 池。请务必逐字符核对地址——迷因币总会引来仿冒者，一个字符错了，钱就进了陌生人的口袋。',
+      },
+      {
+        q: '怎么确认拿到的是正确的代币？',
+        a: '我们唯一会公布的地址是 0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1，它会完整地出现在本页、我们的 X 主页和 Telegram 上。如果某个网站给你看的是缩写版或另一个地址，请立刻关掉。',
+      },
+      {
+        q: '有交易税吗？',
+        a: '$IF 合约不会在你的交易之外额外收取任何费用。你在主池看到的 1% 是 Uniswap 自己的费率档位，归提供流动性的人所有，不归我们。合约在 Blockscout 上公开——请自己去读，而不是相信一个网站的说法。',
+      },
+      {
+        q: '销毁了多少？',
+        a: '超过 9300 万枚 $IF（占总供应量 9% 以上）位于 0x…dEaD，一个没有私钥的地址。这些代币永远无法再被转移。这是区块浏览器上的实时余额，不是文件里的一句承诺。',
+      },
+      {
+        q: '社区在哪里？',
+        a: 'X 是 @WhatIFonHOOD，Telegram 是 t.me/WhatIFonHoodChain。两个都很活跃，都由持币的人自己在运营。每个人都是开发者。',
+      },
+      {
+        q: '$IF 是一项投资吗？',
+        a: '不是。它是一枚没有内在价值、没有团队承诺、没有路线图的迷因币。价格下跌和上涨一样容易，绝大多数迷因币最终归零。永远不要投入超过你能坦然承受全部损失的金额。',
+      },
+    ],
+  },
+
+  footer: {
+    heading: { lead: '如果你加入了', accent: '会怎样？' },
+    subtitle: '图表就在那里。问题就在这里。',
+    buy: '购买 $IF',
+    telegram: '加入 Telegram',
+    follow: '在 X 上关注',
+    chart: '图表',
+    canonical: '唯一的官方网站是 whatifonhood.com，其他都不是我们。',
+    disclaimer:
+      '$IF 是一枚没有内在价值、也不应期待任何财务回报的迷因币。本站内容不构成投资建议。请自行研究（DYOR）。',
+    builtBy: '每个人都是开发者。',
+  },
+
+  pages: {
+    memes: {
+      title: '迷因库',
+      heading: { lead: '每一张迷因图。', accent: '随便拿。' },
+      intro:
+        '每一张 $IF 迷因图，全分辨率，无水印，无需署名。发它、印它、改它——它们本来就是为此而生的。',
+      download: '下载',
+      all: '全部',
+      searchLabel: '搜索迷因',
+      empty: '没有匹配的结果，换个词试试。',
+      count: '张',
+    },
+    brand: {
+      title: '品牌',
+      heading: { lead: '三个标识，', accent: '以及用法。' },
+      intro: '一个品牌，三个标识：币标识代币，角色标识世界，字标标识名字。需要什么就拿什么。',
+      download: '下载',
+      kitNote: '包含标识、头像、矢量字标、横幅、角色参考图和透明素材——附带调色板、字体与使用说明。',
+      rulesTitle: '三条重要规则',
+      rules: [
+        '硬币必须保留外圈，这是它之所以像一枚货币的原因。',
+        '合约地址不要使用展示字体，也不要缩写。',
+        '不要使用 Robinhood 的羽毛标识，改为写「on Robinhood Chain」。',
+      ],
+    },
+    stats: {
+      title: '数据',
+      heading: { lead: '每一个数字，', accent: '都是实时的。' },
+      intro: '价格、流动性、供应量与销毁——直接读自 Robinhood Chain。',
+      sourceNote:
+        '价格、流动性和成交量来自 DexScreener；销毁数据直接读自链上。两者都会在你打开本页时刷新。',
+      poolLabel: '主要流动性池',
+      openExplorer: '打开合约',
+      openChart: '打开图表',
+      timeframes: { day: '24小时', week: '7天', month: '30天', all: '全部' },
+      chartTypes: { candles: 'K线', line: '折线' },
+      chartTitle: '价格',
+      feedTitle: '最新成交',
+      biggestBuy: '最大买单',
+      buys: '买入',
+      sells: '卖出',
+      buyLabel: '买',
+      sellLabel: '卖',
+      viewTx: '查看',
+      loading: '正在读取链上数据…',
+      failed: '暂时无法获取行情数据，以上数字来自最近一次构建。',
+      feedNote: 'IF/WETH 池的最新成交记录。',
+    },
+    machine: {
+      title: 'What $IF 机器',
+      heading: { lead: '如果你早点', accent: '买入会怎样？' },
+      intro: '选一个你错过的币、一个金额、一个日期。剩下那道你一直在回避的算术题，交给机器。',
+      coinLabel: '你错过的币',
+      searchPlaceholder: '搜索币种 —— bitcoin、doge、pepe…',
+      noResults: '数据集中没有这个名字。',
+      emptyState: '选一个币、一个金额、一个月份，剩下的交给机器。',
+      investedLabel: '你投入',
+      worthLabel: '现在会值',
+      boughtLabel: '你会持有',
+      entryLabel: '当时价格',
+      todayLabel: '现在价格',
+      coinCount: '按月计价，自各币种上市之日起。',
+      amountLabel: '当时会投入的金额',
+      dateLabel: '时间',
+      calculate: '算一下',
+      resultLead: '现在会值',
+      multiplier: '倍数',
+      shareText: (amount, coin, month, value, multiple) =>
+        `如果我在 ${month} 把 ${amount} 投进 ${coin} 会怎样？\n\n${value}，${multiple}。\n\n还在问。`,
+      verdicts: {
+        dodged: '这个你算是躲过去了。',
+        fine: '也就那样吧。',
+        ouch: '尽量别去想。',
+        painful: '这个到现在还疼。',
+        unbearable: '这事千万别告诉别人。',
+      },
+      shareOnX: '发到 X',
+      pivot: '如果这次你没有错过呢？',
+      pivotCta: '购买 $IF',
+      disclaimer: '基于历史价格的粗略计算，仅供娱乐。过去的价格不能预测任何事。',
+    },
+    pfp: {
+      title: '头像生成器',
+      heading: { lead: '找到属于', accent: '你的那一枚。' },
+      intro: '点击生成，拿到一枚 $IF 硬币，设为头像。无需钱包、无需注册、无需连接任何东西。',
+      subline: '四种稀有度，每次抽取免费。',
+      generate: '生成我的 $IF',
+      again: '再来一次',
+      hint: '一键完成。所有记录只保存在你自己的浏览器里。',
+      tiers: { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' },
+      found: (found, total) => `已收集 ${found} / ${total}`,
+      showPool: '查看全部硬币',
+      hidePool: '收起',
+      locked: '尚未获得',
+      download: '下载 PNG',
+      shareCard: '分享卡片',
+      postOnX: '发到 X',
+      shareText: (name, tier) => `我抽到了 ${name} —— ${tier}。\n\n如果这一枚就是你呢？`,
+      odds: '概率',
+      openGenerator: '抽你自己的',
+    },
+    notFound: {
+      title: '页面未找到',
+      eyebrow: '404',
+      heading: { lead: '如果这个页面', accent: '从未存在过？' },
+      intro: '它确实不存在。这里什么都没有搬走 —— 这个地址从来就不是我们的。',
+      tryThese: '这些是存在的',
+    },
+    meme: {
+      intro: '最高分辨率，无水印，无需署名。拿走吧。',
+      description: (title, series) =>
+        `${title} —— 来自 ${series} 系列的 $IF 梗图。最高分辨率，随意发布，无需署名。`,
+      download: '下载',
+      postOnX: '发到 X',
+      more: '更多来自',
+      backToVault: '返回梗图库',
+      shareText: (title) => `${title}\n\n还在问。`,
+    },
+    memeMaker: {
+      title: '梗图生成器',
+      heading: { lead: '做一张。', accent: '发出去。' },
+      intro:
+        '八种版式，四个姿势，你的文字。全部在你自己的设备上生成，直接保存为 PNG。不会上传任何内容。',
+      templateLabel: '版式',
+      poseLabel: '姿势',
+      backdropLabel: '背景',
+      templates: {
+        classic: '经典',
+        caption: '引用',
+        'this-or-that': '二选一',
+        statement: '宣言',
+        question: '那个问题',
+        spotlight: '聚光灯',
+        chart: '行情日',
+        gm: 'gm',
+      },
+      fields: {
+        top: '上方文字',
+        bottom: '下方文字',
+        line: '你的文字',
+        first: '上格',
+        second: '下格',
+      },
+      poses: {
+        'arms-crossed': '淡定',
+        facepalm: '后悔',
+        thinking: '思考',
+        victory: '胜利',
+      },
+      backdrops: {
+        glow: '光晕',
+        void: '虚空',
+        grid: '网格',
+        spotlight: '聚光',
+        stars: '星空',
+        chart: '图表',
+      },
+      download: '下载 PNG',
+      share: '分享',
+      shuffle: '随机',
+      saved: '已保存。把它附到你的帖子里。',
+      failed: '生成失败，请重试。',
+      shareText: '用 $IF 梗图生成器做的。\n\n还在问。',
+      privacy: '一切都在你的浏览器里完成。不上传，不注册，不保存。',
+      cta: '自己做一张',
+    },
+  },
+
+  common: {
+    skipToContent: '跳到主要内容',
+    externalLink: '在新标签页打开',
+  },
+};

@@ -1,0 +1,46 @@
+---
+/**
+ * A value shown in full, in monospace, with a copy button.
+ *
+ * Used for the contract address and the chain parameters. The value is never
+ * truncated and never set in a display face: a reader has to be able to compare
+ * it character by character against our X profile and Telegram.
+ */
+interface Props {
+  label: string;
+  value: string;
+  copyLabel: string;
+  copiedLabel: string;
+  /** Larger treatment for the contract address itself. */
+  emphasis?: boolean;
+}
+
+const { label, value, copyLabel, copiedLabel, emphasis = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex min-w-0 items-center gap-3 rounded-xl border border-line bg-void/60 px-4 py-3',
+    emphasis && 'sm:px-5 sm:py-4',
+  ]}
+>
+  <span class="w-20 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+    {label}
+  </span>
+  <code
+    class:list={[
+      'min-w-0 flex-1 overflow-x-auto font-mono text-ink',
+      emphasis ? 'text-xs sm:text-sm' : 'text-xs',
+    ]}>{value}</code
+  >
+  <button
+    type="button"
+    class="js-copy shrink-0 rounded-lg px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted transition-colors hover:bg-lime/10 hover:text-lime"
+    data-copy-value={value}
+    data-copy-label={copyLabel}
+    data-copied-label={copiedLabel}
+    aria-label={`${copyLabel} ${label}`}
+  >
+    {copyLabel}
+  </button>
+</div>

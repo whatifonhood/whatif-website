@@ -1,0 +1,115 @@
+---
+/**
+ * The shell every page uses: metadata, social cards, fonts, and the scripts that
+ * make the page interactive.
+ *
+ * There is no analytics script, no tag manager and no third-party embed. Fonts
+ * and images are served from this origin, which is why the Content-Security-
+ * Policy in public/_headers can be as tight as it is.
+ */
+import { LOCALES, LOCALE_PATHS, LINKS, SITE, type Locale } from '../config/site.ts';
+import { getCopy } from '../content/index.ts';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  /** Page title. The site name is appended automatically. */
+  title: string;
+  description: string;
+  /** Set on the landing page so the title is not doubled up. */
+  isHome?: boolean;
+  /** Absolute URL of the sharing image. Defaults to the site-wide card. */
+  socialImage?: string;
+}
+
+const { locale, title, description, isHome = false, socialImage } = Astro.props;
+const copy = getCopy(locale);
+
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const shareImage = socialImage ?? new URL('/og-default.jpg', SITE.url).href;
+const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
+
+/** Every language of this page, for search engines. */
+const alternates = LOCALES.map((code) => ({
+  code,
+  href: new URL(LOCALE_PATHS[code], SITE.url).href,
+}));
+
+/** Tells search engines who publishes this site and which accounts are ours. */
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: new URL('/favicon-512.png', SITE.url).href,
+  description: SITE.description,
+  sameAs: [LINKS.x, LINKS.telegram],
+};
+---
+
+<!doctype html>
+<html lang={copy.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {
+      alternates.map((alternate) => (
+        <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={SITE.url} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#080B07" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={copy.htmlLang} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={LINKS.xHandle} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(organizationSchema)} />
+  </head>
+
+  <body class="bg-void text-ink antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-lime focus:px-5 focus:py-3 focus:font-semibold focus:text-void"
+    >
+      {copy.common.skipToContent}
+    </a>
+
+    <slot />
+
+    <script>
+      import { initNav } from '../scripts/nav.ts';
+      import { initCopyButtons } from '../scripts/copy.ts';
+      import { initReveal } from '../scripts/reveal.ts';
+      import { initToolsMenu } from '../scripts/tools-menu.ts';
+
+      initNav();
+      initCopyButtons();
+      initReveal();
+      initToolsMenu();
+    </script>
+  </body>
+</html>

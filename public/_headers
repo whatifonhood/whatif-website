@@ -1,0 +1,47 @@
+# Response headers for Netlify.
+#
+# Two jobs: cache the fingerprinted assets forever, and lock down what the page
+# is allowed to do. The site is static, has no accounts and holds no secrets, so
+# the policy below can be unusually strict — every source is either this origin
+# or one of the two public read-only APIs that provide the live figures.
+#
+# Verified by tests/headers.spec.ts, which fails the build if a directive is lost.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://rpc.mainnet.chain.robinhood.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; manifest-src 'self'; upgrade-insecure-requests
+
+# The PFP generator draws its share cards on a canvas and hands them to the
+# browser as blob: URLs, so it needs that one extra image source. Everything
+# else stays identical to the site-wide policy above.
+/pfp/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+
+# The meme generator draws on a canvas and hands the result to the share sheet
+# or a download as a blob: URL, exactly like the PFP generator above. Same one
+# extra image source, nothing else widened.
+/memes/make/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+
+# The generator's artwork is content-addressed by name and never edited in place.
+/pfp/img/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Astro fingerprints everything in /_astro, so it can never go stale.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Artwork that is replaced by uploading a new file, not by editing one.
+/memes/*
+  Cache-Control: public, max-age=604800
+
+# The HTML itself must always be revalidated so a deploy goes live immediately.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

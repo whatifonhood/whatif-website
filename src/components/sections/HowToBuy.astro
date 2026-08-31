@@ -1,0 +1,112 @@
+---
+import { MARKETS, ONRAMPS, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Button from '../ui/Button.astro';
+import Icons from '../ui/Icons.astro';
+import ToolLogo, { type LogoName } from '../ui/ToolLogo.astro';
+
+/**
+ * How to buy, in three steps.
+ *
+ * There is no swap widget and no wallet code here, by design: this site never
+ * asks anyone to connect a wallet or sign anything. Buying hands off to Uniswap
+ * with the token already selected. See WEBSITE-PLAN.md, "Buying".
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+
+/** The outbound link for each step, matched by index. */
+const stepLinks = [ONRAMPS.metamask, ONRAMPS.bridgingGuide, MARKETS.uniswap];
+
+/** Where each venue points, and which logo it carries. */
+const VENUES: Record<string, { url: string; logo: LogoName }> = {
+  Uniswap: { url: MARKETS.uniswap, logo: 'uniswap' },
+  DexScreener: { url: MARKETS.dexscreener, logo: 'dexscreener' },
+  CoinGecko: { url: MARKETS.coingecko, logo: 'coingecko' },
+  CoinMarketCap: { url: MARKETS.coinmarketcap, logo: 'coinmarketcap' },
+  Blockscout: { url: MARKETS.contract, logo: 'blockscout' },
+};
+---
+
+<Section id="buy" divider>
+  <div class="max-w-2xl">
+    <Eyebrow>{copy.buy.eyebrow}</Eyebrow>
+    <SectionHeading heading={copy.buy.heading} class="mt-4" />
+    <p class="mt-5 text-lg leading-relaxed text-muted">{copy.buy.intro}</p>
+  </div>
+
+  <ol class="mt-14 grid gap-4 lg:grid-cols-3" data-reveal>
+    {
+      copy.buy.steps.map((step, index) => (
+        <li class="card card-hover flex flex-col p-6">
+          <span class="font-display text-3xl font-black italic leading-none text-lime">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <h3 class="mt-6 font-display text-xl font-semibold text-ink">{step.title}</h3>
+          <p class="mt-2 flex-1 leading-relaxed text-muted">{step.body}</p>
+          {step.action && (
+            <Button
+              href={stepLinks[index]}
+              variant={index === 2 ? 'primary' : 'secondary'}
+              external
+              externalLabel={copy.common.externalLink}
+              class="mt-5 w-full"
+            >
+              {index === 0 && <ToolLogo name="metamask" size={18} class="h-[18px] w-[18px]" />}
+              {index === 2 && <ToolLogo name="uniswap" size={18} class="h-[18px] w-[18px]" />}
+              {step.action}
+              <Icons name="arrow-up-right" size={14} />
+            </Button>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+
+  <!-- Track it, chart it, verify it -->
+  <h3 class="mt-16 font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+    {copy.buy.venuesTitle}
+  </h3>
+  <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" data-reveal>
+    {
+      copy.buy.venues.map((venue) => {
+        const target = VENUES[venue.label];
+        return (
+          <a
+            href={target?.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="card card-hover shimmer group flex flex-col items-start gap-3 p-5"
+          >
+            <span class="grid h-12 w-12 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/10">
+              {target && <ToolLogo name={target.logo} size={30} class="h-[30px] w-[30px]" />}
+            </span>
+            <span class="flex items-center gap-1.5 font-display font-semibold text-ink">
+              {venue.label}
+              <Icons
+                name="arrow-up-right"
+                size={12}
+                class="text-faint transition-colors group-hover:text-lime"
+              />
+            </span>
+            <span class="text-sm leading-relaxed text-muted">{venue.blurb}</span>
+          </a>
+        );
+      })
+    }
+  </div>
+
+  <!-- The promise that makes phishing clones obvious -->
+  <p
+    class="mt-10 max-w-3xl rounded-xl border-l-2 border-lime bg-lime/[0.06] px-5 py-4 text-sm leading-relaxed text-muted"
+  >
+    {copy.buy.safetyNote}
+  </p>
+</Section>

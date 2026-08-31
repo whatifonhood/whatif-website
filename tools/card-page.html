@@ -1,0 +1,127 @@
+<!doctype html>
+<!--
+  Source for the per-page sharing cards (public/og-<page>.jpg).
+
+  Rendered by `npm run cards`, which passes the page in the query string:
+    card-page.html?kicker=Stats&title=Every%20number,%20live&sub=Read%20from%20the%20chain
+
+  Same cosmos and scrim as the site-wide card, so a set of links posted together
+  reads as one family rather than as unrelated pages.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Archivo';
+        font-style: italic;
+        font-weight: 900;
+        src: url('../node_modules/@fontsource/archivo/files/archivo-latin-900-italic.woff2')
+          format('woff2');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-weight: 700;
+        src: url('../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2')
+          format('woff2');
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #080b07;
+        position: relative;
+        font-family: 'Archivo', sans-serif;
+      }
+      .art {
+        position: absolute;
+        inset: 0;
+        background-image: url('../src/assets/hero-cosmos.png');
+        background-size: cover;
+        background-position: 68% 42%;
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          #080b07 20%,
+          rgba(8, 11, 7, 0.86) 52%,
+          rgba(8, 11, 7, 0.18) 100%
+        );
+      }
+      .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 320px 0 76px;
+        gap: 26px;
+      }
+      .kicker {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 19px;
+        color: #8fce02;
+      }
+      h1 {
+        font-style: italic;
+        font-weight: 900;
+        font-size: 92px;
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+      .sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 18px;
+        color: #9aa889;
+      }
+      .mark {
+        position: absolute;
+        left: 76px;
+        bottom: 46px;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 17px;
+        color: #8fce02;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="art"></div>
+    <div class="scrim"></div>
+    <div class="content">
+      <p class="kicker" id="kicker">What $IF</p>
+      <h1 id="title">Every number, live</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <p class="mark">whatifonhood.com</p>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      document.getElementById('kicker').textContent = params.get('kicker') ?? 'What $IF';
+      document.getElementById('title').textContent = params.get('title') ?? '';
+      document.getElementById('sub').textContent = params.get('sub') ?? '';
+
+      // Long titles step down rather than spilling off the card.
+      const heading = document.getElementById('title');
+      for (let size = 92; size > 44 && heading.scrollWidth > heading.clientWidth; size -= 3) {
+        heading.style.fontSize = `${size}px`;
+      }
+    </script>
+  </body>
+</html>

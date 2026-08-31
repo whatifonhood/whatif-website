@@ -1,0 +1,99 @@
+<!doctype html>
+<!--
+  Source for the social sharing card (public/og-default.jpg).
+  Edit this file, then run `npm run og` to re-render it at 1200x630.
+  Fonts and artwork are loaded from the repo, so this renders offline.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Archivo';
+        font-style: italic;
+        font-weight: 900;
+        src: url('../node_modules/@fontsource/archivo/files/archivo-latin-900-italic.woff2')
+          format('woff2');
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-weight: 400;
+        src: url('../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2')
+          format('woff2');
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #080b07;
+        position: relative;
+        font-family: 'Archivo', sans-serif;
+      }
+      .art {
+        position: absolute;
+        inset: 0;
+        background-image: url('../src/assets/hero-cosmos.png');
+        background-size: cover;
+        background-position: 68% 42%;
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          #080b07 22%,
+          rgba(8, 11, 7, 0.82) 46%,
+          rgba(8, 11, 7, 0.1) 100%
+        );
+      }
+      .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 0 0 76px;
+        gap: 26px;
+      }
+      h1 {
+        font-style: italic;
+        font-weight: 900;
+        font-size: 108px;
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+      h1 .tick {
+        color: #8fce02;
+      }
+      .kicker,
+      .sub {
+        font-family: 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 19px;
+      }
+      .kicker {
+        color: #8fce02;
+      }
+      .sub {
+        color: #9aa889;
+        letter-spacing: 0.14em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="art"></div>
+    <div class="scrim"></div>
+    <div class="content">
+      <p class="kicker">Robinhood Chain</p>
+      <h1>What <span class="tick">$IF</span><br />this is the one?</h1>
+      <p class="sub">The meme coin for the perpetually curious</p>
+    </div>
+  </body>
+</html>
