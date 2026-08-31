@@ -436,3 +436,56 @@ test('every subject agrees with every verb', async () => {
 
   expect(problems).toEqual([]);
 });
+
+/**
+ * Sharing a question.
+ *
+ * The id in the URL is indices, never the words. A link carrying raw text would
+ * let anyone render whatever they liked onto a card wearing our branding, which
+ * is a way to make $IF appear to say something it never said.
+ */
+test.describe('a question can be linked', () => {
+  test('a shared link reopens the same question', async ({ page }) => {
+    await page.goto('/ask/');
+    await expect(page).toHaveURL(/\?q=/);
+    const asked = (await page.locator('[data-ask-question]').textContent())?.trim();
+
+    await page.goto(page.url());
+    expect((await page.locator('[data-ask-question]').textContent())?.trim()).toBe(asked);
+  });
+
+  test('a tampered link falls back instead of rendering what it was given', async ({ page }) => {
+    for (const bad of ['<script>alert(1)</script>', 'l99999', 'p0.999', 'nonsense']) {
+      await page.goto(`/ask/?q=${encodeURIComponent(bad)}`);
+      const shown = (await page.locator('[data-ask-question]').textContent())?.trim() ?? '';
+      expect(shown.startsWith('What if')).toBe(true);
+      expect(shown).not.toContain('script');
+      expect(shown).not.toContain(bad);
+    }
+  });
+
+  test('everyone gets the same question on the same day', async ({ page }) => {
+    const { questionForDate } = await import('../src/config/what-if.ts');
+    expect(questionForDate('2026-09-01').text).toBe(questionForDate('2026-09-01').text);
+    expect(questionForDate('2026-09-01').text).not.toBe(questionForDate('2026-09-02').text);
+
+    await page.goto('/ask/');
+    await expect(page.locator('[data-ask-daily]')).not.toBeEmpty();
+  });
+});
+
+/**
+ * Figures quoted in prose.
+ *
+ * The FAQ used to state the burn as typed text. A number typed into copy on a
+ * finance site is a false claim the moment it drifts, so it has to come from
+ * the same place the stat strip does.
+ */
+test('the burn is never quoted as hardcoded text', async ({ page }) => {
+  await page.goto('/');
+  // Present before any script runs, so the sentence is never half-finished.
+  await expect(page.locator('main [data-stat="burned"]').first()).not.toBeEmpty();
+
+  const body = (await page.locator('main').textContent()) ?? '';
+  expect(body, 'a burn figure is typed into the copy').not.toMatch(/93 million|93 millones/i);
+});

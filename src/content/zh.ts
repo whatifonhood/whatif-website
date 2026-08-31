@@ -96,7 +96,7 @@ export const zh: SiteCopy = {
       },
       {
         title: '9% 已经消失',
-        body: '超过 9300 万枚 $IF 躺在一个没有人持有私钥的销毁地址里。这不是承诺——这是一个你可以自己去读的余额。',
+        body: '{burned} 枚 $IF（占供应量 {burnedPercent}）躺在一个没有人持有私钥的销毁地址里。这不是承诺——这是一个你可以自己去读的余额。',
       },
       {
         title: '一切自己核实',
@@ -229,7 +229,7 @@ export const zh: SiteCopy = {
       },
       {
         q: '销毁了多少？',
-        a: '超过 9300 万枚 $IF（占总供应量 9% 以上）位于 0x…dEaD，一个没有私钥的地址。这些代币永远无法再被转移。这是区块浏览器上的实时余额，不是文件里的一句承诺。',
+        a: '{burned} 枚 $IF（占总供应量 {burnedPercent}）位于 0x…dEaD，一个没有私钥的地址。这些代币永远无法再被转移。这是区块浏览器上的实时余额，不是文件里的一句承诺。',
       },
       {
         q: '社区在哪里？',
@@ -383,8 +383,12 @@ export const zh: SiteCopy = {
       heading: { lead: '如果', accent: '什么都有可能？' },
       intro: '整个币就是一个问题。这里一遍又一遍地问，而且几乎不会重复。',
       again: '再来一个',
-      copy: '复制',
+      copyLink: '复制链接',
       copied: '已复制。',
+      linkCopied: '链接已复制。',
+      today: '今天的问题',
+      answerLabel: '你的回答',
+      answerPlaceholder: '说说你的想法，它会出现在卡片上。',
       postOnX: '发到 X',
       download: '下载卡片',
       possibilities: '种可能的问题',

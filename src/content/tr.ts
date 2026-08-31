@@ -96,7 +96,7 @@ export const tr: SiteCopy = {
       },
       {
         title: 'Yüzde dokuzu şimdiden gitti',
-        body: '93 milyondan fazla $IF, anahtarı kimsede olmayan bir yakma adresinde duruyor. Bu bir söz değil — kendi gözünle okuyabileceğin bir bakiye.',
+        body: '{burned} $IF, anahtarı kimsede olmayan bir yakma adresinde duruyor. Bu bir söz değil — kendi gözünle okuyabileceğin bir bakiye.',
       },
       {
         title: 'Her şeyi kendin doğrula',
@@ -236,7 +236,7 @@ export const tr: SiteCopy = {
       },
       {
         q: 'Ne kadarı yakıldı?',
-        a: '93 milyondan fazla $IF — toplam arzın %9’undan fazlası — özel anahtarı olmayan 0x…dEaD adresinde duruyor. Bu tokenler bir daha asla hareket edemez. Bu, bir belgedeki iddia değil, blok gezgininde canlı duran bir bakiye.',
+        a: '{burned} $IF — toplam arzın {burnedPercent}’i — özel anahtarı olmayan 0x…dEaD adresinde duruyor. Bu tokenler bir daha asla hareket edemez. Bu, bir belgedeki iddia değil, blok gezgininde canlı duran bir bakiye.',
       },
       {
         q: 'Topluluk nerede?',
@@ -396,8 +396,12 @@ export const tr: SiteCopy = {
       intro:
         'Bütün coin tek bir sorudan ibaret. İşte o soru, tekrar tekrar, ve neredeyse hiç aynısı çıkmadan.',
       again: 'Bir tane daha',
-      copy: 'Kopyala',
+      copyLink: 'Bağlantıyı kopyala',
       copied: 'Kopyalandı.',
+      linkCopied: 'Bağlantı kopyalandı.',
+      today: 'Bugünün sorusu',
+      answerLabel: 'Senin cevabın',
+      answerPlaceholder: 'Ne düşündüğünü yaz. Kartın üstüne geçer.',
       postOnX: "X'te paylaş",
       download: 'Kartı indir',
       possibilities: 'olası soru',

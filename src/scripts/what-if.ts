@@ -8,68 +8,28 @@
  * only what is interchangeable within one idea, and never join two ideas. This
  * file picks and renders.
  */
-import { BANKS, LINES, PATTERNS, countPossibilities, type Category } from '../config/what-if.ts';
+import {
+  countPossibilities,
+  questionForDate,
+  questionFromId,
+  randomQuestion,
+  type Question,
+} from '../config/what-if.ts';
 import { track } from '../lib/analytics.ts';
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 675;
 
 /** How many recent questions to avoid repeating. */
-const MEMORY = 30;
+const MEMORY = 60;
 
-/**
- * How often each register comes up.
- *
- * The philosophical one leads: it is the question the whole coin is built on and
- * the one worth reading twice. Money is the regret the Machine already answers
- * in detail, and the market jokes are garnish, so they take the smallest share.
- */
-const WEIGHTS: Record<Category, number> = { deep: 0.62, money: 0.24, market: 0.14 };
-
-function pick<T>(items: readonly T[]): T {
-  return items[Math.floor(Math.random() * items.length)]!;
-}
-
-/** Fills a pattern's slots. */
-function fill(text: string): string {
-  return text.replace(/\{(\w+)\}/g, (_, slot: string) => {
-    const bank = BANKS[slot];
-    return bank ? pick(bank) : '';
-  });
-}
-
-function pickCategory(): Category {
-  let roll = Math.random();
-  for (const entry of Object.entries(WEIGHTS) as [Category, number][]) {
-    roll -= entry[1];
-    if (roll <= 0) return entry[0];
+/** Avoids showing the same question twice in a session. */
+function nextQuestion(recent: string[]): Question {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const question = randomQuestion();
+    if (!recent.includes(question.id)) return question;
   }
-  return 'deep';
-}
-
-/**
- * One question.
- *
- * Written lines and fillable patterns sit in the same pool for the chosen
- * register, so a hand-written thought is as likely to come up as a generated
- * one — which keeps the average quality up where the written ones are.
- */
-function generate(recent: string[]): string {
-  const draw = (): string => {
-    const category = pickCategory();
-    const pool = [
-      ...LINES.filter((line) => line.category === category).map((line) => line.text),
-      ...PATTERNS.filter((pattern) => pattern.category === category).map((p) => p.text),
-    ];
-    return fill(pool.length > 0 ? pick(pool) : pick(LINES).text);
-  };
-
-  // Repeats are possible in a set this size, so a few attempts are worth making.
-  for (let attempt = 0; attempt < 14; attempt += 1) {
-    const text = draw();
-    if (!recent.includes(text)) return text;
-  }
-  return draw();
+  return randomQuestion();
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -103,7 +63,11 @@ function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: number)
  * Set as prose, not as a headline. Uppercase black italic at this size reads as
  * shouting, and these are meant to be read rather than announced.
  */
-async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<void> {
+async function drawCard(
+  canvas: HTMLCanvasElement,
+  question: string,
+  answer: string,
+): Promise<void> {
   const context = canvas.getContext('2d');
   if (!context) return;
   canvas.width = CARD_WIDTH;
@@ -133,10 +97,12 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
 
-  // Short questions get to be large; long ones step down until they fit.
-  let size = 66;
+  // An answer takes room from the question, so the question is sized against
+  // whatever is left rather than a fixed box.
+  const answerText = answer.trim();
+  const maxHeight = answerText ? 220 : 320;
+  let size = answerText ? 52 : 66;
   let lines: string[] = [];
-  const maxHeight = 320;
   while (size > 26) {
     context.font = `600 ${size}px Archivo, sans-serif`;
     lines = wrap(context, question, boxWidth);
@@ -145,11 +111,37 @@ async function drawCard(canvas: HTMLCanvasElement, question: string): Promise<vo
   }
 
   const lineHeight = size * 1.3;
-  let y = 218 + (maxHeight - lines.length * lineHeight) / 2;
+  let y = (answerText ? 196 : 218) + (maxHeight - lines.length * lineHeight) / 2;
   context.fillStyle = '#E9F0DD';
   for (const line of lines) {
     context.fillText(line, PAD, y);
     y += lineHeight;
+  }
+
+  // The answer, set apart from the question so the card reads as a reply.
+  if (answerText) {
+    const rule = y + 14;
+    context.strokeStyle = 'rgba(143,206,2,0.5)';
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(PAD, rule);
+    context.lineTo(PAD + 60, rule);
+    context.stroke();
+
+    let answerSize = 34;
+    let answerLines: string[] = [];
+    while (answerSize > 18) {
+      context.font = `400 ${answerSize}px Archivo, sans-serif`;
+      answerLines = wrap(context, answerText, boxWidth);
+      if (answerLines.length <= 3) break;
+      answerSize -= 2;
+    }
+    context.fillStyle = '#8FCE02';
+    let answerY = rule + answerSize + 24;
+    for (const line of answerLines.slice(0, 3)) {
+      context.fillText(line, PAD, answerY);
+      answerY += answerSize * 1.32;
+    }
   }
 
   context.font = '700 20px "JetBrains Mono", monospace';
@@ -184,40 +176,67 @@ export function initWhatIf(): void {
   const output = root.querySelector<HTMLElement>('[data-ask-question]');
   const again = root.querySelector<HTMLButtonElement>('[data-ask-again]');
   const canvas = root.querySelector<HTMLCanvasElement>('[data-ask-card]');
+  const answerInput = root.querySelector<HTMLTextAreaElement>('[data-ask-answer]');
   const copyButton = root.querySelector<HTMLButtonElement>('[data-ask-copy]');
   const shareLink = root.querySelector<HTMLAnchorElement>('[data-ask-share]');
   const download = root.querySelector<HTMLAnchorElement>('[data-ask-download]');
   const status = root.querySelector<HTMLElement>('[data-ask-status]');
+  const daily = root.querySelector<HTMLElement>('[data-ask-daily]');
   if (!output) return;
 
   const labels = {
     copied: root.dataset.labelCopied ?? '',
+    linkCopied: root.dataset.labelLinkCopied ?? '',
     shareTemplate: root.dataset.shareText ?? '',
   };
 
   const recent: string[] = [];
+  let current = randomQuestion();
   let cardUrl: string | null = null;
+  let redrawTimer: number | undefined;
 
-  const ask = () => {
-    const question = generate(recent);
-    recent.push(question);
-    if (recent.length > MEMORY) recent.shift();
+  /**
+   * Today's question, the same one for everybody.
+   *
+   * The date is taken locally, so somebody in Sydney gets tomorrow's before
+   * somebody in London. That is the right trade — a shared question people can
+   * answer together beats one that changes at an arbitrary hour of their night.
+   */
+  if (daily) {
+    const today = new Date();
+    const iso = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+    daily.textContent = questionForDate(iso).text;
+  }
 
-    output.textContent = question;
+  const render = () => {
+    output.textContent = current.text;
     // Re-triggering the animation is what makes each one feel like an arrival.
     output.classList.remove('is-new');
     void output.offsetWidth;
     output.classList.add('is-new');
 
+    // The address bar matches the screen, so the question can be sent to
+    // somebody. The id is indices, never the words — see the note in the config.
+    const url = new URL(window.location.href);
+    url.searchParams.set('q', current.id);
+    window.history.replaceState(null, '', url);
+
+    const answer = answerInput?.value.trim() ?? '';
+
     if (shareLink) {
-      const url = new URL('https://x.com/intent/post');
-      url.searchParams.set('text', labels.shareTemplate.replace('{question}', question));
-      url.searchParams.set('url', 'https://whatifonhood.com/ask/');
-      shareLink.href = url.toString();
+      const intent = new URL('https://x.com/intent/post');
+      const text = labels.shareTemplate.replace('{question}', current.text);
+      intent.searchParams.set('text', answer ? `${current.text}\n\n${answer}` : text);
+      intent.searchParams.set('url', url.href);
+      shareLink.href = intent.toString();
     }
 
     if (canvas) {
-      void drawCard(canvas, question).then(() => {
+      void drawCard(canvas, current.text, answer).then(() => {
         canvas.toBlob((blob) => {
           if (!blob || !download) return;
           if (cardUrl) URL.revokeObjectURL(cardUrl);
@@ -227,18 +246,31 @@ export function initWhatIf(): void {
         }, 'image/png');
       });
     }
+  };
 
+  const ask = () => {
+    current = nextQuestion(recent);
+    recent.push(current.id);
+    if (recent.length > MEMORY) recent.shift();
+    if (answerInput) answerInput.value = '';
+    render();
     track('Question Asked');
   };
 
   again?.addEventListener('click', ask);
 
+  // Typing redraws the card, but not on every keystroke.
+  answerInput?.addEventListener('input', () => {
+    window.clearTimeout(redrawTimer);
+    redrawTimer = window.setTimeout(render, 350);
+  });
+
   copyButton?.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(output.textContent ?? '');
-      if (status) status.textContent = labels.copied;
+      await navigator.clipboard.writeText(window.location.href);
+      if (status) status.textContent = labels.linkCopied;
     } catch {
-      /* clipboard unavailable; the text is on screen to copy by hand */
+      /* clipboard unavailable; the URL is in the address bar */
     }
   });
 
@@ -255,5 +287,13 @@ export function initWhatIf(): void {
   const total = root.querySelector<HTMLElement>('[data-ask-total]');
   if (total) total.textContent = countPossibilities().toLocaleString();
 
-  ask();
+  // A shared link opens on its own question; anything invalid falls back.
+  const shared = questionFromId(new URLSearchParams(window.location.search).get('q') ?? '');
+  if (shared) {
+    current = shared;
+    recent.push(shared.id);
+    render();
+  } else {
+    ask();
+  }
 }
