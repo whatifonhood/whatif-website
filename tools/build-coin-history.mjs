@@ -56,7 +56,7 @@ const COINGECKO_HEADERS = COINGECKO_KEY
   : {};
 
 /** How many coins to include, ordered by how much they actually trade. */
-const MAX_COINS = Number(env.MACHINE_COIN_COUNT) || 600;
+const MAX_COINS = Number(env.MACHINE_COIN_COUNT) || 1500;
 const MIN_QUOTE_VOLUME_USD = 300_000;
 /** A coin needs enough history for the question to be interesting. */
 const MIN_MONTHS = 6;

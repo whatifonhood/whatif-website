@@ -164,6 +164,41 @@ const metrics = [
             }
             <button
               type="button"
+              data-chart-zoom="out"
+              class="chart-toggle"
+              aria-label={page.zoomOut}
+              title={page.zoomOut}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              data-chart-zoom="in"
+              class="chart-toggle"
+              aria-label={page.zoomIn}
+              title={page.zoomIn}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              data-chart-reset
+              class="chart-toggle chart-reset"
+              title={page.resetZoom}
+            >
+              {page.resetZoom}
+            </button>
+            <button
+              type="button"
+              data-chart-average
+              aria-pressed="false"
+              class="chart-toggle"
+              title={page.average}
+            >
+              {page.average}
+            </button>
+            <button
+              type="button"
               data-chart-log
               aria-pressed="false"
               class="chart-toggle"
@@ -188,6 +223,9 @@ const metrics = [
           <g data-candles></g>
           <!-- Volume sits in its own lane under the price. -->
           <g data-volume></g>
+          <!-- Overlays, drawn on the same scale as the price above. -->
+          <g data-average></g>
+          <g data-burn-marks></g>
           <line data-crosshair class="crosshair" x1="0" x2="0" y1="0" y2="320" opacity="0"></line>
         </svg>
         <span data-chart-high class="chart-bound top-3">—</span>
@@ -549,6 +587,22 @@ const metrics = [
 </PageLayout>
 
 <style>
+  /* Reset only appears once there is something to reset. */
+  .chart-reset {
+    display: none;
+  }
+  [data-zoomed='true'] .chart-reset {
+    display: inline-flex;
+  }
+
+  [data-chart-wrap] {
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  [data-chart-wrap][data-panning='true'] {
+    cursor: grabbing;
+  }
+
   .chart-grip {
     display: flex;
     height: 18px;
@@ -744,8 +798,39 @@ const metrics = [
     letter-spacing: 0.08em;
     color: var(--color-muted);
   }
-  .tf-chip:hover {
+  .tf-chip:hover,
+  .chart-toggle:hover {
     color: var(--color-ink);
+    border-color: color-mix(in srgb, var(--color-lime) 45%, var(--color-line));
+  }
+
+  /*
+   * The chart's own controls. These share the timeframe chips' shape so the row
+   * reads as one set of controls rather than pills followed by loose words —
+   * the class was referenced but never defined, so they were plain text.
+   */
+  .chart-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.35rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .chart-toggle[aria-pressed='true'] {
+    background: var(--color-lime);
+    border-color: var(--color-lime);
+    color: var(--color-void);
   }
   .tf-chip[aria-pressed='true'] {
     background: var(--color-lime);
@@ -1003,6 +1088,23 @@ const metrics = [
 
 <style is:global>
   /* Drawn at runtime — see the note on the other global block. */
+  .ma-line {
+    fill: none;
+    stroke: var(--color-gold, #e4d98e);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .burn-mark {
+    stroke: var(--color-warn, #f0a06a);
+    stroke-width: 2;
+    opacity: 0.75;
+  }
+  .burn-mark:hover {
+    opacity: 1;
+    stroke-width: 3;
+  }
   .chart-tip b {
     display: block;
     color: var(--color-faint);
