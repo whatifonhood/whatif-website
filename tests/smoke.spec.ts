@@ -366,3 +366,45 @@ test('analytics stays first-party', async ({ page }) => {
   // Whatever else the page does, it must not load a tracker from someone else.
   expect(thirdParty.filter((h) => /plausible|google|segment|hotjar/i.test(h))).toEqual([]);
 });
+
+/**
+ * The header's section links are in-page anchors. On a sub-page an anchor to
+ * "#thesis" points at nothing and the button does nothing at all, which is what
+ * used to happen — so off the landing page they have to carry the landing page
+ * with them, in the language the visitor is reading.
+ */
+test.describe('the header gets you home', () => {
+  test('section links work from a sub-page', async ({ page }) => {
+    await page.goto('/stats/');
+    await expect(page.locator('header a[href$="#thesis"]').first()).toHaveAttribute(
+      'href',
+      '/#thesis',
+    );
+
+    // On a narrow viewport these links live in the collapsed menu, so the click
+    // has to go through the same path a person on a phone would take.
+    const opener = page.locator('header [aria-controls="mobile-menu"]');
+    if (await opener.isVisible()) await opener.click();
+
+    const link = page.locator('header a[href$="#thesis"]:visible').first();
+    await link.click();
+    await expect(page).toHaveURL(/\/#thesis$/);
+    await expect(page.locator('#thesis')).toBeVisible();
+  });
+
+  test('a sub-page in another language returns to that language', async ({ page }) => {
+    await page.goto('/es/stats/');
+    await expect(page.locator('header a[href$="#thesis"]').first()).toHaveAttribute(
+      'href',
+      '/es/#thesis',
+    );
+  });
+
+  test('the landing page keeps a plain anchor so it does not reload', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('header a[href$="#thesis"]').first()).toHaveAttribute(
+      'href',
+      '#thesis',
+    );
+  });
+});
