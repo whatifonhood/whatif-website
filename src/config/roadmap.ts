@@ -72,6 +72,13 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
+    title: 'The vault in every language',
+    body: 'All 65 memes now have a page in Chinese, Turkish and Spanish as well as English. The titles stay as written — they are jokes, not prose.',
+    href: '/memes/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
     title: 'Your collection survives a new phone',
     body: 'Pulls are kept in your own browser, so clearing it used to lose them. Copy a code, paste it in anywhere else, and they come back.',
     href: '/pfp/',

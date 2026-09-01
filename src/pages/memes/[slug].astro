@@ -1,11 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import PageLayout from '../../layouts/PageLayout.astro';
+import MemePage from '../../components/pages/MemePage.astro';
 import { MEMES } from '../../config/memes.ts';
-import { SITE } from '../../config/site.ts';
-import { getCopy } from '../../content/index.ts';
-import Button from '../../components/ui/Button.astro';
-import Icons from '../../components/ui/Icons.astro';
 
 /**
  * A page for every meme.
@@ -24,99 +20,6 @@ export const getStaticPaths = (() =>
   }))) satisfies GetStaticPaths;
 
 const { meme } = Astro.props;
-
-const locale = 'en' as const;
-const copy = getCopy(locale);
-const page = copy.pages.meme;
-
-/** Three more from the same series, so the page is a doorway not a dead end. */
-const siblings = MEMES.filter((m) => m.series === meme.series && m.slug !== meme.slug).slice(0, 3);
-
-const url = `${SITE.url}/memes/${meme.slug}/`;
-
-const shareUrl = new URL('https://x.com/intent/post');
-shareUrl.searchParams.set('text', page.shareText(meme.title));
-shareUrl.searchParams.set('url', url);
 ---
 
-<PageLayout
-  locale={locale}
-  title={meme.title}
-  description={page.description(meme.title, meme.series)}
-  eyebrow={meme.series}
-  heading={{ lead: meme.title, accent: '' }}
-  intro={page.intro}
-  socialImage={`${SITE.url}/memes/og/${meme.slug}.jpg`}
->
-  <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
-    <figure class="overflow-hidden rounded-2xl border border-line bg-surface">
-      <img
-        src={`/memes/full/${meme.slug}.webp`}
-        alt={meme.title}
-        width={meme.width}
-        height={meme.height}
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-        class="w-full"
-      />
-    </figure>
-
-    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-      <Button
-        href={`/memes/full/${meme.slug}.webp`}
-        size="lg"
-        download={`whatif-${meme.slug}.webp`}
-      >
-        {page.download}
-        <Icons name="arrow-up-right" size={16} />
-      </Button>
-      <a
-        href={shareUrl.toString()}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
-      >
-        <Icons name="x" size={14} />
-        {page.postOnX}
-      </a>
-    </div>
-
-    {
-      siblings.length > 0 && (
-        <section class="mt-16 border-t border-line pt-10">
-          <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
-            {page.more} {meme.series}
-          </h2>
-          <ul class="mt-5 grid grid-cols-3 gap-4">
-            {siblings.map((sibling) => (
-              <li class="card group overflow-hidden">
-                <a href={`/memes/${sibling.slug}/`}>
-                  <img
-                    src={`/memes/thumb/${sibling.slug}.webp`}
-                    alt={sibling.title}
-                    width={sibling.width}
-                    height={sibling.height}
-                    loading="lazy"
-                    decoding="async"
-                    class="aspect-square w-full bg-surface-2 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  />
-                  <p class="truncate p-3 text-sm font-semibold text-ink">{sibling.title}</p>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    <p class="mt-12 text-center">
-      <a
-        href="/memes/"
-        class="text-sm text-muted underline-offset-4 hover:text-lime hover:underline"
-      >
-        {page.backToVault}
-      </a>
-    </p>
-  </div>
-</PageLayout>
+<MemePage locale="en" meme={meme} />
