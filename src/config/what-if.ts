@@ -574,3 +574,32 @@ export function questionFromId(id: string): Question | null {
 
   return { text, id };
 }
+
+/**
+ * The first day the site asked a question, and the start of the archive.
+ *
+ * $IF launched on this day. There is nothing to show before it.
+ */
+export const DAILY_FIRST = '2026-07-11';
+
+/**
+ * Every day from launch to `to`, inclusive, as YYYY-MM-DD.
+ *
+ * Used to build the daily archive. The caller passes the end date rather than
+ * this reading a clock, so a build is reproducible and a test can ask for a
+ * fixed range.
+ */
+export function everyDayTo(to: string): string[] {
+  const days: string[] = [];
+  const end = Date.parse(`${to}T00:00:00Z`);
+  if (!Number.isFinite(end)) return days;
+
+  for (
+    let cursor = new Date(`${DAILY_FIRST}T00:00:00Z`);
+    cursor.getTime() <= end;
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  ) {
+    days.push(cursor.toISOString().slice(0, 10));
+  }
+  return days;
+}

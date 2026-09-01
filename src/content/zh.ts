@@ -416,6 +416,9 @@ export const zh: SiteCopy = {
       openGenerator: '抽你自己的',
     },
     ask: {
+      dailyArchiveTitle: '至今的每一天',
+      dailyArchiveIntro: '每天一个问题，所有人都一样。这里是全部。',
+      dailyAnswerCta: '回答这一个',
       title: '问一个更好的问题',
       eyebrow: '生成器',
       heading: { lead: '如果', accent: '什么都有可能？' },

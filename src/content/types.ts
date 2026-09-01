@@ -368,6 +368,10 @@ export interface SiteCopy {
       openGenerator: string;
     };
     ask: {
+      /** The archive of daily questions. */
+      dailyArchiveTitle: string;
+      dailyArchiveIntro: string;
+      dailyAnswerCta: string;
       title: string;
       eyebrow: string;
       heading: SplitHeading;

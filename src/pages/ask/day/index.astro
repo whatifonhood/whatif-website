@@ -1,0 +1,45 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import { getCopy } from '../../../content/index.ts';
+import { everyDayTo, questionForDate } from '../../../config/what-if.ts';
+
+/** Every daily question so far, newest first. */
+const days = everyDayTo(new Date().toISOString().slice(0, 10))
+  .map((date) => ({ date, question: questionForDate(date) }))
+  .reverse();
+
+const locale = 'en' as const;
+const copy = getCopy(locale);
+const page = copy.pages.ask;
+---
+
+<PageLayout
+  locale={locale}
+  title={page.dailyArchiveTitle}
+  description={page.dailyArchiveIntro}
+  eyebrow={page.eyebrow}
+  heading={{ lead: page.dailyArchiveTitle, accent: '' }}
+  intro={page.dailyArchiveIntro}
+>
+  <div class="mx-auto w-full max-w-3xl px-5 py-12 sm:px-8">
+    <ol class="divide-y divide-line/60">
+      {
+        days.map(({ date, question }) => (
+          <li>
+            <a href={`/ask/day/${date}/`} class="group block py-4 transition-colors">
+              <time
+                datetime={date}
+                class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
+              >
+                {date}
+              </time>
+              <p class="mt-1 text-lg leading-relaxed text-ink group-hover:text-lime">
+                {question.text}
+              </p>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</PageLayout>

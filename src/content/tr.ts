@@ -429,6 +429,9 @@ export const tr: SiteCopy = {
       openGenerator: 'Kendi paranı çek',
     },
     ask: {
+      dailyArchiveTitle: 'Bugüne kadarki her gün',
+      dailyArchiveIntro: 'Günde bir soru, herkese aynısı. Hepsi burada.',
+      dailyAnswerCta: 'Buna cevap ver',
       title: 'Daha iyi bir soru sor',
       eyebrow: 'Üretici',
       heading: { lead: 'Ya', accent: 'her şey mümkünse?' },

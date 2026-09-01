@@ -425,6 +425,9 @@ export const en: SiteCopy = {
       openGenerator: 'Pull your own',
     },
     ask: {
+      dailyArchiveTitle: 'Every day so far',
+      dailyArchiveIntro: 'One question a day, the same one for everybody. Here is all of them.',
+      dailyAnswerCta: 'Answer this one',
       title: 'Ask a better question',
       eyebrow: 'The generator',
       heading: { lead: 'What $IF', accent: 'anything?' },

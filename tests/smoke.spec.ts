@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
+import { questionForDate } from '../src/config/what-if.ts';
 
 /**
  * The checks that must never fail.
@@ -918,3 +919,53 @@ test('the pressure chart says what it counts', async ({ page }) => {
   // The threshold is the reason the chart is comparable; it must be stated.
   await expect(panel).toContainText(/\$500|500 ?\$|500 dolar|500 美元/);
 });
+
+/**
+ * The daily archive.
+ *
+ * A page for every question the generator can make would be two thousand
+ * near-identical documents — a doorway-page pattern that would drag down the
+ * coin pages that do have something to say. The daily question is the one worth
+ * a page: one per day, the same for everybody, and the one people answer
+ * together. Any other question still has a shareable link via `/ask/?q=`.
+ */
+test.describe('every day so far', () => {
+  test('a day unfurls with its own question, not a generic title', async ({ page }) => {
+    await page.goto('/ask/day/2026-08-01/');
+    const question = questionForDate('2026-08-01').text;
+    await expect(page).toHaveTitle(new RegExp(escapeForRegExp(question)));
+    await expect(page.locator('h1')).toContainText(question);
+  });
+
+  test('the days are linked to each other and to the index', async ({ page }) => {
+    await page.goto('/ask/day/2026-08-01/');
+    await page.locator('a[href="/ask/day/2026-07-31/"]').click();
+    await expect(page.locator('h1')).toContainText(questionForDate('2026-07-31').text);
+    await page.locator('a[href="/ask/day/"]').click();
+    await expect(page.locator('h1')).toContainText(/every day/i);
+  });
+
+  test('the archive is reachable from the generator', async ({ page }) => {
+    await page.goto('/ask/');
+    await page.locator('a[href="/ask/day/"]').first().click();
+    await expect(page.locator('ol li')).not.toHaveCount(0);
+  });
+
+  test('the first day has no day before it', async ({ page }) => {
+    await page.goto('/ask/day/2026-07-11/');
+    await expect(page.locator('a[href*="/ask/day/2026-07-10"]')).toHaveCount(0);
+  });
+
+  test('answering a day opens that exact question', async ({ page }) => {
+    await page.goto('/ask/day/2026-08-01/');
+    await page.locator('a[href^="/ask/?q="]').first().click();
+    await expect(page.locator('[data-ask-question]')).toHaveText(
+      questionForDate('2026-08-01').text,
+    );
+  });
+});
+
+/** Escapes a sentence so it can be matched literally inside a RegExp. */
+function escapeForRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
