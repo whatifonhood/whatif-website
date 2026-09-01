@@ -44,6 +44,13 @@ const page = copy.pages.ask;
     <section class="mb-10 rounded-2xl border border-lime/30 bg-surface p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.today}</p>
       <p data-ask-daily class="ask-daily mt-3"></p>
+      <!-- The way into the archive, which is otherwise unreachable. -->
+      <a
+        href="/ask/day/"
+        class="mt-4 inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-lime"
+      >
+        {page.dailyArchiveTitle} →
+      </a>
     </section>
 
     <div class="rounded-2xl border border-line bg-surface p-8 sm:p-12">

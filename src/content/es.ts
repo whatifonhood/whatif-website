@@ -443,6 +443,9 @@ export const es: SiteCopy = {
       openGenerator: 'Saca la tuya',
     },
     ask: {
+      dailyArchiveTitle: 'Todos los días hasta ahora',
+      dailyArchiveIntro: 'Una pregunta al día, la misma para todos. Aquí están todas.',
+      dailyAnswerCta: 'Responder esta',
       title: 'Hazte una pregunta mejor',
       eyebrow: 'El generador',
       heading: { lead: '¿Y $IF', accent: 'cualquier cosa?' },

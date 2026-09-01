@@ -86,6 +86,13 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
+    title: 'Every day so far',
+    body: 'The daily question now has a page per day, so a shared link unfurls with the question itself and the whole run is readable back to launch.',
+    href: '/ask/day/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
     title: 'Since you were last here',
     body: 'Come back and the dashboard says what moved. Compared against figures your own browser kept — nothing is sent anywhere.',
     href: '/stats/',
