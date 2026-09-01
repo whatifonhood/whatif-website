@@ -26,7 +26,11 @@ export default defineConfig({
     sitemap({
       // The individual coin pages are made for social previews, not for search.
       // Listing all 101 would bury the pages people actually look for.
-      filter: (page) => !/\/pfp\/[^/]+\/?$/.test(new URL(page).pathname),
+      // /card-preview is a review page, not a page of the site.
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        return !/\/pfp\/[^/]+\/?$/.test(path) && !path.startsWith('/card-preview');
+      },
     }),
   ],
 

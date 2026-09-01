@@ -1,0 +1,152 @@
+---
+/**
+ * A preview of the four share cards. TEMPORARY — delete once they are approved.
+ *
+ * Rendered through the real drawing code with real data, so what is on screen
+ * here is exactly what a card would look like when somebody downloads one.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout locale="en" title="Card preview" description="Preview of the four share cards." noindex>
+  <div class="mx-auto w-full max-w-5xl px-5 py-12">
+    <h1 class="display-heading text-3xl">Share cards</h1>
+    <p class="mt-3 text-muted">Real drawing code, real data. Nothing is wired into the site yet.</p>
+
+    <div class="mt-10 space-y-12">
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          1 — The What $IF Machine
+        </figcaption>
+        <canvas data-card="machine" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          2 — Ask a better question
+        </figcaption>
+        <canvas data-card="ask" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          3 — Ask, with an answer written in
+        </figcaption>
+        <canvas data-card="ask-answered" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          4 — Wallet lookup
+        </figcaption>
+        <canvas data-card="holdings" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          5 — Find your coin
+        </figcaption>
+        <canvas data-card="pfp" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+
+      <figure>
+        <figcaption class="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          6 — The Machine, on a coin that went down
+        </figcaption>
+        <canvas data-card="machine-loss" class="w-full rounded-xl border border-line"></canvas>
+      </figure>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    drawAskCard,
+    drawHoldingsCard,
+    drawMachineCard,
+    drawPfpCard,
+  } from '../lib/card-designs.ts';
+
+  const canvas = (name: string) =>
+    document.querySelector<HTMLCanvasElement>(`[data-card="${name}"]`);
+
+  /** A believable price history, so the curve in the portal is a real shape. */
+  const history: [string, number][] = [];
+  let price = 0.00042;
+  for (let i = 0; i < 60; i += 1) {
+    price *= 1 + Math.sin(i / 3.1) * 0.18 + (i > 40 ? 0.11 : 0.02);
+    history.push([`2021-${String((i % 12) + 1).padStart(2, '0')}`, price]);
+  }
+
+  await document.fonts.ready;
+
+  const machine = canvas('machine');
+  if (machine) {
+    drawMachineCard(machine, {
+      symbol: 'DOGE',
+      month: 'August 2019',
+      amount: '$500',
+      value: '$16,960',
+      multiple: 33.9,
+      verdict: 'That one still hurts.',
+      history,
+      entryIndex: 12,
+    });
+  }
+
+  const loss = canvas('machine-loss');
+  if (loss) {
+    drawMachineCard(loss, {
+      symbol: 'WHEN',
+      month: 'August 2025',
+      amount: '$500',
+      value: '$194.66',
+      multiple: 0.4,
+      verdict: 'You dodged that one.',
+      history: [...history].reverse(),
+      entryIndex: 34,
+    });
+  }
+
+  const ask = canvas('ask');
+  if (ask) {
+    drawAskCard(
+      ask,
+      'What if the day you cannot remember was the one that changed everything?',
+      '',
+    );
+  }
+
+  const answered = canvas('ask-answered');
+  if (answered) {
+    drawAskCard(
+      answered,
+      'What if putting my Christmas bonus into the dog one was all it took?',
+      'It was. I just did not know it yet.',
+    );
+  }
+
+  const holdings = canvas('holdings');
+  if (holdings) {
+    drawHoldingsCard(holdings, {
+      tokens: '2.4M',
+      usd: '$22,438',
+      band: 'Shark',
+      line: 'Enough to notice. Not enough to sleep.',
+      share: 0.0024,
+    });
+  }
+
+  const pfp = canvas('pfp');
+  if (pfp) {
+    const image = new Image();
+    image.onload = () =>
+      drawPfpCard(pfp, image, {
+        name: 'Godface',
+        tier: 'Legendary',
+        tierColor: '#E4D98E',
+        odds: '2% odds · 11 of 150',
+      });
+    image.src = '/coins/full/godface.webp';
+  }
+</script>
