@@ -49,6 +49,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /** Price plot height. The volume lane sits underneath it. */
 const PLOT_H = 252;
+/** The SVG's full height, price lane plus volume lane. */
+const CHART_H = 320;
 const VOL_TOP = 264;
 const VOL_H = 52;
 
@@ -72,6 +74,135 @@ function makeScale(min: number, max: number, log: boolean) {
   }
   const span = max - min || max || 1;
   return (value: number) => padY + (1 - (value - min) / span) * (height - padY * 2);
+}
+
+/**
+ * Round price levels to label an axis with.
+ *
+ * A scale reading 0.008173, 0.008460, 0.008747 is arithmetically correct and
+ * useless — the eye cannot place a price against it. These are the round
+ * numbers a person would have chosen: 1, 2, 2.5 or 5 times a power of ten,
+ * whichever gives roughly the requested number of lines inside the range.
+ */
+function niceLevels(min: number, max: number, count = 5): number[] {
+  if (!(max > min)) return [];
+  const rough = (max - min) / count;
+  const magnitude = 10 ** Math.floor(Math.log10(rough));
+  const step =
+    [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((candidate) => candidate >= rough) ??
+    10 * magnitude;
+
+  const levels: number[] = [];
+  for (let value = Math.ceil(min / step) * step; value <= max; value += step) {
+    levels.push(Number(value.toFixed(12)));
+  }
+  return levels;
+}
+
+/**
+ * The price scale down the right, and the lines it names across the plot.
+ *
+ * On a log axis the levels are placed by the same scale the candles use, so a
+ * line always sits exactly where its price is rather than where a linear
+ * reading of the label would put it.
+ */
+function drawPriceScale(
+  svg: SVGSVGElement,
+  scaleEl: HTMLElement | null,
+  min: number,
+  max: number,
+  y: (value: number) => number,
+  locale: string,
+): void {
+  const grid = svg.querySelector('[data-grid]');
+  if (grid) grid.replaceChildren();
+  if (scaleEl) scaleEl.replaceChildren();
+  if (!(max > min)) return;
+
+  const levels = niceLevels(min, max);
+  const lines: SVGElement[] = [];
+
+  for (const level of levels) {
+    const at = y(level);
+    const line = document.createElementNS(SVG_NS, 'line');
+    line.setAttribute('x1', '0');
+    line.setAttribute('x2', '1000');
+    line.setAttribute('y1', at.toFixed(2));
+    line.setAttribute('y2', at.toFixed(2));
+    line.setAttribute('class', 'grid-line');
+    lines.push(line);
+
+    if (scaleEl) {
+      const label = document.createElement('span');
+      // The scale is positioned over the price lane only, so a percentage of
+      // PLOT_H puts a label exactly on its own line however tall the box is.
+      label.style.top = `${(at / CHART_H) * 100}%`;
+      label.textContent = formatUsd(level, locale);
+      scaleEl.append(label);
+    }
+  }
+  grid?.append(...lines);
+}
+
+/**
+ * The dates along the bottom.
+ *
+ * How many, and how precise, follows the window: hours within a day, days
+ * within a quarter, months beyond that.
+ */
+function drawTimeAxis(axis: HTMLElement | null, candles: Candle[], locale: string): void {
+  if (!axis) return;
+  axis.replaceChildren();
+  if (candles.length < 2) return;
+
+  const span = (candles[candles.length - 1]!.time - candles[0]!.time) * 1000;
+  const day = 86_400_000;
+  const format = new Intl.DateTimeFormat(locale, {
+    ...(span <= 2 * day
+      ? { hour: '2-digit', minute: '2-digit' }
+      : span <= 120 * day
+        ? { day: 'numeric', month: 'short' }
+        : { month: 'short', year: '2-digit' }),
+  });
+
+  const wanted = 5;
+  const step = Math.max(1, Math.floor(candles.length / wanted));
+  for (let i = Math.floor(step / 2); i < candles.length; i += step) {
+    const candle = candles[i];
+    if (!candle) continue;
+    const label = document.createElement('span');
+    label.style.left = `${((i + 0.5) / candles.length) * 100}%`;
+    label.textContent = format.format(new Date(candle.time * 1000));
+    axis.append(label);
+  }
+}
+
+/** An exponential moving average, which reacts faster than a flat one. */
+function drawEma(
+  svg: SVGSVGElement,
+  candles: Candle[],
+  y: (v: number) => number,
+  period = 21,
+): void {
+  const layer = svg.querySelector('[data-ema]');
+  if (!layer) return;
+  layer.replaceChildren();
+  if (candles.length < period) return;
+
+  const k = 2 / (period + 1);
+  let ema = candles.slice(0, period).reduce((sum, c) => sum + c.close, 0) / period;
+  const points: string[] = [];
+  for (const [index, candle] of candles.entries()) {
+    if (index >= period) ema = candle.close * k + ema * (1 - k);
+    if (index < period - 1) continue;
+    const x = ((index + 0.5) / candles.length) * 1000;
+    points.push(`${points.length === 0 ? 'M' : 'L'}${x.toFixed(2)},${y(ema).toFixed(2)}`);
+  }
+
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', points.join(' '));
+  path.setAttribute('class', 'ema-line');
+  layer.append(path);
 }
 
 /** Volume bars under the price, coloured by whether the candle closed up. */
@@ -391,6 +522,65 @@ export function initDashboard(locale: string): void {
   let loaded: Candle[] = [];
   let view = { start: 0, end: 0 };
 
+  /** The price range the visible candles were drawn against, for the crosshair. */
+  let lastBounds = { low: 0, high: 0 };
+
+  const priceScale = root.querySelector<HTMLElement>('[data-price-scale]');
+  const timeAxis = root.querySelector<HTMLElement>('[data-time-axis]');
+  const ohlcBar = root.querySelector<HTMLElement>('[data-ohlc]');
+  const lastLine = root.querySelector<SVGLineElement>('[data-last-line]');
+
+  /**
+   * The reading line above the chart.
+   *
+   * Shows whichever candle the pointer is on, and the most recent one when it
+   * is not — so the row is never empty and never has to be discovered.
+   */
+  const showOhlc = (candle: Candle | undefined) => {
+    if (!ohlcBar || !candle) return;
+    const change = candle.open === 0 ? 0 : ((candle.close - candle.open) / candle.open) * 100;
+    ohlcBar.replaceChildren();
+    const pairs: [string, string][] = [
+      ['O', formatUsd(candle.open, locale)],
+      ['H', formatUsd(candle.high, locale)],
+      ['L', formatUsd(candle.low, locale)],
+      ['C', formatUsd(candle.close, locale)],
+      ['VOL', formatCompact(candle.volumeUsd, locale)],
+    ];
+    for (const [key, value] of pairs) {
+      const label = document.createElement('b');
+      label.textContent = key;
+      const shown = document.createElement('span');
+      shown.textContent = value;
+      const group = document.createElement('span');
+      group.append(label, ' ', shown);
+      ohlcBar.append(group);
+    }
+    const move = document.createElement('span');
+    move.dataset.direction = change >= 0 ? 'up' : 'down';
+    move.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+    ohlcBar.append(move);
+  };
+
+  /** A dashed line and a tag at the most recent close. */
+  const markLastPrice = (candles: Candle[], y: (value: number) => number) => {
+    const last = candles[candles.length - 1];
+    if (!lastLine || !last) return;
+    const at = y(last.close);
+    lastLine.setAttribute('y1', at.toFixed(2));
+    lastLine.setAttribute('y2', at.toFixed(2));
+    lastLine.setAttribute('opacity', '1');
+
+    priceScale?.querySelector('[data-last]')?.remove();
+    if (!priceScale) return;
+    const tag = document.createElement('span');
+    tag.className = 'scale-tag';
+    tag.dataset.last = '';
+    tag.style.top = `${(at / CHART_H) * 100}%`;
+    tag.textContent = formatUsd(last.close, locale);
+    priceScale.append(tag);
+  };
+
   const clampView = () => {
     const MIN = 8;
     const total = loaded.length;
@@ -416,12 +606,27 @@ export function initDashboard(locale: string): void {
 
     // Overlays read the same scale the price was drawn with, so they line up.
     const scale = makeScale(bounds.low, bounds.high, log);
+    lastBounds = bounds;
     if (root.dataset.showAverage === 'true') {
       drawAverage(chart, candles, scale, Math.max(3, Math.round(candles.length / 8)));
     } else {
       chart.querySelector('[data-average]')?.replaceChildren();
     }
+    if (root.dataset.showEma === 'true') {
+      // Scaled to the window: a fixed period leaves a short view with almost
+      // no line, and a long view with one that never turns.
+      drawEma(chart, candles, scale, Math.max(5, Math.round(candles.length / 6)));
+    } else {
+      chart.querySelector('[data-ema]')?.replaceChildren();
+    }
     drawBurnMarks(chart, candles, BURNS, locale, labels.burnMark);
+
+    // The furniture that makes it readable: round price levels down the right
+    // with a line each, the dates along the bottom, and the last close marked.
+    drawPriceScale(chart, priceScale, bounds.low, bounds.high, scale, locale);
+    drawTimeAxis(timeAxis, candles, locale);
+    markLastPrice(candles, scale);
+    showOhlc(candles[candles.length - 1]);
 
     chart.dataset.type = type;
     // Only offer "reset" when there is something to reset to.
@@ -881,19 +1086,33 @@ export function initDashboard(locale: string): void {
    */
   const wrap = root.querySelector<HTMLElement>('[data-chart-wrap]');
   const crosshair = chart?.querySelector<SVGLineElement>('[data-crosshair]');
+  const crosshairY = chart?.querySelector<SVGLineElement>('[data-crosshair-y]');
   const tip = root.querySelector<HTMLElement>('[data-tip]');
+
+  /** The two tags that ride the scales with the pointer. */
+  const priceTag = document.createElement('span');
+  priceTag.className = 'scale-tag';
+  const timeTag = document.createElement('span');
+  timeTag.className = 'scale-tag';
 
   const hideCrosshair = () => {
     holding = false;
     crosshair?.setAttribute('opacity', '0');
+    crosshairY?.setAttribute('opacity', '0');
+    priceTag.remove();
+    timeTag.remove();
     if (tip) tip.hidden = true;
+    // Back to the most recent candle, so the row is never blank.
+    showOhlc(shown[shown.length - 1]);
   };
 
   const moveCrosshair = (event: PointerEvent) => {
     if (!wrap || !chart || !crosshair || !tip || shown.length === 0) return;
     // While dragging, the pointer is moving the chart, not reading it.
     if (wrap.dataset.panning === 'true') return;
-    const box = wrap.getBoundingClientRect();
+    // Measured against the PLOT, not the wrapper: the wrapper now reserves
+    // padding for the two scales, and including it would offset every reading.
+    const box = chart.getBoundingClientRect();
     const ratio = Math.min(0.999, Math.max(0, (event.clientX - box.left) / box.width));
     const index = Math.min(shown.length - 1, Math.floor(ratio * shown.length));
     const candle = shown[index];
@@ -904,6 +1123,55 @@ export function initDashboard(locale: string): void {
     const centre = ((index + 0.5) / shown.length) * 1000;
     crosshair.setAttribute('x1', centre.toFixed(2));
     crosshair.setAttribute('x2', centre.toFixed(2));
+
+    /*
+     * The horizontal arm follows the POINTER, not the candle.
+     *
+     * That is what a crosshair is for: reading off any price on the scale, not
+     * only the one the candle closed at. The price it names is derived by
+     * inverting the same scale the candles were drawn with, so it agrees with
+     * the axis whether the chart is linear or logarithmic.
+     */
+    const withinPlot = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height));
+    const plotY = withinPlot * CHART_H;
+    if (crosshairY) {
+      crosshairY.setAttribute('y1', plotY.toFixed(2));
+      crosshairY.setAttribute('y2', plotY.toFixed(2));
+      crosshairY.setAttribute('opacity', plotY <= PLOT_H ? '1' : '0');
+    }
+
+    if (priceScale && plotY <= PLOT_H) {
+      const padY = 14;
+      const usable = PLOT_H - padY * 2;
+      const fraction = 1 - (plotY - padY) / usable;
+      const log = root.dataset.logScale === 'true';
+      const at = log
+        ? Math.exp(
+            Math.log(Math.max(lastBounds.low, Number.MIN_VALUE)) +
+              fraction *
+                (Math.log(Math.max(lastBounds.high, Number.MIN_VALUE)) -
+                  Math.log(Math.max(lastBounds.low, Number.MIN_VALUE))),
+          )
+        : lastBounds.low + fraction * (lastBounds.high - lastBounds.low);
+      priceTag.style.top = `${(plotY / CHART_H) * 100}%`;
+      priceTag.textContent = formatUsd(at, locale);
+      priceScale.append(priceTag);
+    } else {
+      priceTag.remove();
+    }
+
+    if (timeAxis) {
+      timeTag.style.left = `${(centre / 1000) * 100}%`;
+      timeTag.textContent = new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(candle.time * 1000));
+      timeAxis.append(timeTag);
+    }
+
+    showOhlc(candle);
 
     const change = ((candle.close - candle.open) / candle.open) * 100;
     tip.replaceChildren();
@@ -1025,6 +1293,18 @@ export function initDashboard(locale: string): void {
     const next = root.dataset.showAverage !== 'true';
     root.dataset.showAverage = String(next);
     averageButton.setAttribute('aria-pressed', String(next));
+    try {
+      localStorage.setItem('whatif.chartAverage', String(next));
+    } catch {
+      /* storage unavailable */
+    }
+    paint();
+  });
+  const emaButton = root.querySelector<HTMLButtonElement>('[data-chart-ema]');
+  emaButton?.addEventListener('click', () => {
+    const next = root.dataset.showEma !== 'true';
+    root.dataset.showEma = String(next);
+    emaButton.setAttribute('aria-pressed', String(next));
     try {
       localStorage.setItem('whatif.chartAverage', String(next));
     } catch {
