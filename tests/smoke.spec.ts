@@ -1440,3 +1440,31 @@ test.describe('the chart can be read', () => {
     await expect(page.locator('[data-price-scale] [data-last]')).toContainText('$');
   });
 });
+
+/**
+ * What comes back when you type a coin's name.
+ *
+ * Ranking an exact SYMBOL match above an exact NAME match put a #920 memecoin
+ * tickered BITCOIN above Bitcoin itself — the first thing most people type.
+ * The two are one tier now, broken by market-cap rank.
+ */
+test('searching a major coin puts that coin first', async ({ page }) => {
+  await page.goto('/machine/');
+  const search = page.locator('[data-machine-search]');
+
+  for (const [query, expected] of [
+    ['bitcoin', 'BTC'],
+    ['btc', 'BTC'],
+    ['ethereum', 'ETH'],
+    ['doge', 'DOGE'],
+    ['solana', 'SOL'],
+  ] as const) {
+    await search.fill(query);
+    const first = page.locator('.result-row').first();
+    await expect(first).toBeVisible();
+    await expect(
+      first.locator('.result-ticker'),
+      `"${query}" should offer ${expected} first`,
+    ).toHaveText(expected);
+  }
+});
