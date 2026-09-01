@@ -322,9 +322,15 @@ export const en: SiteCopy = {
       bands: { top10: 'Top 10', next20: '11–30', next20More: '31–50', rest: 'Everyone else' },
       holdersUpdated: 'recounted',
       pressureTitle: 'Buy and sell pressure',
-      pressureNote: 'Hourly volume over the last day. Buys up, sells down.',
+      pressureNote: 'Hourly volume over the last day, trades of $500 and up. Buys up, sells down.',
       burnHistoryTitle: 'Every burn',
       burnHistoryNote: 'Read from the chain. Each step is a transaction you can open.',
+      weekTitle: 'The last seven days',
+      weekPrice: 'Price',
+      weekBurned: 'Burned',
+      weekBurnCount: 'across {count} burns',
+      weekLargest: 'Largest single burn',
+      weekNote: 'Up to {date}. Refreshed daily, not live — the figures above it are.',
       holderTableTitle: 'Who holds it',
       holderTableIntro:
         'The fifteen largest holdings, with everything we can identify named. The biggest is the burn address — those tokens are gone, not held.',
@@ -342,7 +348,7 @@ export const en: SiteCopy = {
       sinceNothing: 'Not much. Still asking.',
       trustTitle: 'Checks anyone can run',
       trustNote:
-        'Two of these are attested by third parties, not by us; two are read from the contract by this page as it loads. Each links to where you can check it yourself, and a check that could not be read says so rather than showing a pass.',
+        'Two of these are attested by third parties, not by us; three are read from the contract by this page as it loads. Each links to where you can check it yourself, and a check that could not be read says so rather than showing a pass.',
       checks: {
         verified: 'Listing verified',
         honeypot: 'Honeypot check',

@@ -317,9 +317,15 @@ export const zh: SiteCopy = {
       bands: { top10: '前 10', next20: '11–30', next20More: '31–50', rest: '其余所有人' },
       holdersUpdated: '重新统计于',
       pressureTitle: '买卖压力',
-      pressureNote: '过去一天的每小时成交量。买入向上，卖出向下。',
+      pressureNote: '过去一天的每小时成交量，仅统计 500 美元以上的交易。买入向上，卖出向下。',
       burnHistoryTitle: '每一次销毁',
       burnHistoryNote: '直接读自链上。每一级台阶都是一笔可以打开的交易。',
+      weekTitle: '过去七天',
+      weekPrice: '价格',
+      weekBurned: '已销毁',
+      weekBurnCount: '共 {count} 次销毁',
+      weekLargest: '单笔最大销毁',
+      weekNote: '截至 {date}。每日更新，非实时 —— 上方的数据才是实时的。',
       holderTableTitle: '谁持有',
       holderTableIntro:
         '持仓最大的十五个地址，能识别的都已标注。最大的是销毁地址 —— 那些代币已经销毁，不是被持有。',
@@ -337,7 +343,7 @@ export const zh: SiteCopy = {
       sinceNothing: '没什么变化。依然在问。',
       trustTitle: '任何人都能做的核查',
       trustNote:
-        '其中两项由第三方认证，不是我们说了算；另外两项由本页加载时直接从合约读取。每一项都链接到你可以自己核实的地方；读取失败的检查会如实说明，而不会显示为通过。',
+        '其中两项由第三方认证，不是我们说的；另外三项由本页面在加载时直接从合约读取。每一项都链接到你可以自行核查的地方，读取不到的项会如实说明，而不是显示通过。',
       checks: {
         verified: '上市已验证',
         honeypot: '蜜罐检测',

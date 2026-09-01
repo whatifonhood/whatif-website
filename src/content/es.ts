@@ -334,9 +334,16 @@ export const es: SiteCopy = {
       bands: { top10: 'Top 10', next20: '11–30', next20More: '31–50', rest: 'Todos los demás' },
       holdersUpdated: 'recontado',
       pressureTitle: 'Presión de compra y venta',
-      pressureNote: 'Volumen por hora del último día. Compras arriba, ventas abajo.',
+      pressureNote:
+        'Volumen por hora del último día, operaciones de $500 o más. Compras arriba, ventas abajo.',
       burnHistoryTitle: 'Cada quema',
       burnHistoryNote: 'Leído de la cadena. Cada escalón es una transacción que puedes abrir.',
+      weekTitle: 'Los últimos siete días',
+      weekPrice: 'Precio',
+      weekBurned: 'Quemado',
+      weekBurnCount: 'en {count} quemas',
+      weekLargest: 'Mayor quema individual',
+      weekNote: 'Hasta el {date}. Se actualiza a diario, no en vivo — las cifras de arriba sí.',
       holderTableTitle: 'Quién lo tiene',
       holderTableIntro:
         'Las quince mayores posiciones, con todo lo identificable señalado. La mayor es la dirección de quema: esos tokens no están guardados, están destruidos.',
@@ -359,7 +366,7 @@ export const es: SiteCopy = {
       sinceNothing: 'Poca cosa. Seguimos preguntando.',
       trustTitle: 'Comprobaciones que cualquiera puede hacer',
       trustNote:
-        'Dos de estas las certifican terceros, no nosotros; las otras dos las lee esta página directamente del contrato al cargar. Cada una enlaza a donde puedes verificarlo tú mismo, y una comprobación que no se pudo leer lo dice en vez de mostrarse como superada.',
+        'Dos de estas las certifican terceros, no nosotros; las otras tres las lee esta página directamente del contrato al cargar. Cada una enlaza a donde puedes verificarlo tú mismo, y una comprobación que no se pudo leer lo dice en vez de mostrarse como superada.',
       checks: {
         verified: 'Listado verificado',
         honeypot: 'Prueba de honeypot',
