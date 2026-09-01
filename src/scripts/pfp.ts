@@ -9,6 +9,7 @@
  * The odds and the pity timers are in src/config/coins.ts and below, in plain
  * sight, because a generator that hides its odds is a slot machine.
  */
+import { decodeCollection, encodeCollection } from '../lib/collection-code.ts';
 import { COINS, COIN_TIERS, type Coin, type CoinTier } from '../config/coins.ts';
 import { SITE } from '../config/site.ts';
 
@@ -208,6 +209,10 @@ export function initPfp(): void {
     hidePool: poolToggle?.dataset.labelHide ?? '',
     shareText: shareLink?.dataset.template ?? '',
     rolled: root.dataset.labelRolled ?? '{name} — {tier}',
+    backupCopied: root.dataset.labelBackupCopied ?? '',
+    backupSelected: root.dataset.labelBackupSelected ?? '',
+    backupBad: root.dataset.labelBackupBad ?? '',
+    backupRestored: root.dataset.labelBackupRestored ?? '',
   };
   const tierLabels: Record<string, string> = JSON.parse(root.dataset.tiers ?? '{}');
 
@@ -360,6 +365,53 @@ export function initPfp(): void {
   poolToggle?.addEventListener('click', () => {
     setPool(poolToggle.getAttribute('aria-expanded') !== 'true');
   });
+
+  /**
+   * Moving the collection to another browser.
+   *
+   * Read and written through `collection-code.ts`, which validates every slug
+   * against the real pool — a pasted code is input from outside this page.
+   */
+  const backup = root.querySelector<HTMLElement>('[data-pfp-backup]');
+  if (backup) {
+    const field = backup.querySelector<HTMLTextAreaElement>('[data-pfp-code]');
+    const status = backup.querySelector<HTMLElement>('[data-pfp-backup-status]');
+    const say = (message: string) => {
+      if (status) status.textContent = message;
+    };
+
+    backup.querySelector('[data-pfp-export]')?.addEventListener('click', () => {
+      const code = encodeCollection({
+        found: Object.keys(state.found),
+        sinceRare: state.sinceRare,
+        sinceLegendary: state.sinceLegendary,
+      });
+      if (field) {
+        field.value = code;
+        field.select();
+      }
+      // The code is in the field either way, so a refused clipboard is not a
+      // failure worth reporting as one.
+      void navigator.clipboard?.writeText(code).then(
+        () => say(labels.backupCopied),
+        () => say(labels.backupSelected),
+      );
+    });
+
+    backup.querySelector('[data-pfp-import]')?.addEventListener('click', () => {
+      const restored = decodeCollection(field?.value ?? '');
+      if (!restored) return say(labels.backupBad);
+
+      // Merged, not replaced: restoring on a browser that already has finds
+      // must never take any away.
+      for (const slug of restored.found) state.found[slug] = true;
+      state.sinceRare = Math.max(state.sinceRare, restored.sinceRare);
+      state.sinceLegendary = Math.max(state.sinceLegendary, restored.sinceLegendary);
+      saveState(state);
+      paintFound();
+      say(labels.backupRestored.replace('{count}', String(Object.keys(state.found).length)));
+    });
+  }
 
   paintFound();
   setPool(state.poolOpen);

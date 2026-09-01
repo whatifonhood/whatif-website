@@ -365,6 +365,18 @@ export interface SiteCopy {
       hidePool: string;
       /** Announced after a pull. Carries `{name}` and `{tier}`. */
       rolled: string;
+      /** Moving a collection to another browser. */
+      backupTitle: string;
+      backupIntro: string;
+      backupCopy: string;
+      backupRestore: string;
+      backupFieldLabel: string;
+      backupPlaceholder: string;
+      backupCopied: string;
+      backupSelected: string;
+      backupBad: string;
+      /** Carries `{count}`. */
+      backupRestored: string;
       locked: string;
       download: string;
       shareCard: string;

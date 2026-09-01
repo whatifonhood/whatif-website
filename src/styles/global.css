@@ -159,7 +159,7 @@ body {
 }
 
 /* A visible, brand-coloured focus ring on every interactive element. */
-:where(a, button, summary, input, [tabindex]):focus-visible {
+:where(a, button, summary, input, textarea, select, [tabindex]):focus-visible {
   outline: 2px solid var(--color-lime);
   outline-offset: 3px;
   border-radius: 4px;

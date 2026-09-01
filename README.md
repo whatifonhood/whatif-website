@@ -196,6 +196,10 @@ keys, no database, no user data. What is left is guarded deliberately.
 - **Nothing is written to the page as HTML.** Values are set with `textContent`.
 - **Nothing is uploaded.** The site has no file input and no form that posts
   anywhere. Every card it draws is drawn on the visitor's own device.
+- **A pasted collection code** (`src/lib/collection-code.ts`) is untrusted input
+  from outside the page: every coin name in it is checked against the real pool
+  and anything unrecognised is dropped, the counters are clamped, and a restore
+  merges rather than replaces so it can never remove a find.
 - **Dependencies** are pinned by `package-lock.json`, installed with `npm ci` in
   CI, and audited on every run.
 

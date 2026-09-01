@@ -60,6 +60,10 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     data-pfp
     data-tiers={JSON.stringify(tierLabels)}
     data-label-rolled={page.rolled}
+    data-label-backup-copied={page.backupCopied}
+    data-label-backup-selected={page.backupSelected}
+    data-label-backup-bad={page.backupBad}
+    data-label-backup-restored={page.backupRestored}
     class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
   >
     <!-- The coin -->
@@ -193,10 +197,75 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
         }
       </div>
     </div>
+
+    <!--
+      Moving a collection to another browser.
+      What somebody has pulled lives only in this browser, so a cleared cache
+      or a new phone loses it. A copied string rather than a file: this site
+      has no upload anywhere and a text field keeps it that way.
+    -->
+    <details data-pfp-backup class="mt-6 rounded-2xl border border-line bg-surface p-6">
+      <summary
+        class="cursor-pointer list-none font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-lime"
+      >
+        {page.backupTitle}
+      </summary>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted">{page.backupIntro}</p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button type="button" data-pfp-export class="pfp-backup-button">
+          {page.backupCopy}
+        </button>
+        <button type="button" data-pfp-import class="pfp-backup-button">
+          {page.backupRestore}
+        </button>
+      </div>
+
+      <label class="mt-4 block">
+        <span class="sr-only">{page.backupFieldLabel}</span>
+        <textarea
+          data-pfp-code
+          rows="3"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder={page.backupPlaceholder}
+          class="w-full resize-none rounded-xl border border-line bg-void/60 px-4 py-3 font-mono text-xs text-ink placeholder:text-faint focus:border-lime/50"
+        ></textarea>
+      </label>
+
+      <p
+        data-pfp-backup-status
+        role="status"
+        aria-live="polite"
+        class="mt-2 min-h-5 font-mono text-[11px] text-lime"
+      >
+      </p>
+    </details>
   </div>
 </PageLayout>
 
 <style>
+  /* Backup controls. Secondary to the pull button, which stays the one
+     obviously primary thing on the page. */
+  .pfp-backup-button {
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .pfp-backup-button:hover {
+    color: var(--color-lime);
+    border-color: color-mix(in oklab, var(--color-lime) 45%, transparent);
+  }
+
   /* The coin sits in a perspective box so it can spin on its Y axis. */
   .pfp-stage {
     position: relative;
