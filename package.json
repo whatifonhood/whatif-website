@@ -34,7 +34,8 @@
     "brandkit": "node tools/build-brand-kit.mjs",
     "questions": "node tools/check-questions.mjs",
     "machine": "node tools/check-machine.mjs",
-    "history:clean": "node tools/clean-coin-history.mjs"
+    "history:clean": "node tools/clean-coin-history.mjs",
+    "holders": "node tools/build-holders.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

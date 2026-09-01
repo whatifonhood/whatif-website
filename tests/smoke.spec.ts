@@ -362,10 +362,13 @@ test.describe('the header gets you home', () => {
 /**
  * The question generator.
  *
- * A combinatorial generator fails by producing sentences that are wrong rather
- * than by throwing, so the only useful test reads what it actually writes. These
- * are the mistakes it has already made once: a capital W mid-sentence after an
- * opener, and a subject contradicting its own verb.
+ * Correctness belongs to `tools/check-questions.mjs`, which walks all 2,406
+ * possibilities against a dozen rules — this used to press the button forty
+ * times, which covered under 2% of the output and could only fail by luck.
+ *
+ * What is left for a browser is what only a browser can show: that the page
+ * renders a question, that pressing the button produces a different one, and
+ * that nothing in the render path mangles what the generator wrote.
  */
 test.describe('the question generator', () => {
   test('writes sentences that read correctly', async ({ page }) => {
@@ -376,7 +379,7 @@ test.describe('the question generator', () => {
     const problems: string[] = [];
     const seen = new Set<string>();
 
-    for (let i = 0; i < 40; i += 1) {
+    for (let i = 0; i < 12; i += 1) {
       const text = (await question.textContent())?.trim() ?? '';
       seen.add(text);
 
@@ -407,7 +410,7 @@ test.describe('the question generator', () => {
     expect(problems.slice(0, 3)).toEqual([]);
     // Each press is confirmed to have changed the text, so anything repeated
     // here is the generator genuinely coming round again.
-    expect(seen.size, 'the generator is repeating itself').toBeGreaterThan(30);
+    expect(seen.size, 'the generator is repeating itself').toBe(12);
   });
 
   test('the count on the page is the real one', async ({ page }) => {
@@ -548,11 +551,18 @@ test.describe('the chart can be navigated', () => {
 
   test('reset puts the whole range back', async ({ page }) => {
     const candles = await waitForCandles(page);
-    const box = await page.locator('[data-chart-wrap]').boundingBox();
-    if (!box) throw new Error('no chart');
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.wheel(0, -600);
+    // Zoom in first, by whichever means this browser has. Mobile WebKit has no
+    // wheel at all, and a phone has no scroll wheel either — the buttons are
+    // what a real visitor uses there, so that is what gets exercised.
+    const box = await page.locator('[data-chart-wrap]').boundingBox();
+    if (box && test.info().project.name === 'desktop') {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.wheel(0, -600);
+    } else {
+      await page.locator('[data-chart-zoom="in"]').click();
+      await page.locator('[data-chart-zoom="in"]').click();
+    }
     await page.waitForTimeout(400);
     const zoomed = await candles.count();
 
@@ -819,5 +829,46 @@ test.describe('what changed since last time', () => {
     }
     await expect(panel).toContainText(/%/);
     await expect(panel.locator('[data-since-lead]')).not.toBeEmpty();
+  });
+});
+
+/**
+ * The holder table.
+ *
+ * Its whole job is to stop a reader mistaking burned supply and the liquidity
+ * pool for whales, so the labels are the part that must be right.
+ */
+test.describe('who holds it', () => {
+  test('names the burn address and the pool', async ({ page }) => {
+    await page.goto('/stats/');
+    const table = page.locator('table').filter({ has: page.locator('.holder-tag') });
+    await expect(table).toBeVisible();
+
+    const burnRow = table.locator('tr', { has: page.locator('.holder-tag[data-kind="burn"]') });
+    await expect(burnRow).toHaveCount(1);
+    // The burn address holds the most, so it is the first row.
+    await expect(table.locator('tbody tr').first()).toContainText(/burn/i);
+    await expect(table.locator('.holder-tag[data-kind="pool"]')).not.toHaveCount(0);
+  });
+
+  test('every row can be checked on the explorer', async ({ page }) => {
+    await page.goto('/stats/');
+    const links = page.locator('table a[href*="/address/0x"]');
+    await expect(links).toHaveCount(15);
+    const hrefs = await links.evaluateAll((nodes) =>
+      nodes.map((node) => (node as HTMLAnchorElement).href),
+    );
+    expect(new Set(hrefs).size).toBe(15);
+  });
+
+  test('the shares add up to less than the whole supply', async ({ page }) => {
+    await page.goto('/stats/');
+    const shares = await page
+      .locator('table tbody tr td:last-child')
+      .filter({ hasText: '%' })
+      .allTextContents();
+    const total = shares.reduce((sum, text) => sum + Number(text.replace(/[%\s]/g, '')), 0);
+    expect(total).toBeGreaterThan(0);
+    expect(total, 'fifteen holders cannot hold more than everything').toBeLessThan(100);
   });
 });

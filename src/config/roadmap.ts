@@ -62,17 +62,54 @@ export const ROADMAP: RoadmapItem[] = [
     body: 'English, 中文, Türkçe and Español across every tool on the site.',
   },
 
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'A page for every coin',
+    body: 'Six hundred and sixty-four of them. Each one answers "what if I had bought this" for every year it has traded, worked out before the page loads.',
+    href: '/machine/doge/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'Who holds it',
+    body: 'The fifteen largest holdings, with the burn address and the liquidity pool named rather than left looking like whales. Every row links to the address.',
+    href: '/stats/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'Who can change the contract',
+    body: 'Read from the chain instead of claimed. The contract has no owner function at all — a stronger fact than any promise, and one anyone can check.',
+    href: '/stats/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'Since you were last here',
+    body: 'Come back and the dashboard says what moved. Compared against figures your own browser kept — nothing is sent anywhere.',
+    href: '/stats/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'The deeper chart',
+    body: 'Zoom, pan, a moving average, and every burn marked on the timeline where it happened.',
+    href: '/stats/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
+    title: 'The whole market in the Machine',
+    body: 'Seven hundred and eighty coins with real monthly history, $IF among them, each one checked against sixteen thousand recomputed sums before it ships.',
+    href: '/machine/',
+  },
+
   // --------------------------------------------------------------- building
   {
     status: 'building',
     title: 'The meme engine',
     body: 'A proper generator with real templates, replacing the first attempt. Make one in ten seconds, post it, no upload.',
-  },
-  {
-    status: 'building',
-    title: 'More of the market in the Machine',
-    body: 'Hundreds of coins with deep history, $IF among them, and every other coin CoinGecko lists searchable alongside them. The long tail of DEX-only tokens is the part still missing.',
-    href: '/machine/',
   },
 
   // ------------------------------------------------------------------- next
@@ -85,12 +122,6 @@ export const ROADMAP: RoadmapItem[] = [
     status: 'next',
     title: 'Learn in every language',
     body: 'The tools are translated; the writing is not. Safety guidance gets translated by people, not by a machine.',
-  },
-  {
-    status: 'next',
-    title: 'Deeper chart',
-    body: 'Longer ranges, a moving average, and burns marked on the timeline where they happened.',
-    href: '/stats/',
   },
 
   // ------------------------------------------------------------------ later

@@ -245,6 +245,16 @@ export interface SiteCopy {
       pressureNote: string;
       burnHistoryTitle: string;
       burnHistoryNote: string;
+      /** Who holds the supply, with the top rows identified. */
+      holderTableTitle: string;
+      holderTableIntro: string;
+      /** Carries `{date}`. */
+      holderTableNote: string;
+      holderAddress: string;
+      holderWhat: string;
+      holderTokens: string;
+      holderShare: string;
+      holderKinds: { burn: string; pool: string; contract: string; unknown: string };
       /** The largest burns, each linked to its transaction. */
       biggestBurnsTitle: string;
       /**
