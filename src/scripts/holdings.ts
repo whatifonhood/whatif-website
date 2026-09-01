@@ -14,11 +14,9 @@ import { getBalanceOf, getPairSnapshot } from '../lib/market.ts';
 import { formatCompact, formatCount, formatUsd } from '../lib/format.ts';
 import { track } from '../lib/analytics.ts';
 import { TOKEN } from '../config/site.ts';
+import { CARD_COINS, coinArt, drawHoldingsCard } from '../lib/card-designs.ts';
 
 const ADDRESS = /^0x[a-fA-F0-9]{40}$/;
-
-const CARD_WIDTH = 1200;
-const CARD_HEIGHT = 675;
 
 /**
  * How a holding is described.
@@ -53,128 +51,11 @@ function diagnose(input: string, labels: Record<string, string>): string {
   return labels.errorShape ?? '';
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(src));
-    image.src = src;
-  });
-}
-
-/**
- * Fits a line of text to a width by stepping the size down.
- *
- * The balance is the hero of the card and its length varies enormously — three
- * digits or eleven — so the size has to follow the number rather than the number
- * being trusted to fit a fixed size.
- */
-function fitLine(
-  context: CanvasRenderingContext2D,
-  text: string,
-  font: (size: number) => string,
-  maxWidth: number,
-  start: number,
-  min = 24,
-): number {
-  let size = start;
-  while (size > min) {
-    context.font = font(size);
-    if (context.measureText(text).width <= maxWidth) break;
-    size -= 2;
-  }
-  context.font = font(size);
-  return size;
-}
-
-/** Wraps text to a width, for the verdict line. */
-function wrapLines(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (context.measureText(candidate).width <= maxWidth) {
-      line = candidate;
-    } else {
-      if (line) lines.push(line);
-      line = word;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
-/**
- * The share-of-supply ring.
- *
- * This is what makes the card worth posting: the number alone is abstract, but
- * a holding drawn against the whole billion says something a figure cannot.
- * It is real data, different for everybody, and it is the graphic rather than
- * a decoration sitting next to one.
- *
- * Tiny holdings still get a visible sliver — an arc of literally zero length
- * would read as a rendering failure rather than as a small position.
- */
-function drawSupplyRing(
-  context: CanvasRenderingContext2D,
-  centreX: number,
-  centreY: number,
-  radius: number,
-  share: number,
-): void {
-  const width = 26;
-  const start = -Math.PI / 2;
-  const sweep = Math.max(0.045, Math.min(1, share)) * Math.PI * 2;
-
-  context.lineCap = 'round';
-
-  // The whole supply.
-  context.beginPath();
-  context.arc(centreX, centreY, radius, 0, Math.PI * 2);
-  context.strokeStyle = '#1B2610';
-  context.lineWidth = width;
-  context.stroke();
-
-  // Their part of it.
-  const sweepGradient = context.createLinearGradient(
-    centreX - radius,
-    centreY - radius,
-    centreX + radius,
-    centreY + radius,
-  );
-  sweepGradient.addColorStop(0, '#C4DC43');
-  sweepGradient.addColorStop(1, '#5F9A05');
-
-  context.beginPath();
-  context.arc(centreX, centreY, radius, start, start + sweep);
-  context.strokeStyle = sweepGradient;
-  context.lineWidth = width;
-  context.stroke();
-
-  // Tick marks every ten percent, so the ring reads as a scale not a doughnut.
-  context.lineWidth = 2;
-  context.strokeStyle = 'rgba(233,240,221,0.10)';
-  for (let i = 0; i < 4; i += 1) {
-    const angle = start + (i / 4) * Math.PI * 2;
-    context.beginPath();
-    context.moveTo(
-      centreX + Math.cos(angle) * (radius - width / 2 - 6),
-      centreY + Math.sin(angle) * (radius - width / 2 - 6),
-    );
-    context.lineTo(
-      centreX + Math.cos(angle) * (radius - width / 2 - 16),
-      centreY + Math.sin(angle) * (radius - width / 2 - 16),
-    );
-    context.stroke();
-  }
-}
-
 /**
  * The share card.
  *
- * Laid out as two columns that never overlap: words on the left, the ring on
- * the right. The previous version pasted the character over the middle of the
- * card and the verdict ran straight through his arm.
+ * Layout and artwork live in src/lib/card-designs.ts, shared with the Machine,
+ * the question generator and the coin pull so the four stay one family.
  */
 async function drawCard(
   canvas: HTMLCanvasElement,
@@ -182,120 +63,22 @@ async function drawCard(
     tokens: number;
     usd?: number;
     band: string;
-    pose: string;
     verdict: string;
     supplyShare: number;
-    sharePercent: string;
   },
+  locale: string,
 ): Promise<void> {
-  const context = canvas.getContext('2d');
-  if (!context) return;
-  canvas.width = CARD_WIDTH;
-  canvas.height = CARD_HEIGHT;
-
-  const PAD = 76;
-  const TEXT_W = 600;
-  const RING_X = 930;
-  const RING_Y = 338;
-  const RING_R = 158;
-
-  const display = (size: number) => `italic 900 ${size}px 'Archivo', sans-serif`;
-  const mono = (size: number) => `700 ${size}px 'JetBrains Mono', monospace`;
-
-  // Ground
-  context.fillStyle = '#080B07';
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  const glow = context.createRadialGradient(RING_X, RING_Y, 0, RING_X, RING_Y, 420);
-  glow.addColorStop(0, 'rgba(143,206,2,0.16)');
-  glow.addColorStop(1, 'rgba(8,11,7,0)');
-  context.fillStyle = glow;
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  // Barely-there texture, so the ground is not flat black. Any stronger and it
-  // reads as a spreadsheet and competes with the ring.
-  context.strokeStyle = 'rgba(34,48,18,0.30)';
-  context.lineWidth = 1;
-  for (let x = 0; x < CARD_WIDTH; x += 80) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, CARD_HEIGHT);
-    context.stroke();
-  }
-  for (let y = 0; y < CARD_HEIGHT; y += 80) {
-    context.beginPath();
-    context.moveTo(0, y);
-    context.lineTo(CARD_WIDTH, y);
-    context.stroke();
-  }
-
-  context.textAlign = 'left';
-  context.textBaseline = 'alphabetic';
-
-  // Band
-  context.font = mono(22);
-  context.fillStyle = '#8FCE02';
-  context.fillText(data.band.toUpperCase(), PAD, 118);
-
-  // Balance — the hero, sized to whatever the number turns out to be.
-  const balance = formatCount(data.tokens, 'en');
-  fitLine(context, balance, display, TEXT_W, 104, 44);
-  context.fillStyle = '#E9F0DD';
-  context.fillText(balance, PAD, 226);
-
-  // Value
-  context.font = mono(26);
-  context.fillStyle = '#9AA889';
-  context.fillText(
-    `$IF${data.usd === undefined ? '' : `   ·   ${formatUsd(data.usd, 'en')}`}`,
-    PAD,
-    278,
+  drawHoldingsCard(
+    canvas,
+    {
+      tokens: formatCompact(data.tokens, locale),
+      usd: data.usd === undefined ? undefined : formatUsd(data.usd, locale),
+      band: data.band,
+      line: data.verdict,
+      share: data.supplyShare,
+    },
+    await cardCoin(CARD_COINS.holdings),
   );
-
-  // Verdict, wrapped inside the text column so it can never reach the ring.
-  context.font = display(46);
-  const lines = wrapLines(context, data.verdict.toUpperCase(), TEXT_W).slice(0, 3);
-  context.fillStyle = '#E9F0DD';
-  for (const [index, line] of lines.entries()) {
-    context.fillText(line, PAD, 412 + index * 52);
-  }
-
-  // A hairline above the footer, to close the text column off.
-  context.strokeStyle = 'rgba(34,48,18,0.9)';
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(PAD, CARD_HEIGHT - 108);
-  context.lineTo(PAD + TEXT_W, CARD_HEIGHT - 108);
-  context.stroke();
-
-  // Mark
-  context.font = mono(21);
-  context.fillStyle = '#8FCE02';
-  context.fillText('WHATIFONHOOD.COM', PAD, CARD_HEIGHT - 62);
-
-  // The character signs the card rather than sitting behind the words: small,
-  // sharp, tucked under the ring where nothing else is competing for room.
-  try {
-    const figure = await loadImage(`/machine/poses/${data.pose}.webp`);
-    // Clears the ring above it and the card edge below it, both deliberately.
-    const height = 132;
-    const width = (figure.width / figure.height) * height;
-    context.drawImage(figure, RING_X - width / 2, CARD_HEIGHT - height - 22, width, height);
-  } catch {
-    /* the card reads fine without it */
-  }
-
-  // The ring, and the share it represents.
-  drawSupplyRing(context, RING_X, RING_Y, RING_R, data.supplyShare);
-
-  context.textAlign = 'center';
-  context.font = display(64);
-  context.fillStyle = '#E9F0DD';
-  context.fillText(data.sharePercent, RING_X, RING_Y + 6);
-
-  context.font = mono(17);
-  context.fillStyle = '#7D8C6E';
-  context.fillText('OF ALL $IF', RING_X, RING_Y + 44);
 }
 
 export function initHoldings(locale: string): void {
@@ -388,21 +171,17 @@ export function initHoldings(locale: string): void {
 
     if (canvas) {
       const supplyShare = tokens / TOKEN.totalSupply;
-      await drawCard(canvas, {
-        tokens,
-        usd,
-        band: bands[band.key] ?? '',
-        pose: band.pose,
-        verdict: verdicts[band.key] ?? '',
-        supplyShare,
-        // Small holdings would all render as "0.0%" and say nothing.
-        sharePercent:
-          supplyShare >= 0.001
-            ? `${(supplyShare * 100).toFixed(2)}%`
-            : supplyShare > 0
-              ? '<0.1%'
-              : '0%',
-      });
+      await drawCard(
+        canvas,
+        {
+          tokens,
+          usd,
+          band: bands[band.key] ?? '',
+          verdict: verdicts[band.key] ?? '',
+          supplyShare,
+        },
+        locale,
+      );
 
       canvas.toBlob((blob) => {
         if (!blob || !download) return;
@@ -428,4 +207,25 @@ export function initHoldings(locale: string): void {
       share.hidden = false;
     }
   });
+}
+
+/**
+ * The card's own coin, fetched once and kept.
+ *
+ * A card still draws without it — the artwork is optional in every design — so
+ * a slow or missing image delays nothing and breaks nothing.
+ */
+const coinCache = new Map<string, Promise<HTMLImageElement | undefined>>();
+function cardCoin(slug: string): Promise<HTMLImageElement | undefined> {
+  let pending = coinCache.get(slug);
+  if (!pending) {
+    pending = new Promise<HTMLImageElement | undefined>((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(undefined);
+      image.src = coinArt(slug);
+    });
+    coinCache.set(slug, pending);
+  }
+  return pending;
 }

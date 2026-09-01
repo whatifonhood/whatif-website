@@ -12,6 +12,7 @@
 import { decodeCollection, encodeCollection } from '../lib/collection-code.ts';
 import { COINS, COIN_TIERS, type Coin, type CoinTier } from '../config/coins.ts';
 import { SITE } from '../config/site.ts';
+import { drawPfpCard } from '../lib/card-designs.ts';
 
 /** Force a rare if one has not appeared in this many pulls, and a legendary likewise. */
 const PITY = { rare: 8, legendary: 60 };
@@ -19,9 +20,6 @@ const PITY = { rare: 8, legendary: 60 };
 const STORAGE_KEY = 'whatif.pfp.v1';
 const SPIN_TURNS = 6;
 const SPIN_MS = 2400;
-
-const CARD_WIDTH = 1200;
-const CARD_HEIGHT = 675;
 
 const TIER_COLOR: Record<CoinTier, string> = {
   common: '#8FCE02',
@@ -96,88 +94,33 @@ function pickCoin(state: State): Coin {
   return choices[Math.floor(Math.random() * choices.length)] ?? COINS[0]!;
 }
 
-/** Draws the 1200x675 share card on a canvas. */
-async function drawShareCard(canvas: HTMLCanvasElement, coin: Coin, tierLabel: string) {
-  const context = canvas.getContext('2d');
-  if (!context) return;
-  canvas.width = CARD_WIDTH;
-  canvas.height = CARD_HEIGHT;
+/**
+ * The share card.
+ *
+ * Layout and artwork live in src/lib/card-designs.ts, shared with the Machine,
+ * the question generator and the wallet lookup so the four stay one family.
+ * This is the one card whose picture is the pulled coin itself.
+ */
+async function drawShareCard(
+  canvas: HTMLCanvasElement,
+  coin: Coin,
+  tierLabel: string,
+): Promise<void> {
+  const image = await new Promise<HTMLImageElement | undefined>((resolve) => {
+    const loading = new Image();
+    loading.onload = () => resolve(loading);
+    loading.onerror = () => resolve(undefined);
+    loading.src = coinImage(coin, 'full');
+  });
+  if (!image) return;
 
-  context.fillStyle = '#080B07';
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  // A deterministic starfield, so the same coin always makes the same card.
-  let seed = [...coin.slug].reduce((acc, character) => acc + character.charCodeAt(0), 0);
-  const random = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-  for (let i = 0; i < 150; i += 1) {
-    const x = random() * CARD_WIDTH;
-    const y = random() * CARD_HEIGHT;
-    context.globalAlpha = 0.15 + random() * 0.5;
-    context.fillStyle = '#FFFFFF';
-    context.beginPath();
-    context.arc(x, y, random() * 1.4 + 0.2, 0, Math.PI * 2);
-    context.fill();
-  }
-  context.globalAlpha = 1;
-
-  const accent = TIER_COLOR[coin.tier];
-
-  // The coin, circular, on the right.
-  const image = new Image();
-  image.src = coinImage(coin, 'full');
-  await image.decode().catch(() => undefined);
-
-  const radius = 236;
-  const centreX = CARD_WIDTH - radius - 80;
-  const centreY = CARD_HEIGHT / 2;
-
-  const glow = context.createRadialGradient(
-    centreX,
-    centreY,
-    radius * 0.6,
-    centreX,
-    centreY,
-    radius * 1.5,
-  );
-  glow.addColorStop(0, `${accent}44`);
-  glow.addColorStop(1, 'rgba(8,11,7,0)');
-  context.fillStyle = glow;
-  context.fillRect(centreX - radius * 1.6, centreY - radius * 1.6, radius * 3.2, radius * 3.2);
-
-  if (image.complete && image.naturalWidth > 0) {
-    context.save();
-    context.beginPath();
-    context.arc(centreX, centreY, radius, 0, Math.PI * 2);
-    context.clip();
-    context.drawImage(image, centreX - radius, centreY - radius, radius * 2, radius * 2);
-    context.restore();
-  }
-
-  // Type on the left.
-  const left = 80;
-  context.fillStyle = accent;
-  context.font = '700 22px "JetBrains Mono", monospace';
-  context.fillText(tierLabel.toUpperCase(), left, 250);
-
-  context.fillStyle = '#E9F0DD';
-  let size = 96;
-  context.font = `900 italic ${size}px Archivo, sans-serif`;
-  while (context.measureText(coin.name.toUpperCase()).width > 560 && size > 40) {
-    size -= 4;
-    context.font = `900 italic ${size}px Archivo, sans-serif`;
-  }
-  context.fillText(coin.name.toUpperCase(), left, 340);
-
-  context.fillStyle = '#9AA889';
-  context.font = '400 26px Archivo, sans-serif';
-  context.fillText("What $IF this one's you?", left, 400);
-
-  context.fillStyle = '#7D8C6E';
-  context.font = '400 19px "JetBrains Mono", monospace';
-  context.fillText(`${SITE.url.replace('https://', '')}/pfp`, left, 580);
+  const tier = COIN_TIERS[coin.tier];
+  drawPfpCard(canvas, image, {
+    name: coin.name,
+    tier: tierLabel,
+    tierColor: TIER_COLOR[coin.tier],
+    odds: `${tier.weight}% odds`,
+  });
 }
 
 export function initPfp(): void {
