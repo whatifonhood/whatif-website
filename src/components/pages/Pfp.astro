@@ -173,22 +173,41 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
               </h3>
               <ul class="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
                 {group.coins.map((coin) => (
-                  <li data-coin-slug={coin.slug} class="pfp-pool-item" title={coin.name}>
-                    <a href={`/pfp/${coin.slug}`} class="block">
+                  <li data-coin-slug={coin.slug} class="pfp-pool-item">
+                    {/*
+                      A coin nobody has pulled yet gives nothing away. Its
+                      picture, its name and its page are all held in data
+                      attributes and only moved into the real ones once it has
+                      been found — see paintFound in src/scripts/pfp.ts.
+
+                      This has to be done in the browser rather than here: the
+                      page is static and identical for everybody, so the server
+                      cannot know what any one visitor has pulled. Rendering the
+                      name into alt, title and an href, and then dimming the
+                      picture with a filter, put the whole pool one hover or one
+                      right-click away.
+                    */}
+                    <a
+                      data-pool-link
+                      data-href={`/pfp/${coin.slug}`}
+                      class="pfp-pool-face block"
+                      aria-hidden="true"
+                    >
                       <img
-                        src={`/coins/thumb/${coin.slug}.webp`}
-                        alt={coin.name}
+                        data-pool-image
+                        data-src={`/coins/thumb/${coin.slug}.webp`}
+                        alt=""
                         width="200"
                         height="200"
                         loading="lazy"
                         decoding="async"
                         class="w-full rounded-full"
                       />
-                      <span class="pfp-pool-lock" aria-hidden="true">
-                        ?
-                      </span>
-                      <span class="sr-only">{page.locked}</span>
+                      <span class="pfp-pool-lock">?</span>
                     </a>
+                    <span data-pool-name class="sr-only">
+                      {page.locked}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -351,11 +370,24 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
   .pfp-pool-item {
     position: relative;
   }
+  /* Nothing to see until it is found: the <img> has no src at all, so the
+     slot is an empty disc rather than a dimmed picture somebody can squint at. */
   .pfp-pool-item img {
-    filter: grayscale(1) brightness(0.13) contrast(0.75);
+    opacity: 0;
     transition:
-      filter 0.4s ease,
+      opacity 0.4s ease,
       transform 0.4s var(--ease-out-expo);
+  }
+  .pfp-pool-face {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+  }
+  .pfp-pool-item[data-found] .pfp-pool-face {
+    background: none;
+    border-color: transparent;
   }
   .pfp-pool-lock {
     position: absolute;
@@ -370,7 +402,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     pointer-events: none;
   }
   .pfp-pool-item[data-found] img {
-    filter: none;
+    opacity: 1;
   }
   .pfp-pool-item[data-found] .pfp-pool-lock {
     display: none;
