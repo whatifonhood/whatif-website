@@ -340,10 +340,23 @@ export function initDashboard(locale: string): void {
   /** Set while a pointer is on the chart, so a refresh cannot yank it away. */
   let holding = false;
 
+  /**
+   * The figures worth remembering between visits.
+   *
+   * Filled in by whichever tasks succeed, then announced once at the end of the
+   * cycle — see `src/scripts/since-last-visit.ts`, which listens for it.
+   */
+  const visitFigures: { price?: number; burned?: number; holders?: number } = {};
+  /** The panel describes one visit, so it is told once and not on every refresh. */
+  let announcedVisit = false;
+
   const renderSnapshot = async (): Promise<TaskResult> => {
     const snapshot = await getPairSnapshot().catch(() => null);
     if (!snapshot) return 'failed';
-    if (snapshot.priceUsd !== undefined) setText('price', formatUsd(snapshot.priceUsd, locale));
+    if (snapshot.priceUsd !== undefined) {
+      setText('price', formatUsd(snapshot.priceUsd, locale));
+      visitFigures.price = snapshot.priceUsd;
+    }
     if (snapshot.marketCapUsd !== undefined)
       setText('marketCap', formatUsd(snapshot.marketCapUsd, locale));
     if (snapshot.liquidityUsd !== undefined)
@@ -623,6 +636,7 @@ export function initDashboard(locale: string): void {
     if (!info) return 'failed';
 
     if (info.holders !== undefined) {
+      visitFigures.holders = info.holders;
       for (const node of root.querySelectorAll<HTMLElement>('[data-metric="holders"]')) {
         node.textContent = formatCount(info.holders, locale);
       }
@@ -662,6 +676,8 @@ export function initDashboard(locale: string): void {
       getBalanceOf(TOKEN.burnAddress).catch(() => undefined),
       getOwner().catch(() => undefined),
     ]);
+
+    if (burned !== undefined) visitFigures.burned = burned;
 
     const marks: Record<string, boolean | undefined> = {
       verified: info.isVerified,
@@ -795,6 +811,13 @@ export function initDashboard(locale: string): void {
     if (status) {
       status.hidden = !allFailed;
       if (allFailed) status.textContent = labels.failed;
+    }
+
+    // Announced once per cycle, after every task has had its turn, so the
+    // panel compares a complete set of figures rather than a partial one.
+    if (!announcedVisit && Object.keys(visitFigures).length > 0) {
+      announcedVisit = true;
+      document.dispatchEvent(new CustomEvent('if:stats', { detail: { ...visitFigures } }));
     }
   };
 

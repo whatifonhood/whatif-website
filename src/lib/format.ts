@@ -71,3 +71,20 @@ export function formatPercent(value: number, locale = 'en'): string {
     maximumFractionDigits: 2,
   }).format(value / 100);
 }
+
+/**
+ * A dollar amount written out in full.
+ *
+ * `formatUsd` compacts anything over a thousand, which is right for a headline
+ * figure but wrong in a column of results: "$16.96K" next to "$652.45" makes
+ * two numbers the reader has to convert before they can compare them.
+ */
+export function formatUsdExact(value: number, locale = 'en'): string {
+  if (!Number.isFinite(value)) return '—';
+  if (value < 1000) return formatUsd(value, locale);
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}

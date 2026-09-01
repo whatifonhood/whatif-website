@@ -1,0 +1,66 @@
+---
+import type { PricePoint } from '../../lib/coin-history.ts';
+
+interface Props {
+  history: PricePoint[];
+}
+
+const { history } = Astro.props;
+
+/**
+ * A coin's whole price history, drawn at build time.
+ *
+ * Server-rendered SVG rather than a canvas: the shape is in the HTML, so it
+ * appears with the page, prints, and survives JavaScript being off. The path is
+ * built from the same committed history the table above it uses.
+ */
+const WIDTH = 1000;
+const HEIGHT = 260;
+
+const prices = history.map(([, price]) => price);
+const logs = prices.map((price) => Math.log10(price));
+const low = Math.min(...logs);
+const high = Math.max(...logs);
+// Log scale: across a 1000x move a linear axis is a flat line and one spike.
+const span = high - low || 1;
+
+const x = (index: number) => (index / Math.max(1, history.length - 1)) * WIDTH;
+const y = (index: number) => HEIGHT - ((logs[index]! - low) / span) * (HEIGHT - 12) - 6;
+
+const line = history
+  .map((_, index) => `${index === 0 ? 'M' : 'L'}${x(index).toFixed(1)},${y(index).toFixed(1)}`)
+  .join(' ');
+const area = `${line} L${WIDTH},${HEIGHT} L0,${HEIGHT} Z`;
+
+const label = `${history[0]![0]} to ${history.at(-1)![0]}`;
+---
+
+<figure class="mt-2">
+  <svg
+    viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+    preserveAspectRatio="none"
+    class="coin-spark h-48 w-full sm:h-64"
+    role="img"
+    aria-label={`Price from ${label}, on a logarithmic scale`}
+  >
+    <defs>
+      <linearGradient id="coin-spark-fill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--color-lime)" stop-opacity="0.28"></stop>
+        <stop offset="100%" stop-color="var(--color-lime)" stop-opacity="0"></stop>
+      </linearGradient>
+    </defs>
+    <path d={area} fill="url(#coin-spark-fill)"></path>
+    <path
+      d={line}
+      fill="none"
+      stroke="var(--color-lime)"
+      stroke-width="2"
+      vector-effect="non-scaling-stroke"
+      stroke-linejoin="round"></path>
+  </svg>
+  <figcaption class="mt-2 flex justify-between font-mono text-[11px] text-faint">
+    <span>{history[0]![0]}</span>
+    <span>Log scale</span>
+    <span>{history.at(-1)![0]}</span>
+  </figcaption>
+</figure>

@@ -245,6 +245,20 @@ export interface SiteCopy {
       pressureNote: string;
       burnHistoryTitle: string;
       burnHistoryNote: string;
+      /** The largest burns, each linked to its transaction. */
+      biggestBurnsTitle: string;
+      /**
+       * "Since you were last here". Shown only to a returning reader, compared
+       * against figures kept in their own browser.
+       */
+      sinceLead: string;
+      /** Carries `{change}` and `{price}`. */
+      sincePrice: string;
+      /** Carries `{amount}`. */
+      sinceBurned: string;
+      /** Carries `{change}` and `{total}`. */
+      sinceHolders: string;
+      sinceNothing: string;
       trustTitle: string;
       /** Says who is attesting, because we are not. */
       trustNote: string;
@@ -304,6 +318,10 @@ export interface SiteCopy {
       disclaimer: string;
       /** Carries `{date}`, the day the price history was captured. */
       pricesCaptured: string;
+      /** The section linking to the coins with a page of their own. */
+      workedOutTitle: string;
+      workedOutIntro: string;
+      workedOutMore: string;
     };
     pfp: {
       title: string;

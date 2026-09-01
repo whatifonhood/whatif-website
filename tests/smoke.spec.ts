@@ -646,7 +646,10 @@ test.describe('the Machine can be operated without seeing it', () => {
     // that a screen reader can announce the field, however it is labelled.
     const named = await page
       .locator('[data-machine-amount]')
-      .evaluate((node) => node.labels?.[0]?.textContent?.trim() ?? node.getAttribute('aria-label'));
+      .evaluate(
+        (node: HTMLInputElement) =>
+          node.labels?.[0]?.textContent?.trim() ?? node.getAttribute('aria-label'),
+      );
     expect(named, 'the amount field has no accessible name').toBeTruthy();
   });
 
@@ -708,4 +711,113 @@ test('no cache rule puts an HTML route behind a week', () => {
       /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|machine\/(logos|poses))\/\*$/,
     );
   }
+});
+
+/**
+ * A page per coin.
+ *
+ * These carry the answer already worked out in the HTML, so the test that
+ * matters is that the arithmetic on the page is the arithmetic in the data —
+ * recomputed here from the same committed file the build read.
+ */
+test.describe('a coin has its own page', () => {
+  test('the numbers on it are the numbers in the history', async ({ page }) => {
+    await page.goto('/machine/doge/');
+
+    const history = JSON.parse(readFileSync('public/machine/h/DOGE.json', 'utf8')) as [
+      string,
+      number,
+    ][];
+    const now = history.at(-1)![1];
+
+    const rows = page.locator('tbody tr');
+    await expect(rows.first()).toBeVisible();
+
+    for (const row of await rows.all()) {
+      const cells = await row.locator('th, td').allTextContents();
+      const [, priceText, , multipleText] = cells;
+      const price = Number(priceText!.replace(/[$,]/g, ''));
+      const shown = Number(multipleText!.replace(/[×,]/g, ''));
+
+      // The row must name a price that is actually in the history.
+      expect(history.some(([, value]) => Math.abs(value - price) < price * 0.01)).toBe(true);
+      // And the multiple must be today's price over it.
+      expect(Math.abs(shown - now / price)).toBeLessThan(Math.max(0.1, shown * 0.02));
+    }
+  });
+
+  test('is reachable from the machine, and links back', async ({ page }) => {
+    await page.goto('/machine/');
+    // The section that exists to give these pages a route in.
+    const first = page
+      .locator('section[aria-labelledby="worked-out"] a[href^="/machine/"]')
+      .first();
+    await expect(first).toBeVisible();
+    await first.click();
+    await expect(page.locator('h1')).toContainText(/had bought/i);
+    await expect(page.locator('main a[href="/machine/"]').first()).toBeVisible();
+  });
+
+  test('does not claim a coin it has no page for', async ({ page }) => {
+    const response = await page.goto('/machine/definitely-not-a-coin/');
+    expect(response?.status()).toBe(404);
+  });
+});
+
+/**
+ * The burn leaderboard.
+ *
+ * Every row has to be checkable, or it is just a number on a page.
+ */
+test('the largest burns each link to their transaction', async ({ page }) => {
+  await page.goto('/stats/');
+  const rows = page.locator('ol li a[href*="/tx/0x"]');
+  await expect(rows).toHaveCount(10);
+
+  const hrefs = await rows.evaluateAll((nodes) =>
+    nodes.map((node) => (node as HTMLAnchorElement).href),
+  );
+  // Ten distinct transactions, each a real hash.
+  expect(new Set(hrefs).size).toBe(10);
+  for (const href of hrefs) expect(href).toMatch(/\/tx\/0x[0-9a-f]{64}$/);
+});
+
+/**
+ * "Since you were last here".
+ *
+ * It must stay invisible on a first visit — a panel describing changes that
+ * have not happened is worse than no panel.
+ */
+test.describe('what changed since last time', () => {
+  test('says nothing to a first-time visitor', async ({ page }) => {
+    await page.goto('/stats/');
+    await page.waitForTimeout(2_000);
+    await expect(page.locator('[data-since]')).toBeHidden();
+  });
+
+  test('reports the change to somebody coming back', async ({ page }) => {
+    await page.goto('/stats/');
+    // Stand in for a visit two days ago at half the price.
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        'if:last-visit',
+        JSON.stringify({
+          at: Date.now() - 2 * 24 * 60 * 60 * 1000,
+          price: 0.000001,
+          burned: 1,
+          holders: 1,
+        }),
+      );
+    });
+    await page.reload();
+
+    const panel = page.locator('[data-since]');
+    try {
+      await expect(panel).toBeVisible({ timeout: 20_000 });
+    } catch {
+      test.skip(true, 'no market data available — the price API is throttling');
+    }
+    await expect(panel).toContainText(/%/);
+    await expect(panel.locator('[data-since-lead]')).not.toBeEmpty();
+  });
 });

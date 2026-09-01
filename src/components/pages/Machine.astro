@@ -1,4 +1,15 @@
 ---
+import { coinHistory, machineCoins, MIN_MONTHS_FOR_PAGE } from '../../lib/coin-history.ts';
+
+/**
+ * The coins linked below, biggest first.
+ *
+ * Same test as `src/pages/machine/[symbol].astro` uses to decide which coins
+ * get a page, so this list can never link to one that was not built.
+ */
+const PAGED_COINS = machineCoins()
+  .filter((coin) => (coinHistory(coin.symbol)?.length ?? 0) >= MIN_MONTHS_FOR_PAGE)
+  .slice(0, 60);
 import PageLayout from '../../layouts/PageLayout.astro';
 import { SITE, type Locale } from '../../config/site.ts';
 import { HISTORY_CAPTURED } from '../../config/coin-history.ts';
@@ -266,6 +277,28 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
         <Icons name="arrow-up-right" size={16} />
       </Button>
     </div>
+
+    <!--
+      The coins with a page of their own.
+      Also the route in: without links from somewhere, several hundred pages
+      exist that nothing on the site or in a crawl ever reaches.
+    -->
+    <section class="mt-14" aria-labelledby="worked-out">
+      <h2 id="worked-out" class="display-heading text-2xl sm:text-3xl">{page.workedOutTitle}</h2>
+      <p class="mt-3 max-w-2xl text-muted">{page.workedOutIntro}</p>
+      <ul class="mt-6 flex flex-wrap gap-2">
+        {
+          PAGED_COINS.map((coin) => (
+            <li>
+              <a href={`/machine/${coin.symbol.toLowerCase()}/`} class="amount-chip">
+                {coin.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-4 font-mono text-[11px] text-faint">{page.workedOutMore}</p>
+    </section>
 
     <p class="mt-8 max-w-2xl font-mono text-[11px] leading-relaxed text-faint">
       {page.disclaimer} · {page.pricesCaptured.replace('{date}', HISTORY_CAPTURED)}
