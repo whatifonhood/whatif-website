@@ -3,6 +3,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import { CHAIN, SITE, type Locale } from '../../config/site.ts';
 import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
 import { BURNS } from '../../config/burns.ts';
+import { HOLDERS, HOLDERS_CAPTURED } from '../../config/holders.ts';
 import { getCopy } from '../../content/index.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
 import Button from '../../components/ui/Button.astro';
@@ -465,6 +466,67 @@ const metrics = [
       <p data-since-lead class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime"></p>
       <ul data-since-list class="mt-4 space-y-2 text-lg leading-relaxed text-ink"></ul>
     </aside>
+
+    <!--
+      Who holds it.
+      The most common question about any token is whether one wallet holds all
+      of it, and the honest answer needs the list rather than a percentage. The
+      top row here is the burn address and the third is the pool everybody
+      trades against — unlabelled, both read as whales.
+    -->
+    <div class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.holderTableTitle}
+      </p>
+      <p class="mt-3 max-w-2xl text-muted">{page.holderTableIntro}</p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full min-w-[32rem] border-collapse text-left font-mono text-sm">
+          <thead>
+            <tr class="border-b border-line text-[11px] uppercase tracking-[0.14em] text-faint">
+              <th scope="col" class="py-3 pr-4 font-normal">{page.holderAddress}</th>
+              <th scope="col" class="py-3 pr-4 font-normal">{page.holderWhat}</th>
+              <th scope="col" class="py-3 pr-4 text-right font-normal">{page.holderTokens}</th>
+              <th scope="col" class="py-3 text-right font-normal">{page.holderShare}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              HOLDERS.map((holder) => (
+                <tr class="border-b border-line/60">
+                  <th scope="row" class="py-3 pr-4 font-normal">
+                    <a
+                      href={`${CHAIN.explorerUrl}/address/${holder.address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-ink transition-colors hover:text-lime"
+                    >
+                      {holder.address.slice(0, 8)}…{holder.address.slice(-6)}
+                      <span class="sr-only">{copy.common.externalLink}</span>
+                    </a>
+                  </th>
+                  <td class="py-3 pr-4">
+                    <span class="holder-tag" data-kind={holder.kind}>
+                      {page.holderKinds[holder.kind]}
+                    </span>
+                  </td>
+                  <td class="py-3 pr-4 text-right tabular-nums text-muted">
+                    {formatCompact(holder.tokens, locale)}
+                  </td>
+                  <td class="py-3 text-right tabular-nums text-muted">
+                    {formatPercent((holder.tokens / TOKEN.totalSupply) * 100, locale)}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-4 font-mono text-[10px] uppercase tracking-wider text-faint">
+        {page.holderTableNote.replace('{date}', HOLDERS_CAPTURED)}
+      </p>
+    </div>
 
     <!-- Burn history -->
     <div class="card mt-3 p-6 sm:p-8">
@@ -1003,6 +1065,36 @@ const metrics = [
      styles never reach them (scoping is applied to markup in the template).
      They have to be global. -->
 <style is:global>
+  /* Holder labels. Burned is the reassuring case, so it gets the site's accent;
+     a pool is infrastructure, not a holding; a bare contract is neither. */
+  .holder-tag {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-faint);
+    white-space: nowrap;
+  }
+
+  .holder-tag[data-kind='burn'] {
+    border-color: color-mix(in oklab, var(--color-lime) 40%, transparent);
+    color: var(--color-lime);
+  }
+
+  .holder-tag[data-kind='pool'] {
+    border-color: color-mix(in oklab, var(--color-ink) 25%, transparent);
+    color: var(--color-muted);
+  }
+
+  /* An unidentified address gets no chip at all — an empty label is honest,
+     a made-up one is not. */
+  .holder-tag[data-kind='unknown'] {
+    border-color: transparent;
+  }
+
   .candle-wick {
     stroke-width: 1.4;
     vector-effect: non-scaling-stroke;
