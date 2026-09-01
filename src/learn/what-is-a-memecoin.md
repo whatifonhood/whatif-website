@@ -16,7 +16,7 @@ A meme coin makes no such claim. It is a shared joke with a ledger attached. Its
 
 ## Why that is not automatically stupid
 
-Plenty of things are worth what people agree they are worth. The honest case for a meme coin is that attention is real, coordination is real, and a token is a way of keeping score of both. The community *is* the product, and the chart is the scoreboard.
+Plenty of things are worth what people agree they are worth. The honest case for a meme coin is that attention is real, coordination is real, and a token is a way of keeping score of both. The community _is_ the product, and the chart is the scoreboard.
 
 The dishonest case is anything that dresses this up as an investment thesis. If someone shows you a valuation model for a meme coin, they have either misunderstood it or they are hoping you will.
 

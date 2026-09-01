@@ -23,6 +23,12 @@ jobs:
       # `npm ci` installs exactly what the lockfile says, and nothing else.
       - run: npm ci
 
+      # The job is called "Typecheck, lint and build" and did not typecheck.
+      # astro check is what catches a broken content contract or a bad prop
+      # before it reaches a page.
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Lint
         run: npm run lint
 

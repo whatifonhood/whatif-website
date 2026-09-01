@@ -72,7 +72,9 @@ async function rpc(method, params, attempt = 0) {
 }
 
 const head = Number(await rpc('eth_blockNumber', []));
-console.warn(`Head block ${head.toLocaleString()}, scanning back in ${CHUNK.toLocaleString()}-block chunks`);
+console.warn(
+  `Head block ${head.toLocaleString()}, scanning back in ${CHUNK.toLocaleString()}-block chunks`,
+);
 
 const events = [];
 for (let to = head; to > 0; to -= CHUNK) {
@@ -141,6 +143,4 @@ export const BURNS_SCANNED_TO = ${head};
 `,
 );
 
-console.warn(
-  `${rows.length} burns written, ${Math.round(total).toLocaleString()} $IF total`,
-);
+console.warn(`${rows.length} burns written, ${Math.round(total).toLocaleString()} $IF total`);

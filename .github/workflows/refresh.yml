@@ -1,0 +1,76 @@
+name: Refresh data
+
+# Freshness on this site comes from rebuilding, not from a live script — that is
+# the deliberate design. But nothing rebuilt unless somebody pushed, so the
+# snapshot figures, the burn list and the tweet wall all decayed together and
+# the site quietly became less true over time.
+#
+# This runs the data tools, commits whatever actually changed, and lets the push
+# trigger the deploy. If an upstream returns nothing it fails loudly rather than
+# committing an empty file over good data.
+
+on:
+  schedule:
+    # 05:12 UTC daily. Off the hour on purpose: every free API is busiest when
+    # thousands of cron jobs fire at :00.
+    - cron: '12 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Refresh on-chain and market data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Each of these writes a committed file. They are separate steps so a
+      # failure names the source that broke rather than "the refresh failed".
+      - name: Snapshot price, supply and burn
+        run: npm run snapshot
+
+      - name: Burn history from the chain
+        run: npm run burns
+
+      - name: Community wall
+        run: npm run tweets
+
+      # A tool that returned nothing would otherwise commit an empty file over
+      # good data, which is worse than being a day stale.
+      - name: Refuse to commit empty data
+        run: |
+          set -e
+          test -s src/config/burns.ts
+          test -s src/config/tweet-cards.ts
+          node -e "
+            const { BURNS } = await import('./src/config/burns.ts');
+            if (BURNS.length === 0) { console.error('burns.ts came back empty'); process.exit(1); }
+          "
+
+      - name: Verify the site still builds
+        run: npm run build
+
+      - name: Commit anything that changed
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add src/config/site.ts src/config/burns.ts src/config/tweet-cards.ts
+          if git diff --cached --quiet; then
+            echo 'Nothing changed today.'
+          else
+            git commit -m 'Refresh on-chain and market data'
+            git push
+          fi

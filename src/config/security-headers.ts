@@ -1,0 +1,86 @@
+/**
+ * The one place response headers are defined.
+ *
+ * Netlify reads public/_headers and Vercel reads vercel.json. They were
+ * maintained by hand, in parallel, and had already drifted: three of the four
+ * per-path policies disagreed between the two hosts, and the test only ever
+ * compared the site-wide one, so nobody noticed. A policy that differs by host
+ * is a policy nobody can reason about.
+ *
+ * Both files are generated from this module by `npm run headers`, and a test
+ * fails if either has been edited by hand since.
+ *
+ * A note on ordering, because the two hosts disagree: Netlify applies the FIRST
+ * matching rule for a header, Vercel the LAST. The generator emits each host's
+ * order accordingly — do not "tidy" one to match the other.
+ */
+
+/** Everything the browser is allowed to reach, and why it is on the list. */
+export const CONNECT_SRC = [
+  "'self'",
+  'https://api.dexscreener.com', // price, liquidity, volume
+  'https://api.geckoterminal.com', // candles, trades, holders, concentration
+  'https://rpc.mainnet.chain.robinhood.com', // the chain: burn, balances, supply
+  'https://api.coingecko.com', // price history for the long-tail coins
+] as const;
+
+/** The policy every page gets. `img-src` is the only part that ever varies. */
+function policy(imgSrc: string): string {
+  return [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self'",
+    `img-src ${imgSrc}`,
+    "font-src 'self'",
+    `connect-src ${CONNECT_SRC.join(' ')}`,
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'none'",
+    "object-src 'none'",
+    "manifest-src 'self'",
+    'upgrade-insecure-requests',
+  ].join('; ');
+}
+
+export const SITE_POLICY = policy("'self' data:");
+
+/**
+ * Pages that draw a card on a canvas and hand it over as a blob: URL.
+ * Exactly one extra image source; nothing else is widened.
+ */
+export const CANVAS_POLICY = policy("'self' data: blob:");
+export const CANVAS_PATHS = ['/pfp', '/ask', '/holdings'] as const;
+
+export const SECURITY_HEADERS: [string, string][] = [
+  ['X-Content-Type-Options', 'nosniff'],
+  ['X-Frame-Options', 'DENY'],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+  [
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+  ],
+  ['Cross-Origin-Opener-Policy', 'same-origin'],
+  ['Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload'],
+];
+
+/** Fingerprinted or content-addressed: safe to cache forever. */
+export const IMMUTABLE_PATHS = ['/_astro', '/pfp/img'] as const;
+
+/**
+ * Artwork, replaced by uploading a new file rather than by editing one.
+ * Scoped to the image directories — a rule on /memes would also match the meme
+ * PAGES and hide every deploy behind a week-old HTML cache.
+ */
+export const WEEK_PATHS = [
+  '/memes/full',
+  '/memes/thumb',
+  '/memes/thumb2x',
+  '/memes/og',
+  '/coins',
+  '/machine',
+] as const;
+
+export const IMMUTABLE_CACHE = 'public, max-age=31536000, immutable';
+export const WEEK_CACHE = 'public, max-age=604800';
+/** HTML always revalidates, so a deploy is live immediately. */
+export const HTML_CACHE = 'public, max-age=0, must-revalidate';

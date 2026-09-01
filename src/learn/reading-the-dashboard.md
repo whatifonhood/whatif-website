@@ -24,7 +24,7 @@ A useful sanity check: if your position is a meaningful fraction of the pool, yo
 
 Twenty-four-hour volume is how much changed hands. The buy and sell counts underneath it, and the hourly pressure chart, say which direction the pressure came from.
 
-Treat trade *counts* with suspicion on a cheap chain — it costs very little to generate a lot of them. Volume in dollars is harder to fake convincingly.
+Treat trade _counts_ with suspicion on a cheap chain — it costs very little to generate a lot of them. Volume in dollars is harder to fake convincingly.
 
 ## Burned
 
