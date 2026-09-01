@@ -10,20 +10,58 @@ import { expect, test } from '@playwright/test';
  */
 const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 
-const REQUIRED_DIRECTIVES = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'none'",
-  "object-src 'none'",
-];
+/**
+ * What each directive must be, EXACTLY.
+ *
+ * Substring matching is what makes a policy test useless: `toContain` on
+ * "script-src 'self'" is satisfied by "script-src 'self' https://attacker.example".
+ * Every directive below is compared as a whole value, in every block.
+ */
+const EXACT_DIRECTIVES: Record<string, string> = {
+  'default-src': "'self'",
+  'script-src': "'self'",
+  'style-src': "'self'",
+  'font-src': "'self'",
+  'frame-ancestors': "'none'",
+  'base-uri': "'self'",
+  'form-action': "'none'",
+  'object-src': "'none'",
+  'manifest-src': "'self'",
+};
+
+/**
+ * Every Content-Security-Policy in the file, not just the first.
+ *
+ * There are four — the site-wide one and three for the pages that draw to a
+ * canvas — and a test that reads one of them proves nothing about the rest.
+ */
+function policiesIn(text: string): string[] {
+  return [...text.matchAll(/Content-Security-Policy:\s*(.+)/g)].map((match) => match[1]!.trim());
+}
+
+/** A policy split into `{ directive: value }`. */
+function directivesOf(policy: string): Record<string, string> {
+  const parsed: Record<string, string> = {};
+  for (const part of policy.split(';')) {
+    const [name, ...rest] = part.trim().split(/\s+/);
+    if (name) parsed[name] = rest.join(' ');
+  }
+  return parsed;
+}
+
+const POLICIES = policiesIn(headers);
 
 test.describe('security headers', () => {
-  for (const directive of REQUIRED_DIRECTIVES) {
-    test(`Content-Security-Policy keeps ${directive}`, () => {
-      expect(headers).toContain(directive);
+  test('there are four policies to check, and this test knows it', () => {
+    // If a page with new needs is added, this number changes deliberately.
+    expect(POLICIES).toHaveLength(4);
+  });
+
+  for (const [directive, value] of Object.entries(EXACT_DIRECTIVES)) {
+    test(`every policy sets ${directive} to exactly ${value}`, () => {
+      for (const policy of POLICIES) {
+        expect(directivesOf(policy)[directive], policy).toBe(value);
+      }
     });
   }
 
@@ -32,25 +70,40 @@ test.describe('security headers', () => {
     expect(headers).not.toContain("'unsafe-eval'");
   });
 
+  test('img-src allows blob: only on the pages that draw cards', () => {
+    const withBlob = POLICIES.filter((policy) =>
+      directivesOf(policy)['img-src']?.includes('blob:'),
+    );
+    // The three canvas pages, and nothing else: /pfp, /ask, /holdings.
+    expect(withBlob).toHaveLength(3);
+    for (const policy of POLICIES) {
+      const imgSrc = directivesOf(policy)['img-src'];
+      expect(["'self' data:", "'self' data: blob:"]).toContain(imgSrc);
+    }
+  });
+
   test('only the public read-only data APIs may be contacted', () => {
-    const connectSrc = headers.match(/connect-src ([^;]+);/)?.[1] ?? '';
-    const allowed = connectSrc.trim().split(/\s+/).sort();
-    // Every entry here is a public, keyless, read-only endpoint, and each one
-    // earns its place:
-    //   dexscreener   price, liquidity and volume
-    //   geckoterminal candles, trades, holders and concentration
-    //   rpc           the chain itself, for the burn and wallet balances
-    //   coingecko     price history for the eighteen thousand coins in the
-    //                 Machine that are too many to ship as files
-    // Adding a fifth is a decision, not a detail — this test exists to make
-    // sure one cannot arrive by accident.
-    expect(allowed).toEqual([
-      "'self'",
-      'https://api.coingecko.com',
-      'https://api.dexscreener.com',
-      'https://api.geckoterminal.com',
-      'https://rpc.mainnet.chain.robinhood.com',
-    ]);
+    // Checked in every policy, not just the first: they must agree, and the
+    // one that does not is exactly the one worth finding.
+    for (const policy of POLICIES) {
+      const allowed = (directivesOf(policy)['connect-src'] ?? '').trim().split(/\s+/).sort();
+      // Every entry here is a public, keyless, read-only endpoint, and each one
+      // earns its place:
+      //   dexscreener   price, liquidity and volume
+      //   geckoterminal candles, trades, holders and concentration
+      //   rpc           the chain itself, for the burn and wallet balances
+      //   coingecko     price history for the eighteen thousand coins in the
+      //                 Machine that are too many to ship as files
+      // Adding a fifth is a decision, not a detail — this test exists to make
+      // sure one cannot arrive by accident.
+      expect(allowed, policy).toEqual([
+        "'self'",
+        'https://api.coingecko.com',
+        'https://api.dexscreener.com',
+        'https://api.geckoterminal.com',
+        'https://rpc.mainnet.chain.robinhood.com',
+      ]);
+    }
   });
 
   test('the transport and sniffing protections are set', () => {

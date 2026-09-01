@@ -403,9 +403,11 @@ test.describe('the question generator', () => {
 
       // Wait for the question to actually change rather than assuming the click
       // landed — under parallel load a press can outrun the read, which looks
-      // like the generator repeating when it is the test racing itself.
+      // like the generator repeating when it is the test racing itself. The
+      // timeout is generous for the same reason: the whole suite runs in
+      // parallel, and a slow tab here is a busy machine, not a broken page.
       await page.locator('[data-ask-again]').click();
-      await expect(question).not.toHaveText(text, { timeout: 5_000 });
+      await expect(question).not.toHaveText(text, { timeout: 20_000 });
     }
 
     expect(problems.slice(0, 3)).toEqual([]);
