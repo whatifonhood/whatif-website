@@ -15,10 +15,9 @@ import {
 } from '../lib/machine.ts';
 import { formatCompact, formatUsd } from '../lib/format.ts';
 import { SITE } from '../config/site.ts';
+import { CARD_COINS, coinArt, drawMachineCard } from '../lib/card-designs.ts';
 
 const MAX_AMOUNT = 1_000_000;
-const CARD_WIDTH = 1200;
-const CARD_HEIGHT = 675;
 
 interface Selection {
   coin: CoinEntry;
@@ -63,15 +62,6 @@ function verdictFor(multiple: number) {
   return VERDICTS.find((entry) => multiple > entry.over) ?? VERDICTS[VERDICTS.length - 1]!;
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(src));
-    image.src = src;
-  });
-}
-
 /** Wraps text to a width, returning the lines. */
 /**
  * Draws the share card: the number, the arithmetic, and IF Man reacting to it.
@@ -79,121 +69,12 @@ function loadImage(src: string): Promise<HTMLImageElement> {
  * The card is the point of the tool — it is what travels. The character is what
  * makes it a joke rather than a screenshot of a calculator.
  */
-/** Fits one line to a width by stepping the size down. */
-function fitLine(
-  context: CanvasRenderingContext2D,
-  text: string,
-  font: (size: number) => string,
-  maxWidth: number,
-  start: number,
-  min = 22,
-): void {
-  let size = start;
-  while (size > min) {
-    context.font = font(size);
-    if (context.measureText(text).width <= maxWidth) return;
-    size -= 2;
-  }
-  context.font = font(size);
-}
-
-/** Wraps text to a width. */
-function wrapToWidth(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (context.measureText(candidate).width <= maxWidth) line = candidate;
-    else {
-      if (line) lines.push(line);
-      line = word;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
-/**
- * The coin's actual price history, with the entry marked.
- *
- * This is what makes the card worth posting. The number on its own is abstract;
- * the curve shows the thing that happened — and it is different for every coin
- * and every date somebody picks, which a character pose is not.
- */
-function drawHistoryCurve(
-  context: CanvasRenderingContext2D,
-  history: PricePoint[],
-  entryIndex: number,
-  box: { x: number; y: number; w: number; h: number },
-  accent: string,
-): void {
-  if (history.length < 2) return;
-
-  const prices = history.map(([, price]) => price);
-  // Log scale, because these series cover several orders of magnitude and a
-  // linear axis renders every early month as a flat line on the floor.
-  const logs = prices.map((price) => Math.log(Math.max(price, Number.MIN_VALUE)));
-  const low = Math.min(...logs);
-  const high = Math.max(...logs);
-  const span = high - low || 1;
-
-  const x = (i: number) => box.x + (i / (history.length - 1)) * box.w;
-  const y = (i: number) => box.y + box.h - ((logs[i]! - low) / span) * box.h;
-
-  const path = new Path2D();
-  history.forEach((_, i) => (i === 0 ? path.moveTo(x(i), y(i)) : path.lineTo(x(i), y(i))));
-
-  const fill = new Path2D(path);
-  fill.lineTo(x(history.length - 1), box.y + box.h);
-  fill.lineTo(box.x, box.y + box.h);
-  fill.closePath();
-
-  const gradient = context.createLinearGradient(0, box.y, 0, box.y + box.h);
-  gradient.addColorStop(0, `${accent}3D`);
-  gradient.addColorStop(1, `${accent}00`);
-  context.fillStyle = gradient;
-  context.fill(fill);
-
-  context.strokeStyle = accent;
-  context.lineWidth = 3;
-  context.lineJoin = 'round';
-  context.stroke(path);
-
-  // Where they would have bought.
-  const ex = x(entryIndex);
-  const ey = y(entryIndex);
-  context.strokeStyle = 'rgba(233,240,221,0.28)';
-  context.lineWidth = 1.5;
-  context.setLineDash([5, 5]);
-  context.beginPath();
-  context.moveTo(ex, box.y);
-  context.lineTo(ex, box.y + box.h);
-  context.stroke();
-  context.setLineDash([]);
-
-  context.fillStyle = '#080B07';
-  context.strokeStyle = '#E9F0DD';
-  context.lineWidth = 3;
-  context.beginPath();
-  context.arc(ex, ey, 8, 0, Math.PI * 2);
-  context.fill();
-  context.stroke();
-
-  // And where it ended.
-  const lx = x(history.length - 1);
-  const ly = y(history.length - 1);
-  context.fillStyle = accent;
-  context.beginPath();
-  context.arc(lx, ly, 8, 0, Math.PI * 2);
-  context.fill();
-}
 
 /**
  * The share card.
  *
- * Two columns that never overlap: the arithmetic on the left, the coin's own
- * price curve on the right. The previous version pasted the character across
- * the middle and the verdict ran straight through him.
+ * Layout and artwork live in src/lib/card-designs.ts, shared with the question
+ * generator, the wallet lookup and the coin pull so the four stay one family.
  */
 async function drawCard(
   canvas: HTMLCanvasElement,
@@ -204,117 +85,27 @@ async function drawCard(
     value: number;
     multiple: number;
     verdict: string;
-    pose: string;
     history: PricePoint[];
     entryIndex: number;
   },
   locale: string,
 ): Promise<void> {
-  const context = canvas.getContext('2d');
-  if (!context) return;
-  canvas.width = CARD_WIDTH;
-  canvas.height = CARD_HEIGHT;
-
-  const regret = data.multiple > 1;
-  const accent = regret ? '#8FCE02' : '#F0A06A';
-
-  const PAD = 76;
-  const TEXT_W = 560;
-  const display = (size: number) => `italic 900 ${size}px Archivo, sans-serif`;
-  const mono = (size: number) => `700 ${size}px "JetBrains Mono", monospace`;
-
-  context.fillStyle = '#080B07';
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  const glow = context.createRadialGradient(880, 300, 0, 880, 300, 520);
-  glow.addColorStop(0, `${accent}26`);
-  glow.addColorStop(1, 'rgba(8,11,7,0)');
-  context.fillStyle = glow;
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  context.strokeStyle = 'rgba(34,48,18,0.32)';
-  context.lineWidth = 1;
-  for (let x = 0; x < CARD_WIDTH; x += 80) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, CARD_HEIGHT);
-    context.stroke();
-  }
-
-  context.textAlign = 'left';
-  context.textBaseline = 'alphabetic';
-
-  context.fillStyle = accent;
-  context.font = mono(20);
-  context.fillText('THE WHAT $IF MACHINE', PAD, 92);
-
-  // A separator rather than a preposition: "in Jul 2019" is right for a month
-  // and wrong for a day, and the fix would need a second word in four languages.
-  const line = `${formatUsd(data.amount, locale)} of ${data.symbol}  ·  ${monthLabel(data.month, locale)}`;
-  context.fillStyle = '#9AA889';
-  fitLine(context, line, (size) => `400 ${size}px Archivo, sans-serif`, TEXT_W, 26, 16);
-  context.fillText(line, PAD, 142);
-
-  const multiple =
-    data.multiple >= 100 ? `${Math.round(data.multiple)}×` : `${data.multiple.toFixed(1)}×`;
-  fitLine(context, multiple, display, TEXT_W, 132, 60);
-  context.fillStyle = accent;
-  context.fillText(multiple, PAD, 268);
-
-  const arrow = `${formatUsd(data.amount, locale)} → ${formatUsd(data.value, locale)}`;
-  fitLine(context, arrow, mono, TEXT_W, 34, 18);
-  context.fillStyle = '#E9F0DD';
-  context.fillText(arrow, PAD, 326);
-
-  context.font = display(50);
-  const verdictLines = wrapToWidth(context, data.verdict.toUpperCase(), TEXT_W).slice(0, 2);
-  context.fillStyle = '#E9F0DD';
-  verdictLines.forEach((text, i) => context.fillText(text, PAD, 442 + i * 56));
-
-  context.strokeStyle = 'rgba(34,48,18,0.9)';
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(PAD, CARD_HEIGHT - 108);
-  context.lineTo(PAD + TEXT_W, CARD_HEIGHT - 108);
-  context.stroke();
-
-  context.font = mono(19);
-  context.fillStyle = accent;
-  context.fillText('WHATIFONHOOD.COM/MACHINE', PAD, CARD_HEIGHT - 66);
-
-  context.font = mono(14);
-  context.fillStyle = '#5C6B4F';
-  context.fillText('HISTORICAL PRICES · NOT FINANCIAL ADVICE', PAD, CARD_HEIGHT - 36);
-
-  // The graphic: the coin's own history, with the entry marked.
-  drawHistoryCurve(
-    context,
-    data.history,
-    data.entryIndex,
-    { x: 700, y: 150, w: 430, h: 300 },
-    accent,
+  // Won or lost decides which coin he wears, and the card's whole accent.
+  const coin = await cardCoin(data.multiple >= 1 ? CARD_COINS.machineWin : CARD_COINS.machineLoss);
+  drawMachineCard(
+    canvas,
+    {
+      symbol: data.symbol,
+      month: monthLabel(data.month, locale),
+      amount: formatUsd(data.amount, locale),
+      value: formatUsd(data.value, locale),
+      multiple: data.multiple,
+      verdict: data.verdict,
+      history: data.history,
+      entryIndex: data.entryIndex,
+    },
+    coin,
   );
-
-  // The coin, on the curve's baseline.
-  try {
-    const logo = await loadImage(`/machine/logos/${data.symbol}.webp`);
-    context.drawImage(logo, 700, 92, 40, 40);
-  } catch {
-    /* a missing logo is cosmetic */
-  }
-  context.font = mono(20);
-  context.fillStyle = '#9AA889';
-  context.fillText(data.symbol, 752, 120);
-
-  // The character signs the card rather than being pasted across it.
-  try {
-    const pose = await loadImage(`/machine/poses/${data.pose}.webp`);
-    const height = 150;
-    const width = (pose.width / pose.height) * height;
-    context.drawImage(pose, CARD_WIDTH - width - 70, CARD_HEIGHT - height - 34, width, height);
-  } catch {
-    /* the numbers still read without it */
-  }
 }
 
 function drawSpark(svg: SVGSVGElement, history: PricePoint[], entryIndex: number): void {
@@ -613,7 +404,6 @@ export function initMachine(locale: string): void {
           value,
           multiple,
           verdict: verdicts[verdict.key] ?? '',
-          pose: verdict.pose,
           history: selection.history,
           entryIndex: index,
         },
@@ -685,4 +475,25 @@ export function initMachine(locale: string): void {
     const start = shared?.coin ?? list.find((coin) => coin.symbol === 'DOGE') ?? list[0];
     if (start) void choose(start, shared ?? undefined);
   });
+}
+
+/**
+ * The card's own coin, fetched once and kept.
+ *
+ * A card still draws without it — the artwork is optional in every design — so
+ * a slow or missing image delays nothing and breaks nothing.
+ */
+const coinCache = new Map<string, Promise<HTMLImageElement | undefined>>();
+function cardCoin(slug: string): Promise<HTMLImageElement | undefined> {
+  let pending = coinCache.get(slug);
+  if (!pending) {
+    pending = new Promise<HTMLImageElement | undefined>((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(undefined);
+      image.src = coinArt(slug);
+    });
+    coinCache.set(slug, pending);
+  }
+  return pending;
 }

@@ -16,9 +16,7 @@ import {
   type Question,
 } from '../config/what-if.ts';
 import { track } from '../lib/analytics.ts';
-
-const CARD_WIDTH = 1200;
-const CARD_HEIGHT = 675;
+import { CARD_COINS, coinArt, drawAskCard } from '../lib/card-designs.ts';
 
 /** How many recent questions to avoid repeating. */
 const MEMORY = 60;
@@ -32,141 +30,18 @@ function nextQuestion(recent: string[]): Question {
   return randomQuestion();
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(src));
-    image.src = src;
-  });
-}
-
-/** Wraps text to a width. */
-function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (context.measureText(candidate).width <= maxWidth) line = candidate;
-    else {
-      if (line) lines.push(line);
-      line = word;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
 /**
  * The share card.
  *
- * Set as prose, not as a headline. Uppercase black italic at this size reads as
- * shouting, and these are meant to be read rather than announced.
+ * Layout and artwork live in src/lib/card-designs.ts, shared with the Machine,
+ * the wallet lookup and the coin pull so the four stay one family.
  */
 async function drawCard(
   canvas: HTMLCanvasElement,
   question: string,
   answer: string,
 ): Promise<void> {
-  const context = canvas.getContext('2d');
-  if (!context) return;
-  canvas.width = CARD_WIDTH;
-  canvas.height = CARD_HEIGHT;
-
-  const PAD = 84;
-  const boxWidth = CARD_WIDTH - PAD * 2 - 110;
-
-  context.fillStyle = '#080B07';
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  const glow = context.createRadialGradient(560, 300, 0, 560, 300, 640);
-  glow.addColorStop(0, 'rgba(143,206,2,0.15)');
-  glow.addColorStop(1, 'rgba(8,11,7,0)');
-  context.fillStyle = glow;
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-
-  context.strokeStyle = 'rgba(34,48,18,0.3)';
-  context.lineWidth = 1;
-  for (let x = 0; x < CARD_WIDTH; x += 80) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, CARD_HEIGHT);
-    context.stroke();
-  }
-
-  context.textAlign = 'left';
-  context.textBaseline = 'alphabetic';
-
-  // An answer takes room from the question, so the question is sized against
-  // whatever is left rather than a fixed box.
-  const answerText = answer.trim();
-  const maxHeight = answerText ? 220 : 320;
-  let size = answerText ? 52 : 66;
-  let lines: string[] = [];
-  while (size > 26) {
-    context.font = `600 ${size}px Archivo, sans-serif`;
-    lines = wrap(context, question, boxWidth);
-    if (lines.length <= 5 && lines.length * size * 1.3 <= maxHeight) break;
-    size -= 2;
-  }
-
-  const lineHeight = size * 1.3;
-  let y = (answerText ? 196 : 218) + (maxHeight - lines.length * lineHeight) / 2;
-  context.fillStyle = '#E9F0DD';
-  for (const line of lines) {
-    context.fillText(line, PAD, y);
-    y += lineHeight;
-  }
-
-  // The answer, set apart from the question so the card reads as a reply.
-  if (answerText) {
-    const rule = y + 14;
-    context.strokeStyle = 'rgba(143,206,2,0.5)';
-    context.lineWidth = 2;
-    context.beginPath();
-    context.moveTo(PAD, rule);
-    context.lineTo(PAD + 60, rule);
-    context.stroke();
-
-    let answerSize = 34;
-    let answerLines: string[] = [];
-    while (answerSize > 18) {
-      context.font = `400 ${answerSize}px Archivo, sans-serif`;
-      answerLines = wrap(context, answerText, boxWidth);
-      if (answerLines.length <= 3) break;
-      answerSize -= 2;
-    }
-    context.fillStyle = '#8FCE02';
-    let answerY = rule + answerSize + 24;
-    for (const line of answerLines.slice(0, 3)) {
-      context.fillText(line, PAD, answerY);
-      answerY += answerSize * 1.32;
-    }
-  }
-
-  context.font = '700 20px "JetBrains Mono", monospace';
-  context.fillStyle = '#8FCE02';
-  context.fillText('STILL ASKING.', PAD, 126);
-
-  context.strokeStyle = 'rgba(34,48,18,0.9)';
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(PAD, CARD_HEIGHT - 112);
-  context.lineTo(CARD_WIDTH - PAD, CARD_HEIGHT - 112);
-  context.stroke();
-
-  context.font = '700 19px "JetBrains Mono", monospace';
-  context.fillStyle = '#8FCE02';
-  context.fillText('WHATIFONHOOD.COM/ASK', PAD, CARD_HEIGHT - 62);
-
-  try {
-    const figure = await loadImage('/machine/poses/thinking.webp');
-    const height = 200;
-    const width = (figure.width / figure.height) * height;
-    context.drawImage(figure, CARD_WIDTH - width - PAD, CARD_HEIGHT - height - 28, width, height);
-  } catch {
-    /* the question reads fine on its own */
-  }
+  drawAskCard(canvas, question, answer, await cardCoin(CARD_COINS.ask));
 }
 
 export function initWhatIf(locale: string): void {
@@ -302,4 +177,25 @@ export function initWhatIf(locale: string): void {
   } else {
     ask();
   }
+}
+
+/**
+ * The card's own coin, fetched once and kept.
+ *
+ * A card still draws without it — the artwork is optional in every design — so
+ * a slow or missing image delays nothing and breaks nothing.
+ */
+const coinCache = new Map<string, Promise<HTMLImageElement | undefined>>();
+function cardCoin(slug: string): Promise<HTMLImageElement | undefined> {
+  let pending = coinCache.get(slug);
+  if (!pending) {
+    pending = new Promise<HTMLImageElement | undefined>((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(undefined);
+      image.src = coinArt(slug);
+    });
+    coinCache.set(slug, pending);
+  }
+  return pending;
 }
