@@ -62,7 +62,10 @@ const metrics = [
     data-timeframe="day"
     data-chart-type="candles"
     data-label-holders-updated={page.holdersUpdated}
+    data-label-burn-mark={page.burnMark}
     data-label-check-pass={page.checkPass}
+    data-label-owner-none={page.ownerNone}
+    data-label-owner-some={page.ownerSome}
     data-label-window={page.windowHours}
     data-label-buy={page.buyLabel}
     data-label-sell={page.sellLabel}
@@ -520,7 +523,7 @@ const metrics = [
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.trustTitle}</p>
       <ul data-trust class="mt-5 grid gap-2.5 sm:grid-cols-2">
         {
-          (['verified', 'honeypot', 'supply', 'burn'] as const).map((check) => (
+          (['verified', 'honeypot', 'supply', 'burn', 'owner'] as const).map((check) => (
             <li data-check={check} class="trust-row">
               <span class="trust-mark" data-state="unknown" aria-hidden="true" />
               <span class="min-w-0 flex-1 text-sm text-ink">{page.checks[check]}</span>

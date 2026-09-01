@@ -25,6 +25,7 @@ export const tr: SiteCopy = {
     toolGroups: { data: 'Rakamlar', play: 'Oyna', assets: 'Görseller', read: 'Oku' },
     languageMenu: 'Dil',
     buy: '$IF Al',
+    home: 'What $IF — ana sayfa',
     pfp: 'Kendi paranı bul',
     openMenu: 'Menüyü aç',
     closeMenu: 'Menüyü kapat',
@@ -336,8 +337,12 @@ export const tr: SiteCopy = {
         honeypot: 'Honeypot kontrolü',
         supply: 'Sabit arz, mint fonksiyonu yok',
         burn: 'Yakım adresinin özel anahtarı yok',
+        owner: 'Sözleşmeyi kim değiştirebilir',
       },
       checkPass: 'Geçti',
+      burnMark: '{amount} yakıldı',
+      ownerNone: 'Owner fonksiyonu yok',
+      ownerSome: 'Sahibi',
     },
     machine: {
       title: 'What $IF Makinesi',
@@ -374,6 +379,7 @@ export const tr: SiteCopy = {
       pivotCta: '$IF Al',
       disclaimer:
         'Geçmiş fiyatlar üzerinden kaba bir hesap, eğlence amaçlı. Geçmiş fiyatlar hiçbir şeyi öngörmez.',
+      pricesCaptured: 'Fiyatlar {date} tarihinde alındı.',
     },
     pfp: {
       title: 'PFP Üretici',
@@ -388,6 +394,7 @@ export const tr: SiteCopy = {
       found: (found, total) => `${total} paradan ${found} tanesi bulundu`,
       showPool: 'Tüm paraları göster',
       hidePool: 'Gizle',
+      rolled: '{name} — {tier} çıktı.',
       locked: 'Henüz bulunmadı',
       download: 'PNG indir',
       shareCard: 'Kartı paylaş',

@@ -169,7 +169,7 @@ async function drawCard(
   }
 }
 
-export function initWhatIf(): void {
+export function initWhatIf(locale: string): void {
   const root = document.querySelector<HTMLElement>('[data-ask]');
   if (!root) return;
 
@@ -291,7 +291,7 @@ export function initWhatIf(): void {
   });
 
   const total = root.querySelector<HTMLElement>('[data-ask-total]');
-  if (total) total.textContent = countPossibilities().toLocaleString();
+  if (total) total.textContent = countPossibilities().toLocaleString(locale);
 
   // A shared link opens on its own question; anything invalid falls back.
   const shared = questionFromId(new URLSearchParams(window.location.search).get('q') ?? '');

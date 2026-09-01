@@ -76,9 +76,20 @@ export const WEEK_PATHS = [
   '/memes/thumb',
   '/memes/thumb2x',
   '/memes/og',
-  '/coins',
-  '/machine',
+  '/coins/full',
+  '/coins/thumb',
+  '/coins/og',
+  '/machine/logos',
+  '/machine/poses',
 ] as const;
+
+/*
+ * Deliberately NOT cached for a week:
+ *   /machine/h, /machine/*.json — price history the daily refresh rewrites, so
+ *   a week-old copy would show week-old prices.
+ *   /machine/, /coins/ — these are HTML routes. A prefix rule on them put every
+ *   deploy behind a seven-day cache, which is the bug this list was split to fix.
+ */
 
 export const IMMUTABLE_CACHE = 'public, max-age=31536000, immutable';
 export const WEEK_CACHE = 'public, max-age=604800';

@@ -37,6 +37,7 @@ export const es: SiteCopy = {
     toolGroups: { data: 'Los números', play: 'Juega', assets: 'Recursos', read: 'Lee' },
     languageMenu: 'Idioma',
     buy: 'Compra $IF',
+    home: 'What $IF — inicio',
     pfp: 'Encuentra tu moneda',
     openMenu: 'Abrir menú',
     closeMenu: 'Cerrar menú',
@@ -344,8 +345,12 @@ export const es: SiteCopy = {
         honeypot: 'Prueba de honeypot',
         supply: 'Suministro fijo, sin función de emisión',
         burn: 'La dirección de quema no tiene clave privada',
+        owner: 'Quién puede cambiar el contrato',
       },
       checkPass: 'Superada',
+      burnMark: '{amount} quemados',
+      ownerNone: 'Sin función de propietario',
+      ownerSome: 'Propiedad de',
     },
     machine: {
       title: 'La Máquina What $IF',
@@ -383,6 +388,7 @@ export const es: SiteCopy = {
       pivotCta: 'Compra $IF',
       disclaimer:
         'Cuentas aproximadas sobre precios históricos, con fines de entretenimiento. Los precios pasados no predicen nada.',
+      pricesCaptured: 'Precios registrados el {date}.',
     },
     pfp: {
       title: 'Generador de PFP',
@@ -397,6 +403,7 @@ export const es: SiteCopy = {
       found: (found, total) => `Encontradas ${found} de ${total}`,
       showPool: 'Ver todas las monedas',
       hidePool: 'Ocultar monedas',
+      rolled: 'Te salió {name} — {tier}.',
       locked: 'Aún no encontrada',
       download: 'Descargar PNG',
       shareCard: 'Tarjeta para compartir',

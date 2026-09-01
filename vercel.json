@@ -125,7 +125,7 @@
       ]
     },
     {
-      "source": "/coins/(.*)",
+      "source": "/coins/full/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -134,7 +134,34 @@
       ]
     },
     {
-      "source": "/machine/(.*)",
+      "source": "/coins/thumb/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "/coins/og/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "/machine/logos/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "/machine/poses/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

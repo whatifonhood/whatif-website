@@ -148,6 +148,9 @@ Edit `tools/og-card.html`, then `npm run og`.
 | `npm run history`  | Refresh prices for the What $IF Machine                   |
 | `npm run snapshot` | Refresh the build-time token figures                      |
 | `npm run og`       | Re-render the social sharing card                         |
+| `npm run headers`  | Regenerate `public/_headers` and `vercel.json`            |
+| `npm run burns`    | Re-read the burn history from the chain                   |
+| `npm run coinlist` | Rebuild the Machine's coin index from CoinGecko           |
 
 ---
 
@@ -155,9 +158,9 @@ Edit `tools/og-card.html`, then `npm run og`.
 
 **Astro, with no UI framework.** Pages are prerendered to static HTML, so crawlers
 and social scrapers see real content and the browser paints before any JavaScript
-runs. The interactive parts — the starfield, the copy buttons, the meme filter,
-the coin framer, the calculator — are small TypeScript files in `src/scripts/`,
-loaded per page. There is no React on the site; nothing here needed it.
+runs. The interactive parts — the starfield, the copy buttons, the meme filter, the
+question generator, the calculator, the live chart — are small TypeScript files
+in `src/scripts/`, loaded per page. There is no React on the site; nothing here needed it.
 
 **Live figures degrade to snapshots.** The price, market cap and burn are
 rendered server-side from `TOKEN_SNAPSHOT` and replaced in the browser once
@@ -165,8 +168,9 @@ DexScreener and the chain respond. If either call fails or times out, the page
 keeps showing the snapshot with its capture date. It never shows a spinner or a
 blank.
 
-**Images** are imported through Astro so it emits AVIF and WebP at several widths
-with content hashes. The hero is a real `<img>` with `fetchpriority="high"` in the
+**Images** are imported through Astro so it emits WebP at several widths with
+content hashes. AVIF was measured and dropped: on this artwork it came out
+_larger_ than WebP, and browsers take the first format they support. The hero is a real `<img>` with `fetchpriority="high"` in the
 static HTML, which is what lets the browser start fetching it during parsing.
 
 ---
@@ -182,16 +186,16 @@ keys, no database, no user data. What is left is guarded deliberately.
 - **The site never asks for a wallet.** No connect button, no signature prompt,
   no seed phrase, ever. That promise is printed on the page so a clone that
   breaks it is recognisable, and a test asserts the page keeps it.
-- **Content-Security-Policy** in `public/_headers` allows scripts, styles and
-  fonts only from this origin, and network calls only to the two public
-  read-only APIs the live figures need. No inline scripts, no inline styles, no
+- **Content-Security-Policy** allows scripts, styles and
+  fonts only from this origin, and network calls only to the four public
+  read-only APIs the live figures need — DexScreener, GeckoTerminal, CoinGecko
+  and the Robinhood Chain RPC. No inline scripts, no inline styles, no
   `unsafe-eval`. `tests/headers.spec.ts` asserts every directive.
 - **Every response from an API is validated** field by field before use
   (`src/lib/token-stats.ts`), has a timeout, and falls back to the snapshot.
 - **Nothing is written to the page as HTML.** Values are set with `textContent`.
-- **Uploaded pictures** (the coin framer) are checked for type and size and
-  decoded with `createImageBitmap`, which either produces an image or throws.
-  They never leave the device.
+- **Nothing is uploaded.** The site has no file input and no form that posts
+  anywhere. Every card it draws is drawn on the visitor's own device.
 - **Dependencies** are pinned by `package-lock.json`, installed with `npm ci` in
   CI, and audited on every run.
 
@@ -202,9 +206,15 @@ in touch.
 
 ## Deploying
 
-Netlify, from `main`. `netlify.toml` holds the build command; `public/_headers`
-holds the caching and security headers. Nothing else needs configuring — there
-are no environment variables to set.
+Vercel, from `main`. There are no environment variables to set.
+
+Both hosts are supported and both configs are **generated**, because they
+disagree about conflicts: Netlify applies the _first_ matching rule, Vercel the
+_last_. Keeping two hand-written files in step failed — three of four CSP blocks
+had drifted apart. So the policy is written once in
+`src/config/security-headers.ts`, and `npm run headers` emits `public/_headers`
+and `vercel.json` in each host's required order. Edit the config, never the
+outputs. `tests/headers.spec.ts` asserts the two agree.
 
 ---
 

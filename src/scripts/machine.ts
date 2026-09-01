@@ -323,7 +323,6 @@ function drawSpark(svg: SVGSVGElement, history: PricePoint[], entryIndex: number
   const prices = history.map(([, price]) => price);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
-  const span = max - min || max || 1;
 
   const x = (i: number) => (i / Math.max(1, history.length - 1)) * width;
   // Log scale: over a 1000x move a linear axis is a flat line and a spike.
@@ -345,7 +344,6 @@ function drawSpark(svg: SVGSVGElement, history: PricePoint[], entryIndex: number
     marker.setAttribute('cx', x(entryIndex).toFixed(1));
     marker.setAttribute('cy', y(history[entryIndex][1]).toFixed(1));
   }
-  void span;
 }
 
 /**
@@ -537,6 +535,10 @@ export function initMachine(locale: string): void {
       chosen.hidden = false;
       const logo = chosen.querySelector<HTMLImageElement>('[data-chosen-logo]');
       if (logo) {
+        logo.hidden = false;
+        logo.onerror = () => {
+          logo.hidden = true;
+        };
         logo.src = `/machine/logos/${coin.symbol}.webp`;
         logo.alt = '';
       }
@@ -561,7 +563,10 @@ export function initMachine(locale: string): void {
   const currentMonth = (): string => selection?.history[Number(monthRange.value)]?.[0] ?? '';
 
   const updateMonthLabel = () => {
-    if (monthOut) monthOut.textContent = monthLabel(currentMonth(), locale);
+    const label = monthLabel(currentMonth(), locale);
+    if (monthOut) monthOut.textContent = label;
+    // Without this the slider announces its index, which names no month.
+    monthRange.setAttribute('aria-valuetext', label);
   };
 
   const calculate = () => {

@@ -9,22 +9,23 @@
  */
 import { getLiveStats } from '../lib/token-stats.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/format.ts';
+import { setLiveText } from '../lib/live-text.ts';
 import { TOKEN } from '../config/site.ts';
 
 /** How often the landing figures refresh while the tab is being looked at. */
 const REFRESH_MS = 30_000;
 
 export async function initLiveStats(locale: string): Promise<void> {
-  const nodes = document.querySelectorAll<HTMLElement>('[data-stat]');
-  if (nodes.length === 0) return;
+  // Nothing to update on this page; do not start a poll for it.
+  if (document.querySelector('[data-stat]') === null) return;
 
-  await update(nodes, locale);
+  await update(locale);
 
   // Same reasoning as the dashboard: poll only while the tab is visible, and
   // refresh the moment it comes back rather than showing stale figures.
   let timer: number | undefined;
   const start = () => {
-    timer ??= window.setInterval(() => void update(nodes, locale), REFRESH_MS);
+    timer ??= window.setInterval(() => void update(locale), REFRESH_MS);
   };
   const stop = () => {
     if (timer !== undefined) window.clearInterval(timer);
@@ -35,11 +36,11 @@ export async function initLiveStats(locale: string): Promise<void> {
     if (document.hidden) {
       stop();
     } else {
-      void update(nodes, locale);
+      void update(locale);
       start();
     }
   });
-  window.addEventListener('focus', () => void update(nodes, locale));
+  window.addEventListener('focus', () => void update(locale));
   start();
 }
 
@@ -57,7 +58,7 @@ export async function initLiveStats(locale: string): Promise<void> {
  * failure returns an empty object. That is why the test here is "did any value
  * arrive", not "did this throw".
  */
-async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<void> {
+async function update(locale: string): Promise<void> {
   const stats = await getLiveStats();
 
   const burnedPercent =
@@ -76,10 +77,8 @@ async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<v
     holders: stats.holders === undefined ? undefined : formatCompact(stats.holders, locale),
   };
 
-  for (const node of nodes) {
-    const key = node.dataset.stat;
-    const value = key ? formatted[key] : undefined;
-    if (value) node.textContent = value;
+  for (const [key, value] of Object.entries(formatted)) {
+    if (value) setLiveText(document, 'data-stat', key, value);
   }
 
   // Only claim "live" when something actually arrived, and go back to the dated

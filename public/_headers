@@ -31,10 +31,19 @@
 /memes/og/*
   Cache-Control: public, max-age=604800
 
-/coins/*
+/coins/full/*
   Cache-Control: public, max-age=604800
 
-/machine/*
+/coins/thumb/*
+  Cache-Control: public, max-age=604800
+
+/coins/og/*
+  Cache-Control: public, max-age=604800
+
+/machine/logos/*
+  Cache-Control: public, max-age=604800
+
+/machine/poses/*
   Cache-Control: public, max-age=604800
 
 /*
