@@ -14,12 +14,14 @@
  * A failure here must never fail a deploy: if X is unreachable the previously
  * committed file is left exactly as it is and the build carries on.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { TWEET_URLS } from '../src/config/tweets.ts';
 import { TWEET_CARDS as COMMITTED } from '../src/config/tweet-cards.ts';
+
+import { writeConfig } from './lib/write-config.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const output = resolve(here, '..', 'src', 'config', 'tweet-cards.ts');
@@ -161,7 +163,7 @@ if (cards.length < wanted) {
 const previous = readFileSync(output, 'utf8');
 const header = previous.slice(0, previous.indexOf('export const TWEET_CARDS'));
 
-writeFileSync(
+await writeConfig(
   output,
   `${header}export const TWEET_CARDS: TweetCard[] = ${JSON.stringify(cards, null, 2)};\n`,
 );

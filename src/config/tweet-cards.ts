@@ -11,21 +11,21 @@ export interface TweetCard {
 
 export const TWEET_CARDS: TweetCard[] = [
   {
-    "text": "What $IF @RobinhoodCrypto eventually lists the native meme of its own ecosystem?",
-    "authorName": "What $IF on Robinhood Chain",
-    "authorUrl": "https://x.com/WhatIFonHOOD",
-    "url": "https://x.com/WhatIFonHOOD/status/2094442732940927202"
+    text: 'What $IF @RobinhoodCrypto eventually lists the native meme of its own ecosystem?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorUrl: 'https://x.com/WhatIFonHOOD',
+    url: 'https://x.com/WhatIFonHOOD/status/2094442732940927202',
   },
   {
-    "text": "Just one. What $IF?",
-    "authorName": "What $IF on Robinhood Chain",
-    "authorUrl": "https://x.com/WhatIFonHOOD",
-    "url": "https://x.com/WhatIFonHOOD/status/2094394783137677653"
+    text: 'Just one. What $IF?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorUrl: 'https://x.com/WhatIFonHOOD',
+    url: 'https://x.com/WhatIFonHOOD/status/2094394783137677653',
   },
   {
-    "text": "$IF you're in the $HOOD , help your brothers make it to right timeline.",
-    "authorName": "What $IF on Robinhood Chain",
-    "authorUrl": "https://x.com/WhatIFonHOOD",
-    "url": "https://x.com/WhatIFonHOOD/status/2093803407362625946"
-  }
+    text: "$IF you're in the $HOOD , help your brothers make it to right timeline.",
+    authorName: 'What $IF on Robinhood Chain',
+    authorUrl: 'https://x.com/WhatIFonHOOD',
+    url: 'https://x.com/WhatIFonHOOD/status/2093803407362625946',
+  },
 ];

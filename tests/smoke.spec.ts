@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
 import { questionForDate } from '../src/config/what-if.ts';
+import { TWEET_URLS } from '../src/config/tweets.ts';
+import { TWEET_CARDS } from '../src/config/tweet-cards.ts';
 
 /**
  * The checks that must never fail.
@@ -1189,6 +1191,27 @@ test.describe('the wall of posts', () => {
       await expect(link).toHaveAttribute('target', '_blank');
       await expect(link).toHaveAttribute('rel', /noopener/);
       await expect(link).toHaveAttribute('rel', /noreferrer/);
+    }
+  });
+
+  /**
+   * The two files have to agree.
+   *
+   * They are edited in different ways — one by hand, one by a generator — so
+   * they can drift apart silently, and the site keeps rendering happily from a
+   * stale card file while the next refresh quietly empties it. That happened
+   * once: a stray `git checkout` reverted the URL list, the wall carried on
+   * showing three posts from the committed cards, and nothing complained.
+   */
+  test('the posts on the wall are the posts we asked for', () => {
+    const cardUrls = TWEET_CARDS.map((card) => card.url);
+    expect(new Set(cardUrls).size, 'the same post twice').toBe(cardUrls.length);
+
+    for (const url of TWEET_URLS) {
+      expect(cardUrls, `${url} is listed but not on the wall — run npm run tweets`).toContain(url);
+    }
+    for (const url of cardUrls) {
+      expect(TWEET_URLS, `${url} is on the wall but not listed`).toContain(url);
     }
   });
 

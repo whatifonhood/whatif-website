@@ -15,5 +15,7 @@
  * hook is enough for a wall of posts.
  */
 export const TWEET_URLS: string[] = [
-  // e.g. 'https://x.com/WhatIFonHOOD/status/1234567890123456789',
+  'https://x.com/WhatIFonHOOD/status/2094442732940927202',
+  'https://x.com/WhatIFonHOOD/status/2094394783137677653',
+  'https://x.com/WhatIFonHOOD/status/2093803407362625946',
 ];
