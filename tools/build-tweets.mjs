@@ -57,6 +57,17 @@ function toPlainText(html) {
       .replace(/<\/p>/gi, '\n')
       .replace(/<[^>]+>/g, '')
       .replace(/&[a-z#0-9]+;/gi, (entity) => ENTITIES[entity.toLowerCase()] ?? ' ')
+      // Invisible characters that change how the rest of the line is DISPLAYED.
+      // U+202A-U+202E and U+2066-U+2069 can reverse or reorder what follows, so
+      // a post can be made to read as something its author did not write; the
+      // zero-width ones can hide text inside a word. Nothing legitimate in a
+      // post needs them — the bidi algorithm handles real Arabic and Hebrew on
+      // its own, and ZWNJ/ZWJ, which Persian and Indic scripts DO need, are
+      // deliberately left alone.
+      .replace(/[\u202A-\u202E\u2066-\u2069\u200B\uFEFF]/g, '')
+      // Control characters, keeping the newlines and tabs that carry meaning.
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
       .replace(/[ \t]+/g, ' ')
       .replace(/\n{3,}/g, '\n\n')
       .trim()

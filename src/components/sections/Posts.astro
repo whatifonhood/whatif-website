@@ -38,17 +38,36 @@ const cards = TWEET_CARDS.slice(0, 6);
       </div>
 
       <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => (
+        {cards.map((card, index) => (
           <li class="card flex flex-col gap-4 p-6">
-            <p class="whitespace-pre-line leading-relaxed text-ink">{card.text}</p>
+            {/*
+              lang: the posts stay in the language they were written in while
+              the page around them is translated, and a screen reader set to
+              Chinese will otherwise try to pronounce English with Chinese
+              phonetics. WCAG 3.1.2.
+            */}
+            <p
+              id={`post-${index}-text`}
+              lang={locale === 'en' ? undefined : 'en'}
+              class="whitespace-pre-line leading-relaxed text-ink"
+            >
+              {card.text}
+            </p>
+            {/*
+              aria-labelledby: every one of these links used to announce the
+              same thing — the account name — while going somewhere different.
+              Listing the links on the page gave three identical entries. Naming
+              each one by the post it opens makes them tell apart.
+            */}
             <a
               href={card.url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-labelledby={`post-${index}-author post-${index}-text`}
               class="mt-auto inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-lime"
             >
               <Icons name="x" size={12} />
-              {card.authorName}
+              <span id={`post-${index}-author`}>{card.authorName}</span>
             </a>
           </li>
         ))}

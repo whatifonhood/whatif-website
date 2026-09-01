@@ -1215,6 +1215,46 @@ test.describe('the wall of posts', () => {
     }
   });
 
+  test('each post link is told apart from the others', async ({ page }) => {
+    await page.goto('/');
+    // Resolved the way a screen reader does. All three used to announce the
+    // account name and nothing else, so listing the page's links gave three
+    // identical entries pointing at three different posts.
+    const names = await page.locator('#posts a[href*="/status/"]').evaluateAll((links) =>
+      links.map((link) => {
+        const ids = link.getAttribute('aria-labelledby');
+        if (!ids) return link.textContent?.trim() ?? '';
+        return ids
+          .split(/\s+/)
+          .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
+          .filter(Boolean)
+          .join(' ');
+      }),
+    );
+    expect(names.length).toBeGreaterThan(1);
+    for (const name of names) expect(name.trim()).not.toBe('');
+    expect(new Set(names).size, 'two links announce the same thing').toBe(names.length);
+  });
+
+  test('the English posts are marked as English on a translated page', async ({ page }) => {
+    for (const [path, expected] of [
+      ['/', null],
+      ['/zh/', 'en'],
+      ['/es/', 'en'],
+      ['/tr/', 'en'],
+    ] as const) {
+      await page.goto(path);
+      const langs = await page
+        .locator('#posts ul > li p')
+        .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('lang')));
+      expect(langs.length).toBeGreaterThan(0);
+      // Marked on a page declared as another language, absent where the page
+      // is already English — an unnecessary lang is noise, a missing one makes
+      // a Chinese screen reader pronounce English with Chinese phonetics.
+      for (const lang of langs) expect(lang, `wrong lang on ${path}`).toBe(expected);
+    }
+  });
+
   test('it is there in every language', async ({ page }) => {
     for (const path of ['/', '/es/', '/zh/', '/tr/']) {
       await page.goto(path);
