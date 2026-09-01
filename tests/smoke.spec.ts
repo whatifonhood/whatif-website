@@ -569,3 +569,37 @@ test.describe('the chart can be navigated', () => {
     await expect(page.locator('.ma-line')).toHaveCount(1);
   });
 });
+
+/**
+ * Translated pages have to be reachable.
+ *
+ * Every internal tool link used to point at the bare English route, so a
+ * visitor on /es/ was silently dropped back into English and nothing on the
+ * site linked to the 24 translated sub-pages at all. They existed and nothing
+ * reached them. This is the test that stops it coming back the next time a link
+ * is added.
+ */
+test.describe('a language keeps you in that language', () => {
+  for (const locale of ['zh', 'tr', 'es']) {
+    test(`/${locale}/ never links out to the English tools`, async ({ page }) => {
+      await page.goto(`/${locale}/`);
+
+      const leaks = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]')]
+          .map((a) => a.getAttribute('href') ?? '')
+          .filter((href) =>
+            /^\/(stats|machine|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href),
+          ),
+      );
+
+      expect(leaks, 'these drop the visitor back into English').toEqual([]);
+    });
+
+    test(`/${locale}/ actually links to its own sub-pages`, async ({ page }) => {
+      await page.goto(`/${locale}/`);
+      const inside = page.locator(`a[href^="/${locale}/"]`);
+      // Orphaned pages are pages nothing points at, so count the pointers.
+      expect(await inside.count()).toBeGreaterThan(5);
+    });
+  }
+});

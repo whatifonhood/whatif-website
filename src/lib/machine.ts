@@ -112,12 +112,18 @@ async function fetchLiveHistory(coingeckoId: string): Promise<PricePoint[]> {
 
 /** One coin's prices, from disk where we have them and from CoinGecko where we do not. */
 export async function getCoinHistory(symbol: string, coingeckoId?: string): Promise<PricePoint[]> {
-  const cached = historyCache.get(symbol);
+  // Keyed on the id that actually identifies the coin, not the ticker: the
+  // long-tail listing has 2,082 duplicated tickers, so "MEOW" alone matches
+  // eight different coins. Keying on the symbol meant clicking the second one
+  // showed the first one's prices under the second one's name — including on
+  // the downloadable share card.
+  const key = coingeckoId ?? symbol;
+  const cached = historyCache.get(key);
   if (cached) return cached;
 
   if (coingeckoId) {
     const live = await fetchLiveHistory(coingeckoId).catch(() => []);
-    if (live.length >= 2) historyCache.set(symbol, live);
+    if (live.length >= 2) historyCache.set(key, live);
     return live;
   }
 
@@ -135,7 +141,7 @@ export async function getCoinHistory(symbol: string, coingeckoId?: string): Prom
     return [[month, price]];
   });
 
-  historyCache.set(symbol, points);
+  historyCache.set(key, points);
   return points;
 }
 

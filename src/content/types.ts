@@ -257,6 +257,8 @@ export interface SiteCopy {
       /** Placeholder in the coin search box. */
       searchPlaceholder: string;
       noResults: string;
+      /** Shown when a coin's prices could not be fetched. */
+      loadFailed: string;
       amountLabel: string;
       dateLabel: string;
       calculate: string;

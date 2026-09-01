@@ -330,7 +330,7 @@ export const tr: SiteCopy = {
       burnHistoryNote: 'Zincirden okundu. Her basamak açabileceğin bir işlem.',
       trustTitle: 'Herkesin yapabileceği kontroller',
       trustNote:
-        'Bunları biz değil, üçüncü taraflar doğruluyor. Her biri kendi kontrol edebileceğin yere bağlanıyor.',
+        'Bunların ikisi biz değil, üçüncü taraflarca doğrulanıyor; diğer ikisini bu sayfa yüklenirken doğrudan sözleşmeden okuyor. Her biri kendi kontrol edebileceğin yere bağlanıyor ve okunamayan bir kontrol, geçti gibi görünmek yerine bunu söylüyor.',
       checks: {
         verified: 'Listeleme doğrulandı',
         honeypot: 'Honeypot kontrolü',
@@ -346,6 +346,8 @@ export const tr: SiteCopy = {
       coinLabel: 'Kaçırdığın coin',
       searchPlaceholder: 'Coin ara — bitcoin, doge, pepe…',
       noResults: 'Bu isimde bir şey yok.',
+      loadFailed:
+        'Bu coinin fiyatları şu anda yüklenemedi. Başka birini dene ya da birazdan tekrar dene.',
       emptyState: 'Bir coin, bir miktar ve bir ay seç. Gerisini makine yapar.',
       investedLabel: 'Koyduğun',
       worthLabel: 'Bugün ederdi',

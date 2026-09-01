@@ -30,3 +30,15 @@ export type ToolId = (typeof TOOL_ROUTES)[number]['id'];
 export function toolsIn(group: ToolGroup) {
   return TOOL_ROUTES.filter((tool) => tool.group === group);
 }
+
+/**
+ * A tool's URL in a given language.
+ *
+ * English is served from the root; every other language lives under its own
+ * prefix. Linking to the bare route from a translated page dropped the visitor
+ * back into English, and meant nothing on the site linked to the 24 translated
+ * sub-pages at all — they existed, and nothing reached them.
+ */
+export function localePath(href: string, locale: string): string {
+  return locale === 'en' ? href : `/${locale}${href}`;
+}

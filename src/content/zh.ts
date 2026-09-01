@@ -320,7 +320,8 @@ export const zh: SiteCopy = {
       burnHistoryTitle: '每一次销毁',
       burnHistoryNote: '直接读自链上。每一级台阶都是一笔可以打开的交易。',
       trustTitle: '任何人都能做的核查',
-      trustNote: '这些由第三方认证，不是我们说了算。每一项都链接到你可以自己核实的地方。',
+      trustNote:
+        '其中两项由第三方认证，不是我们说了算；另外两项由本页加载时直接从合约读取。每一项都链接到你可以自己核实的地方；读取失败的检查会如实说明，而不会显示为通过。',
       checks: {
         verified: '上市已验证',
         honeypot: '蜜罐检测',
@@ -336,6 +337,7 @@ export const zh: SiteCopy = {
       coinLabel: '你错过的币',
       searchPlaceholder: '搜索币种 —— bitcoin、doge、pepe…',
       noResults: '数据集中没有这个名字。',
+      loadFailed: '暂时无法加载这个币的价格。换一个试试，或稍后再试。',
       emptyState: '选一个币、一个金额、一个月份，剩下的交给机器。',
       investedLabel: '你投入',
       worthLabel: '现在会值',

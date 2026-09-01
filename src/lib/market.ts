@@ -309,3 +309,31 @@ export async function getBalanceOf(address: string): Promise<number | undefined>
   // BigInt keeps full precision; dividing by the decimals gives whole tokens.
   return Number(BigInt(body.result) / 10n ** BigInt(TOKEN.decimals));
 }
+
+/**
+ * The token's total supply, read from the contract.
+ *
+ * The trust panel used to assert "fixed supply, no mint function" as a
+ * hardcoded `true`, under a caption saying the checks were attested by third
+ * parties. It was attested by nobody. This reads the real number so the claim
+ * can be derived instead of asserted — and shown as unverified when the call
+ * fails, rather than silently passing.
+ *
+ * `0x18160ddd` is the four-byte selector for `totalSupply()`.
+ */
+export async function getTotalSupply(): Promise<number | undefined> {
+  const body = await fetchJson(DATA_APIS.rpc, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'eth_call',
+      params: [{ to: TOKEN.address, data: '0x18160ddd' }, 'latest'],
+    }),
+  });
+
+  if (!isRecord(body) || typeof body.result !== 'string') return undefined;
+  if (!/^0x[0-9a-fA-F]+$/.test(body.result)) return undefined;
+  return Number(BigInt(body.result) / 10n ** BigInt(TOKEN.decimals));
+}

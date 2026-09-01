@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { localePath } from '../../config/navigation.ts';
 import { LINKS, MARKETS, SITE, type Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import Button from '../ui/Button.astro';
@@ -88,11 +89,16 @@ const headingTail = ` ${copy.footer.heading.accent}`;
         </div>
 
         <nav class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
-          <a href="/pfp/" class="hover:text-ink">{copy.nav.pfp}</a>
-          <a href="/memes/" class="hover:text-ink">{copy.pages.memes.title}</a>
-          <a href="/stats/" class="hover:text-ink">{copy.pages.stats.title}</a>
-          <a href="/machine/" class="hover:text-ink">{copy.pages.machine.title}</a>
-          <a href="/brand/" class="hover:text-ink">{copy.pages.brand.title}</a>
+          <a href={localePath('/pfp/', locale)} class="hover:text-ink">{copy.nav.pfp}</a>
+          <a href={localePath('/memes/', locale)} class="hover:text-ink">{copy.pages.memes.title}</a
+          >
+          <a href={localePath('/stats/', locale)} class="hover:text-ink">{copy.pages.stats.title}</a
+          >
+          <a href={localePath('/machine/', locale)} class="hover:text-ink"
+            >{copy.pages.machine.title}</a
+          >
+          <a href={localePath('/brand/', locale)} class="hover:text-ink">{copy.pages.brand.title}</a
+          >
           <a
             href={MARKETS.contract}
             target="_blank"

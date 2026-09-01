@@ -108,7 +108,7 @@ export const es: SiteCopy = {
         body: 'Bloques rápidos, gas barato y el nombre que arrastró a toda una generación al mercado. Robinhood también empezó siendo un "¿y si?".',
       },
       {
-        title: 'Nueve por ciento ya quemado',
+        title: 'Ya quemado, y para siempre',
         body: '{burned} $IF — {burnedPercent} del suministro — están en una dirección de quema cuyas claves no tiene nadie. Eso no es una promesa: es un saldo que puedes leer tú mismo.',
       },
       {
@@ -243,7 +243,7 @@ export const es: SiteCopy = {
       },
       {
         q: '¿Qué se ha quemado?',
-        a: 'Más de {burned} $IF — {burnedPercent} del suministro total — están en 0x…dEaD, una dirección sin clave privada. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
+        a: '{burned} $IF — {burnedPercent} del suministro total — están en 0x…dEaD, una dirección sin clave privada. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
       },
       {
         q: '¿Dónde está la comunidad?',
@@ -338,7 +338,7 @@ export const es: SiteCopy = {
       burnHistoryNote: 'Leído de la cadena. Cada escalón es una transacción que puedes abrir.',
       trustTitle: 'Comprobaciones que cualquiera puede hacer',
       trustNote:
-        'Esto lo certifican terceros, no nosotros. Cada punto enlaza a donde puedes verificarlo tú mismo.',
+        'Dos de estas las certifican terceros, no nosotros; las otras dos las lee esta página directamente del contrato al cargar. Cada una enlaza a donde puedes verificarlo tú mismo, y una comprobación que no se pudo leer lo dice en vez de mostrarse como superada.',
       checks: {
         verified: 'Listado verificado',
         honeypot: 'Prueba de honeypot',
@@ -355,6 +355,8 @@ export const es: SiteCopy = {
       coinLabel: 'La moneda que se te escapó',
       searchPlaceholder: 'Busca una moneda — bitcoin, doge, pepe…',
       noResults: 'No hay nada con ese nombre en el conjunto.',
+      loadFailed:
+        'No se pudieron cargar los precios de esa moneda ahora mismo. Prueba con otra o inténtalo en un momento.',
       emptyState: 'Elige una moneda, un monto y un mes. La máquina hace el resto.',
       investedLabel: 'Pusiste',
       worthLabel: 'Hoy valdría',
