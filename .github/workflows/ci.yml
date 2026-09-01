@@ -48,7 +48,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Both, because playwright.config.ts runs two projects: desktop is
+      # Chromium and mobile is iPhone 13, which is WebKit. Installing only
+      # chromium made every mobile test fail to launch — so this job was red on
+      # every push and half the suite had never actually run here.
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm test
       - uses: actions/upload-artifact@v4
         if: failure()
