@@ -61,11 +61,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <script>
   import {
+    CARD_COINS,
+    coinArt,
     drawAskCard,
     drawHoldingsCard,
     drawMachineCard,
     drawPfpCard,
   } from '../lib/card-designs.ts';
+
+  /** Every card waits for its own artwork before it draws. */
+  const load = (src: string) =>
+    new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error(src));
+      image.src = src;
+    });
 
   const canvas = (name: string) =>
     document.querySelector<HTMLCanvasElement>(`[data-card="${name}"]`);
@@ -82,30 +93,38 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   const machine = canvas('machine');
   if (machine) {
-    drawMachineCard(machine, {
-      symbol: 'DOGE',
-      month: 'August 2019',
-      amount: '$500',
-      value: '$16,960',
-      multiple: 33.9,
-      verdict: 'That one still hurts.',
-      history,
-      entryIndex: 12,
-    });
+    drawMachineCard(
+      machine,
+      {
+        symbol: 'DOGE',
+        month: 'August 2019',
+        amount: '$500',
+        value: '$16,960',
+        multiple: 33.9,
+        verdict: 'That one still hurts.',
+        history,
+        entryIndex: 12,
+      },
+      await load(coinArt(CARD_COINS.machineWin)),
+    );
   }
 
   const loss = canvas('machine-loss');
   if (loss) {
-    drawMachineCard(loss, {
-      symbol: 'WHEN',
-      month: 'August 2025',
-      amount: '$500',
-      value: '$194.66',
-      multiple: 0.4,
-      verdict: 'You dodged that one.',
-      history: [...history].reverse(),
-      entryIndex: 34,
-    });
+    drawMachineCard(
+      loss,
+      {
+        symbol: 'WHEN',
+        month: 'August 2025',
+        amount: '$500',
+        value: '$194.66',
+        multiple: 0.4,
+        verdict: 'You dodged that one.',
+        history: [...history].reverse(),
+        entryIndex: 34,
+      },
+      await load(coinArt(CARD_COINS.machineLoss)),
+    );
   }
 
   const ask = canvas('ask');
@@ -114,6 +133,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       ask,
       'What if the day you cannot remember was the one that changed everything?',
       '',
+      await load(coinArt(CARD_COINS.ask)),
     );
   }
 
@@ -123,18 +143,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       answered,
       'What if putting my Christmas bonus into the dog one was all it took?',
       'It was. I just did not know it yet.',
+      await load(coinArt(CARD_COINS.ask)),
     );
   }
 
   const holdings = canvas('holdings');
   if (holdings) {
-    drawHoldingsCard(holdings, {
-      tokens: '2.4M',
-      usd: '$22,438',
-      band: 'Shark',
-      line: 'Enough to notice. Not enough to sleep.',
-      share: 0.0024,
-    });
+    drawHoldingsCard(
+      holdings,
+      {
+        tokens: '2.4M',
+        usd: '$22,438',
+        band: 'Shark',
+        line: 'Enough to notice. Not enough to sleep.',
+        share: 0.0024,
+      },
+      await load(coinArt(CARD_COINS.shark)),
+    );
   }
 
   const pfp = canvas('pfp');

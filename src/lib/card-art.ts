@@ -250,3 +250,47 @@ export function paintEyebrow(context: CanvasRenderingContext2D, text: string): v
   context.fillText(text.toUpperCase(), 72, 96);
   context.restore();
 }
+
+/**
+ * A coin medallion, dropped into the middle of a portal.
+ *
+ * The artwork is the existing coin set — the same circular pieces the pull
+ * hands out — so a card carries a real piece of the coin's own world rather
+ * than a stock pose. Which one is chosen is up to the card: the Machine uses
+ * "aped earlier" on a win and "this is fine" on a loss, the question generator
+ * uses the thinker, the wallet card uses whichever band the holding falls in.
+ */
+export function paintMedallion(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  size: number,
+  accent = LIME,
+): void {
+  context.save();
+
+  // A pool of shadow, so the medallion sits in the portal rather than on it.
+  const shadow = context.createRadialGradient(x, y, size * 0.3, x, y, size * 0.72);
+  shadow.addColorStop(0, 'rgba(8,11,7,0.92)');
+  shadow.addColorStop(1, 'rgba(8,11,7,0)');
+  context.fillStyle = shadow;
+  context.beginPath();
+  context.arc(x, y, size * 0.72, 0, Math.PI * 2);
+  context.fill();
+
+  context.beginPath();
+  context.arc(x, y, size / 2, 0, Math.PI * 2);
+  context.closePath();
+  context.clip();
+  context.drawImage(image, x - size / 2, y - size / 2, size, size);
+  context.restore();
+
+  context.save();
+  context.beginPath();
+  context.arc(x, y, size / 2, 0, Math.PI * 2);
+  context.strokeStyle = `${accent}66`;
+  context.lineWidth = 3;
+  context.stroke();
+  context.restore();
+}

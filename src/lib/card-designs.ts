@@ -20,12 +20,35 @@ import {
   paintBackdrop,
   paintEyebrow,
   paintFooter,
+  paintMedallion,
   paintPortal,
   seeded,
   wrap,
 } from './card-art.ts';
 
 const PAD = 72;
+
+/**
+ * The coin each card wears, by meaning rather than by chance.
+ *
+ * These are the existing pieces from the pull set, so nothing new had to be
+ * drawn and every card carries something from the coin's own world.
+ */
+export const CARD_COINS = {
+  /** IF Man tapping his temple: the Machine's whole question. */
+  machineWin: 'aped-earlier',
+  /** Coffee in front of a wall of red candles. */
+  machineLoss: 'this-is-fine',
+  /** The thinker, ringed with question marks. */
+  ask: 'thinker',
+  whale: 'whale',
+  shark: 'diamond-hands',
+  holder: 'hodl',
+  curious: 'telescope',
+} as const;
+
+/** Where a card's medallion is fetched from. */
+export const coinArt = (slug: string) => `/coins/full/${slug}.webp`;
 
 function prepare(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   const context = canvas.getContext('2d');
@@ -59,7 +82,11 @@ export interface MachineCardData {
  * it completely. The price curve runs through the middle of the portal, with
  * the entry marked — so the picture and the number say the same thing.
  */
-export function drawMachineCard(canvas: HTMLCanvasElement, data: MachineCardData): void {
+export function drawMachineCard(
+  canvas: HTMLCanvasElement,
+  data: MachineCardData,
+  coin?: HTMLImageElement,
+): void {
   const context = prepare(canvas);
   if (!context) return;
 
@@ -76,7 +103,10 @@ export function drawMachineCard(canvas: HTMLCanvasElement, data: MachineCardData
   const sweep = won ? Math.min(1, 0.25 + Math.log10(Math.max(1, data.multiple)) * 0.25) : 0.12;
   paintPortal(context, cx, cy, radius, { accent, sweep, seed: hash(data.symbol) });
 
-  drawSpark(context, data.history, data.entryIndex, cx, cy, radius * 0.82, accent);
+  // The curve first, so the medallion sits on top of its own chart and the
+  // line reads as running out from behind it.
+  drawSpark(context, data.history, data.entryIndex, cx, cy, radius * 0.95, accent);
+  if (coin) paintMedallion(context, coin, cx, cy, 208, accent);
 
   paintEyebrow(context, 'The What $IF Machine');
 
@@ -176,16 +206,20 @@ function drawSpark(
  * The question is the whole design, so the portal sits behind it, low and dim,
  * as something the words are falling into rather than an object beside them.
  */
-export function drawAskCard(canvas: HTMLCanvasElement, question: string, answer: string): void {
+export function drawAskCard(
+  canvas: HTMLCanvasElement,
+  question: string,
+  answer: string,
+  coin?: HTMLImageElement,
+): void {
   const context = prepare(canvas);
   if (!context) return;
 
   paintBackdrop(context, hash(question));
-  paintPortal(context, CARD_WIDTH - 150, CARD_HEIGHT - 90, 300, {
-    accent: LIME,
-    sweep: 0.5,
-    seed: hash(question),
-  });
+  const askX = CARD_WIDTH - 178;
+  const askY = CARD_HEIGHT - 168;
+  paintPortal(context, askX, askY, 250, { accent: LIME, sweep: 0.5, seed: hash(question) });
+  if (coin) paintMedallion(context, coin, askX, askY, 190, LIME);
 
   paintEyebrow(context, 'Still asking.');
 
@@ -257,7 +291,11 @@ export interface HoldingsCardData {
  * which is the honest picture of what one holder is against a billion tokens —
  * and the reason the number beside it is worth reading.
  */
-export function drawHoldingsCard(canvas: HTMLCanvasElement, data: HoldingsCardData): void {
+export function drawHoldingsCard(
+  canvas: HTMLCanvasElement,
+  data: HoldingsCardData,
+  coin?: HTMLImageElement,
+): void {
   const context = prepare(canvas);
   if (!context) return;
 
@@ -271,18 +309,20 @@ export function drawHoldingsCard(canvas: HTMLCanvasElement, data: HoldingsCardDa
   const sweep = data.share > 0 ? Math.max(0.04, Math.min(1, Math.sqrt(data.share))) : 0;
   paintPortal(context, cx, cy, radius, { accent: LIME, sweep, seed: hash(data.tokens) });
 
+  if (coin) paintMedallion(context, coin, cx, cy, 196, LIME);
+
+  // Under the portal, not inside it: the medallion has the middle now.
   context.save();
   context.textAlign = 'center';
-  context.font = '900 italic 70px Archivo, sans-serif';
+  context.font = '900 italic 54px Archivo, sans-serif';
   context.fillStyle = INK;
   const percent = data.share * 100;
   const shown =
     percent >= 1 ? `${percent.toFixed(1)}%` : percent > 0 ? `${percent.toFixed(3)}%` : '0%';
-  // Centred on the ring, not offset from it.
-  context.fillText(shown, cx, cy + 12);
-  context.font = '700 18px "JetBrains Mono", monospace';
+  context.fillText(shown, cx, cy + radius + 74);
+  context.font = '700 17px "JetBrains Mono", monospace';
   context.fillStyle = FAINT;
-  context.fillText('OF ALL $IF', cx, cy + 48);
+  context.fillText('OF ALL $IF', cx, cy + radius + 104);
   context.restore();
 
   paintEyebrow(context, data.band);
@@ -295,16 +335,18 @@ export function drawHoldingsCard(canvas: HTMLCanvasElement, data: HoldingsCardDa
   context.fillStyle = FAINT;
   context.fillText(data.usd ? `$IF  ·  ${data.usd}` : '$IF', PAD, 296);
 
+  // The left column only: the percentage sits under the portal on the right,
+  // and a full-width line would run straight through it.
   const { lines, size } = fitLines(
     context,
     data.line,
     (s) => `900 italic ${s}px Archivo, sans-serif`,
-    CARD_WIDTH - PAD * 2,
-    140,
-    52,
-    28,
+    cx - radius - PAD - 48,
+    150,
+    48,
+    26,
   );
-  let y = 466;
+  let y = 452;
   context.fillStyle = INK;
   for (const line of lines.slice(0, 3)) {
     context.fillText(line.toUpperCase(), PAD, y);
