@@ -51,6 +51,8 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
   <div
     data-machine
     data-label-load-failed={page.loadFailed}
+    data-label-since={page.searchSince}
+    data-label-on-demand={page.searchOnDemand}
     data-verdicts={JSON.stringify(page.verdicts)}
     class="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8"
   >
@@ -433,10 +435,35 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
     background: var(--color-surface-2);
   }
   .result-logo {
+    background: var(--color-surface-2);
+  }
+  /* The mark and the logo share one grid cell: whichever survives is the one
+     that shows. Stacking them means the row never reflows when a logo loads. */
+  .result-mark,
+  .result-logo {
+    grid-column: 1;
+    grid-row: 1;
     height: 1.75rem;
     width: 1.75rem;
     border-radius: 9999px;
+  }
+  .result-mark {
+    display: grid;
+    place-items: center;
     background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.02em;
+    color: var(--color-faint);
+  }
+
+  .result-text {
+    grid-column: 2;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
   }
   .result-name {
     min-width: 0;
@@ -446,7 +473,16 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
     color: var(--color-ink);
     font-size: 0.9rem;
   }
+  .result-meta {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-faint);
+    white-space: nowrap;
+  }
   .result-ticker {
+    grid-column: 3;
     font-family: var(--font-mono);
     font-size: 0.65rem;
     text-transform: uppercase;

@@ -379,6 +379,8 @@ export const tr: SiteCopy = {
       noResults: 'Bu isimde bir şey yok.',
       loadFailed:
         'Bu coinin fiyatları şu anda yüklenemedi. Başka birini dene ya da birazdan tekrar dene.',
+      searchSince: 'şu tarihten beri',
+      searchOnDemand: 'fiyatlar seçince gelir',
       emptyState: 'Bir coin, bir miktar ve bir ay seç. Gerisini makine yapar.',
       investedLabel: 'Koyduğun',
       worthLabel: 'Bugün ederdi',

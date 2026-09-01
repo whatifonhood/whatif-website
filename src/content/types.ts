@@ -307,6 +307,10 @@ export interface SiteCopy {
       noResults: string;
       /** Shown when a coin's prices could not be fetched. */
       loadFailed: string;
+      /** In a search result: "since 2013". */
+      searchSince: string;
+      /** In a search result, for a coin whose prices are fetched when picked. */
+      searchOnDemand: string;
       amountLabel: string;
       dateLabel: string;
       calculate: string;
