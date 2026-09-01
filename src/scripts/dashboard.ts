@@ -328,6 +328,8 @@ export function initDashboard(locale: string): void {
 
   /** The candles currently drawn, so the crosshair can read them. */
   let shown: Candle[] = [];
+  /** The trades renderTrades fetched this cycle, reused by renderExtremes. */
+  let lastTrades: Trade[] = [];
   /** Set while a pointer is on the chart, so a refresh cannot yank it away. */
   let holding = false;
 
@@ -445,6 +447,7 @@ export function initDashboard(locale: string): void {
     if (!feed) return 'skipped';
     const trades = await getRecentTrades().catch(() => []);
     if (trades.length === 0) return 'failed';
+    lastTrades = trades;
 
     const firstRun = seenTrades.size === 0;
     const rows = trades.slice(0, 25).map((trade) => {
@@ -512,9 +515,12 @@ export function initDashboard(locale: string): void {
    * printed rather than assumed.
    */
   const renderExtremes = async (): Promise<TaskResult> => {
+    // renderTrades has already fetched the recent list this cycle; asking for
+    // it again sent two byte-identical requests in the same batch and made the
+    // rate limit arrive sooner for everyone.
     const [large, recent] = await Promise.all([
       getLargeTrades().catch(() => [] as Trade[]),
-      getRecentTrades().catch(() => [] as Trade[]),
+      lastTrades.length > 0 ? Promise.resolve(lastTrades) : getRecentTrades().catch(() => []),
     ]);
 
     // Merge and de-duplicate; the two queries overlap.
@@ -896,7 +902,12 @@ export function initDashboard(locale: string): void {
     'wheel',
     (event) => {
       if (loaded.length < 2) return;
-      // Only take over the page scroll when there is something to zoom.
+      // Only take the scroll when the gesture is a deliberate zoom. A plain
+      // vertical wheel over the chart should still scroll the page past it —
+      // cancelling every wheel event trapped anyone scrolling through.
+      const zooming =
+        event.ctrlKey || event.metaKey || Math.abs(event.deltaX) > Math.abs(event.deltaY);
+      if (!zooming) return;
       event.preventDefault();
       const box = wrap.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
@@ -1041,8 +1052,12 @@ export function initDashboard(locale: string): void {
     grip.addEventListener('keydown', (event) => {
       const step = event.shiftKey ? 60 : 20;
       const current = Number(grip.getAttribute('aria-valuenow')) || MIN_H;
-      if (event.key === 'ArrowUp') applyHeight(current - step);
-      else if (event.key === 'ArrowDown') applyHeight(current + step);
+      // Left/Right as well as Up/Down: a slider that ignores half the arrow
+      // keys is a slider some people cannot move.
+      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') applyHeight(current - step);
+      else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') applyHeight(current + step);
+      else if (event.key === 'PageUp') applyHeight(current - 100);
+      else if (event.key === 'PageDown') applyHeight(current + 100);
       else if (event.key === 'Home') applyHeight(MIN_H);
       else if (event.key === 'End') applyHeight(MAX_H);
       else return;

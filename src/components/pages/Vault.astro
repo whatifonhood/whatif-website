@@ -59,7 +59,12 @@ const page = copy.pages.memes;
           autocomplete="off"
           class="w-full rounded-full border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-faint focus:border-lime/50 sm:w-56"
         />
-        <p class="shrink-0 font-mono text-[11px] uppercase tracking-wider text-faint">
+        <p
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          class="shrink-0 font-mono text-[11px] uppercase tracking-wider text-faint"
+        >
           <span data-vault-count>{MEMES.length}</span>{' '}{page.count}
         </p>
       </div>

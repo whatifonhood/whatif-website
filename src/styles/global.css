@@ -37,7 +37,15 @@
   --color-surface-2: #151d0e;
   --color-line: #223012;
   --color-ink: #e9f0dd; /* body text */
-  --color-muted: #9aa889; /* secondary text */
+  --color-muted: #9aa889;
+  /* Referenced by the wallet-lookup error, the sell side of the dashboard and
+     the machine card, but never actually defined — so all of them fell back to
+     ordinary body ink and the warning read as normal text. */
+  --color-warn: #f0a06a;
+  /* Borders on text inputs. --color-line is 1.41:1 on the page ground, which
+     fails WCAG 1.4.11's 3:1 for a control boundary; this clears it. The
+     decorative --color-line is left alone. */
+  --color-field: #4a6b28; /* secondary text */
   /* Lightened from #6f7c62 so 10px labels clear WCAG AA (4.5:1) on every
      surface in this palette — checked against void, surface and surface-2. */
   --color-faint: #7d8c6e; /* labels, captions */
@@ -119,6 +127,22 @@ html {
   scroll-behavior: smooth;
   /* Anchored sections clear the fixed header. */
   scroll-padding-top: 5rem;
+}
+
+/*
+ * Nothing may scroll the page sideways.
+ *
+ * The marquee is deliberately wider than the screen and relies on its own
+ * container clipping it, and four languages of variable-length copy run through
+ * the same fixed header. A single element getting 12px too wide should not turn
+ * the whole page into a horizontal scroller — which it intermittently did on
+ * Spanish at phone widths.
+ *
+ * `clip` rather than `hidden`: hidden would create a scroll container and break
+ * `position: sticky` on descendants.
+ */
+html {
+  overflow-x: clip;
 }
 
 body {

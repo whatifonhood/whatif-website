@@ -46,4 +46,6 @@ for (const coin of listing) {
 
 writeFileSync(join(outDir, 'all.json'), JSON.stringify(rows));
 const kb = Math.round(JSON.stringify(rows).length / 1024);
-process.stdout.write(`${rows.length} more coins written (${kb} KB), on top of ${local.size} with deep history\n`);
+process.stdout.write(
+  `${rows.length} more coins written (${kb} KB), on top of ${local.size} with deep history\n`,
+);

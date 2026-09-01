@@ -46,16 +46,18 @@ function toPlainText(html) {
   // paragraph and drop everything after it.
   const paragraph = source.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
 
-  return (paragraph ? paragraph[1] : source)
-    // A media link X appends is not part of what was written.
-    .replace(/<a[^>]*>\s*[^<]*pic\.(twitter|x)\.com[^<]*<\/a>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&[a-z#0-9]+;/gi, (entity) => ENTITIES[entity.toLowerCase()] ?? ' ')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  return (
+    (paragraph ? paragraph[1] : source)
+      // A media link X appends is not part of what was written.
+      .replace(/<a[^>]*>\s*[^<]*pic\.(twitter|x)\.com[^<]*<\/a>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&[a-z#0-9]+;/gi, (entity) => ENTITIES[entity.toLowerCase()] ?? ' ')
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  );
 }
 
 const cards = [];
@@ -106,5 +108,8 @@ if (cards.length === 0 && TWEET_URLS.length > 0) {
 const previous = readFileSync(output, 'utf8');
 const header = previous.slice(0, previous.indexOf('export const TWEET_CARDS'));
 
-writeFileSync(output, `${header}export const TWEET_CARDS: TweetCard[] = ${JSON.stringify(cards, null, 2)};\n`);
+writeFileSync(
+  output,
+  `${header}export const TWEET_CARDS: TweetCard[] = ${JSON.stringify(cards, null, 2)};\n`,
+);
 console.warn(`\n${cards.length} posts written${failed ? `, ${failed} failed` : ''}`);

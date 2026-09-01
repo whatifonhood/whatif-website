@@ -86,21 +86,62 @@ test.describe('the two hosting configs agree', () => {
         }),
     );
 
-  test('the Content-Security-Policy is the same on both hosts', async () => {
+  /**
+   * Compares EVERY policy, not just the site-wide one.
+   *
+   * The previous version of this test only looked at the first block in each
+   * file, which is why three of the four per-path policies were allowed to
+   * drift apart unnoticed.
+   */
+  test('every Content-Security-Policy matches across both hosts', async () => {
     const { readFileSync } = await import('node:fs');
 
     const netlify = readFileSync('public/_headers', 'utf8');
-    const netlifyPolicy = /^ {2}Content-Security-Policy: (.+)$/m.exec(netlify)?.[1];
-    expect(netlifyPolicy, 'no site-wide policy in public/_headers').toBeTruthy();
+    const netlifyPolicies: Record<string, string> = {};
+    let path = '';
+    for (const line of netlify.split('\n')) {
+      if (line && !line.startsWith(' ') && !line.startsWith('#')) path = line.trim();
+      const match = /^\s+Content-Security-Policy:\s*(.+)$/.exec(line);
+      if (match && path) netlifyPolicies[path.replace('/*', '')] = match[1]!;
+    }
 
     const vercel = JSON.parse(readFileSync('vercel.json', 'utf8'));
-    const vercelPolicy = vercel.headers
-      .find((rule: { source: string }) => rule.source === '/(.*)')
-      ?.headers.find((header: { key: string }) => header.key === 'Content-Security-Policy')?.value;
-    expect(vercelPolicy, 'no site-wide policy in vercel.json').toBeTruthy();
+    const vercelPolicies: Record<string, string> = {};
+    for (const rule of vercel.headers) {
+      for (const header of rule.headers) {
+        if (header.key === 'Content-Security-Policy') {
+          vercelPolicies[rule.source.replace('/(.*)', '').replace('(.*)', '')] = header.value;
+        }
+      }
+    }
 
-    expect(parse(vercelPolicy), 'the two hosts disagree on the policy').toEqual(
-      parse(netlifyPolicy as string),
+    expect(Object.keys(netlifyPolicies).sort()).toEqual(Object.keys(vercelPolicies).sort());
+    for (const key of Object.keys(netlifyPolicies)) {
+      expect(parse(vercelPolicies[key]!), `the two hosts disagree on ${key || '/'}`).toEqual(
+        parse(netlifyPolicies[key]!),
+      );
+    }
+  });
+
+  /**
+   * Both files are generated. If either has been hand-edited, regenerating
+   * would change it — so this catches the edit rather than the drift it causes.
+   */
+  test('both header files match the config they are generated from', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { execFileSync } = await import('node:child_process');
+
+    const before = {
+      netlify: readFileSync('public/_headers', 'utf8'),
+      vercel: readFileSync('vercel.json', 'utf8'),
+    };
+    execFileSync('node', ['tools/build-headers.mjs'], { stdio: 'ignore' });
+
+    expect(readFileSync('public/_headers', 'utf8'), 'public/_headers was edited by hand').toBe(
+      before.netlify,
+    );
+    expect(readFileSync('vercel.json', 'utf8'), 'vercel.json was edited by hand').toBe(
+      before.vercel,
     );
   });
 
@@ -112,4 +153,25 @@ test.describe('the two hosting configs agree', () => {
       expect(contents, `${file} allows unsafe-eval`).not.toContain("'unsafe-eval'");
     }
   });
+});
+
+/**
+ * The snapshot has to be refreshed.
+ *
+ * `npm run snapshot` is manual, so nothing forces these figures to ever be
+ * updated again — and they are what every visitor sees first, and what a
+ * visitor whose fetch fails sees for their whole session. A stale number on a
+ * page about money is a false claim, so the build says so.
+ */
+test('the build-time figures are not stale', async () => {
+  const { TOKEN_SNAPSHOT, SNAPSHOT_MAX_AGE_DAYS } = await import('../src/config/site.ts');
+
+  const captured = Date.parse(`${TOKEN_SNAPSHOT.capturedAt}T00:00:00Z`);
+  expect(Number.isFinite(captured), 'capturedAt is not a date').toBe(true);
+
+  const days = (Date.now() - captured) / 86_400_000;
+  expect(
+    days,
+    `the snapshot is ${Math.round(days)} days old — run \`npm run snapshot\``,
+  ).toBeLessThan(SNAPSHOT_MAX_AGE_DAYS);
 });

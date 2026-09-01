@@ -71,7 +71,7 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'building',
     title: 'More of the market in the Machine',
-    body: 'Nearly five hundred coins so far, $IF among them. The long tail of DEX-only tokens is the part still missing.',
+    body: 'Hundreds of coins with deep history, $IF among them, and every other coin CoinGecko lists searchable alongside them. The long tail of DEX-only tokens is the part still missing.',
     href: '/machine/',
   },
 

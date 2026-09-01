@@ -274,8 +274,14 @@ export function initWhatIf(): void {
     }
   });
 
-  // Space is the natural key for "again" once you have pressed the button once.
-  document.addEventListener('keydown', (event) => {
+  /**
+   * Space asks for another — but only when the tool has focus.
+   *
+   * This used to listen on the document and swallow Space whenever nothing
+   * interactive was focused, which is the state on every fresh load. Space is
+   * the page-down key, so scrolling the page with it silently did nothing.
+   */
+  root.addEventListener('keydown', (event) => {
     if (event.key !== ' ' && event.key !== 'Enter') return;
     const active = document.activeElement;
     if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;

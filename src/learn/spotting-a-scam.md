@@ -18,7 +18,7 @@ If a site shows you a shortened address with an ellipsis in the middle and no wa
 
 ## Nobody legitimate needs your seed phrase
 
-Not support. Not a giveaway. Not a "wallet validation" step. Not a migration. There is no situation in which a real project needs the twelve or twenty-four words that control your wallet, because those words *are* your wallet.
+Not support. Not a giveaway. Not a "wallet validation" step. Not a migration. There is no situation in which a real project needs the twelve or twenty-four words that control your wallet, because those words _are_ your wallet.
 
 Anyone asking for them is stealing from you, and no amount of official-looking branding changes that.
 

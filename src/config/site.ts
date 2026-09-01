@@ -119,14 +119,24 @@ export const DATA_APIS = {
  * Refresh with `npm run snapshot` (see README) whenever the site is rebuilt.
  */
 export const TOKEN_SNAPSHOT = {
-  capturedAt: '2026-08-29',
-  priceUsd: 0.007643,
-  marketCapUsd: 6_931_654,
-  liquidityUsd: 403_573,
-  volume24hUsd: 395_396,
-  burnedTokens: 93_076_893,
+  capturedAt: '2026-09-01',
+  priceUsd: 0.009254,
+  marketCapUsd: 8_390_496,
+  liquidityUsd: 424_541,
+  volume24hUsd: 533_631,
+  burnedTokens: 93_366_065,
   holders: 6816,
 } as const;
+
+/**
+ * How old the snapshot may get before the build complains.
+ *
+ * These figures are shown instantly and while the live call is in flight, so a
+ * stale one is visible to every visitor for a moment and to anyone whose fetch
+ * fails for their whole session. `npm run snapshot` is manual, so without a
+ * gate nothing forces it to ever run again. Checked by tests/headers.spec.ts.
+ */
+export const SNAPSHOT_MAX_AGE_DAYS = 30;
 
 /** Percentage of total supply that has been burned. Derived, never typed by hand. */
 export const BURNED_PERCENT = (TOKEN_SNAPSHOT.burnedTokens / TOKEN.totalSupply) * 100;
