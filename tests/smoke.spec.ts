@@ -748,7 +748,7 @@ test('no cache rule puts an HTML route behind a week', () => {
   for (const rule of weekly) {
     // Every long-cached prefix must be an asset directory, not a page route.
     expect(rule, `${rule} would also match an HTML page`).toMatch(
-      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|machine\/(logos|poses))\/\*$/,
+      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|machine\/(logos|poses)|posts)\/\*$/,
     );
   }
 });
@@ -1157,7 +1157,7 @@ test.describe('the wall of posts', () => {
 
   test('nothing markup-shaped survived the strip', async ({ page }) => {
     await page.goto('/');
-    const texts = await page.locator('#posts ul > li p').allTextContents();
+    const texts = await page.locator('#posts [id$="-text"]').allTextContents();
     expect(texts.length).toBeGreaterThan(0);
 
     for (const text of texts) {
@@ -1179,7 +1179,7 @@ test.describe('the wall of posts', () => {
     // Whatever a post contains, it must be text nodes only. An element inside
     // the quote means third-party HTML was rendered rather than escaped.
     const elementsInside = await page
-      .locator('#posts ul > li p')
+      .locator('#posts [id$="-text"]')
       .evaluateAll((nodes) => nodes.reduce((total, node) => total + node.children.length, 0));
     expect(elementsInside, 'a post rendered as markup').toBe(0);
   });
@@ -1245,7 +1245,7 @@ test.describe('the wall of posts', () => {
     ] as const) {
       await page.goto(path);
       const langs = await page
-        .locator('#posts ul > li p')
+        .locator('#posts [id$="-text"]')
         .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('lang')));
       expect(langs.length).toBeGreaterThan(0);
       // Marked on a page declared as another language, absent where the page
@@ -1253,6 +1253,47 @@ test.describe('the wall of posts', () => {
       // a Chinese screen reader pronounce English with Chinese phonetics.
       for (const lang of langs) expect(lang, `wrong lang on ${path}`).toBe(expected);
     }
+  });
+
+  /**
+   * The pictures are the reason this is not X's embed widget.
+   *
+   * They are downloaded at build time and re-encoded into public/posts/, so
+   * they load from this origin. If one ever pointed back at X, every visitor
+   * would be announcing themselves to it on a page that promises they are not.
+   */
+  test('every picture is served from this site, not from X', async ({ page }) => {
+    await page.goto('/');
+    // The pictures are lazy and the wall is near the bottom of the page.
+    await page.locator('#posts').scrollIntoViewIfNeeded();
+    await expect(page.locator('#posts img').first()).toBeVisible();
+    await page.waitForFunction(
+      () => [...document.querySelectorAll<HTMLImageElement>('#posts img')].every((i) => i.complete),
+      null,
+      { timeout: 15_000 },
+    );
+
+    const images = await page.locator('#posts img').evaluateAll((nodes) =>
+      nodes.map((node) => ({
+        src: node.getAttribute('src') ?? '',
+        loaded: (node as HTMLImageElement).naturalWidth > 0,
+      })),
+    );
+    expect(images.length, 'the wall has no pictures at all').toBeGreaterThan(0);
+    for (const image of images) {
+      expect(image.src, 'a picture is hotlinked from a third party').toMatch(/^\/posts\//);
+      expect(image.loaded, `${image.src} did not load`).toBe(true);
+    }
+  });
+
+  test('a post shows its author, handle and date', async ({ page }) => {
+    await page.goto('/');
+    const first = page.locator('#posts ul > li').first();
+    await expect(first.locator('[id$="-author"]')).not.toBeEmpty();
+    await expect(first).toContainText('@');
+    // A real date, not an empty <time>.
+    await expect(first.locator('time')).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
+    await expect(first.locator('time')).not.toBeEmpty();
   });
 
   test('it is there in every language', async ({ page }) => {

@@ -81,6 +81,7 @@ export const WEEK_PATHS = [
   '/coins/og',
   '/machine/logos',
   '/machine/poses',
+  '/posts',
 ] as const;
 
 /*
