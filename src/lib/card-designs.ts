@@ -109,7 +109,7 @@ export function drawMachineCard(
   // The curve first, so the medallion sits on top of its own chart and the
   // line reads as running out from behind it.
   drawSpark(context, data.history, data.entryIndex, cx, cy, radius * 0.95, accent);
-  if (coin) paintMedallion(context, coin, cx, cy, 208, accent);
+  if (coin) paintMedallion(context, coin, cx, cy, 268, accent);
 
   paintEyebrow(context, 'The What $IF Machine');
 
@@ -222,7 +222,7 @@ export function drawAskCard(
   const askX = CARD_WIDTH - 178;
   const askY = CARD_HEIGHT - 168;
   paintPortal(context, askX, askY, 250, { accent: LIME, sweep: 0.5, seed: hash(question) });
-  if (coin) paintMedallion(context, coin, askX, askY, 190, LIME);
+  if (coin) paintMedallion(context, coin, askX, askY, 250, LIME);
 
   paintEyebrow(context, 'Still asking.');
 
@@ -312,7 +312,7 @@ export function drawHoldingsCard(
   const sweep = data.share > 0 ? Math.max(0.04, Math.min(1, Math.sqrt(data.share))) : 0;
   paintPortal(context, cx, cy, radius, { accent: LIME, sweep, seed: hash(data.tokens) });
 
-  if (coin) paintMedallion(context, coin, cx, cy, 196, LIME);
+  if (coin) paintMedallion(context, coin, cx, cy, 252, LIME);
 
   // Under the portal, not inside it: the medallion has the middle now.
   context.save();
