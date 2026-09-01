@@ -72,6 +72,13 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
+    title: 'Check every number yourself',
+    body: 'The exact command behind each figure on the dashboard, built from the same addresses the page uses. Paste any of them into a terminal and check us.',
+    href: '/stats/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
     title: 'Who holds it',
     body: 'The fifteen largest holdings, with the burn address and the liquidity pool named rather than left looking like whales. Every row links to the address.',
     href: '/stats/',

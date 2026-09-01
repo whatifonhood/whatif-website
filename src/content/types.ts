@@ -245,6 +245,13 @@ export interface SiteCopy {
       pressureNote: string;
       burnHistoryTitle: string;
       burnHistoryNote: string;
+      /** How to reproduce every figure, without this site. */
+      reproduceTitle: string;
+      reproduceIntro: string;
+      reproduceField: string;
+      reproduceNote: string;
+      /** One label per recipe key in src/lib/reproduce.ts. */
+      reproduceLabels: Record<string, string>;
       /** The last seven days, from committed data rather than live. */
       weekTitle: string;
       weekPrice: string;

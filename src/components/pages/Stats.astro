@@ -4,6 +4,7 @@ import { CHAIN, SITE, type Locale } from '../../config/site.ts';
 import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
 import { BURNS } from '../../config/burns.ts';
 import { HOLDERS, HOLDERS_CAPTURED } from '../../config/holders.ts';
+import { RECIPES } from '../../lib/reproduce.ts';
 import { weekInSummary } from '../../lib/week.ts';
 import { getCopy } from '../../content/index.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
@@ -777,6 +778,45 @@ const metrics = [
       <p class="mt-5 text-xs leading-relaxed text-faint">{page.trustNote}</p>
     </div>
 
+    <!--
+      Reproduce every number.
+      The landing page says "don't trust a website — including this one", and
+      this is the means to act on it. Every command is built from the same
+      constants the running code uses, so it cannot drift into being wrong
+      without the site being wrong the same way.
+    -->
+    <details class="card mt-3 p-6 sm:p-8">
+      <summary class="cursor-pointer list-none">
+        <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          {page.reproduceTitle}
+        </span>
+        <p class="mt-3 max-w-2xl text-muted">{page.reproduceIntro}</p>
+      </summary>
+
+      <ol class="mt-6 space-y-6">
+        {
+          RECIPES.map((recipe) => (
+            <li>
+              <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+                {page.reproduceLabels[recipe.key] ?? recipe.key}
+              </p>
+              <!--
+                set:text on a self-closing element, so no source indentation
+                can end up inside the block. A reader copies the command, and
+                sixteen leading spaces would come with it.
+              -->
+              <pre class="reproduce-command mt-2" set:text={recipe.command} />
+              <p class="mt-1.5 font-mono text-[11px] text-faint">
+                {page.reproduceField} <span class="text-ink">{recipe.field}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="mt-8 max-w-2xl text-xs leading-relaxed text-faint">{page.reproduceNote}</p>
+    </details>
+
     <!-- Verify it yourself -->
     <div class="mt-10 grid gap-3 lg:grid-cols-2">
       <CopyField
@@ -1167,6 +1207,23 @@ const metrics = [
      styles never reach them (scoping is applied to markup in the template).
      They have to be global. -->
 <style is:global>
+  /* Reproduce panel. A command must be copyable verbatim, so it scrolls
+     rather than wrapping — a wrapped curl pasted into a shell is a broken one. */
+  .reproduce-command {
+    overflow-x: auto;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: var(--color-void);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+    white-space: pre;
+    -webkit-overflow-scrolling: touch;
+  }
+
+
   /* Holder labels. Burned is the reassuring case, so it gets the site's accent;
      a pool is infrastructure, not a holding; a bare contract is neither. */
   .holder-tag {

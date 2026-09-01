@@ -971,3 +971,54 @@ test.describe('every day so far', () => {
 function escapeForRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+/**
+ * "Don't trust a website — including this one."
+ *
+ * The reproduce panel is the means to act on that line, so the commands in it
+ * have to be copyable verbatim and have to name the real endpoints. A command
+ * carrying the page's own source indentation is a broken paste.
+ */
+test.describe('check every number yourself', () => {
+  test('every command is copyable as-is', async ({ page }) => {
+    await page.goto('/stats/');
+    const blocks = page.locator('.reproduce-command');
+    await expect(blocks).not.toHaveCount(0);
+
+    for (const text of await blocks.allTextContents()) {
+      expect(text, 'a command must start at column zero').toBe(text.trimStart());
+      expect(text).toMatch(/^curl /);
+      // No placeholder ever reaches the page.
+      expect(text).not.toMatch(/YOUR_|<[a-z]+>|\bTODO\b/);
+    }
+  });
+
+  test('the commands name the real contract and pool', async ({ page }) => {
+    await page.goto('/stats/');
+    const all = (await page.locator('.reproduce-command').allTextContents()).join('\n');
+    expect(all.toLowerCase()).toContain(TOKEN.address.toLowerCase());
+    expect(all.toLowerCase()).toContain(TOKEN.primaryPool.toLowerCase());
+    // Nothing here may require a key, an account or a signature.
+    expect(all).not.toMatch(/api[_-]?key|authorization|bearer/i);
+  });
+
+  // Not the same list as connect-src: the explorer is read here at build time
+  // and by the reader in a terminal, never by the page.
+  test('it only ever sends people to a source this site actually uses', async ({ page }) => {
+    await page.goto('/stats/');
+    const all = (await page.locator('.reproduce-command').allTextContents()).join('\n');
+    const hosts = [...all.matchAll(/https:\/\/([^/'\s"]+)/g)].map((m) => m[1]!);
+    expect(new Set(hosts).size).toBeGreaterThan(1);
+    for (const host of new Set(hosts)) {
+      expect(
+        [
+          'api.dexscreener.com',
+          'api.geckoterminal.com',
+          'rpc.mainnet.chain.robinhood.com',
+          'robinhoodchain.blockscout.com',
+        ],
+        `${host} is published as a source but this site does not use it`,
+      ).toContain(host);
+    }
+  });
+});
