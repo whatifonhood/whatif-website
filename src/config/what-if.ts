@@ -155,7 +155,7 @@ export interface Pattern {
 export const PATTERNS: Pattern[] = [
   { category: 'money', text: 'What if I had put {amount} into {asset} {when}?' },
   { category: 'money', text: 'What if I had bought {asset} {when}?' },
-  { category: 'money', text: 'What if {amount} into {asset} was all it took?' },
+  { category: 'money', text: 'What if putting {amount} into {asset} was all it took?' },
   { category: 'money', text: 'What if I sell and {consequence}?' },
   { category: 'money', text: 'What if I hold and {consequence}?' },
   { category: 'money', text: 'What if I had spent {amount} on {asset} instead?' },

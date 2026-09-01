@@ -228,10 +228,31 @@ export function initPfp(): void {
         .replace('{found}', String(found))
         .replace('{total}', String(COINS.length));
     }
+    // A coin stays a mystery until it has been pulled: the markup ships with no
+    // picture, no name and no link, and they are moved in from data attributes
+    // only here. The page is static and the same for everybody, so this is the
+    // only place that can know.
     for (const slug of Object.keys(state.found)) {
-      root
-        .querySelector(`[data-coin-slug="${CSS.escape(slug)}"]`)
-        ?.setAttribute('data-found', 'true');
+      const item = root.querySelector<HTMLElement>(`[data-coin-slug="${CSS.escape(slug)}"]`);
+      if (!item || item.dataset.found === 'true') continue;
+      item.dataset.found = 'true';
+
+      const coin = COINS.find((entry) => entry.slug === slug);
+      const image = item.querySelector<HTMLImageElement>('[data-pool-image]');
+      if (image?.dataset.src) {
+        image.src = image.dataset.src;
+        image.alt = coin?.name ?? '';
+      }
+
+      const link = item.querySelector<HTMLAnchorElement>('[data-pool-link]');
+      if (link?.dataset.href) {
+        link.href = link.dataset.href;
+        link.removeAttribute('aria-hidden');
+        if (coin) link.title = coin.name;
+      }
+
+      const name = item.querySelector<HTMLElement>('[data-pool-name]');
+      if (name && coin) name.textContent = coin.name;
     }
   };
 
