@@ -167,13 +167,20 @@ export function searchCoins(coins: CoinEntry[], query: string, limit = 8): CoinE
     .map((coin) => {
       const symbol = normalise(coin.symbol);
       const name = normalise(coin.name);
+      /*
+       * An exact match is an exact match, whichever field it landed in.
+       *
+       * Ranking symbol above name put a #920 memecoin tickered BITCOIN above
+       * Bitcoin itself, because its SYMBOL matched exactly while Bitcoin only
+       * matched on NAME. Both are now the same tier and the tie is broken by
+       * market-cap rank below, which is the thing that actually tells them
+       * apart. Same for the two "starts with" tiers.
+       */
       let score = -1;
-      if (symbol === needle) score = 0;
-      else if (name === needle) score = 1;
-      else if (symbol.startsWith(needle)) score = 2;
-      else if (name.startsWith(needle)) score = 3;
-      else if (name.includes(needle)) score = 4;
-      else if (symbol.includes(needle)) score = 5;
+      if (symbol === needle || name === needle) score = 0;
+      else if (symbol.startsWith(needle) || name.startsWith(needle)) score = 1;
+      else if (name.includes(needle)) score = 2;
+      else if (symbol.includes(needle)) score = 3;
       return { coin, score };
     })
     .filter((entry) => entry.score >= 0);
