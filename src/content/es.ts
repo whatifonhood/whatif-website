@@ -337,6 +337,12 @@ export const es: SiteCopy = {
       pressureNote: 'Volumen por hora del último día. Compras arriba, ventas abajo.',
       burnHistoryTitle: 'Cada quema',
       burnHistoryNote: 'Leído de la cadena. Cada escalón es una transacción que puedes abrir.',
+      biggestBurnsTitle: 'Las diez quemas más grandes',
+      sinceLead: 'Desde tu última visita, {ago}',
+      sincePrice: 'El precio se movió {change}, hasta {price}.',
+      sinceBurned: 'Se quemaron {amount} $IF.',
+      sinceHolders: 'Los holders pasaron {change}, hasta {total}.',
+      sinceNothing: 'Poca cosa. Seguimos preguntando.',
       trustTitle: 'Comprobaciones que cualquiera puede hacer',
       trustNote:
         'Dos de estas las certifican terceros, no nosotros; las otras dos las lee esta página directamente del contrato al cargar. Cada una enlaza a donde puedes verificarlo tú mismo, y una comprobación que no se pudo leer lo dice en vez de mostrarse como superada.',
@@ -389,6 +395,9 @@ export const es: SiteCopy = {
       disclaimer:
         'Cuentas aproximadas sobre precios históricos, con fines de entretenimiento. Los precios pasados no predicen nada.',
       pricesCaptured: 'Precios registrados el {date}.',
+      workedOutTitle: 'Ya calculado',
+      workedOutIntro: 'La respuesta de estas monedas ya está en su propia página, sin pulsar nada.',
+      workedOutMore: 'El resto de monedas funciona igual — búscala arriba.',
     },
     pfp: {
       title: 'Generador de PFP',

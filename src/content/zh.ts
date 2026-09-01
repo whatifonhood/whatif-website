@@ -320,6 +320,12 @@ export const zh: SiteCopy = {
       pressureNote: '过去一天的每小时成交量。买入向上，卖出向下。',
       burnHistoryTitle: '每一次销毁',
       burnHistoryNote: '直接读自链上。每一级台阶都是一笔可以打开的交易。',
+      biggestBurnsTitle: '最大的十次销毁',
+      sinceLead: '自你上次来访，{ago}',
+      sincePrice: '价格变动 {change}，现为 {price}。',
+      sinceBurned: '销毁了 {amount} $IF。',
+      sinceHolders: '持币地址 {change}，现为 {total}。',
+      sinceNothing: '没什么变化。依然在问。',
       trustTitle: '任何人都能做的核查',
       trustNote:
         '其中两项由第三方认证，不是我们说了算；另外两项由本页加载时直接从合约读取。每一项都链接到你可以自己核实的地方；读取失败的检查会如实说明，而不会显示为通过。',
@@ -369,6 +375,9 @@ export const zh: SiteCopy = {
       pivotCta: '购买 $IF',
       disclaimer: '基于历史价格的粗略计算，仅供娱乐。过去的价格不能预测任何事。',
       pricesCaptured: '价格数据截至 {date}。',
+      workedOutTitle: '已经算好了',
+      workedOutIntro: '这些币的答案已经在各自的页面上，无需操作。',
+      workedOutMore: '其他币种同理 — 在上方搜索即可。',
     },
     pfp: {
       title: '头像生成器',

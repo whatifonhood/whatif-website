@@ -329,6 +329,12 @@ export const tr: SiteCopy = {
       pressureNote: 'Son bir günün saatlik hacmi. Alımlar yukarı, satımlar aşağı.',
       burnHistoryTitle: 'Her yakım',
       burnHistoryNote: 'Zincirden okundu. Her basamak açabileceğin bir işlem.',
+      biggestBurnsTitle: 'En büyük on yakım',
+      sinceLead: 'Son ziyaretinden bu yana, {ago}',
+      sincePrice: 'Fiyat {change} hareket etti, {price} oldu.',
+      sinceBurned: '{amount} $IF yakıldı.',
+      sinceHolders: 'Sahip sayısı {change} değişti, {total} oldu.',
+      sinceNothing: 'Pek bir şey yok. Hâlâ soruyoruz.',
       trustTitle: 'Herkesin yapabileceği kontroller',
       trustNote:
         'Bunların ikisi biz değil, üçüncü taraflarca doğrulanıyor; diğer ikisini bu sayfa yüklenirken doğrudan sözleşmeden okuyor. Her biri kendi kontrol edebileceğin yere bağlanıyor ve okunamayan bir kontrol, geçti gibi görünmek yerine bunu söylüyor.',
@@ -380,6 +386,9 @@ export const tr: SiteCopy = {
       disclaimer:
         'Geçmiş fiyatlar üzerinden kaba bir hesap, eğlence amaçlı. Geçmiş fiyatlar hiçbir şeyi öngörmez.',
       pricesCaptured: 'Fiyatlar {date} tarihinde alındı.',
+      workedOutTitle: 'Zaten hesaplandı',
+      workedOutIntro: 'Bu coinlerin cevabı kendi sayfasında hazır, hiçbir şeye basmadan.',
+      workedOutMore: 'Setteki diğer tüm coinler de aynı şekilde çalışır — yukarıdan arayın.',
     },
     pfp: {
       title: 'PFP Üretici',

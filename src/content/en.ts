@@ -325,6 +325,12 @@ export const en: SiteCopy = {
       pressureNote: 'Hourly volume over the last day. Buys up, sells down.',
       burnHistoryTitle: 'Every burn',
       burnHistoryNote: 'Read from the chain. Each step is a transaction you can open.',
+      biggestBurnsTitle: 'The ten largest burns',
+      sinceLead: 'Since you were last here, {ago}',
+      sincePrice: 'The price moved {change}, to {price}.',
+      sinceBurned: '{amount} $IF was burned.',
+      sinceHolders: 'Holders went {change}, to {total}.',
+      sinceNothing: 'Not much. Still asking.',
       trustTitle: 'Checks anyone can run',
       trustNote:
         'Two of these are attested by third parties, not by us; two are read from the contract by this page as it loads. Each links to where you can check it yourself, and a check that could not be read says so rather than showing a pass.',
@@ -377,6 +383,9 @@ export const en: SiteCopy = {
       disclaimer:
         'Rough arithmetic on historical prices, for entertainment. Past prices predict nothing.',
       pricesCaptured: 'Prices captured {date}.',
+      workedOutTitle: 'Already worked out',
+      workedOutIntro: 'The answer for these is on its own page, no buttons to press.',
+      workedOutMore: 'Every other coin in the set works the same way — search for it above.',
     },
     pfp: {
       title: 'PFP Generator',

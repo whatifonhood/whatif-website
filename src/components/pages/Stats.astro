@@ -1,7 +1,8 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { SITE, type Locale } from '../../config/site.ts';
+import { CHAIN, SITE, type Locale } from '../../config/site.ts';
 import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
+import { BURNS } from '../../config/burns.ts';
 import { getCopy } from '../../content/index.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
 import Button from '../../components/ui/Button.astro';
@@ -22,6 +23,23 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getCopy(locale);
+
+/**
+ * The ten largest burns.
+ *
+ * Sorted from the committed event log rather than fetched: these are historical
+ * facts that only change when a bigger burn happens, and the daily refresh
+ * picks that up.
+ */
+const BIGGEST_BURNS = [...BURNS].sort((a, b) => b.tokens - a.tokens).slice(0, 10);
+
+const burnDate = (seconds: number) =>
+  new Date(seconds * 1000).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
 const page = copy.pages.stats;
 
 const metrics = [
@@ -429,6 +447,25 @@ const metrics = [
       </p>
     </div>
 
+    <!--
+      Shown only to somebody who has been here before, and only after an hour.
+      Everything it compares against is in their own browser — see
+      src/scripts/since-last-visit.ts.
+    -->
+    <aside
+      data-since
+      hidden
+      data-label-lead={page.sinceLead}
+      data-label-price={page.sincePrice}
+      data-label-burned={page.sinceBurned}
+      data-label-holders={page.sinceHolders}
+      data-label-nothing={page.sinceNothing}
+      class="card mt-3 border-lime/25 p-6 sm:p-8"
+    >
+      <p data-since-lead class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime"></p>
+      <ul data-since-list class="mt-4 space-y-2 text-lg leading-relaxed text-ink"></ul>
+    </aside>
+
     <!-- Burn history -->
     <div class="card mt-3 p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
@@ -449,6 +486,44 @@ const metrics = [
       <p class="mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">
         {page.burnHistoryNote}
       </p>
+
+      <!--
+        The largest burns, each one linked to the transaction that made it.
+        The curve above shows the shape; this names the events behind it, and
+        every row can be checked on the explorer by anyone who doubts it.
+      -->
+      <h3 class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.biggestBurnsTitle}
+      </h3>
+      <ol class="mt-4 divide-y divide-line/60">
+        {
+          BIGGEST_BURNS.map((burn, index) => (
+            <li class="flex items-baseline gap-4 py-2.5">
+              <span class="w-5 shrink-0 font-mono text-[11px] tabular-nums text-faint">
+                {index + 1}
+              </span>
+              <span class="font-mono text-sm tabular-nums text-ink">
+                {formatCount(burn.tokens, locale)}
+                <span class="text-faint">{TOKEN.symbol}</span>
+              </span>
+              <span class="ml-auto font-mono text-[11px] text-faint">
+                <time datetime={new Date(burn.time * 1000).toISOString()}>
+                  {burnDate(burn.time)}
+                </time>
+              </span>
+              <a
+                href={`${CHAIN.explorerUrl}/tx/${burn.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="shrink-0 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+              >
+                {page.viewTx}
+                <span class="sr-only">{copy.common.externalLink}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
     </div>
 
     <!-- Live trades -->
@@ -1057,8 +1132,12 @@ const metrics = [
 <script>
   import { initLiveStats } from '../../scripts/live-stats.ts';
   import { initDashboard } from '../../scripts/dashboard.ts';
+  import { initSinceLastVisit } from '../../scripts/since-last-visit.ts';
 
   const locale = document.documentElement.lang || 'en';
+  // Listening before the dashboard runs, or the figures are announced to
+  // nobody on a fast connection.
+  initSinceLastVisit(locale);
   void initLiveStats(locale);
   initDashboard(locale);
 </script>
