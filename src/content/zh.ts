@@ -368,6 +368,8 @@ export const zh: SiteCopy = {
       searchPlaceholder: '搜索币种 —— bitcoin、doge、pepe…',
       noResults: '数据集中没有这个名字。',
       loadFailed: '暂时无法加载这个币的价格。换一个试试，或稍后再试。',
+      searchSince: '自',
+      searchOnDemand: '选中后获取价格',
       emptyState: '选一个币、一个金额、一个月份，剩下的交给机器。',
       investedLabel: '你投入',
       worthLabel: '现在会值',

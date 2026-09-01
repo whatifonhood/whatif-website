@@ -393,6 +393,8 @@ export const es: SiteCopy = {
       noResults: 'No hay nada con ese nombre en el conjunto.',
       loadFailed:
         'No se pudieron cargar los precios de esa moneda ahora mismo. Prueba con otra o inténtalo en un momento.',
+      searchSince: 'desde',
+      searchOnDemand: 'precios al vuelo',
       emptyState: 'Elige una moneda, un monto y un mes. La máquina hace el resto.',
       investedLabel: 'Pusiste',
       worthLabel: 'Hoy valdría',

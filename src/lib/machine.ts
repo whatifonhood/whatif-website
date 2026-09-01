@@ -198,7 +198,23 @@ export async function searchAllCoins(
   if (found.length >= limit || query.trim().length < 2) return found;
 
   const tail = await getTailIndex();
-  const seen = new Set(found.map((coin) => coin.symbol));
-  const extra = searchCoins(tail, query, limit).filter((coin) => !seen.has(coin.symbol));
+
+  /*
+   * Deduped on symbol AND name, not on symbol alone.
+   *
+   * The long-tail index holds 270 pairs that share both — the same coin
+   * relisted, or a clone — under different CoinGecko ids. They are separate
+   * coins to CoinGecko and identical to a reader, so showing both gives a
+   * choice nobody can make. Symbol alone would be too blunt: reused tickers
+   * are ordinary down there, and those really are different coins.
+   */
+  const key = (coin: CoinEntry) => `${coin.symbol}|${coin.name}`;
+  const seen = new Set(found.map(key));
+  const extra: CoinEntry[] = [];
+  for (const coin of searchCoins(tail, query, limit * 2)) {
+    if (seen.has(key(coin))) continue;
+    seen.add(key(coin));
+    extra.push(coin);
+  }
   return [...found, ...extra].slice(0, limit);
 }

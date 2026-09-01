@@ -234,6 +234,8 @@ export function initMachine(locale: string): void {
     noResults: results.dataset.noResults ?? '',
     loadFailed: root.dataset.labelLoadFailed ?? '',
     shareText: shareLink?.dataset.template ?? '',
+    since: root.dataset.labelSince ?? 'since',
+    onDemand: root.dataset.labelOnDemand ?? 'prices on demand',
   };
 
   /** Verdict lines, rendered into the page so they stay translatable. */
@@ -273,25 +275,54 @@ export function initMachine(locale: string): void {
       button.type = 'button';
       button.className = 'result-row';
 
+      /*
+       * The mark.
+       *
+       * Only the coins with committed price history have a logo file — the
+       * other seventeen thousand are searched from the long-tail index and
+       * have none, and their logos live on a CDN this site's policy does not
+       * allow. So a missing logo is replaced by a lettered disc rather than
+       * removed, which also tells the two sets apart at a glance instead of
+       * leaving most rows with a hole where a picture should be.
+       */
+      const mark = document.createElement('span');
+      mark.className = 'result-mark';
+      mark.textContent = coin.symbol.slice(0, 2);
+
       const logo = document.createElement('img');
       logo.src = `/machine/logos/${coin.symbol}.webp`;
       logo.alt = '';
-      logo.width = 24;
-      logo.height = 24;
+      logo.width = 28;
+      logo.height = 28;
       logo.loading = 'lazy';
       logo.className = 'result-logo';
-      // A missing logo should not leave a broken image icon.
       logo.addEventListener('error', () => logo.remove());
+      logo.addEventListener('load', () => mark.remove());
+
+      const text = document.createElement('span');
+      text.className = 'result-text';
 
       const name = document.createElement('span');
       name.className = 'result-name';
       name.textContent = coin.name;
 
+      // What the row can tell you before you pick it: how big the coin is,
+      // and how far back the Machine can actually go.
+      const meta = document.createElement('span');
+      meta.className = 'result-meta';
+      const facts: string[] = [];
+      if (coin.rank > 0 && coin.rank < 99_000) facts.push(`#${coin.rank}`);
+      if (coin.firstMonth) facts.push(`${labels.since} ${coin.firstMonth.slice(0, 4)}`);
+      else facts.push(labels.onDemand);
+      meta.textContent = facts.join('  ·  ');
+
+      text.append(name, meta);
+
       const ticker = document.createElement('span');
       ticker.className = 'result-ticker';
       ticker.textContent = coin.symbol;
 
-      button.append(logo, name, ticker);
+      button.append(mark, logo, text, ticker);
       button.addEventListener('click', () => void choose(coin));
       item.append(button);
       results.append(item);

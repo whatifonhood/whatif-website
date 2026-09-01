@@ -375,6 +375,8 @@ export const en: SiteCopy = {
       noResults: 'Nothing by that name in the set.',
       loadFailed:
         'Could not load prices for that coin just now. Try another, or try again in a moment.',
+      searchSince: 'since',
+      searchOnDemand: 'prices on demand',
       emptyState: 'Pick a coin, an amount and a month. The machine does the rest.',
       investedLabel: 'You put in',
       worthLabel: 'It would be worth',

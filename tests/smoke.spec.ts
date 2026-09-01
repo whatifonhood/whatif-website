@@ -1305,3 +1305,57 @@ test.describe('the wall of posts', () => {
     }
   });
 });
+
+/**
+ * Picking a coin in the Machine.
+ *
+ * Only the 780 coins with committed price history have a logo file; the other
+ * seventeen thousand are searched from the long-tail index and have none, and
+ * their logos live on a CDN the site's policy does not allow. Every row still
+ * has to be readable and tell you something.
+ */
+test.describe('the coin search', () => {
+  test('every row has a mark, a full name and a ticker', async ({ page }) => {
+    await page.goto('/machine/');
+    await page.locator('[data-machine-search]').fill('doge');
+    await expect(page.locator('.result-row').first()).toBeVisible();
+
+    for (const row of await page.locator('.result-row').all()) {
+      // Either the real logo or the lettered stand-in — never neither.
+      const marks = await row.locator('.result-logo, .result-mark').count();
+      expect(marks, 'a row has nothing where its picture should be').toBeGreaterThan(0);
+
+      const name = (await row.locator('.result-name').textContent()) ?? '';
+      expect(name.trim().length, 'the name column collapsed').toBeGreaterThan(1);
+      await expect(row.locator('.result-ticker')).not.toBeEmpty();
+      // The line that says how far back the Machine can go for this coin.
+      await expect(row.locator('.result-meta')).not.toBeEmpty();
+    }
+  });
+
+  test('the same coin is never offered twice', async ({ page }) => {
+    await page.goto('/machine/');
+    await page.locator('[data-machine-search]').fill('doge');
+    await expect(page.locator('.result-row').first()).toBeVisible();
+
+    const rows = await page
+      .locator('.result-row')
+      .evaluateAll((nodes) =>
+        nodes.map(
+          (node) =>
+            `${node.querySelector('.result-name')?.textContent}|${node.querySelector('.result-ticker')?.textContent}`,
+        ),
+      );
+    expect(rows.length).toBeGreaterThan(1);
+    // The long-tail index holds 270 pairs identical in symbol and name.
+    expect(new Set(rows).size, 'two rows a reader cannot tell apart').toBe(rows.length);
+  });
+
+  test('a coin with deep history says how far back it goes', async ({ page }) => {
+    await page.goto('/machine/');
+    await page.locator('[data-machine-search]').fill('bitcoin');
+    const first = page.locator('.result-row').first();
+    await expect(first).toBeVisible();
+    await expect(first.locator('.result-meta')).toContainText(/\d{4}/);
+  });
+});
