@@ -1120,3 +1120,84 @@ test.describe('moving a collection between browsers', () => {
     expect(found, 'a refused code must not clear anything').toBe(1);
   });
 });
+
+/**
+ * The community wall.
+ *
+ * This is the one place on the site where words written by somebody else reach
+ * a visitor's browser. They arrive through X's oEmbed endpoint at build time as
+ * a block of HTML, and `tools/build-tweets.mjs` reduces them to plain text
+ * before anything is committed. The tests that matter are the ones proving that
+ * reduction actually happened and that nothing markup-shaped survived.
+ */
+test.describe('the wall of posts', () => {
+  test('shows real posts, each linking to the post it quotes', async ({ page }) => {
+    await page.goto('/');
+    const wall = page.locator('#posts');
+    await expect(wall).toBeVisible();
+
+    const cards = wall.locator('ul > li');
+    await expect(cards).not.toHaveCount(0);
+
+    const links = wall.locator('ul > li a[href^="https://x.com/"]');
+    await expect(links).toHaveCount(await cards.count());
+
+    const hrefs = await links.evaluateAll((nodes) =>
+      nodes.map((node) => (node as HTMLAnchorElement).href),
+    );
+    // Every card points at a distinct, real status URL — never a search, a
+    // profile, or a redirect.
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+    for (const href of hrefs) {
+      expect(href).toMatch(/^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/\d{1,25}$/);
+    }
+  });
+
+  test('nothing markup-shaped survived the strip', async ({ page }) => {
+    await page.goto('/');
+    const texts = await page.locator('#posts ul > li p').allTextContents();
+    expect(texts.length).toBeGreaterThan(0);
+
+    for (const text of texts) {
+      expect(text.trim()).not.toBe('');
+      // If a tag or an entity reaches the page as text, the reduction failed.
+      // If it reaches it as markup, this is the least of the problems — the
+      // structural check below covers that.
+      expect(text, 'a tag survived as text').not.toMatch(/<\/?[a-z][^>]*>/i);
+      expect(text, 'an unresolved entity survived').not.toMatch(/&(amp|lt|gt|quot|#\d+);/i);
+      // oEmbed appends its own "— name (@handle) date" line; we render the
+      // author ourselves, so it must have been dropped.
+      expect(text, 'the oEmbed attribution line survived').not.toMatch(/—\s*.+\(@\w+\)/);
+      expect(text, 'a media shortlink survived').not.toMatch(/pic\.(twitter|x)\.com/);
+    }
+  });
+
+  test('the quoted text is inert, not markup', async ({ page }) => {
+    await page.goto('/');
+    // Whatever a post contains, it must be text nodes only. An element inside
+    // the quote means third-party HTML was rendered rather than escaped.
+    const elementsInside = await page
+      .locator('#posts ul > li p')
+      .evaluateAll((nodes) => nodes.reduce((total, node) => total + node.children.length, 0));
+    expect(elementsInside, 'a post rendered as markup').toBe(0);
+  });
+
+  test('every outbound link is safe to click', async ({ page }) => {
+    await page.goto('/');
+    const external = page.locator('#posts a[href^="http"]');
+    for (const link of await external.all()) {
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+      await expect(link).toHaveAttribute('rel', /noreferrer/);
+    }
+  });
+
+  test('it is there in every language', async ({ page }) => {
+    for (const path of ['/', '/es/', '/zh/', '/tr/']) {
+      await page.goto(path);
+      await expect(page.locator('#posts'), `no wall on ${path}`).toBeVisible();
+      // The surrounding copy is translated even though the posts are not.
+      await expect(page.locator('#posts ul > li')).not.toHaveCount(0);
+    }
+  });
+});

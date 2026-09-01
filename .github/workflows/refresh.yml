@@ -67,6 +67,13 @@ jobs:
             if (BURNS.length === 0) { console.error('burns.ts came back empty'); process.exit(1); }
             const { HOLDERS } = await import('./src/config/holders.ts');
             if (HOLDERS.length === 0) { console.error('holders.ts came back empty'); process.exit(1); }
+            // 'test -s' passes on a file holding an empty array, because the
+            // header and the type are still in it.
+            const { TWEET_URLS } = await import('./src/config/tweets.ts');
+            const { TWEET_CARDS } = await import('./src/config/tweet-cards.ts');
+            if (TWEET_URLS.length > 0 && TWEET_CARDS.length === 0) {
+              console.error('tweet-cards.ts came back empty'); process.exit(1);
+            }
           "
 
       - name: Verify the site still builds
