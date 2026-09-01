@@ -167,7 +167,15 @@ function parseTrades(body: unknown): Trade[] {
  * with how busy the day was. Callers must check the timestamps before claiming
  * any particular window.
  */
-export async function getLargeTrades(minUsd = 500): Promise<Trade[]> {
+/**
+ * The size a trade has to reach to be counted as a large one.
+ *
+ * Exported because the hourly pressure chart has to bucket a single, consistent
+ * population — see the note in `renderPressure`.
+ */
+export const LARGE_TRADE_USD = 500;
+
+export async function getLargeTrades(minUsd = LARGE_TRADE_USD): Promise<Trade[]> {
   const body = await fetchJson(`${GECKO}/trades?trade_volume_in_usd_greater_than=${minUsd}`);
   return parseTrades(body);
 }

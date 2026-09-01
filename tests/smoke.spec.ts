@@ -872,3 +872,49 @@ test.describe('who holds it', () => {
     expect(total, 'fifteen holders cannot hold more than everything').toBeLessThan(100);
   });
 });
+
+/**
+ * The trust panel exists to not be a list of assertions.
+ *
+ * Every row has to lead somewhere the claim can be re-run by somebody who does
+ * not trust us, and the note beside them has to describe the rows that are
+ * actually there.
+ */
+test.describe('checks anyone can run', () => {
+  test('every row links to where it can be checked', async ({ page }) => {
+    await page.goto('/stats/');
+    const rows = page.locator('[data-trust] li');
+    await expect(rows).toHaveCount(5);
+    for (const row of await rows.all()) {
+      await expect(row.locator('a[href^="https://"]')).toHaveCount(1);
+    }
+  });
+
+  test('the note counts the rows that are there', async ({ page }) => {
+    await page.goto('/stats/');
+    const rows = await page.locator('[data-trust] li').count();
+    const note = (await page.locator('[data-trust] ~ p').first().textContent()) ?? '';
+    // Two are third-party attestations, the rest are read from the contract.
+    const words = ['one', 'two', 'three', 'four', 'five', 'six'];
+    expect(note.toLowerCase()).toContain(words[rows - 2 - 1]);
+  });
+});
+
+/**
+ * The hourly pressure chart has to measure every hour the same way.
+ *
+ * It is fed two merged queries — trades over $500 reaching back a day, and the
+ * most recent trades of any size. Bucketing both put the last couple of hours
+ * on a different footing from the rest of the chart.
+ */
+test('the pressure chart says what it counts', async ({ page }) => {
+  await page.goto('/stats/');
+  const panel = page.locator('[data-pressure]');
+  try {
+    await expect(panel).toBeVisible({ timeout: 20_000 });
+  } catch {
+    test.skip(true, 'no trade data available — the API is throttling');
+  }
+  // The threshold is the reason the chart is comparable; it must be stated.
+  await expect(panel).toContainText(/\$500|500 ?\$|500 dolar|500 美元/);
+});

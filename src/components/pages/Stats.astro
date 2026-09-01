@@ -4,6 +4,7 @@ import { CHAIN, SITE, type Locale } from '../../config/site.ts';
 import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
 import { BURNS } from '../../config/burns.ts';
 import { HOLDERS, HOLDERS_CAPTURED } from '../../config/holders.ts';
+import { weekInSummary } from '../../lib/week.ts';
 import { getCopy } from '../../content/index.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
 import Button from '../../components/ui/Button.astro';
@@ -42,6 +43,23 @@ const burnDate = (seconds: number) =>
   });
 
 const page = copy.pages.stats;
+
+const WEEK = weekInSummary();
+
+/**
+ * Where each of these can be checked, by somebody who does not trust us.
+ *
+ * A trust panel whose rows lead nowhere is a list of assertions. Anything with
+ * no independent page to point at is left without a link rather than given one
+ * that does not prove it.
+ */
+const CHECK_PROOF: Record<string, string | undefined> = {
+  verified: `${CHAIN.explorerUrl}/address/${TOKEN.address}?tab=contract`,
+  honeypot: `https://www.geckoterminal.com/robinhood/pools/${TOKEN.primaryPool}`,
+  supply: `${CHAIN.explorerUrl}/token/${TOKEN.address}`,
+  burn: `${CHAIN.explorerUrl}/address/${TOKEN.burnAddress}`,
+  owner: `${CHAIN.explorerUrl}/address/${TOKEN.address}?tab=read_contract`,
+};
 
 const metrics = [
   {
@@ -468,6 +486,76 @@ const metrics = [
     </aside>
 
     <!--
+      The week, from committed data.
+      Rendered here rather than fetched: it moves when the daily refresh runs,
+      not by the second, so the panel names the day it covers instead of
+      pretending to be live.
+    -->
+    <div class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.weekTitle}
+      </p>
+      <dl class="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-3">
+        {
+          WEEK.priceThen !== undefined && WEEK.priceNow !== undefined && (
+            <div>
+              <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+                {page.weekPrice}
+              </dt>
+              <dd
+                class="mt-1.5 font-display text-2xl font-semibold tabular-nums"
+                class:list={[WEEK.priceNow >= WEEK.priceThen ? 'text-lime' : 'text-warn']}
+              >
+                {WEEK.priceNow >= WEEK.priceThen ? '+' : ''}
+                {formatPercent(((WEEK.priceNow - WEEK.priceThen) / WEEK.priceThen) * 100, locale)}
+              </dd>
+              <p class="mt-1 font-mono text-[11px] text-faint">
+                {formatUsd(WEEK.priceThen, locale)} → {formatUsd(WEEK.priceNow, locale)}
+              </p>
+            </div>
+          )
+        }
+
+        <div>
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+            {page.weekBurned}
+          </dt>
+          <dd class="mt-1.5 font-display text-2xl font-semibold tabular-nums text-ink">
+            {formatCompact(WEEK.burnedTokens, locale)}
+          </dd>
+          <p class="mt-1 font-mono text-[11px] text-faint">
+            {page.weekBurnCount.replace('{count}', String(WEEK.burnCount))}
+          </p>
+        </div>
+
+        {
+          WEEK.largestBurn && (
+            <div>
+              <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+                {page.weekLargest}
+              </dt>
+              <dd class="mt-1.5 font-display text-2xl font-semibold tabular-nums text-ink">
+                {formatCompact(WEEK.largestBurn.tokens, locale)}
+              </dd>
+              <a
+                href={`${CHAIN.explorerUrl}/tx/${WEEK.largestBurn.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-1 inline-block font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+              >
+                {page.viewTx}
+                <span class="sr-only">{copy.common.externalLink}</span>
+              </a>
+            </div>
+          )
+        }
+      </dl>
+      <p class="mt-5 font-mono text-[10px] uppercase tracking-wider text-faint">
+        {page.weekNote.replace('{date}', WEEK.to)}
+      </p>
+    </div>
+
+    <!--
       Who holds it.
       The most common question about any token is whether one wallet holds all
       of it, and the honest answer needs the list rather than a percentage. The
@@ -663,7 +751,21 @@ const metrics = [
           (['verified', 'honeypot', 'supply', 'burn', 'owner'] as const).map((check) => (
             <li data-check={check} class="trust-row">
               <span class="trust-mark" data-state="unknown" aria-hidden="true" />
-              <span class="min-w-0 flex-1 text-sm text-ink">{page.checks[check]}</span>
+              <span class="min-w-0 flex-1 text-sm text-ink">
+                {CHECK_PROOF[check] ? (
+                  <a
+                    href={CHECK_PROOF[check]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="underline decoration-line underline-offset-4 transition-colors hover:text-lime hover:decoration-lime"
+                  >
+                    {page.checks[check]}
+                    <span class="sr-only">{copy.common.externalLink}</span>
+                  </a>
+                ) : (
+                  page.checks[check]
+                )}
+              </span>
               <span
                 data-check-state
                 class="font-mono text-[10px] uppercase tracking-wider text-faint"

@@ -10,6 +10,7 @@
  */
 import {
   getLargeTrades,
+  LARGE_TRADE_USD,
   getPairSnapshot,
   getPriceHistory,
   getBalanceOf,
@@ -578,7 +579,17 @@ export function initDashboard(locale: string): void {
     return 'ok';
   };
 
-  /** Hourly buy and sell volume, from trades already fetched. No extra request. */
+  /**
+   * Hourly buy and sell volume, from trades already fetched. No extra request.
+   *
+   * Only trades at or above `LARGE_TRADE_USD` are counted, and that filter is
+   * the point rather than an optimisation. The list handed in is two queries
+   * merged: one for trades over that size reaching back a day, and one for the
+   * most recent trades of any size. Bucketing both together measured the last
+   * couple of hours by one rule and the rest of the chart by another, so the
+   * recent bars were inflated against everything beside them — in a chart whose
+   * only job is comparing one hour to another.
+   */
   const renderPressure = (trades: Trade[]) => {
     const panel = root.querySelector<HTMLElement>('[data-pressure]');
     const bars = root.querySelector<SVGGElement>('[data-pressure-bars]');
@@ -587,6 +598,7 @@ export function initDashboard(locale: string): void {
     const now = Date.now();
     const buckets = Array.from({ length: 24 }, () => ({ buy: 0, sell: 0 }));
     for (const trade of trades) {
+      if (trade.usd < LARGE_TRADE_USD) continue;
       const hoursAgo = Math.floor((now - trade.time) / 3_600_000);
       if (hoursAgo < 0 || hoursAgo > 23) continue;
       buckets[23 - hoursAgo]![trade.kind] += trade.usd;

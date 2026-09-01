@@ -326,9 +326,16 @@ export const tr: SiteCopy = {
       bands: { top10: 'İlk 10', next20: '11–30', next20More: '31–50', rest: 'Diğer herkes' },
       holdersUpdated: 'yeniden sayıldı',
       pressureTitle: 'Alım ve satım baskısı',
-      pressureNote: 'Son bir günün saatlik hacmi. Alımlar yukarı, satımlar aşağı.',
+      pressureNote:
+        'Son bir günün saatlik hacmi, 500 dolar ve üzeri işlemler. Alımlar yukarı, satışlar aşağı.',
       burnHistoryTitle: 'Her yakım',
       burnHistoryNote: 'Zincirden okundu. Her basamak açabileceğin bir işlem.',
+      weekTitle: 'Son yedi gün',
+      weekPrice: 'Fiyat',
+      weekBurned: 'Yakıldı',
+      weekBurnCount: '{count} yakım boyunca',
+      weekLargest: 'En büyük tek yakım',
+      weekNote: '{date} tarihine kadar. Günlük yenilenir, canlı değil — yukarıdaki rakamlar canlı.',
       holderTableTitle: 'Kim tutuyor',
       holderTableIntro:
         'En büyük on beş bakiye, tespit edilebilen her şey adlandırılmış. En büyüğü yakım adresi — o tokenlar tutulmuyor, yok edilmiş.',
@@ -346,7 +353,7 @@ export const tr: SiteCopy = {
       sinceNothing: 'Pek bir şey yok. Hâlâ soruyoruz.',
       trustTitle: 'Herkesin yapabileceği kontroller',
       trustNote:
-        'Bunların ikisi biz değil, üçüncü taraflarca doğrulanıyor; diğer ikisini bu sayfa yüklenirken doğrudan sözleşmeden okuyor. Her biri kendi kontrol edebileceğin yere bağlanıyor ve okunamayan bir kontrol, geçti gibi görünmek yerine bunu söylüyor.',
+        'Bunlardan ikisi bizim değil, üçüncü tarafların beyanıdır; diğer üçü bu sayfa yüklenirken doğrudan sözleşmeden okunur. Her biri kendiniz kontrol edebileceğiniz yere bağlanır ve okunamayan bir kontrol, geçti göstermek yerine bunu söyler.',
       checks: {
         verified: 'Listeleme doğrulandı',
         honeypot: 'Honeypot kontrolü',

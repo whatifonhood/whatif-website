@@ -245,6 +245,15 @@ export interface SiteCopy {
       pressureNote: string;
       burnHistoryTitle: string;
       burnHistoryNote: string;
+      /** The last seven days, from committed data rather than live. */
+      weekTitle: string;
+      weekPrice: string;
+      weekBurned: string;
+      /** Carries `{count}`. */
+      weekBurnCount: string;
+      weekLargest: string;
+      /** Carries `{date}`, the last day covered. */
+      weekNote: string;
       /** Who holds the supply, with the top rows identified. */
       holderTableTitle: string;
       holderTableIntro: string;
