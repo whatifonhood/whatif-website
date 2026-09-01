@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
 import { questionForDate } from '../src/config/what-if.ts';
 
@@ -594,20 +595,41 @@ test.describe('the chart can be navigated', () => {
  * is added.
  */
 test.describe('a language keeps you in that language', () => {
+  // The homepage alone was not enough: the vault leaked to the English meme
+  // pages while the homepage was clean, because only the homepage was checked.
+  const PAGES = ['', 'memes/', 'stats/', 'machine/', 'pfp/', 'ask/'];
+
+  /**
+   * The rule, stated precisely: a link must stay in the reader's language
+   * WHEN A TRANSLATED PAGE EXISTS TO STAY IN.
+   *
+   * Some things genuinely have no translation and never will — an image file,
+   * and the deep pages built only in English (a coin's own page, a pulled
+   * coin's page, the daily archive). Flagging those would push the suite into
+   * demanding four thousand pages, and asserting "whatever we do now is fine"
+   * would let the real bug back in. So the test asks the only question that
+   * matters: does the translated page exist, and did we link to it?
+   */
+  const hasTranslation = (href: string, locale: string) =>
+    existsSync(join('dist', locale, href, 'index.html'));
+
   for (const locale of ['zh', 'tr', 'es']) {
-    test(`/${locale}/ never links out to the English tools`, async ({ page }) => {
-      await page.goto(`/${locale}/`);
+    for (const path of PAGES) {
+      test(`/${locale}/${path} links to a translation whenever one exists`, async ({ page }) => {
+        await page.goto(`/${locale}/${path}`);
 
-      const leaks = await page.evaluate(() =>
-        [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]')]
-          .map((a) => a.getAttribute('href') ?? '')
-          .filter((href) =>
-            /^\/(stats|machine|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href),
-          ),
-      );
+        const english = await page.evaluate(() =>
+          [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]')]
+            .map((a) => a.getAttribute('href') ?? '')
+            .filter((href) =>
+              /^\/(stats|machine|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href),
+            ),
+        );
 
-      expect(leaks, 'these drop the visitor back into English').toEqual([]);
-    });
+        const leaks = [...new Set(english)].filter((href) => hasTranslation(href, locale));
+        expect(leaks, 'these have a translated page and should point at it').toEqual([]);
+      });
+    }
 
     test(`/${locale}/ actually links to its own sub-pages`, async ({ page }) => {
       await page.goto(`/${locale}/`);
@@ -615,16 +637,16 @@ test.describe('a language keeps you in that language', () => {
       // Orphaned pages are pages nothing points at, so count the pointers.
       expect(await inside.count()).toBeGreaterThan(5);
     });
+
+    test(`/${locale}/memes/ reaches its own meme pages`, async ({ page }) => {
+      await page.goto(`/${locale}/memes/`);
+      const inside = page.locator(`a[href^="/${locale}/memes/"]`);
+      // 65 memes, each with a page in this language.
+      expect(await inside.count()).toBeGreaterThan(60);
+    });
   }
 });
 
-/**
- * Translation metadata.
- *
- * These used to point every page at the four locale homepages, which tells a
- * search engine that /es/ is the Spanish version of /machine/. The damage is
- * invisible on the page, so only a test catches it.
- */
 test.describe('hreflang names this page in each language', () => {
   for (const path of ['/machine/', '/es/machine/', '/stats/', '/zh/ask/']) {
     test(`${path} points at its own translations`, async ({ page }) => {
