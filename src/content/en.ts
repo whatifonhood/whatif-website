@@ -25,6 +25,7 @@ export const en: SiteCopy = {
     toolGroups: { data: 'The numbers', play: 'Play', assets: 'Assets', read: 'Read' },
     languageMenu: 'Language',
     buy: 'Buy $IF',
+    home: 'What $IF — home',
     pfp: 'Find your coin',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
@@ -332,8 +333,12 @@ export const en: SiteCopy = {
         honeypot: 'Honeypot check',
         supply: 'Fixed supply, no mint function',
         burn: 'Burn address has no private key',
+        owner: 'Who can change the contract',
       },
       checkPass: 'Passed',
+      burnMark: '{amount} burned',
+      ownerNone: 'No owner function',
+      ownerSome: 'Owned by',
     },
     machine: {
       title: 'The What $IF Machine',
@@ -371,6 +376,7 @@ export const en: SiteCopy = {
       pivotCta: 'Buy $IF',
       disclaimer:
         'Rough arithmetic on historical prices, for entertainment. Past prices predict nothing.',
+      pricesCaptured: 'Prices captured {date}.',
     },
     pfp: {
       title: 'PFP Generator',
@@ -385,6 +391,7 @@ export const en: SiteCopy = {
       found: (found, total) => `Found ${found} of ${total}`,
       showPool: 'Show all coins',
       hidePool: 'Hide coins',
+      rolled: 'You pulled {name} — {tier}.',
       locked: 'Not found yet',
       download: 'Download PNG',
       shareCard: 'Share card',

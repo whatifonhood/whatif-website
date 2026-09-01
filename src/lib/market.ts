@@ -337,3 +337,45 @@ export async function getTotalSupply(): Promise<number | undefined> {
   if (!/^0x[0-9a-fA-F]+$/.test(body.result)) return undefined;
   return Number(BigInt(body.result) / 10n ** BigInt(TOKEN.decimals));
 }
+
+/**
+ * Who, if anyone, can still change the contract.
+ *
+ * The renounce claim was removed from this site for lack of proof, and the
+ * honest replacement for a claim you cannot evidence is not silence — it is
+ * showing the raw answer whatever it says. If the call reverts, the contract
+ * has no owner function, which is a stronger fact than any promise. If it
+ * returns an address, that is worth saying before somebody else says it.
+ *
+ * `0x8da5cb5b` is the four-byte selector for `owner()`.
+ */
+export async function getOwner(): Promise<{ address: string } | { none: true } | undefined> {
+  let body: unknown;
+  try {
+    body = await fetchJson(DATA_APIS.rpc, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_call',
+        params: [{ to: TOKEN.address, data: '0x8da5cb5b' }, 'latest'],
+      }),
+    });
+  } catch {
+    return undefined;
+  }
+
+  if (!isRecord(body)) return undefined;
+  // A revert means there is no owner() to call — the contract cannot be
+  // administered through one. That is an answer, not a failure.
+  if (isRecord(body.error)) return { none: true };
+  if (typeof body.result !== 'string') return undefined;
+  if (body.result === '0x') return { none: true };
+  if (!/^0x[0-9a-fA-F]{64}$/.test(body.result)) return undefined;
+
+  // The address is the last 20 bytes of the returned word.
+  const address = `0x${body.result.slice(-40)}`;
+  const isZero = /^0x0{40}$/.test(address);
+  return isZero ? { none: true } : { address };
+}

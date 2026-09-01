@@ -76,12 +76,16 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
 
         <!-- Amount -->
         <div class="mt-7">
-          <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          <label
+            for="machine-amount"
+            class="block font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
+          >
             {page.amountLabel}
-          </span>
+          </label>
           <div class="mt-3 flex items-center gap-2">
-            <span class="font-mono text-lg text-faint">$</span>
+            <span class="font-mono text-lg text-faint" aria-hidden="true">$</span>
             <input
+              id="machine-amount"
               data-machine-amount
               type="number"
               min="1"
@@ -264,7 +268,7 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
     </div>
 
     <p class="mt-8 max-w-2xl font-mono text-[11px] leading-relaxed text-faint">
-      {page.disclaimer} · Prices captured {HISTORY_CAPTURED}.
+      {page.disclaimer} · {page.pricesCaptured.replace('{date}', HISTORY_CAPTURED)}
     </p>
   </div>
 </PageLayout>

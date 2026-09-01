@@ -28,6 +28,8 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { dropOutliers, trimAtRedenomination } from './lib/history-rules.mjs';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const outDir = join(root, 'public', 'machine');
@@ -125,25 +127,6 @@ const SKIP = new Set([
  * genuine rally disagrees with the point before it and agrees with the one
  * after. First and last points are compared against their single neighbour.
  */
-const OUTLIER_RATIO = 50;
-
-function dropOutliers(points) {
-  if (points.length < 3) return points;
-
-  const wild = (a, b) => {
-    if (!(a > 0) || !(b > 0)) return true;
-    const ratio = a > b ? a / b : b / a;
-    return ratio > OUTLIER_RATIO;
-  };
-
-  return points.filter(([, price], index) => {
-    const before = points[index - 1]?.[1];
-    const after = points[index + 1]?.[1];
-    if (before === undefined) return !(after !== undefined && wild(price, after));
-    if (after === undefined) return !wild(price, before);
-    return !(wild(price, before) && wild(price, after));
-  });
-}
 
 function looksLikeAStablecoin(points) {
   const prices = points.map(([, price]) => price);
@@ -266,6 +249,7 @@ for (const [position, coin] of candidates.entries()) {
   }
 
   points = dropOutliers(points);
+  points = trimAtRedenomination(points) ?? [];
   if (!points || points.length < MIN_MONTHS) continue;
   if (looksLikeAStablecoin(points)) continue;
 

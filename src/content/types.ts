@@ -38,6 +38,8 @@ export interface SiteCopy {
     /** The language dropdown's button and label. */
     languageMenu: string;
     buy: string;
+    /** The header logo's link, which goes home. */
+    home: string;
     pfp: string;
     openMenu: string;
     closeMenu: string;
@@ -246,8 +248,20 @@ export interface SiteCopy {
       trustTitle: string;
       /** Says who is attesting, because we are not. */
       trustNote: string;
-      checks: { verified: string; honeypot: string; supply: string; burn: string };
+      checks: {
+        verified: string;
+        honeypot: string;
+        supply: string;
+        burn: string;
+        owner: string;
+      };
+      /** Shown when the contract has no owner function at all. */
+      ownerNone: string;
+      /** Shown, with the address, when it does. */
+      ownerSome: string;
       checkPass: string;
+      /** Tooltip on a burn tick. Carries `{amount}`. */
+      burnMark: string;
     };
     machine: {
       title: string;
@@ -288,6 +302,8 @@ export interface SiteCopy {
       pivot: string;
       pivotCta: string;
       disclaimer: string;
+      /** Carries `{date}`, the day the price history was captured. */
+      pricesCaptured: string;
     };
     pfp: {
       title: string;
@@ -303,6 +319,8 @@ export interface SiteCopy {
       found: (found: number, total: number) => string;
       showPool: string;
       hidePool: string;
+      /** Announced after a pull. Carries `{name}` and `{tier}`. */
+      rolled: string;
       locked: string;
       download: string;
       shareCard: string;

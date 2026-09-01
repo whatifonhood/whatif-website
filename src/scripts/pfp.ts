@@ -190,6 +190,7 @@ export function initPfp(): void {
   const nameEl = root.querySelector<HTMLElement>('[data-pfp-name]');
   const tierEl = root.querySelector<HTMLElement>('[data-pfp-tier]');
   const actions = root.querySelector<HTMLElement>('[data-pfp-actions]');
+  const statusEl = root.querySelector<HTMLElement>('[data-pfp-status]');
   const download = root.querySelector<HTMLAnchorElement>('[data-pfp-download]');
   const cardLink = root.querySelector<HTMLAnchorElement>('[data-pfp-card]');
   const shareLink = root.querySelector<HTMLAnchorElement>('[data-pfp-x]');
@@ -206,6 +207,7 @@ export function initPfp(): void {
     showPool: poolToggle?.dataset.labelShow ?? '',
     hidePool: poolToggle?.dataset.labelHide ?? '',
     shareText: shareLink?.dataset.template ?? '',
+    rolled: root.dataset.labelRolled ?? '{name} — {tier}',
   };
   const tierLabels: Record<string, string> = JSON.parse(root.dataset.tiers ?? '{}');
 
@@ -251,8 +253,13 @@ export function initPfp(): void {
     tierEl.dataset.tier = coin.tier;
     result.hidden = false;
     if (actions) actions.hidden = false;
-    generate.disabled = false;
+    generate.setAttribute('aria-disabled', 'false');
     generate.textContent = labels.again;
+    // Announced, because the result appears in a region nothing points at.
+    if (statusEl)
+      statusEl.textContent = labels.rolled
+        .replace('{name}', coin.name)
+        .replace('{tier}', tierLabel);
 
     // Record it, and reset the relevant pity counter.
     if (!state.found[coin.slug]) state.found[coin.slug] = true;
@@ -336,9 +343,11 @@ export function initPfp(): void {
   };
 
   generate.addEventListener('click', () => {
+    // `rolling` is the real guard. The button reports the state rather than
+    // taking it, because a disabled button loses focus mid-roll.
     if (rolling) return;
     rolling = true;
-    generate.disabled = true;
+    generate.setAttribute('aria-disabled', 'true');
     result.hidden = true;
     if (actions) actions.hidden = true;
     coinWrap.dataset.tier = 'none';

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
 
 /**
@@ -601,5 +602,110 @@ test.describe('a language keeps you in that language', () => {
       // Orphaned pages are pages nothing points at, so count the pointers.
       expect(await inside.count()).toBeGreaterThan(5);
     });
+  }
+});
+
+/**
+ * Translation metadata.
+ *
+ * These used to point every page at the four locale homepages, which tells a
+ * search engine that /es/ is the Spanish version of /machine/. The damage is
+ * invisible on the page, so only a test catches it.
+ */
+test.describe('hreflang names this page in each language', () => {
+  for (const path of ['/machine/', '/es/machine/', '/stats/', '/zh/ask/']) {
+    test(`${path} points at its own translations`, async ({ page }) => {
+      await page.goto(path);
+      const links = page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])');
+      await expect(links).toHaveCount(4);
+
+      const hrefs = await links.evaluateAll((nodes) =>
+        nodes.map((node) => (node as HTMLLinkElement).href),
+      );
+      // The page is /machine/, so every alternate must be a /machine/ too.
+      const tail = path.replace(/^\/(zh|tr|es)\//, '/');
+      for (const href of hrefs) {
+        expect(new URL(href).pathname.replace(/^\/(zh|tr|es)\//, '/')).toBe(tail);
+      }
+      // And all four are distinct, so they really are four languages.
+      expect(new Set(hrefs).size).toBe(4);
+    });
+  }
+});
+
+/**
+ * Accessible names on the controls that had none.
+ *
+ * A field whose label is a nearby span is unlabelled as far as a screen reader
+ * is concerned, and a slider that reports its array index names no month.
+ */
+test.describe('the Machine can be operated without seeing it', () => {
+  test('the amount field has a name', async ({ page }) => {
+    await page.goto('/machine/');
+    // Asserted through the accessibility tree, not the markup: the point is
+    // that a screen reader can announce the field, however it is labelled.
+    const named = await page
+      .locator('[data-machine-amount]')
+      .evaluate((node) => node.labels?.[0]?.textContent?.trim() ?? node.getAttribute('aria-label'));
+    expect(named, 'the amount field has no accessible name').toBeTruthy();
+  });
+
+  test('the month slider says the month, not its index', async ({ page }) => {
+    await page.goto('/machine/');
+    await page.getByRole('combobox').or(page.locator('[data-machine-search]')).first().fill('doge');
+    await page.locator('.result-row').first().click();
+
+    const slider = page.locator('[data-machine-month]');
+    await expect(slider).toBeEnabled();
+    // A month name and a year — never a bare number.
+    await expect(slider).toHaveAttribute('aria-valuetext', /[A-Za-zÀ-鿿]+.*\d{4}|\d{4}/);
+  });
+});
+
+/**
+ * The generator keeps focus while it rolls.
+ *
+ * It used to set `disabled` for the 2.4s spin, which drops focus to the top of
+ * the document — so a keyboard user lost their place and never heard the result.
+ */
+test('the coin generator announces what it pulled', async ({ page }) => {
+  await page.goto('/pfp/');
+  const generate = page.locator('[data-pfp-generate]');
+  await generate.focus();
+  await generate.press('Enter');
+
+  // Still the focused element while the reel spins.
+  await expect(generate).toBeFocused();
+  await expect(page.locator('[data-pfp-status]')).not.toBeEmpty({ timeout: 10_000 });
+});
+
+/**
+ * Ownership is read from the chain rather than claimed.
+ *
+ * The site removed its "renounced" claim for lack of proof. The honest
+ * replacement is the raw answer, whatever it is.
+ */
+test('the stats page states who can change the contract', async ({ page }) => {
+  await page.goto('/stats/');
+  const row = page.locator('[data-check="owner"]');
+  await expect(row).toBeVisible();
+  // Either the contract has no owner function, or it names one. Never a claim.
+  await expect(row).not.toContainText(/renounc/i);
+});
+
+/**
+ * HTML must never sit behind a long cache, or a deploy is invisible for a week.
+ */
+test('no cache rule puts an HTML route behind a week', () => {
+  const rules = readFileSync('public/_headers', 'utf8');
+  const weekly = [...rules.matchAll(/^(\/\S+)\n\s+Cache-Control: public, max-age=604800/gm)].map(
+    (match) => match[1]!,
+  );
+  expect(weekly.length).toBeGreaterThan(0);
+  for (const rule of weekly) {
+    // Every long-cached prefix must be an asset directory, not a page route.
+    expect(rule, `${rule} would also match an HTML page`).toMatch(
+      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|machine\/(logos|poses))\/\*$/,
+    );
   }
 });

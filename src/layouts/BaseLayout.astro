@@ -7,7 +7,8 @@
  * and images are served from this origin, which is why the Content-Security-
  * Policy in public/_headers can be as tight as it is.
  */
-import { LOCALES, LOCALE_PATHS, LINKS, SITE, type Locale } from '../config/site.ts';
+import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
+import { basePath, localePath } from '../config/navigation.ts';
 import { getCopy } from '../content/index.ts';
 import '../styles/global.css';
 
@@ -29,10 +30,15 @@ const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const shareImage = socialImage ?? new URL('/og-default.jpg', SITE.url).href;
 const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
 
-/** Every language of this page, for search engines. */
+/**
+ * Every language of *this* page, for search engines.
+ *
+ * These used to point at the four locale homepages regardless of the page they
+ * were on, which claims /es/ is the Spanish translation of /machine/.
+ */
 const alternates = LOCALES.map((code) => ({
   code,
-  href: new URL(LOCALE_PATHS[code], SITE.url).href,
+  href: new URL(localePath(basePath(Astro.url.pathname), code), SITE.url).href,
 }));
 
 /** Tells search engines who publishes this site and which accounts are ours. */

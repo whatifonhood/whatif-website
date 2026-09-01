@@ -1,3 +1,5 @@
+import { LOCALES } from './site.ts';
+
 /**
  * The tools in the header dropdown, grouped.
  *
@@ -41,4 +43,19 @@ export function toolsIn(group: ToolGroup) {
  */
 export function localePath(href: string, locale: string): string {
   return locale === 'en' ? href : `/${locale}${href}`;
+}
+
+/**
+ * Strips a locale prefix, giving the path as it exists in English.
+ *
+ * `/es/machine/` and `/machine/` are the same page in two languages, and
+ * several things — hreflang, the language switcher — need to get from one to
+ * the other. Pairs with `localePath`, which goes the other way.
+ */
+export function basePath(pathname: string): string {
+  const match = /^\/([a-z]{2})(\/.*)?$/.exec(pathname);
+  if (!match) return pathname;
+  const [, code, rest] = match;
+  if (!LOCALES.includes(code as (typeof LOCALES)[number]) || code === 'en') return pathname;
+  return rest && rest !== '/' ? rest : '/';
 }

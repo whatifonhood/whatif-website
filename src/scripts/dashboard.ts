@@ -16,12 +16,14 @@ import {
   getRecentBurns,
   getRecentTrades,
   getTokenInfo,
+  getOwner,
   getTotalSupply,
   type Candle,
   type Timeframe,
   type Trade,
 } from '../lib/market.ts';
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/format.ts';
+import { setLiveText } from '../lib/live-text.ts';
 import { BURNS, BURNS_SCANNED_TO } from '../config/burns.ts';
 import { CHAIN, TOKEN } from '../config/site.ts';
 
@@ -247,6 +249,9 @@ function drawBurnMarks(
   svg: SVGSVGElement,
   candles: Candle[],
   burns: { time: number; tokens: number }[],
+  locale: string,
+  /** e.g. "{amount} burned", from the copy files. */
+  template: string,
 ): void {
   const layer = svg.querySelector('[data-burn-marks]');
   if (!layer || candles.length < 2) return;
@@ -267,7 +272,10 @@ function drawBurnMarks(
       mark.setAttribute('class', 'burn-mark');
 
       const title = document.createElementNS(SVG_NS, 'title');
-      title.textContent = `${Math.round(burn.tokens).toLocaleString()} burned`;
+      title.textContent = template.replace(
+        '{amount}',
+        Math.round(burn.tokens).toLocaleString(locale),
+      );
       mark.append(title);
       return mark;
     });
@@ -303,16 +311,15 @@ export function initDashboard(locale: string): void {
     view: root.dataset.labelView ?? 'View',
     failed: root.dataset.labelFailed ?? '',
     holdersUpdated: root.dataset.labelHoldersUpdated ?? '',
+    burnMark: root.dataset.labelBurnMark ?? '{amount} burned',
     checkPass: root.dataset.labelCheckPass ?? '',
+    ownerNone: root.dataset.labelOwnerNone ?? '',
+    ownerSome: root.dataset.labelOwnerSome ?? '',
     windowHours: (hours: number) =>
       (root.dataset.labelWindow ?? '').replace('{hours}', String(hours)),
   };
 
-  const setText = (key: string, value: string) => {
-    for (const node of root.querySelectorAll<HTMLElement>(`[data-metric="${key}"]`)) {
-      node.textContent = value;
-    }
-  };
+  const setText = (key: string, value: string) => setLiveText(root, 'data-metric', key, value);
 
   /** Colours and signs a percentage change. */
   const setChange = (key: string, value: number | undefined) => {
@@ -400,7 +407,7 @@ export function initDashboard(locale: string): void {
     } else {
       chart.querySelector('[data-average]')?.replaceChildren();
     }
-    drawBurnMarks(chart, candles, BURNS);
+    drawBurnMarks(chart, candles, BURNS, locale, labels.burnMark);
 
     chart.dataset.type = type;
     // Only offer "reset" when there is something to reset to.
@@ -650,9 +657,10 @@ export function initDashboard(locale: string): void {
     // are now derived from the chain, and a failed read shows as unverified
     // rather than quietly passing — which is what our own scam article tells
     // readers to look out for.
-    const [supply, burned] = await Promise.all([
+    const [supply, burned, owner] = await Promise.all([
       getTotalSupply().catch(() => undefined),
       getBalanceOf(TOKEN.burnAddress).catch(() => undefined),
+      getOwner().catch(() => undefined),
     ]);
 
     const marks: Record<string, boolean | undefined> = {
@@ -661,7 +669,12 @@ export function initDashboard(locale: string): void {
       // True only if the supply on-chain still matches what the site publishes.
       supply: supply === undefined ? undefined : supply === TOKEN.totalSupply,
       burn: burned === undefined ? undefined : burned > 0,
+      // Not a pass/fail: the row states whatever the chain says. A contract
+      // with no owner function is the strong case, and an owned one is worth
+      // saying plainly rather than leaving for somebody else to discover.
+      owner: owner === undefined ? undefined : 'none' in owner,
     };
+
     for (const [check, passed] of Object.entries(marks)) {
       const row = root.querySelector<HTMLElement>(`[data-check="${check}"]`);
       if (!row || passed === undefined) continue;
@@ -670,6 +683,17 @@ export function initDashboard(locale: string): void {
       const state = row.querySelector<HTMLElement>('[data-check-state]');
       if (state && passed) state.textContent = labels.checkPass;
     }
+
+    // After the loop: this row says what the chain returned rather than a
+    // generic "Confirmed", so it must not be overwritten by it.
+    const ownerRow = root.querySelector<HTMLElement>('[data-check="owner"] [data-check-state]');
+    if (ownerRow && owner) {
+      ownerRow.textContent =
+        'none' in owner
+          ? labels.ownerNone
+          : `${labels.ownerSome} ${owner.address.slice(0, 6)}…${owner.address.slice(-4)}`;
+    }
+
     return 'ok';
   };
 

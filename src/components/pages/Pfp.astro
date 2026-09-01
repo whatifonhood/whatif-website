@@ -59,6 +59,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
   <div
     data-pfp
     data-tiers={JSON.stringify(tierLabels)}
+    data-label-rolled={page.rolled}
     class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
   >
     <!-- The coin -->
@@ -78,6 +79,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
       </div>
 
       <!-- Result -->
+      <p data-pfp-status role="status" aria-live="polite" class="sr-only"></p>
       <div data-pfp-result hidden class="mt-8 flex flex-col items-center gap-3">
         <h2 data-pfp-name class="display-heading text-3xl sm:text-4xl"></h2>
         <span
@@ -91,7 +93,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
         data-pfp-generate
         data-label-generate={page.generate}
         data-label-again={page.again}
-        class="mt-8 rounded-full bg-lime px-8 py-4 font-display text-base font-bold text-void transition-all duration-300 hover:-translate-y-0.5 hover:bg-lime-pale hover:shadow-[0_12px_36px_-12px_rgba(143,206,2,0.6)] disabled:opacity-60"
+        class="mt-8 rounded-full bg-lime px-8 py-4 font-display text-base font-bold text-void transition-all duration-300 hover:-translate-y-0.5 hover:bg-lime-pale hover:shadow-[0_12px_36px_-12px_rgba(143,206,2,0.6)] aria-disabled:opacity-60"
       >
         {page.generate}
       </button>
