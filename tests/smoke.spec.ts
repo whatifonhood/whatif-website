@@ -44,7 +44,12 @@ for (const page of PAGES) {
       // snapshot figures stay on screen. Asserting on it makes the suite fail
       // for reasons nobody here can fix, so only our own errors are counted.
       const dataApi = /dexscreener|geckoterminal|coingecko|rpc\.mainnet\.chain\.robinhood\.com/i;
-      const networkFailure = /failed to fetch|net::ERR|CORS|Access to fetch/i;
+      // Each browser words a throttled cross-origin request differently:
+      // Chromium says "net::ERR_FAILED" and "Access to fetch", WebKit says
+      // "not allowed by Access-Control-Allow-Origin" and "due to access
+      // control checks", and a rate limit shows up as a bare 429.
+      const networkFailure =
+        /failed to fetch|net::ERR|CORS|Access to fetch|Access-Control-Allow-Origin|access control checks|\b429\b/i;
 
       const ours = errors.filter((message) => {
         if (dataApi.test(message) && networkFailure.test(message)) return false;
@@ -53,6 +58,13 @@ for (const page of PAGES) {
         // be acted on — but a genuine 404 for one of our own files says "404"
         // rather than ERR_FAILED and is still counted.
         if (/^Failed to load resource: net::ERR/i.test(message)) return false;
+        // WebKit's equivalent bare line, which also names no host.
+        if (
+          /^(Failed to load resource: )?Origin https?:\/\/[^\s]+ is not allowed by Access-Control-Allow-Origin/i.test(
+            message,
+          )
+        )
+          return false;
         return true;
       });
       expect(ours, `console errors on ${page.path}`).toEqual([]);
@@ -385,22 +397,13 @@ test.describe('the question generator', () => {
       const text = (await question.textContent())?.trim() ?? '';
       seen.add(text);
 
-      // Case-sensitive on purpose: "Okay but What if" is the bug.
-      if (/[a-z,] What if/.test(text)) problems.push(`capitalised mid-sentence: ${text}`);
-      if (/(sold|held)[^?]*never sold/.test(text)) problems.push(`contradiction: ${text}`);
-      if (/ {2}| ,| \?/.test(text)) problems.push(`spacing: ${text}`);
+      // Only what the RENDER PATH could break. Every rule about the sentences
+      // themselves lives in tools/check-questions.mjs, which reads all 2,406 —
+      // a second copy here can only sample a handful and drift out of step
+      // with the real one, which is exactly what it did.
       if (!text.endsWith('?')) problems.push(`not a question: ${text}`);
       if (/\{\w+\}/.test(text)) problems.push(`unfilled slot: ${text}`);
-      // The failure this generator was rebuilt to remove: two unrelated ideas
-      // stapled together, which is grammatical and meaningless.
-      if ((text.match(/ and /g) ?? []).length > 1) problems.push(`two ideas: ${text}`);
-      if (text.length > 90) problems.push(`too long: ${text}`);
-      // Agreement: "we was early", "I is still asking".
-      if (/\b(we|they) was\b|\bI is\b|\beveryone were\b/.test(text)) {
-        problems.push(`agreement: ${text}`);
-      }
-      // Double negatives, which is what "nobody" does to a negative verb.
-      if (/\bnobody\b[^?]*\bnever\b/.test(text)) problems.push(`double negative: ${text}`);
+      if (/ {2}| ,| \?/.test(text)) problems.push(`spacing: ${text}`);
 
       // Wait for the question to actually change rather than assuming the click
       // landed — under parallel load a press can outrun the read, which looks
