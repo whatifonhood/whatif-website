@@ -29,10 +29,10 @@ const BROWSER_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
-const response = await fetch(
-  `${CHAIN.explorerUrl}/api/v2/tokens/${TOKEN.address}/holders`,
-  { headers: { accept: 'application/json', 'user-agent': BROWSER_UA }, signal: AbortSignal.timeout(30_000) },
-);
+const response = await fetch(`${CHAIN.explorerUrl}/api/v2/tokens/${TOKEN.address}/holders`, {
+  headers: { accept: 'application/json', 'user-agent': BROWSER_UA },
+  signal: AbortSignal.timeout(30_000),
+});
 if (!response.ok) throw new Error(`explorer returned ${response.status}`);
 
 const body = await response.json();
