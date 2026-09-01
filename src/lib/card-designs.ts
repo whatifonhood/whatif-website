@@ -29,26 +29,29 @@ import {
 const PAD = 72;
 
 /**
- * The coin each card wears, by meaning rather than by chance.
+ * The coin each card wears.
  *
- * These are the existing pieces from the pull set, so nothing new had to be
- * drawn and every card carries something from the coin's own world.
+ * Drawn FOR the cards and used nowhere else. The pull set is a collection
+ * people earn, so spending those pieces as card furniture would cheapen both —
+ * a coin you can see on any shared card is not much of a pull. These four also
+ * carry a gunmetal rim rather than the collection's lime, so a card is never
+ * mistaken for somebody's find.
+ *
+ * Generated from the character reference sheet through the pipeline in
+ * what-if-meme/PFP-GENERATION-PLAN.md, same five-block prompt as the pool.
  */
 export const CARD_COINS = {
-  /** IF Man tapping his temple: the Machine's whole question. */
-  machineWin: 'aped-earlier',
-  /** Coffee in front of a wall of red candles. */
-  machineLoss: 'this-is-fine',
-  /** The thinker, ringed with question marks. */
-  ask: 'thinker',
-  whale: 'whale',
-  shark: 'diamond-hands',
-  holder: 'hodl',
-  curious: 'telescope',
+  /** Reaching up a staircase of green candles. Rim: WHAT $IF EARLIER. */
+  machineWin: 'earlier',
+  /** Palm out, red candles falling past. Rim: DODGED IT. */
+  machineLoss: 'dodged',
+  /** Looking up at a question mark written in stars. Rim: STILL ASKING. */
+  ask: 'asking',
+  /** One glowing coin cupped at the chest, a chain behind. Rim: READ THE CHAIN. */
+  holdings: 'ledger',
 } as const;
 
-/** Where a card's medallion is fetched from. */
-export const coinArt = (slug: string) => `/coins/full/${slug}.webp`;
+export const coinArt = (slug: string) => `/cards/${slug}.webp`;
 
 function prepare(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   const context = canvas.getContext('2d');
