@@ -66,6 +66,22 @@ contract address that disagrees with it.
 4. Add `src/pages/<code>/index.astro` containing `<Landing locale="<code>" />`.
 5. Add the code to `i18n.locales` in `astro.config.mjs`.
 
+### …put a post on the community wall?
+
+Paste the post's URL into `TWEET_URLS` in `src/config/tweets.ts`, then run:
+
+```bash
+npm run tweets
+```
+
+That fetches the text and author through X's oEmbed endpoint **at build time**,
+reduces the returned HTML to plain text, and writes `src/config/tweet-cards.ts` —
+which is what the page renders. Commit both files.
+
+No third-party script runs on the site and no iframe loads, so the
+Content-Security-Policy is untouched. The daily refresh re-runs this; a post
+deleted on X drops off the wall, and a rate limit or an outage changes nothing.
+
 ### …add a meme to the vault?
 
 Drop the PNG into `what-if-meme/brand-pack/meme-pack/memes/`, then:
