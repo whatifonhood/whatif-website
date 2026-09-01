@@ -45,6 +45,7 @@ export const zh: SiteCopy = {
 
   posts: {
     eyebrow: '来自时间线',
+    readOnX: '在 X 上查看',
     heading: { lead: '大家还在', accent: '问。' },
     intro: '社区正在发布的内容。在这里呈现，而不是嵌入 —— 没有追踪器，没有 iframe。',
     follow: '在 X 上关注',
@@ -177,21 +178,6 @@ export const zh: SiteCopy = {
     heading: { lead: '每一张迷因图。', accent: '随便拿。' },
     body: '我们做过的每一张迷因图，全分辨率，随时可发。它们本来就是为此而生的。请负责任地右键保存。',
     cta: '打开迷因库',
-  },
-
-  ecosystem: {
-    eyebrow: '生态系统',
-    heading: { lead: '我们真正', accent: '在用的工具。' },
-    intro: '我们就是这样交易、追踪和核实 $IF 的。每个链接都指向官方页面。',
-    blurbs: {
-      Uniswap: '在这条链的主要 DEX 上用 ETH 兑换 $IF。',
-      DexScreener: '实时价格、流动性与每一笔交易。',
-      CoinGecko: '价格历史、市值与社区数据。',
-      CoinMarketCap: '排名、供应量与市场数据。',
-      Blockscout: '合约、持有人与销毁记录。',
-      MetaMask: '大多数人已经在用的 EVM 钱包。',
-      'Robinhood Wallet': '在手机上原生支持 Robinhood Chain。',
-    },
   },
 
   roadmap: {

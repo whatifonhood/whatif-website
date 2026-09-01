@@ -57,6 +57,7 @@ export const es: SiteCopy = {
 
   posts: {
     eyebrow: 'Desde la timeline',
+    readOnX: 'Ver en X',
     heading: { lead: 'La gente sigue', accent: 'preguntando.' },
     intro:
       'Lo que publica la comunidad. Se muestra aquí, no se incrusta — sin rastreadores, sin iframes.',
@@ -191,21 +192,6 @@ export const es: SiteCopy = {
     heading: { lead: 'Todos los memes.', accent: 'Gratis para robar.' },
     body: 'Todos los memes que hemos hecho, en máxima resolución, listos para publicar. Para eso están. Haz clic derecho con responsabilidad.',
     cta: 'Abrir la bóveda',
-  },
-
-  ecosystem: {
-    eyebrow: 'Ecosistema',
-    heading: { lead: 'Herramientas que', accent: 'sí usamos.' },
-    intro: 'Cómo operamos, seguimos y verificamos $IF. Cada enlace abre el sitio real.',
-    blurbs: {
-      Uniswap: 'Cambia ETH por $IF en el DEX principal de la cadena.',
-      DexScreener: 'Precio, liquidez y cada operación en vivo.',
-      CoinGecko: 'Historial de precios, capitalización, datos de la comunidad.',
-      CoinMarketCap: 'Ranking, suministro y datos de mercado.',
-      Blockscout: 'El contrato, los holders, la quema.',
-      MetaMask: 'La wallet EVM que casi todos ya tienen.',
-      'Robinhood Wallet': 'Soporta Robinhood Chain de forma nativa, en tu teléfono.',
-    },
   },
 
   roadmap: {

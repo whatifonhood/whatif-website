@@ -45,6 +45,7 @@ export const tr: SiteCopy = {
 
   posts: {
     eyebrow: 'Akıştan',
+    readOnX: 'X’te oku',
     heading: { lead: 'İnsanlar hâlâ', accent: 'soruyor.' },
     intro: 'Topluluğun paylaştıkları. Gömülmüyor, burada çiziliyor — takip kodu yok, iframe yok.',
     follow: "X'te takip et",
@@ -179,21 +180,6 @@ export const tr: SiteCopy = {
     heading: { lead: 'Her meme.', accent: 'Çalması serbest.' },
     body: 'Yaptığımız her meme, tam çözünürlükte, paylaşmaya hazır. Zaten bunun için varlar. Sağ tıkla, sorumluca.',
     cta: 'Kasayı aç',
-  },
-
-  ecosystem: {
-    eyebrow: 'Ekosistem',
-    heading: { lead: 'Gerçekten', accent: 'kullandığımız araçlar.' },
-    intro: '$IF’i böyle alıp satıyor, takip ediyor ve doğruluyoruz. Her link gerçeğine gider.',
-    blurbs: {
-      Uniswap: 'Zincirin ana DEX’inde ETH’yi $IF’a çevir.',
-      DexScreener: 'Canlı fiyat, likidite ve her işlem.',
-      CoinGecko: 'Fiyat geçmişi, piyasa değeri, topluluk verileri.',
-      CoinMarketCap: 'Sıralama, arz ve piyasa verisi.',
-      Blockscout: 'Kontrat, cüzdanlar ve yakılanlar.',
-      MetaMask: 'Çoğu kişide zaten olan EVM cüzdanı.',
-      'Robinhood Wallet': 'Telefonda Robinhood Chain’i doğrudan destekler.',
-    },
   },
 
   roadmap: {

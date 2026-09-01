@@ -45,6 +45,7 @@ export const en: SiteCopy = {
 
   posts: {
     eyebrow: 'From the timeline',
+    readOnX: 'Read on X',
     heading: { lead: 'People are', accent: 'still asking.' },
     intro: 'What the community is posting. Rendered here, not embedded — no tracker, no iframe.',
     follow: 'Follow on X',
@@ -179,21 +180,6 @@ export const en: SiteCopy = {
     heading: { lead: 'Every meme.', accent: 'Free to steal.' },
     body: "Every meme we've made, in full resolution, ready to post. That is the point of them. Right-click responsibly.",
     cta: 'Open the vault',
-  },
-
-  ecosystem: {
-    eyebrow: 'Ecosystem',
-    heading: { lead: 'Tools we', accent: 'actually use.' },
-    intro: 'How we trade, track and verify $IF. Every link opens the real thing.',
-    blurbs: {
-      Uniswap: 'Swap ETH for $IF on the chain’s main DEX.',
-      DexScreener: 'Live price, liquidity and every trade.',
-      CoinGecko: 'Price history, market cap, community stats.',
-      CoinMarketCap: 'Ranking, supply and market data.',
-      Blockscout: 'The contract, the holders, the burn.',
-      MetaMask: 'The EVM wallet most people already have.',
-      'Robinhood Wallet': 'Holds Robinhood Chain natively, on your phone.',
-    },
   },
 
   roadmap: {

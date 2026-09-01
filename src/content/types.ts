@@ -61,6 +61,8 @@ export interface SiteCopy {
   /** The wall of posts. Hidden entirely when there is nothing to show. */
   posts: {
     eyebrow: string;
+    /** The link under each card, beside its date. */
+    readOnX: string;
     heading: SplitHeading;
     intro: string;
     follow: string;
@@ -129,14 +131,6 @@ export interface SiteCopy {
     heading: SplitHeading;
     body: string;
     cta: string;
-  };
-
-  ecosystem: {
-    eyebrow: string;
-    heading: SplitHeading;
-    intro: string;
-    /** Keyed by the tool name in `ECOSYSTEM` — see src/config/ecosystem.ts. */
-    blurbs: Record<string, string>;
   };
 
   roadmap: {
