@@ -19,6 +19,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { TWEET_URLS } from '../src/config/tweets.ts';
+import { TWEET_CARDS as COMMITTED } from '../src/config/tweet-cards.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const output = resolve(here, '..', 'src', 'config', 'tweet-cards.ts');
@@ -62,6 +63,22 @@ function toPlainText(html) {
 
 const cards = [];
 let failed = 0;
+/** Posts X says are gone for good. These are meant to leave the wall. */
+let dropped = 0;
+
+/**
+ * What is already on the wall, so a bad day cannot take a post off it.
+ *
+ * A fetch can fail for two very different reasons, and they deserve opposite
+ * treatment: a post DELETED on X should leave the wall, but a rate limit or a
+ * five-hundred should change nothing. Without this the daily job would write
+ * whatever it happened to get, and the refresh commit would make a transient
+ * failure permanent — two posts quietly gone until somebody noticed.
+ */
+const alreadyOnTheWall = new Map(COMMITTED.map((card) => [card.url, card]));
+
+/** 404 and 410 mean the post is gone for good. Everything else is a bad day. */
+const GONE = new Set([404, 410]);
 
 for (const url of TWEET_URLS) {
   if (!POST_URL.test(url)) {
@@ -80,7 +97,11 @@ for (const url of TWEET_URLS) {
       redirect: 'follow',
       signal: AbortSignal.timeout(20_000),
     });
-    if (!response.ok) throw new Error(String(response.status));
+    if (!response.ok) {
+      const error = new Error(String(response.status));
+      error.status = response.status;
+      throw error;
+    }
     const body = await response.json();
 
     const text = toPlainText(body.html);
@@ -95,13 +116,45 @@ for (const url of TWEET_URLS) {
     process.stdout.write(`  ✓ ${url.split('/').pop()}\n`);
   } catch (error) {
     failed += 1;
-    console.warn(`  ✗ ${url} — ${error.message}`);
+
+    if (GONE.has(error.status)) {
+      console.warn(`  ✗ ${url} — deleted or unavailable (${error.status}); dropping it`);
+      dropped += 1;
+      continue;
+    }
+
+    const kept = alreadyOnTheWall.get(url);
+    if (kept) {
+      cards.push(kept);
+      console.warn(`  ~ ${url} — ${error.message}; keeping the copy already committed`);
+    } else {
+      console.warn(`  ✗ ${url} — ${error.message}`);
+    }
   }
 }
 
 // Leave the committed file alone rather than emptying the wall over a bad day.
 if (cards.length === 0 && TWEET_URLS.length > 0) {
   console.warn('\nNothing fetched; keeping the existing tweet-cards.ts.');
+  process.exit(0);
+}
+
+/*
+ * A last guard on the same idea, counted against what we MEANT to end up with
+ * rather than against what is already committed.
+ *
+ * Measuring against the committed file would refuse the two cases that are
+ * supposed to shrink the wall: a post deleted on X, and a URL removed from
+ * TWEET_URLS by hand. Measuring against the intent catches only the case that
+ * matters — a post we still want, that we could not fetch, and have no
+ * committed copy of.
+ */
+const wanted = TWEET_URLS.filter((url) => POST_URL.test(url)).length - dropped;
+if (cards.length < wanted) {
+  console.warn(
+    `\nOnly ${cards.length} of ${wanted} posts survived; ` +
+      'keeping the existing tweet-cards.ts rather than publishing a short wall.',
+  );
   process.exit(0);
 }
 
