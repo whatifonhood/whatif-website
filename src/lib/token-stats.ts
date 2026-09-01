@@ -27,6 +27,7 @@ export interface LiveStats {
   liquidityUsd?: number;
   volume24hUsd?: number;
   burnedTokens?: number;
+  holders?: number;
 }
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -47,17 +48,32 @@ export function asPositiveNumber(value: unknown): number | undefined {
  * through it keeps the limit tripped and helps nobody, so a 429 puts every
  * caller on this origin on hold and the page keeps showing what it already had.
  */
-let throttledUntil = 0;
+const throttledUntil = new Map<string, number>();
 
-/** How long a 429 stops us asking. */
+/** How long a 429 stops us asking that origin. */
 const BACKOFF_MS = 60_000;
 
-export function isThrottled(): boolean {
-  return Date.now() < throttledUntil;
+/**
+ * Backoff is per-origin.
+ *
+ * It used to be a single module-level timestamp, so one 429 from GeckoTerminal
+ * also stopped the site reading DexScreener and the chain itself for a minute —
+ * three unrelated services silenced by one of them being busy.
+ */
+function originOf(url: string): string {
+  try {
+    return new URL(url, window.location.origin).origin;
+  } catch {
+    return url;
+  }
+}
+
+export function isThrottled(url: string): boolean {
+  return Date.now() < (throttledUntil.get(originOf(url)) ?? 0);
 }
 
 export async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
-  if (isThrottled()) throw new Error('rate-limited; holding off');
+  if (isThrottled(url)) throw new Error('rate-limited; holding off');
 
   const response = await fetch(url, {
     ...init,
@@ -66,7 +82,7 @@ export async function fetchJson(url: string, init?: RequestInit): Promise<unknow
   });
 
   if (response.status === 429) {
-    throttledUntil = Date.now() + BACKOFF_MS;
+    throttledUntil.set(originOf(url), Date.now() + BACKOFF_MS);
     throw new Error(`${url} responded 429`);
   }
   if (!response.ok) throw new Error(`${url} responded ${response.status}`);
@@ -124,13 +140,32 @@ async function fetchBurnedTokens(): Promise<number | undefined> {
  * Everything the page needs, in one call. Individual failures are tolerated:
  * whatever succeeds is returned, and the caller keeps the snapshot for the rest.
  */
+/** Holder count. The same keyless endpoint the dashboard reads. */
+async function fetchHolders(): Promise<number | undefined> {
+  const body = await fetchJson(
+    `https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/${TOKEN.address}/info`,
+  );
+  if (!isRecord(body) || !isRecord(body.data) || !isRecord(body.data.attributes)) return undefined;
+  const holders = body.data.attributes.holders;
+  return isRecord(holders) ? asPositiveNumber(holders.count) : undefined;
+}
+
 export async function getLiveStats(): Promise<LiveStats> {
-  const [pair, burned] = await Promise.allSettled([fetchPairStats(), fetchBurnedTokens()]);
+  // The holder tile on the landing page was a build constant sitting under a
+  // heading that says the figures come from the chain. It is fetched now.
+  const [pair, burned, holders] = await Promise.allSettled([
+    fetchPairStats(),
+    fetchBurnedTokens(),
+    fetchHolders(),
+  ]);
 
   return {
     ...(pair.status === 'fulfilled' ? pair.value : {}),
     ...(burned.status === 'fulfilled' && burned.value !== undefined
       ? { burnedTokens: burned.value }
+      : {}),
+    ...(holders.status === 'fulfilled' && holders.value !== undefined
+      ? { holders: holders.value }
       : {}),
   };
 }

@@ -43,13 +43,22 @@ export async function initLiveStats(locale: string): Promise<void> {
   start();
 }
 
+/**
+ * Fetches the live figures and writes whatever arrived.
+ *
+ * The badge that says "Live" is only allowed to appear if something actually
+ * came back. It used to flip unconditionally, which meant a total API failure
+ * left the build-time snapshot on screen with the honest "as of <date>" label
+ * REMOVED and a live indicator in its place — a price from the last deploy,
+ * asserted as current, on a page about money. It never corrected itself and got
+ * worse the longer since the last build.
+ *
+ * `getLiveStats` uses Promise.allSettled and so can never reject; a total
+ * failure returns an empty object. That is why the test here is "did any value
+ * arrive", not "did this throw".
+ */
 async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<void> {
-  let stats;
-  try {
-    stats = await getLiveStats();
-  } catch {
-    return; // Snapshot stays on screen.
-  }
+  const stats = await getLiveStats();
 
   const burnedPercent =
     stats.burnedTokens === undefined ? undefined : (stats.burnedTokens / TOKEN.totalSupply) * 100;
@@ -64,6 +73,7 @@ async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<v
     burnedExact:
       stats.burnedTokens === undefined ? undefined : formatCount(stats.burnedTokens, locale),
     burnedPercent: burnedPercent === undefined ? undefined : formatPercent(burnedPercent, locale),
+    holders: stats.holders === undefined ? undefined : formatCompact(stats.holders, locale),
   };
 
   for (const node of nodes) {
@@ -72,11 +82,14 @@ async function update(nodes: NodeListOf<HTMLElement>, locale: string): Promise<v
     if (value) node.textContent = value;
   }
 
-  // Now the figures are current, swap the "as of <date>" note for a live badge.
+  // Only claim "live" when something actually arrived, and go back to the dated
+  // label when a later poll fails — otherwise a page left open overnight keeps
+  // asserting a figure it stopped being able to confirm hours ago.
+  const arrived = Object.values(formatted).some((value) => value !== undefined);
   for (const note of document.querySelectorAll<HTMLElement>('[data-stat-freshness]')) {
     const snapshot = note.querySelector<HTMLElement>('[data-freshness-snapshot]');
     const live = note.querySelector<HTMLElement>('[data-freshness-live]');
-    if (snapshot) snapshot.hidden = true;
-    if (live) live.hidden = false;
+    if (snapshot) snapshot.hidden = arrived;
+    if (live) live.hidden = !arrived;
   }
 }

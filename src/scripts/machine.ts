@@ -369,9 +369,25 @@ function readStateFromUrl(coins: CoinEntry[]): UrlState | null {
 
   const symbol = params.get('coin');
   if (!symbol) return null;
-  // Allowlist: the symbol has to be one we actually shipped.
+
+  // Allowlisted against our own index, never trusted from the URL. A coin from
+  // the long tail carries its id too, otherwise a shared link for one of the
+  // eighteen thousand tail coins silently opened on DOGE showing different
+  // numbers than the sender saw.
+  const id = params.get('id');
   const coin = coins.find((entry) => entry.symbol === symbol.toUpperCase());
-  if (!coin) return null;
+  if (!coin) {
+    if (!id || !/^[a-z0-9-]{1,80}$/.test(id)) return null;
+    return {
+      coin: {
+        symbol: symbol.toUpperCase(),
+        name: symbol.toUpperCase(),
+        rank: 99_999,
+        firstMonth: '',
+        coingeckoId: id,
+      },
+    };
+  }
 
   const state: UrlState = { coin };
 
@@ -389,9 +405,16 @@ function readStateFromUrl(coins: CoinEntry[]): UrlState | null {
   return state;
 }
 
-function writeStateToUrl(symbol: string, month: string, amount: number): void {
+function writeStateToUrl(
+  symbol: string,
+  month: string,
+  amount: number,
+  coingeckoId?: string,
+): void {
   const url = new URL(window.location.href);
   url.searchParams.set('coin', symbol);
+  if (coingeckoId) url.searchParams.set('id', coingeckoId);
+  else url.searchParams.delete('id');
   url.searchParams.set('from', month);
   url.searchParams.set('amount', String(amount));
   // replaceState, not pushState: typing an amount should not fill the back button.
@@ -410,6 +433,7 @@ export function initMachine(locale: string): void {
   const monthOut = root.querySelector<HTMLElement>('[data-machine-month-label]');
   const run = root.querySelector<HTMLButtonElement>('[data-machine-run]');
   const output = root.querySelector<HTMLElement>('[data-machine-output]');
+  const failure = root.querySelector<HTMLElement>('[data-machine-failure]');
   const empty = root.querySelector<HTMLElement>('[data-machine-empty]');
   const spark = root.querySelector<SVGSVGElement>('[data-machine-spark]');
   const canvas = root.querySelector<HTMLCanvasElement>('[data-machine-card]');
@@ -419,6 +443,7 @@ export function initMachine(locale: string): void {
 
   const labels = {
     noResults: results.dataset.noResults ?? '',
+    loadFailed: root.dataset.labelLoadFailed ?? '',
     shareText: shareLink?.dataset.template ?? '',
   };
 
@@ -486,12 +511,27 @@ export function initMachine(locale: string): void {
   };
 
   const choose = async (coin: CoinEntry, preset?: { month?: string; amount?: number }) => {
-    const history = await getCoinHistory(coin.symbol, coin.coingeckoId);
-    if (history.length < 2) return;
-
-    selection = { coin, history };
+    // Close the dropdown first: a slow long-tail fetch used to leave it hanging
+    // open with no sign anything had happened.
     search.value = '';
     results.hidden = true;
+    if (failure) failure.hidden = true;
+    root.dataset.loading = 'true';
+
+    const history = await getCoinHistory(coin.symbol, coin.coingeckoId).catch(() => []);
+    root.dataset.loading = 'false';
+
+    if (history.length < 2) {
+      // Say so. Silently doing nothing is the worst of the options, and it was
+      // the one this took whenever a long-tail price fetch failed.
+      if (failure) {
+        failure.textContent = labels.loadFailed;
+        failure.hidden = false;
+      }
+      return;
+    }
+
+    selection = { coin, history };
 
     if (chosen) {
       chosen.hidden = false;
@@ -531,8 +571,10 @@ export function initMachine(locale: string): void {
     const now = selection.history.at(-1);
     if (!then || !now) return;
 
+    // Clamp for the arithmetic, but do not write back into the field while it is
+    // being typed in — rewriting it on every keystroke made clearing the box and
+    // entering a new amount fight the user.
     const invested = Math.min(Math.max(Number(amount.value) || 0, 1), MAX_AMOUNT);
-    amount.value = String(invested);
 
     const units = invested / then[1];
     const value = units * now[1];
@@ -552,7 +594,7 @@ export function initMachine(locale: string): void {
     if (spark) drawSpark(spark, selection.history, index);
 
     // The address bar now matches the screen, so the result can be shared.
-    writeStateToUrl(selection.coin.symbol, then[0], invested);
+    writeStateToUrl(selection.coin.symbol, then[0], invested, selection.coin.coingeckoId);
 
     if (canvas) {
       const verdict = verdictFor(multiple);
@@ -616,6 +658,12 @@ export function initMachine(locale: string): void {
     calculate();
   });
   amount.addEventListener('input', calculate);
+  // Tidy the value when they are finished, not while they are still typing.
+  amount.addEventListener('blur', () => {
+    const value = Number(amount.value);
+    if (!Number.isFinite(value) || value < 1) amount.value = '1';
+    else if (value > MAX_AMOUNT) amount.value = String(MAX_AMOUNT);
+  });
   for (const chip of root.querySelectorAll<HTMLButtonElement>('[data-amount-chip]')) {
     chip.addEventListener('click', () => {
       amount.value = chip.dataset.amountChip ?? '500';

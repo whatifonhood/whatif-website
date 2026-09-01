@@ -1,5 +1,6 @@
 ---
 import { ROADMAP } from '../../config/roadmap.ts';
+import { localePath } from '../../config/navigation.ts';
 import type { Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import Section from '../ui/Section.astro';
@@ -63,7 +64,7 @@ const shipped = ROADMAP.filter((item) => item.status === 'shipped').length;
 
   <div class="mt-8 flex flex-wrap items-center gap-4">
     <a
-      href="/roadmap/"
+      href={localePath('/roadmap/', locale)}
       class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
     >
       {page.title}

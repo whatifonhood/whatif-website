@@ -12,9 +12,11 @@ import {
   getLargeTrades,
   getPairSnapshot,
   getPriceHistory,
+  getBalanceOf,
   getRecentBurns,
   getRecentTrades,
   getTokenInfo,
+  getTotalSupply,
   type Candle,
   type Timeframe,
   type Trade,
@@ -24,6 +26,18 @@ import { BURNS, BURNS_SCANNED_TO } from '../config/burns.ts';
 import { CHAIN, TOKEN } from '../config/site.ts';
 
 const REFRESH_MS = 15_000;
+
+/**
+ * What one refresh task reports back.
+ *
+ * The banner used to be driven by `results.every(r => r.status === 'rejected')`,
+ * which could never be true: `renderExtremes` catches its own failures, and the
+ * chart task resolves immediately while a pointer is on it. So the dashboard
+ * could not tell the visitor that anything was wrong, in any language. Saying
+ * so explicitly is the only version of this that stays correct as tasks are
+ * added.
+ */
+type TaskResult = 'ok' | 'failed' | 'skipped';
 
 /** Transaction hashes already on screen, so new ones can be highlighted. */
 const seenTrades = new Set<string>();
@@ -317,8 +331,9 @@ export function initDashboard(locale: string): void {
   /** Set while a pointer is on the chart, so a refresh cannot yank it away. */
   let holding = false;
 
-  const renderSnapshot = async () => {
-    const snapshot = await getPairSnapshot();
+  const renderSnapshot = async (): Promise<TaskResult> => {
+    const snapshot = await getPairSnapshot().catch(() => null);
+    if (!snapshot) return 'failed';
     if (snapshot.priceUsd !== undefined) setText('price', formatUsd(snapshot.priceUsd, locale));
     if (snapshot.marketCapUsd !== undefined)
       setText('marketCap', formatUsd(snapshot.marketCapUsd, locale));
@@ -341,6 +356,7 @@ export function initDashboard(locale: string): void {
       const bar = root.querySelector<HTMLElement>('[data-flow-bar]');
       if (bar) bar.style.setProperty('--buy-share', `${(buys / (buys + sells)) * 100}%`);
     }
+    return 'ok';
   };
 
   /**
@@ -402,10 +418,10 @@ export function initDashboard(locale: string): void {
    * edge, so the window is shifted by however many were added and the view stays
    * pointed at the same moment in time.
    */
-  const renderChart = async (timeframe: Timeframe, keepView = false) => {
-    if (!chart) return;
-    const candles = await getPriceHistory(timeframe);
-    if (candles.length < 2) return;
+  const renderChart = async (timeframe: Timeframe, keepView = false): Promise<TaskResult> => {
+    if (!chart) return 'skipped';
+    const candles = await getPriceHistory(timeframe).catch(() => []);
+    if (candles.length < 2) return 'failed';
 
     const zoomed = view.end - view.start < loaded.length;
     if (keepView && zoomed && loaded.length > 0) {
@@ -422,12 +438,13 @@ export function initDashboard(locale: string): void {
 
     loaded = candles;
     paint();
+    return 'ok';
   };
 
-  const renderTrades = async () => {
-    if (!feed) return;
-    const trades = await getRecentTrades();
-    if (trades.length === 0) return;
+  const renderTrades = async (): Promise<TaskResult> => {
+    if (!feed) return 'skipped';
+    const trades = await getRecentTrades().catch(() => []);
+    if (trades.length === 0) return 'failed';
 
     const firstRun = seenTrades.size === 0;
     const rows = trades.slice(0, 25).map((trade) => {
@@ -482,6 +499,7 @@ export function initDashboard(locale: string): void {
         second: '2-digit',
       }).format(new Date());
     }
+    return 'ok';
   };
 
   /**
@@ -493,7 +511,7 @@ export function initDashboard(locale: string): void {
    * was, not a window we chose, so whatever span the data actually covers is
    * printed rather than assumed.
    */
-  const renderExtremes = async () => {
+  const renderExtremes = async (): Promise<TaskResult> => {
     const [large, recent] = await Promise.all([
       getLargeTrades().catch(() => [] as Trade[]),
       getRecentTrades().catch(() => [] as Trade[]),
@@ -503,7 +521,7 @@ export function initDashboard(locale: string): void {
     const byHash = new Map<string, Trade>();
     for (const trade of [...large, ...recent]) byHash.set(trade.txHash, trade);
     const all = [...byHash.values()];
-    if (all.length === 0) return;
+    if (all.length === 0) return 'failed';
 
     const oldest = Math.min(...all.map((trade) => trade.time));
     const hours = Math.max(1, Math.round((Date.now() - oldest) / 3_600_000));
@@ -531,6 +549,7 @@ export function initDashboard(locale: string): void {
     }
 
     renderPressure(all);
+    return 'ok';
   };
 
   /** Hourly buy and sell volume, from trades already fetched. No extra request. */
@@ -586,8 +605,9 @@ export function initDashboard(locale: string): void {
    * allows, which is why the holder count no longer has to be a build-time
    * snapshot refreshed by hand.
    */
-  const renderTokenInfo = async () => {
-    const info = await getTokenInfo();
+  const renderTokenInfo = async (): Promise<TaskResult> => {
+    const info = await getTokenInfo().catch(() => null);
+    if (!info) return 'failed';
 
     if (info.holders !== undefined) {
       for (const node of root.querySelectorAll<HTMLElement>('[data-metric="holders"]')) {
@@ -619,11 +639,22 @@ export function initDashboard(locale: string): void {
     // Only fields that mean something on this chain are rendered. The response
     // also carries mint and freeze authority, which are Solana concepts and come
     // back null here — showing a null as a pass would be a false claim.
+    // `supply` and `burn` used to be hardcoded `true` under a caption saying
+    // these were attested by third parties. They were attested by nobody. Both
+    // are now derived from the chain, and a failed read shows as unverified
+    // rather than quietly passing — which is what our own scam article tells
+    // readers to look out for.
+    const [supply, burned] = await Promise.all([
+      getTotalSupply().catch(() => undefined),
+      getBalanceOf(TOKEN.burnAddress).catch(() => undefined),
+    ]);
+
     const marks: Record<string, boolean | undefined> = {
       verified: info.isVerified,
       honeypot: info.isHoneypot === undefined ? undefined : !info.isHoneypot,
-      supply: true,
-      burn: true,
+      // True only if the supply on-chain still matches what the site publishes.
+      supply: supply === undefined ? undefined : supply === TOKEN.totalSupply,
+      burn: burned === undefined ? undefined : burned > 0,
     };
     for (const [check, passed] of Object.entries(marks)) {
       const row = root.querySelector<HTMLElement>(`[data-check="${check}"]`);
@@ -633,6 +664,7 @@ export function initDashboard(locale: string): void {
       const state = row.querySelector<HTMLElement>('[data-check-state]');
       if (state && passed) state.textContent = labels.checkPass;
     }
+    return 'ok';
   };
 
   /**
@@ -721,10 +753,18 @@ export function initDashboard(locale: string): void {
       renderExtremes(),
       renderTokenInfo(),
     ]);
-    const everythingFailed = results.every((result) => result.status === 'rejected');
+    // A task that was skipped says nothing about whether the data is reachable,
+    // so it does not count either way. The banner appears when everything that
+    // actually tried, failed.
+    const outcomes = results.map((result) =>
+      result.status === 'fulfilled' ? result.value : 'failed',
+    );
+    const tried = outcomes.filter((outcome) => outcome !== 'skipped');
+    const allFailed = tried.length > 0 && tried.every((outcome) => outcome === 'failed');
+
     if (status) {
-      status.hidden = !everythingFailed;
-      if (everythingFailed) status.textContent = labels.failed;
+      status.hidden = !allFailed;
+      if (allFailed) status.textContent = labels.failed;
     }
   };
 

@@ -299,6 +299,10 @@ async function drawCard(
 }
 
 export function initHoldings(locale: string): void {
+  /** The current card's blob URL, released before the next one replaces it. */
+  let cardUrl: string | null = null;
+  /** Counter so a slow lookup cannot overwrite a newer one. */
+  let latest = 0;
   const root = document.querySelector<HTMLElement>('[data-holdings]');
   if (!root) return;
 
@@ -338,6 +342,15 @@ export function initHoldings(locale: string): void {
     }
     if (error) error.hidden = true;
 
+    // Clear the previous answer before fetching the next. It used to stay on
+    // screen while a new address loaded, so for a second or two the page showed
+    // one wallet's balance under another wallet's request.
+    result.hidden = true;
+    root.dataset.loading = 'true';
+
+    // A slow first lookup must not overwrite a faster second one.
+    const request = ++latest;
+
     let tokens: number | undefined;
     let priceUsd: number | undefined;
     try {
@@ -348,9 +361,13 @@ export function initHoldings(locale: string): void {
           .catch(() => undefined),
       ]);
     } catch {
-      fail(labels.errorNetwork ?? '');
+      root.dataset.loading = 'false';
+      if (request === latest) fail(labels.errorNetwork ?? '');
       return;
     }
+
+    root.dataset.loading = 'false';
+    if (request !== latest) return; // A newer lookup has already started.
 
     if (tokens === undefined) {
       fail(labels.errorNetwork ?? '');
@@ -389,7 +406,10 @@ export function initHoldings(locale: string): void {
 
       canvas.toBlob((blob) => {
         if (!blob || !download) return;
-        download.href = URL.createObjectURL(blob);
+        // Release the previous one; every other generator in the repo does.
+        if (cardUrl) URL.revokeObjectURL(cardUrl);
+        cardUrl = URL.createObjectURL(blob);
+        download.href = cardUrl;
         download.download = 'what-if-holdings.png';
         download.hidden = false;
       }, 'image/png');

@@ -1,6 +1,6 @@
 ---
 import type { Locale } from '../../config/site.ts';
-import { TOOL_GROUPS, toolsIn } from '../../config/navigation.ts';
+import { TOOL_GROUPS, toolsIn, localePath } from '../../config/navigation.ts';
 import { getCopy } from '../../content/index.ts';
 import Icons from './Icons.astro';
 
@@ -50,7 +50,7 @@ const copy = getCopy(locale);
               {toolsIn(group).map((tool) => (
                 <li>
                   <a
-                    href={tool.href}
+                    href={localePath(tool.href, locale)}
                     class="group flex flex-col gap-0.5 rounded-xl px-3 py-2 transition-colors hover:bg-surface-2"
                   >
                     <span class="flex items-center gap-1.5 text-sm font-semibold text-ink">

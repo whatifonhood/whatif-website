@@ -95,7 +95,7 @@ export const en: SiteCopy = {
         body: 'Fast blocks, cheap gas, and the name that dragged a generation into the market. Robinhood started as a what if too.',
       },
       {
-        title: 'Nine percent already gone',
+        title: 'Already burned, and gone for good',
         body: '{burned} $IF — {burnedPercent} of the supply — sits in a burn address nobody holds the keys to. That is not a promise — it is a balance you can read yourself.',
       },
       {
@@ -231,7 +231,7 @@ export const en: SiteCopy = {
       },
       {
         q: 'What has been burned?',
-        a: 'More than {burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address with no private key. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
+        a: '{burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address with no private key. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
       },
       {
         q: 'Where is the community?',
@@ -326,7 +326,7 @@ export const en: SiteCopy = {
       burnHistoryNote: 'Read from the chain. Each step is a transaction you can open.',
       trustTitle: 'Checks anyone can run',
       trustNote:
-        'These are attested by third parties, not by us. Each one links to where you can check it yourself.',
+        'Two of these are attested by third parties, not by us; two are read from the contract by this page as it loads. Each links to where you can check it yourself, and a check that could not be read says so rather than showing a pass.',
       checks: {
         verified: 'Listing verified',
         honeypot: 'Honeypot check',
@@ -343,6 +343,8 @@ export const en: SiteCopy = {
       coinLabel: 'The coin you missed',
       searchPlaceholder: 'Search a coin — bitcoin, doge, pepe…',
       noResults: 'Nothing by that name in the set.',
+      loadFailed:
+        'Could not load prices for that coin just now. Try another, or try again in a moment.',
       emptyState: 'Pick a coin, an amount and a month. The machine does the rest.',
       investedLabel: 'You put in',
       worthLabel: 'It would be worth',

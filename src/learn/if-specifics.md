@@ -22,9 +22,9 @@ One billion $IF, fixed at launch. There is no mint function, which means the num
 
 ## The burn
 
-More than 93 million $IF sits at `0x000000000000000000000000000000000000dEaD`, an address with no private key. Those tokens cannot move again, by anyone, ever.
+A large share of the supply sits at `0x000000000000000000000000000000000000dEaD`, an address with no private key. Those tokens cannot move again, by anyone, ever. The current figure is on the [stats page](/stats/), read live from the chain — deliberately not repeated here, because a number typed into an article is wrong the moment it moves.
 
-Every burn is plotted on the [stats page](/stats/) as a cumulative curve built from the chain's own transaction logs, with the largest ones linking straight to the transaction. Roughly nine percent of the total supply is gone.
+Every burn is plotted on the [stats page](/stats/) as a cumulative curve built from the chain's own transaction logs, with the largest ones linking straight to the transaction you can open and check.
 
 ## Tax
 

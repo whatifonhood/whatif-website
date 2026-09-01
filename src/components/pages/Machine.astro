@@ -39,6 +39,7 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
 
   <div
     data-machine
+    data-label-load-failed={page.loadFailed}
     data-verdicts={JSON.stringify(page.verdicts)}
     class="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8"
   >
@@ -138,6 +139,19 @@ const AMOUNT_CHIPS = [100, 500, 1000, 10000];
           class="card flex flex-1 items-center justify-center p-8 text-center text-muted"
         >
           {page.emptyState}
+        </p>
+
+        <!--
+          Shown when a coin's prices cannot be fetched. Before this, that case did
+          nothing at all: the dropdown stayed open and no message appeared.
+        -->
+        <p
+          data-machine-failure
+          hidden
+          role="status"
+          aria-live="polite"
+          class="mt-4 text-sm text-warn"
+        >
         </p>
 
         <div data-machine-output hidden data-direction="up" class="card ring-anim p-6 sm:p-8">

@@ -1,5 +1,6 @@
 ---
 import type { Locale } from '../config/site.ts';
+import { localePath } from '../config/navigation.ts';
 import { getCopy } from '../content/index.ts';
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/sections/Header.astro';
@@ -67,7 +68,7 @@ const memes = [memeTimeline, memeTarot, memeTwoButtons, memeNews, memeCreation, 
       heading={copy.pfpTeaser.heading}
       body={copy.pfpTeaser.body}
       cta={copy.pfpTeaser.cta}
-      href="/pfp/"
+      href={localePath('/pfp/', locale)}
       images={coins}
       imageAlt={copy.pfpTeaser.eyebrow}
     />
@@ -78,7 +79,7 @@ const memes = [memeTimeline, memeTarot, memeTwoButtons, memeNews, memeCreation, 
       heading={copy.vaultTeaser.heading}
       body={copy.vaultTeaser.body}
       cta={copy.vaultTeaser.cta}
-      href="/memes/"
+      href={localePath('/memes/', locale)}
       images={memes}
       imageAlt={copy.vaultTeaser.eyebrow}
       reverse
