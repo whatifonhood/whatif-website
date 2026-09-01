@@ -2107,7 +2107,22 @@ export const BURNS: BurnEvent[] = [
     tokens: 15473,
     txHash: '0x0090add012556fa46a7bc50965008499030f64f2c271d1d38ce452abeb5d5039',
   },
+  {
+    time: 1788197458,
+    tokens: 67063,
+    txHash: '0xec8784d5a5615e2a7f820db44a9e6de72785415d008ba158f5d563020be824b3',
+  },
+  {
+    time: 1788203978,
+    tokens: 4919,
+    txHash: '0xed00f46887d00548ec6007a5cfa446ea7ac6724bdc74dd5d7ff264701db0318d',
+  },
+  {
+    time: 1788217483,
+    tokens: 26191,
+    txHash: '0x40986f65155da4e536d572c743282da04900a48db5dab3877281ef38f13dd08f',
+  },
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 50948491;
+export const BURNS_SCANNED_TO = 51379117;

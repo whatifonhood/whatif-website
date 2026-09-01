@@ -13,11 +13,13 @@
  *
  * Run with `npm run holders`.
  */
-import { writeFileSync } from 'node:fs';
+
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 import { CHAIN, TOKEN } from '../src/config/site.ts';
+
+import { writeConfig } from './lib/write-config.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -96,7 +98,7 @@ export const HOLDERS: Holder[] = ${JSON.stringify(holders, null, 2)};
 export const HOLDERS_CAPTURED = '${new Date().toISOString().slice(0, 10)}';
 `;
 
-writeFileSync(join(root, 'src', 'config', 'holders.ts'), file);
+await writeConfig(join(root, 'src', 'config', 'holders.ts'), file);
 console.warn(
   `Wrote ${holders.length} holders — ` +
     `${holders.filter((h) => h.kind !== 'unknown').length} identified.`,

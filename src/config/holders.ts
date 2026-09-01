@@ -26,7 +26,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x39A200271525E9641e799127bdAB299DAeF21953',
-    tokens: 23432983,
+    tokens: 23795212,
     kind: 'pool',
   },
   {
