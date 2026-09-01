@@ -120,10 +120,10 @@ export const DATA_APIS = {
  */
 export const TOKEN_SNAPSHOT = {
   capturedAt: '2026-09-01',
-  priceUsd: 0.008898,
-  marketCapUsd: 8_067_966,
-  liquidityUsd: 412_535,
-  volume24hUsd: 538_764,
+  priceUsd: 0.008241,
+  marketCapUsd: 7_472_171,
+  liquidityUsd: 399_068,
+  volume24hUsd: 570_229,
   burnedTokens: 93_366_065,
   holders: 6816,
 } as const;

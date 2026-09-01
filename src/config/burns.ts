@@ -2125,4 +2125,4 @@ export const BURNS: BurnEvent[] = [
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 51379117;
+export const BURNS_SCANNED_TO = 51632548;
