@@ -203,6 +203,8 @@ export interface SiteCopy {
       resetZoom: string;
       /** Moving-average overlay toggle. */
       average: string;
+      /** The exponential moving average toggle. */
+      ema: string;
       /** Explains that the chart can be dragged and scrolled. */
       chartHint: string;
       /** Candles or a line. */

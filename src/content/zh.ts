@@ -282,6 +282,7 @@ export const zh: SiteCopy = {
       zoomOut: '缩小',
       resetZoom: '重置',
       average: '均线',
+      ema: 'EMA',
       chartHint: '滚轮缩放 · 拖动平移 · 双击重置',
       chartTypes: { candles: 'K线', line: '折线' },
       logScale: '对数',

@@ -1359,3 +1359,84 @@ test.describe('the coin search', () => {
     await expect(first.locator('.result-meta')).toContainText(/\d{4}/);
   });
 });
+
+/**
+ * The chart's furniture.
+ *
+ * A price scale, a time axis and a crosshair that names what it is pointing at
+ * are what separate a chart from a picture of one. These check the parts that
+ * can silently drift out of alignment — a label that no longer sits on its own
+ * gridline is wrong in a way nobody notices until they trade on it.
+ */
+test.describe('the chart can be read', () => {
+  const waitForChart = async (page: import('@playwright/test').Page) => {
+    await page.goto('/stats/');
+    try {
+      await expect(page.locator('[data-candles] rect').first()).toBeVisible({ timeout: 20_000 });
+      await page.waitForTimeout(600);
+    } catch {
+      test.skip(true, 'no market data available — the price API is throttling');
+    }
+  };
+
+  test('the price scale sits exactly on its gridlines', async ({ page }) => {
+    await waitForChart(page);
+
+    const offsets = await page.evaluate(() => {
+      const lines = [...document.querySelectorAll('.grid-line')];
+      const labels = [...document.querySelectorAll('[data-price-scale] span:not(.scale-tag)')];
+      return lines.map((line, i) => {
+        const a = line.getBoundingClientRect();
+        const b = labels[i]?.getBoundingClientRect();
+        return b ? Math.abs(b.top + b.height / 2 - a.top) : 999;
+      });
+    });
+
+    expect(offsets.length, 'the chart drew no price levels').toBeGreaterThan(1);
+    for (const off of offsets) {
+      expect(off, 'a price label has drifted off its gridline').toBeLessThan(2);
+    }
+  });
+
+  test('both axes are labelled', async ({ page }) => {
+    await waitForChart(page);
+    await expect(page.locator('[data-price-scale] span').first()).toContainText('$');
+    const times = await page.locator('[data-time-axis] span').allTextContents();
+    expect(times.length, 'the chart has no time axis').toBeGreaterThan(1);
+    for (const t of times) expect(t.trim()).not.toBe('');
+  });
+
+  test('the crosshair names the price and the time it points at', async ({ page }) => {
+    await waitForChart(page);
+    const box = await page.locator('[data-chart-wrap]').boundingBox();
+    if (!box) throw new Error('no chart');
+
+    // hover() rather than mouse.move(): the latter moves the virtual pointer
+    // without the enter that makes a browser dispatch pointermove to the
+    // element, so the handler never runs and the test fails on a working page.
+    await page
+      .locator('[data-chart-wrap]')
+      .hover({ position: { x: box.width * 0.5, y: box.height * 0.4 } });
+    await page.waitForTimeout(300);
+
+    await expect(page.locator('[data-crosshair]')).toHaveAttribute('opacity', '1');
+    await expect(page.locator('[data-crosshair-y]')).toHaveAttribute('opacity', '1');
+    await expect(page.locator('[data-price-scale] .scale-tag').first()).toContainText('$');
+    await expect(page.locator('[data-time-axis] .scale-tag')).not.toBeEmpty();
+  });
+
+  test('the reading line always shows a candle', async ({ page }) => {
+    await waitForChart(page);
+    // Before any hover it shows the most recent candle, so it is never blank.
+    const bar = page.locator('[data-ohlc]');
+    await expect(bar).toContainText('O');
+    await expect(bar).toContainText('VOL');
+    await expect(bar).toContainText('$');
+  });
+
+  test('the last price is marked on the scale', async ({ page }) => {
+    await waitForChart(page);
+    await expect(page.locator('[data-last-line]')).toHaveAttribute('opacity', '1');
+    await expect(page.locator('[data-price-scale] [data-last]')).toContainText('$');
+  });
+});

@@ -298,6 +298,7 @@ export const es: SiteCopy = {
       zoomOut: 'Alejar',
       resetZoom: 'Restablecer',
       average: 'Media',
+      ema: 'EMA',
       chartHint: 'Rueda para acercar · arrastra para mover · doble clic para restablecer',
       chartTypes: { candles: 'Velas', line: 'Línea' },
       logScale: 'Log',

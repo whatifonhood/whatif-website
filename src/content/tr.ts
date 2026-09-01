@@ -291,6 +291,7 @@ export const tr: SiteCopy = {
       zoomOut: 'Uzaklaştır',
       resetZoom: 'Sıfırla',
       average: 'Ort.',
+      ema: 'EMA',
       chartHint: 'Yakınlaştırmak için kaydır · taşımak için sürükle · sıfırlamak için çift tıkla',
       chartTypes: { candles: 'Mum', line: 'Çizgi' },
       logScale: 'Log',
