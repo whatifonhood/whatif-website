@@ -800,11 +800,9 @@ const metrics = [
               <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
                 {page.reproduceLabels[recipe.key] ?? recipe.key}
               </p>
-              <!--
-                set:text on a self-closing element, so no source indentation
-                can end up inside the block. A reader copies the command, and
-                sixteen leading spaces would come with it.
-              -->
+              {/* set:text on a self-closing element, so no source indentation
+                  ends up inside the block — a reader copies the command, and
+                  sixteen leading spaces would come with it. */}
               <pre class="reproduce-command mt-2" set:text={recipe.command} />
               <p class="mt-1.5 font-mono text-[11px] text-faint">
                 {page.reproduceField} <span class="text-ink">{recipe.field}</span>
@@ -1222,7 +1220,6 @@ const metrics = [
     white-space: pre;
     -webkit-overflow-scrolling: touch;
   }
-
 
   /* Holder labels. Burned is the reassuring case, so it gets the site's accent;
      a pool is infrastructure, not a holding; a bare contract is neither. */
