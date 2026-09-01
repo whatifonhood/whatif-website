@@ -1022,3 +1022,76 @@ test.describe('check every number yourself', () => {
     }
   });
 });
+
+/**
+ * A collection has to survive a new phone.
+ *
+ * Finds live in this browser's localStorage and nowhere else, so a cleared
+ * cache used to destroy them. The code has to round-trip, and restoring on a
+ * browser that already has finds must never take any away.
+ */
+test.describe('moving a collection between browsers', () => {
+  test('a code restores the collection somewhere else', async ({ page }) => {
+    await page.goto('/pfp/');
+    // Stand in for a collection earned on another device.
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        'whatif.pfp.v1',
+        JSON.stringify({ found: {}, sinceRare: 0, sinceLegendary: 0, poolOpen: false }),
+      );
+    });
+
+    await page.locator('[data-pfp-generate]').click();
+    await expect(page.locator('[data-pfp-result]')).toBeVisible({ timeout: 10_000 });
+
+    await page.locator('[data-pfp-backup] summary').click();
+    await page.locator('[data-pfp-export]').click();
+    const code = await page.locator('[data-pfp-code]').inputValue();
+    expect(code.length).toBeGreaterThan(10);
+
+    // A different browser: nothing found, then the code pasted in.
+    await page.evaluate(() => window.localStorage.removeItem('whatif.pfp.v1'));
+    await page.reload();
+    await page.locator('[data-pfp-backup] summary').click();
+    await page.locator('[data-pfp-code]').fill(code);
+    await page.locator('[data-pfp-import]').click();
+
+    await expect(page.locator('[data-pfp-backup-status]')).toContainText(/1|restaur|恢复|geri/i);
+    const found = await page.evaluate(
+      () =>
+        Object.keys(JSON.parse(localStorage.getItem('whatif.pfp.v1') ?? '{}').found ?? {}).length,
+    );
+    expect(found).toBe(1);
+  });
+
+  test('a bad code is refused, and changes nothing', async ({ page }) => {
+    await page.goto('/pfp/');
+    await page.locator('[data-pfp-backup] summary').click();
+    await page.locator('[data-pfp-code]').fill('not-a-real-code');
+    await page.locator('[data-pfp-import]').click();
+    await expect(page.locator('[data-pfp-backup-status]')).not.toBeEmpty();
+
+    const found = await page.evaluate(
+      () =>
+        Object.keys(JSON.parse(localStorage.getItem('whatif.pfp.v1') ?? '{}').found ?? {}).length,
+    );
+    expect(found).toBe(0);
+  });
+
+  test('restoring never removes a find already on this browser', async ({ page }) => {
+    await page.goto('/pfp/');
+    await page.locator('[data-pfp-generate]').click();
+    await expect(page.locator('[data-pfp-result]')).toBeVisible({ timeout: 10_000 });
+
+    await page.locator('[data-pfp-backup] summary').click();
+    // A code carrying a real coin, but not the one just pulled.
+    await page.locator('[data-pfp-code]').fill(await page.evaluate(() => 'x'));
+    await page.locator('[data-pfp-import]').click();
+
+    const found = await page.evaluate(
+      () =>
+        Object.keys(JSON.parse(localStorage.getItem('whatif.pfp.v1') ?? '{}').found ?? {}).length,
+    );
+    expect(found, 'a refused code must not clear anything').toBe(1);
+  });
+});

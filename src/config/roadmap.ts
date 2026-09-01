@@ -72,6 +72,13 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
+    title: 'Your collection survives a new phone',
+    body: 'Pulls are kept in your own browser, so clearing it used to lose them. Copy a code, paste it in anywhere else, and they come back.',
+    href: '/pfp/',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
     title: 'Check every number yourself',
     body: 'The exact command behind each figure on the dashboard, built from the same addresses the page uses. Paste any of them into a terminal and check us.',
     href: '/stats/',
