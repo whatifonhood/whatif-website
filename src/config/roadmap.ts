@@ -72,6 +72,13 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
+    title: 'The community wall',
+    body: 'Real posts on the landing page, in our own type rather than embedded. The text is fetched once at build time — no third-party script, no iframe, nothing watching you read it.',
+    href: '/#posts',
+  },
+  {
+    status: 'shipped',
+    date: '2026-09-01',
     title: 'The vault in every language',
     body: 'All 65 memes now have a page in Chinese, Turkish and Spanish as well as English. The titles stay as written — they are jokes, not prose.',
     href: '/memes/',
@@ -141,11 +148,6 @@ export const ROADMAP: RoadmapItem[] = [
   },
 
   // ------------------------------------------------------------------- next
-  {
-    status: 'next',
-    title: 'The community wall',
-    body: 'Real posts on the homepage, rendered in our own type rather than embedded — no tracker, no iframe.',
-  },
   {
     status: 'next',
     title: 'Learn in every language',
