@@ -21,9 +21,11 @@ interface Props {
   isHome?: boolean;
   /** Absolute URL of the sharing image. Defaults to the site-wide card. */
   socialImage?: string;
+  /** Keeps a page out of search and out of the sitemap. Review pages only. */
+  noindex?: boolean;
 }
 
-const { locale, title, description, isHome = false, socialImage } = Astro.props;
+const { locale, title, description, isHome = false, socialImage, noindex = false } = Astro.props;
 const copy = getCopy(locale);
 
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
@@ -61,6 +63,7 @@ const organizationSchema = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {
       alternates.map((alternate) => (
