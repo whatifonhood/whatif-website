@@ -162,6 +162,14 @@ const next = index >= 0 ? pages[index + 1] : undefined;
   }
 
   @media (pointer: fine) {
+    @supports (height: 100svh) {
+      @media (min-width: 1024px) {
+        .docs-nav {
+          max-height: calc(100svh - 4rem);
+        }
+      }
+    }
+
     .docs-link {
       min-height: 0;
     }
@@ -172,7 +180,9 @@ const next = index >= 0 ? pages[index + 1] : undefined;
       position: sticky;
       top: 4rem;
       width: 16rem;
-      max-height: calc(100svh - 4rem);
+      /* Without a maximum the sidebar does not scroll at all; the svh
+         refinement is in its own @supports block below. */
+      max-height: calc(100vh - 4rem);
       overflow-y: auto;
       overscroll-behavior: contain;
       border-bottom: 0;

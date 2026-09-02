@@ -85,11 +85,13 @@ const copy = getCopy(locale);
         transform 0.18s var(--ease-out-expo),
         visibility 0.18s;
     }
+    .tools-menu[data-open] .tools-panel,
     .tools-menu:has([aria-expanded='true']) .tools-panel {
       visibility: visible;
       opacity: 1;
       transform: translateY(0);
     }
+    .tools-menu[data-open] [data-tools-toggle] svg:last-child,
     .tools-menu:has([aria-expanded='true']) [data-tools-toggle] svg:last-child {
       transform: rotate(180deg);
     }

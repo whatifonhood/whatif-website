@@ -9,6 +9,22 @@
  * Values come from the locked brand sheet: what-if-meme/brand-pack/brand-sheet.html
  */
 
+/*
+ * Browser baseline.
+ *
+ * Tailwind 4 compiles to `@property`, `color-mix()` and `oklab()`, so its own
+ * floor — Safari 16.4, Chrome 111, Firefox 128 — is this site's floor too, and
+ * it is higher than the JavaScript target. Below it the layout still holds and
+ * the palette still resolves, because every brand colour is a plain hex token
+ * and `color-mix` is only ever used for a tint or a border blend; what is lost
+ * is accent shading, not content.
+ *
+ * The rule that follows from that: nothing a visitor NEEDS may depend on a
+ * modern selector or unit. The tools menu once opened only through `:has()`,
+ * which Firefox did not ship until 121, so the site's main navigation could not
+ * be opened at all on an ESR build — see src/scripts/tools-menu.ts. Enhancement
+ * with a modern feature is fine. Function is not.
+ */
 @import 'tailwindcss';
 
 /*
@@ -291,6 +307,7 @@ body {
    * only applies when a single word has nowhere else to go.
    */
   overflow-wrap: break-word;
+  -webkit-hyphens: auto;
   hyphens: auto;
 }
 

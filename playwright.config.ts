@@ -22,9 +22,19 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  /*
+   * Three engines, because the site has to work in all of them.
+   *
+   * `desktop` is Blink, `mobile` is WebKit — which is what every iPhone runs,
+   * whatever browser is installed on it — and `firefox` is Gecko. Two engines
+   * agreeing proves nothing about the third: the site's own tools menu once
+   * opened only through `:has()`, which Gecko did not ship until Firefox 121,
+   * and nothing in a Chrome-and-Safari suite could have noticed.
+   */
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['iPhone 13'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
   ],
 
   webServer: {

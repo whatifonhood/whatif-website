@@ -273,7 +273,16 @@ test.describe('the wallet lookup', () => {
       { value: `0x${'a'.repeat(64)}`, expect: /transaction hash/i },
       { value: 'hello', expect: /starts with 0x/i },
     ];
+    /*
+     * A fresh page per case, because all three write into the same element.
+     * Asserting straight after the click let the previous case's message
+     * satisfy `toHaveText` — the text was never empty in between, so the
+     * retry loop had nothing to wait for and simply matched the stale one
+     * until it timed out. It surfaced first on Firefox, under the load of
+     * three projects running at once, but nothing about it was Firefox's.
+     */
     for (const item of cases) {
+      await page.reload();
       await page.locator('[data-holdings-input]').fill(item.value);
       await page.locator('[data-holdings-form] button').click();
       await expect(page.locator('[data-holdings-error]')).toBeVisible();
@@ -1687,5 +1696,105 @@ test.describe('the chart reads under a finger', () => {
       crosshair: '1',
       tipHidden: false,
     });
+  });
+});
+
+/**
+ * The things that differ between engines, and the widths where four languages
+ * stop fitting.
+ *
+ * These run in every project rather than one, because that is the entire point:
+ * a check that only ever sees Blink and WebKit cannot tell you that Gecko is
+ * missing a selector the navigation depends on.
+ */
+test.describe('it works the same in every engine', () => {
+  /*
+   * The dropdown must not need `:has()`.
+   *
+   * The panel used to be revealed only by `.tools-menu:has([aria-expanded])`,
+   * and Firefox did not ship `:has()` until 121 — so on an ESR build the site's
+   * main navigation could not be opened at all. The script mirrors the state
+   * onto the container as `data-open`, and this asserts that mirror exists, not
+   * merely that the panel happens to be visible.
+   */
+  test('the tools menu opens without needing a modern selector', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'the phone has its own menu');
+    await page.goto('/');
+    const menu = page.locator('.tools-menu').first();
+    const toggle = menu.locator('[data-tools-toggle]');
+
+    await toggle.click();
+    await expect(menu).toHaveAttribute('data-open', '');
+    await expect(menu.locator('.tools-panel')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    // Take the pointer off the menu: hover holds the panel open by design.
+    await page.mouse.move(10, 600);
+    await expect(menu).not.toHaveAttribute('data-open', '');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  /*
+   * Every viewport-height rule carries a `vh` fallback in its own @supports
+   * block. Two declarations in one rule get deduplicated by the minifier, and
+   * the one it drops is the fallback — so this asserts the shipped CSS, not the
+   * source.
+   */
+  test('viewport-height rules keep their fallback', async ({ page }) => {
+    await page.goto('/');
+    const heights = await page.evaluate(() => {
+      const hero = document.querySelector('#top');
+      return hero ? getComputedStyle(hero).minHeight : '';
+    });
+    expect(heights, 'the hero must have a minimum height').not.toBe('0px');
+    expect(heights).not.toBe('auto');
+  });
+
+  /*
+   * The header row holds the logo, four section links, two menus and a call to
+   * action, and the labels are not the same length in four languages. At iPad
+   * portrait the Spanish nav ran past the edge of the screen — and nothing on
+   * this site can scroll sideways, so it was simply gone.
+   */
+  for (const width of [768, 820, 912, 1024, 1280]) {
+    test(`the header fits every language at ${width}px`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'mobile', 'phones use the collapsed menu');
+      await page.setViewportSize({ width, height: 900 });
+      const spilling: string[] = [];
+      for (const path of ['/', '/es/', '/tr/', '/zh/']) {
+        await page.goto(path);
+        const over = await page.evaluate(() => {
+          const edge = document.documentElement.clientWidth;
+          return [...document.querySelectorAll<HTMLElement>('header *')]
+            .filter((el) => {
+              const box = el.getBoundingClientRect();
+              return box.width > 0 && box.right > edge + 1;
+            })
+            .slice(0, 1)
+            .map(
+              (el) =>
+                `${el.className.toString().slice(0, 30)} +${Math.round(el.getBoundingClientRect().right - edge)}px`,
+            );
+        });
+        for (const one of over) spilling.push(`${path} ${one}`);
+      }
+      expect(spilling, 'the header must fit the longest language').toEqual([]);
+    });
+  }
+
+  /*
+   * A phone on its side is a real orientation, and the hero used to reserve a
+   * full viewport plus portrait padding in it — 718px of a 390px screen, with
+   * everything but the headline below the fold.
+   */
+  test('a landscape phone can see the call to action', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'orientation only matters on a phone');
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto('/');
+    const reachable = await page.evaluate(() => {
+      const cta = document.querySelector('#top .enter-2');
+      return cta ? cta.getBoundingClientRect().bottom <= window.innerHeight : false;
+    });
+    expect(reachable, 'the Buy button must be on screen in landscape').toBe(true);
   });
 });

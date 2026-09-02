@@ -46,6 +46,12 @@ const FULL_QUALITY = 82;
  */
 function seriesFor(slug) {
   if (slug.startsWith('gm-')) return 'gm';
+  if (slug.startsWith('meme-artefact-')) return 'Artefacts';
+  if (slug.startsWith('meme-history-')) return 'History';
+  if (slug.startsWith('meme-hood-') || slug.startsWith('rh-')) return 'Robinhood';
+  if (slug.startsWith('meme-life-')) return 'Real life';
+  if (slug.startsWith('meme-face-')) return 'Reactions';
+  if (slug.startsWith('meme-card-')) return 'Cards';
   if (slug.startsWith('meme-figure-')) return 'Figures';
   if (slug.startsWith('meme-token-')) return 'Crossovers';
   if (slug.startsWith('meme-reactive-')) return 'Market days';
@@ -58,7 +64,7 @@ function seriesFor(slug) {
 function titleFor(slug) {
   const words = slug
     .replace(/^(meme|gm)-/, '')
-    .replace(/^(figure|token|reactive|when)-/, '')
+    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card)-/, '')
     .split('-');
   const joined = words.join(' ');
   return joined.charAt(0).toUpperCase() + joined.slice(1);
@@ -70,14 +76,29 @@ function dimensionsOf(file) {
   return { width, height };
 }
 
-rmSync(join(root, 'public', 'memes'), { recursive: true, force: true });
-mkdirSync(thumbDir, { recursive: true });
-mkdirSync(thumbMidDir, { recursive: true });
-mkdirSync(thumb2xDir, { recursive: true });
-mkdirSync(fullDir, { recursive: true });
+/*
+ * Only the four directories this script writes.
+ *
+ * It used to remove `public/memes` whole. That directory also holds `og/` — the
+ * 65 social cards rendered by `npm run cards`, which this script does not
+ * produce and cannot put back — so a single run deleted every one of them, and
+ * nothing said so. It also replaces the published set with whatever is in the
+ * source pack today, and the pack has drifted well past what is committed, so
+ * the run left the site linking to files that no longer existed.
+ *
+ * Same shape of bug as the one in build-coins.mjs: a generator deleting a
+ * directory it does not own. If a meme is withdrawn, delete its four files by
+ * hand and remove it from src/config/memes.ts.
+ */
+for (const directory of [thumbDir, thumbMidDir, thumb2xDir, fullDir]) {
+  rmSync(directory, { recursive: true, force: true });
+  mkdirSync(directory, { recursive: true });
+}
 
 const files = readdirSync(source)
   .filter((name) => name.endsWith('.png'))
+  // Rejected takes are kept in the pack for reference but never published.
+  .filter((name) => !/-alt\.png$|ALT/i.test(name))
   .sort();
 
 const entries = [];
@@ -117,6 +138,12 @@ for (const [index, file] of files.entries()) {
 
 const seriesOrder = [
   'Classics',
+  'Artefacts',
+  'History',
+  'Real life',
+  'Robinhood',
+  'Reactions',
+  'Cards',
   'Crossovers',
   'Figures',
   'Market days',
