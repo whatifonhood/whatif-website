@@ -9,7 +9,7 @@
 interface Props {
   href?: string;
   variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'md' | 'lg';
+  size?: 'md' | 'lg' | 'xl';
   /** Set for links that leave the site. Adds target, rel and a screen-reader hint. */
   external?: boolean;
   externalLabel?: string;
@@ -19,6 +19,11 @@ interface Props {
   id?: string;
   class?: string;
   'aria-label'?: string;
+  title?: string;
+  /** Rendered but not shown, for a control a script reveals later. */
+  hidden?: boolean;
+  /** Hooks for the page's own script, spread onto the element unchanged. */
+  [key: `data-${string}`]: string | boolean | undefined;
 }
 
 const {
@@ -34,7 +39,7 @@ const {
 } = Astro.props;
 
 const base =
-  'inline-flex items-center justify-center gap-2.5 rounded-full font-semibold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5';
+  'inline-flex items-center justify-center gap-2.5 rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5';
 
 const variants = {
   primary:
@@ -43,9 +48,18 @@ const variants = {
   ghost: 'text-muted hover:text-ink',
 } as const;
 
+/*
+ * Weight belongs to the size, not to `base`.
+ *
+ * `xl` sets font-bold and the display face; if `base` also set font-semibold the
+ * winner would be whichever utility Tailwind happened to emit last, which is not
+ * something a component should depend on.
+ */
 const sizes = {
-  md: 'px-5 py-3 text-sm',
-  lg: 'px-6 py-3.5 text-base',
+  md: 'px-5 py-3 text-sm font-semibold',
+  lg: 'px-6 py-3.5 text-base font-semibold',
+  /** The one big call to action a page is allowed: the brand kit, the coin pull. */
+  xl: 'px-8 py-4 font-display text-base font-bold',
 } as const;
 
 const classes = [base, variants[variant], sizes[size], className];
