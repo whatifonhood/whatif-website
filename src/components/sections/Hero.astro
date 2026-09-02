@@ -129,6 +129,23 @@ const stats = [
           ))
         }
       </dl>
+
+      <!--
+        Where these four figures came from. The strip is live, but nothing on it
+        said so, which left a visitor unable to tell a price from thirty seconds
+        ago from one baked in at the last deploy. src/scripts/live-stats.ts
+        swaps these two the moment the chain answers, and swaps them back if a
+        later poll fails — the same element the Numbers section uses.
+      -->
+      <p
+        data-stat-freshness
+        class="enter enter-3 mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-faint"
+      >
+        <span data-freshness-snapshot>{copy.numbers.asOf} {TOKEN_SNAPSHOT.capturedAt}</span>
+        <span data-freshness-live hidden class="inline-flex items-center gap-1.5 text-lime">
+          <span class="h-1.5 w-1.5 rounded-full bg-lime"></span>{copy.numbers.live}
+        </span>
+      </p>
     </div>
   </div>
 
