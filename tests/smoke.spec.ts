@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
+import { LOCALE_PATHS, LOCALES, SITE, TOKEN } from '../src/config/site.ts';
+import { hasTranslation } from '../src/config/navigation.ts';
 import { questionForDate } from '../src/config/what-if.ts';
 import { TWEET_URLS } from '../src/config/tweets.ts';
 import { TWEET_CARDS } from '../src/config/tweet-cards.ts';
@@ -164,24 +165,34 @@ test.describe('headings keep their spaces', () => {
 });
 
 test.describe('the Content-Security-Policy stays satisfiable', () => {
-  // `style-src 'self'` blocks inline style attributes and `script-src 'self'`
-  // blocks inline scripts. Both are easy to reintroduce by accident — a template
-  // literal in a `style=` attribute is the usual way — and the failure only
-  // shows up in production, where the browser silently drops the style.
+  /*
+   * `style-src 'self'` blocks inline style attributes and `script-src 'self'`
+   * blocks inline scripts. Both are easy to reintroduce by accident — a template
+   * literal in a `style=` attribute is the usual way — and the failure only
+   * shows up in production, where the browser silently drops the style.
+   *
+   * This reads the HTML we shipped, not the DOM the browser ended up with. CSP
+   * governs markup; a style set through the CSSOM at runtime is allowed, and the
+   * dashboard sets plenty of them positioning axis labels. Asking the live page
+   * therefore failed or passed depending on whether the chart had finished
+   * drawing — a race, and one that would eventually be "fixed" by deleting a
+   * real check.
+   */
   for (const page of PAGES) {
-    test(`${page.name} has no inline styles or scripts`, async ({ page: browserPage }) => {
-      await browserPage.goto(page.path);
+    test(`${page.name} has no inline styles or scripts`, async ({ request }) => {
+      const html = await (await request.get(page.path)).text();
 
-      const inlineStyles = await browserPage.evaluate(() =>
-        [...document.querySelectorAll('[style]')].map((el) => el.outerHTML.slice(0, 100)),
+      const styleAttributes = [...html.matchAll(/<[a-zA-Z][^>]*?\sstyle="[^"]*"/g)].map((m) =>
+        m[0].slice(0, 120),
       );
-      expect(inlineStyles, 'inline style attributes are blocked by the CSP').toEqual([]);
+      expect(styleAttributes, 'inline style attributes are blocked by the CSP').toEqual([]);
 
-      const inlineScripts = await browserPage.evaluate(() =>
-        [...document.querySelectorAll('script')]
-          .filter((el) => !el.src && el.type !== 'application/ld+json')
-          .map((el) => el.outerHTML.slice(0, 100)),
-      );
+      const styleBlocks = [...html.matchAll(/<style[\s>]/g)].map((m) => m[0]);
+      expect(styleBlocks, 'inline <style> blocks are blocked by the CSP').toEqual([]);
+
+      const inlineScripts = [...html.matchAll(/<script\b[^>]*>/g)]
+        .map((m) => m[0])
+        .filter((tag) => !/\ssrc=/.test(tag) && !/application\/ld\+json/.test(tag));
       expect(inlineScripts, 'inline scripts are blocked by the CSP').toEqual([]);
     });
   }
@@ -583,8 +594,11 @@ test.describe('a language keeps you in that language', () => {
       test(`/${locale}/${path} links to a translation whenever one exists`, async ({ page }) => {
         await page.goto(`/${locale}/${path}`);
 
+        // :not([hreflang]) skips the language picker, whose whole job is to
+        // link out of the reader's language — an English link there is the
+        // feature, not the leak.
         const english = await page.evaluate(() =>
-          [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]')]
+          [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]:not([hreflang])')]
             .map((a) => a.getAttribute('href') ?? '')
             .filter((href) => /^\/(stats|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href)),
         );
@@ -1287,18 +1301,110 @@ test('every internal link resolves to a real page', () => {
     const path = href.split('#')[0]!.split('?')[0]!;
     if (!path.startsWith('/')) return true;
     const base = join(dist, path.replace(/^\/|\/$/g, ''));
-    return existsSync(join(base, 'index.html')) || existsSync(base);
+    // `${base}.html` is for the pages Astro writes flat rather than as a
+    // directory — 404.html is the only one, and it is linked absolutely from
+    // its own canonical, so nothing caught it until the walker learned to read
+    // absolute URLs.
+    return existsSync(join(base, 'index.html')) || existsSync(base) || existsSync(`${base}.html`);
   };
 
   const broken = new Map<string, number>();
   for (const page of pages) {
     const html = readFileSync(page, 'utf8');
-    for (const href of new Set(
-      [...html.matchAll(/(?:href|src)="(\/[^"#][^"]*)"/g)].map((m) => m[1]!),
-    )) {
+    // Root-relative hrefs, plus absolute ones on our own origin: hreflang
+    // alternates are written absolute, so a walker that only saw "/..." missed
+    // them entirely and 36 dead white-paper alternates shipped unnoticed.
+    const found = [
+      ...[...html.matchAll(/(?:href|src)="(\/[^"#][^"]*)"/g)].map((m) => m[1]!),
+      ...[...html.matchAll(/(?:href|src)="([^"]+)"/g)]
+        .map((m) => m[1]!)
+        .filter((href) => href.startsWith(SITE.url))
+        .map((href) => new URL(href).pathname),
+    ];
+    for (const href of new Set(found)) {
       if (!resolves(href)) broken.set(href, (broken.get(href) ?? 0) + 1);
     }
   }
 
   expect([...broken.keys()].sort(), 'these links 404').toEqual([]);
+});
+
+/**
+ * The list of English-only routes is checked against what Astro built.
+ *
+ * src/config/navigation.ts decides three things from one list — whether a tool
+ * link carries a locale prefix, whether a page names an hreflang alternate, and
+ * where the language switcher sends you. A stale entry there is not a typo, it
+ * is a 404 in three places at once. So the list is not trusted: it is compared
+ * against the directory Astro produced.
+ */
+test('the English-only list matches what was actually built', () => {
+  const dist = 'dist';
+  const english: string[] = [];
+  const walk = (dir: string, prefix: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      // Skip the locale trees and the build's own asset directories.
+      if (prefix === '' && (LOCALES.includes(entry.name as never) || entry.name.startsWith('_'))) {
+        continue;
+      }
+      const path = `${prefix}/${entry.name}`;
+      if (existsSync(join(dir, entry.name, 'index.html'))) english.push(`${path}/`);
+      walk(join(dir, entry.name), path);
+    }
+  };
+  walk(dist, '');
+  expect(english.length, 'nothing was built').toBeGreaterThan(50);
+
+  const wrong: string[] = [];
+  for (const path of english) {
+    for (const locale of LOCALES.filter((code) => code !== 'en')) {
+      const built = existsSync(join(dist, locale, path, 'index.html'));
+      const claimed = hasTranslation(path, locale);
+      if (built !== claimed) {
+        wrong.push(`${path} in ${locale}: built=${built}, navigation.ts says ${claimed}`);
+      }
+    }
+  }
+  expect(wrong.sort(), 'ENGLISH_ONLY in src/config/navigation.ts is out of date').toEqual([]);
+});
+
+/**
+ * Switching language keeps your place.
+ *
+ * The picker used to point at that language's home page from wherever you were,
+ * so a reader halfway through a Learn article who wanted it in Turkish got the
+ * Turkish landing page and had to find the article again — on the section of the
+ * site written for people who are new and being careful.
+ */
+test.describe('the language picker keeps your place', () => {
+  const KEEPS = [
+    '/learn/spotting-a-scam/',
+    '/zh/learn/self-custody-basics/',
+    '/stats/',
+    '/es/memes/',
+  ];
+
+  for (const path of KEEPS) {
+    test(`${path} offers the same page in every language`, async ({ page }) => {
+      await page.goto(path);
+      const tail = path.replace(/^\/(zh|tr|es)\//, '/');
+
+      for (const locale of LOCALES) {
+        const href = await page.locator(`a[hreflang="${locale}"]`).first().getAttribute('href');
+        expect(href, `${locale} should offer ${tail}`).toBe(
+          locale === 'en' ? tail : `/${locale}${tail}`,
+        );
+      }
+    });
+  }
+
+  /** No translation to keep: the white paper is English only. */
+  test('a page with no translation falls back to that language home', async ({ page }) => {
+    await page.goto('/docs/the-token/');
+    expect(await page.locator('a[hreflang="zh"]').first().getAttribute('href')).toBe('/zh/');
+    await expect(
+      page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])'),
+    ).toHaveCount(0);
+  });
 });

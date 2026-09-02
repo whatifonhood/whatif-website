@@ -8,7 +8,7 @@
  * Policy in public/_headers can be as tight as it is.
  */
 import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
-import { basePath, localePath } from '../config/navigation.ts';
+import { basePath, hasTranslation, localePath } from '../config/navigation.ts';
 import { getCopy } from '../content/index.ts';
 import '../styles/global.css';
 
@@ -36,12 +36,18 @@ const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
  * Every language of *this* page, for search engines.
  *
  * These used to point at the four locale homepages regardless of the page they
- * were on, which claims /es/ is the Spanish translation of /machine/.
+ * were on, which claims /es/ is the Spanish translation of /machine/. Then they
+ * pointed at the right path in every language — including the languages a page
+ * was never built in, so the twelve white paper pages advertised 36 translations
+ * that answer 404. A page with no translation names none: a single self-
+ * referencing alternate says nothing, so the block is skipped entirely.
  */
-const alternates = LOCALES.map((code) => ({
-  code,
-  href: new URL(localePath(basePath(Astro.url.pathname), code), SITE.url).href,
-}));
+const alternates = LOCALES.filter((code) => hasTranslation(Astro.url.pathname, code)).map(
+  (code) => ({
+    code,
+    href: new URL(localePath(basePath(Astro.url.pathname), code), SITE.url).href,
+  }),
+);
 
 /** Tells search engines who publishes this site and which accounts are ours. */
 const organizationSchema = {
@@ -66,9 +72,10 @@ const organizationSchema = {
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {
-      alternates.map((alternate) => (
-        <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
-      ))
+      alternates.length > 1 &&
+        alternates.map((alternate) => (
+          <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
+        ))
     }
     <link rel="alternate" hreflang="x-default" href={SITE.url} />
 
