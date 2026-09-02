@@ -55,7 +55,6 @@ export interface SiteCopy {
     buy: string;
     chart: string;
     /** Small print under the stat strip. */
-    statsNote: string;
   };
 
   /** The wall of posts. Hidden entirely when there is nothing to show. */
