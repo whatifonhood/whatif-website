@@ -1,5 +1,6 @@
 ---
-import { LOCALES, LOCALE_NAMES, LOCALE_PATHS, type Locale } from '../../config/site.ts';
+import { LOCALES, LOCALE_NAMES, type Locale } from '../../config/site.ts';
+import { translatedPath } from '../../config/navigation.ts';
 import { getCopy } from '../../content/index.ts';
 import Icons from './Icons.astro';
 
@@ -23,6 +24,16 @@ interface Props {
 const { locale, inline = false } = Astro.props;
 const copy = getCopy(locale);
 
+/**
+ * Where each language takes you: this page, in that language.
+ *
+ * It used to be that language's home page, from wherever you were — so a reader
+ * halfway through a Learn article who switched language lost the article. Pages
+ * built in English only (the white paper, a coin's own page) have nothing to
+ * switch to, and fall back to the home page.
+ */
+const target = (code: Locale) => translatedPath(Astro.url.pathname, code);
+
 /** Full names read better in a menu than two-letter codes. */
 const FULL_NAME: Record<Locale, string> = {
   en: 'English',
@@ -37,7 +48,7 @@ const FULL_NAME: Record<Locale, string> = {
     <div class="flex flex-wrap gap-2">
       {LOCALES.map((code) => (
         <a
-          href={LOCALE_PATHS[code]}
+          href={target(code)}
           hreflang={code}
           aria-current={code === locale ? 'page' : undefined}
           class:list={[
@@ -73,7 +84,7 @@ const FULL_NAME: Record<Locale, string> = {
           {LOCALES.map((code) => (
             <li>
               <a
-                href={LOCALE_PATHS[code]}
+                href={target(code)}
                 hreflang={code}
                 aria-current={code === locale ? 'page' : undefined}
                 class:list={[
