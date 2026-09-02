@@ -9,6 +9,18 @@
  */
 import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
 import { basePath, hasTranslation, localePath } from '../config/navigation.ts';
+
+/*
+ * The two faces the first screen is set in, fetched as early as the HTML is.
+ *
+ * They are discovered inside a stylesheet otherwise, which is one round trip
+ * later, and the swap when they land was moving the page enough to put CLS at
+ * 0.109 on the longer content pages — over Google's 0.1 threshold, and visible
+ * as a jolt while reading. Imported with ?url so Vite hashes and fingerprints
+ * them like any other asset rather than us hardcoding a build path.
+ */
+import archivoBody from '@fontsource/archivo/files/archivo-latin-400-normal.woff2?url';
+import archivoDisplay from '@fontsource/archivo/files/archivo-latin-900-italic.woff2?url';
 import { getCopy } from '../content/index.ts';
 import '../styles/global.css';
 
@@ -69,6 +81,9 @@ const organizationSchema = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+
+    <link rel="preload" as="font" type="font/woff2" href={archivoBody} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={archivoDisplay} crossorigin />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {

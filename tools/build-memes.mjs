@@ -18,13 +18,24 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const source = resolve(root, '..', 'what-if-meme', 'brand-pack', 'meme-pack', 'memes');
 const thumbDir = join(root, 'public', 'memes', 'thumb');
+const thumbMidDir = join(root, 'public', 'memes', 'thumb15x');
 const thumb2xDir = join(root, 'public', 'memes', 'thumb2x');
 const fullDir = join(root, 'public', 'memes', 'full');
 
-// Two thumbnail widths, offered through a srcset: a phone showing two columns
-// needs ~380 device pixels, a retina desktop showing four needs ~600. Serving
-// one size for both means every phone downloads twice what it can display.
+/*
+ * Three thumbnail widths, offered through a srcset.
+ *
+ * Two was not enough. A phone showing two columns has a slot of about 200 CSS
+ * pixels; at the device pixel ratios Android reports that is roughly 530 device
+ * pixels, which does not fit 400 and so takes 800 — twice what it can display.
+ * Measured on a Pixel 7, the vault pulled 1.6MB of thumbnails before the reader
+ * had scrolled at all. The middle rung is what those phones take instead.
+ *
+ * Safari picks the 400 for the same slot, so the middle rung costs iPhones
+ * nothing. Desktop keeps the 800.
+ */
 const THUMB_WIDTH = 400;
+const THUMB_MID_WIDTH = 600;
 const THUMB_2X_WIDTH = 800;
 const THUMB_QUALITY = 72;
 const FULL_QUALITY = 82;
@@ -61,6 +72,7 @@ function dimensionsOf(file) {
 
 rmSync(join(root, 'public', 'memes'), { recursive: true, force: true });
 mkdirSync(thumbDir, { recursive: true });
+mkdirSync(thumbMidDir, { recursive: true });
 mkdirSync(thumb2xDir, { recursive: true });
 mkdirSync(fullDir, { recursive: true });
 
@@ -77,6 +89,7 @@ for (const [index, file] of files.entries()) {
 
   for (const [width, directory] of [
     [THUMB_WIDTH, thumbDir],
+    [THUMB_MID_WIDTH, thumbMidDir],
     [THUMB_2X_WIDTH, thumb2xDir],
   ]) {
     execFileSync('magick', [
