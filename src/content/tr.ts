@@ -40,7 +40,6 @@ export const tr: SiteCopy = {
       'Sonsuz meraklılar için bir meme coin. Ya daha önce alsaydın? Ya elinde tutsaydın? Ya bu gerçekten o ise?',
     buy: '$IF Al',
     chart: 'Grafik',
-    statsNote: 'Veriler zincirden geliyor, sayfayı her açtığında yenilenir.',
   },
 
   posts: {

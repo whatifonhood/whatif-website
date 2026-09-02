@@ -40,7 +40,6 @@ export const en: SiteCopy = {
       'The meme coin for the perpetually curious. What if you aped earlier? What if you held? What if this is the one?',
     buy: 'Buy $IF',
     chart: 'Chart',
-    statsNote: 'Live from the chain. Refreshed when you load the page.',
   },
 
   posts: {

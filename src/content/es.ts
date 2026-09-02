@@ -52,7 +52,6 @@ export const es: SiteCopy = {
       'La meme coin para los eternamente curiosos. ¿Y si hubieras entrado antes? ¿Y si hubieras aguantado? ¿Y si esta es la buena?',
     buy: 'Compra $IF',
     chart: 'Gráfico',
-    statsNote: 'En vivo desde la cadena. Se actualiza cada vez que cargas la página.',
   },
 
   posts: {
