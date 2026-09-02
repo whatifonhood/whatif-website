@@ -627,7 +627,8 @@ test.describe('a language keeps you in that language', () => {
     test(`/${locale}/memes/ reaches its own meme pages`, async ({ page }) => {
       await page.goto(`/${locale}/memes/`);
       const inside = page.locator(`a[href^="/${locale}/memes/"]`);
-      // 65 memes, each with a page in this language.
+      // Every meme has a page in this language; the vault grows, so this is a
+      // floor rather than an exact count.
       expect(await inside.count()).toBeGreaterThan(60);
     });
   }

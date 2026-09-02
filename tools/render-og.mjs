@@ -46,12 +46,6 @@ const PAGES = [
     sub: 'Read straight from Robinhood Chain',
   },
   {
-    file: 'og-machine.jpg',
-    kicker: 'The What $IF Machine',
-    title: 'What $IF you aped earlier?',
-    sub: 'The arithmetic you have been avoiding',
-  },
-  {
     file: 'og-memes.jpg',
     kicker: 'The vault',
     title: 'Every meme. Free to steal.',

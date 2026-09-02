@@ -159,7 +159,7 @@ export const ROADMAP: RoadmapItem[] = [
     track: 'words',
     date: '2026-09-01',
     title: 'The vault in every language',
-    body: 'All 65 memes now have a page in Chinese, Turkish and Spanish as well as English. The titles stay as written — they are jokes, not prose.',
+    body: 'Every meme in the vault now has a page in Chinese, Turkish and Spanish as well as English. The titles stay as written — they are jokes, not prose.',
     href: '/memes/',
   },
   {
