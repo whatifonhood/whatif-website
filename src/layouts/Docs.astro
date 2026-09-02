@@ -170,6 +170,56 @@ const next = index >= 0 ? pages[index + 1] : undefined;
       }
     }
 
+    /*
+   * The contents column scrolls without showing a scrollbar.
+   *
+   * It is a tall sticky list beside the reading column, and a grey native
+   * scrollbar sitting against the text is the loudest thing on the page for
+   * something nobody needs to look at. Hidden, not disabled: the wheel, a
+   * touch drag and the keyboard all still scroll it.
+   */
+    .docs-nav {
+      scrollbar-width: none;
+    }
+    .docs-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* The link back to the front of the paper. */
+    .docs-home {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-faint);
+      transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+    }
+    .docs-home:hover {
+      background: var(--color-surface);
+      color: var(--color-ink);
+    }
+    .docs-home[aria-current='page'] {
+      background: var(--color-surface-2);
+      color: var(--color-lime);
+    }
+    .docs-home-mark {
+      font-size: 0.8rem;
+      line-height: 1;
+    }
+    @media (pointer: coarse) {
+      .docs-home {
+        min-height: 44px;
+      }
+    }
+
     .docs-link {
       min-height: 0;
     }

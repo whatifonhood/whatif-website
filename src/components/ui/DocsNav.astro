@@ -25,6 +25,17 @@ const pages = getDocsPages();
 ---
 
 <nav aria-label="White paper contents">
+  <!--
+    The way back to the front of the paper.
+    Every page linked deeper into the paper and none of them linked to its
+    contents, so once you were inside there was no way back to the beginning
+    short of the browser button.
+  -->
+  <a href="/docs/" class="docs-home" aria-current={slug === undefined ? 'page' : undefined}>
+    <span class="docs-home-mark" aria-hidden="true">←</span>
+    White paper
+  </a>
+
   {
     DOCS_GROUPS.map((group) => (
       <section class="mb-7">

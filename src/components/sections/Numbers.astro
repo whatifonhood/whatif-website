@@ -45,7 +45,10 @@ const figures = [
     label: copy.numbers.stats.supply,
     value: formatCompact(TOKEN.totalSupply, locale),
   },
-  { key: 'chain', label: copy.numbers.stats.chain, value: CHAIN.name },
+  // The only figure here that is words rather than a number. It is allowed to
+  // wrap; "Robinhood / Chain" over two lines reads fine, and no amount of
+  // shrinking fits a fourteen-character proper noun into half a 320px screen.
+  { key: 'chain', label: copy.numbers.stats.chain, value: CHAIN.name, wraps: true },
 ];
 ---
 
@@ -120,14 +123,22 @@ const figures = [
       <SectionHeading heading={copy.numbers.heading} class="mt-4" />
       <p class="mt-5 text-lg leading-relaxed text-muted">{copy.numbers.intro}</p>
 
-      <dl class="mt-10 grid grid-cols-2 gap-3">
+      {
+        /* Tighter gutters at the smallest width: at 320px the Spanish figures
+          need every pixel of the cell, and shrinking the type further would
+          cost more than the gap does. */
+      }
+      <dl class="mt-10 grid grid-cols-2 gap-2 sm:gap-3">
         {
           figures.map((figure) => (
-            <div class="card card-hover min-w-0 p-5 text-center">
-              {/* Sized for the longest locale; see the same note in Hero.astro. */}
+            <div class="card card-hover min-w-0 p-3 text-center sm:p-5">
+              {/* Shrinks to fit; a number never breaks. See the note in Hero.astro. */}
               <dd
                 data-stat={figure.key}
-                class="font-display text-[clamp(0.95rem,5.2vw,1.5rem)] font-black italic tabular-nums tracking-tight text-lime [overflow-wrap:anywhere]"
+                class:list={[
+                  'font-display text-[clamp(0.72rem,4.4vw,1.5rem)] font-black italic tabular-nums tracking-tight text-lime',
+                  'wraps' in figure && figure.wraps ? 'text-balance' : 'whitespace-nowrap',
+                ]}
               >
                 {figure.value}
               </dd>
