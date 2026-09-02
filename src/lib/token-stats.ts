@@ -75,11 +75,27 @@ export function isThrottled(url: string): boolean {
 export async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
   if (isThrottled(url)) throw new Error('rate-limited; holding off');
 
-  const response = await fetch(url, {
-    ...init,
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    headers: { accept: 'application/json', ...(init?.headers ?? {}) },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      headers: { accept: 'application/json', ...(init?.headers ?? {}) },
+    });
+  } catch (error) {
+    /*
+     * A throw here is usually a rate limit wearing a disguise.
+     *
+     * GeckoTerminal's 429 carries no `access-control-allow-origin`, so the
+     * browser blocks the response before any code sees it and `fetch` rejects
+     * with a bare TypeError — the status below is unreachable in a browser, and
+     * the backoff it sets never engaged. Every retry then hammered an endpoint
+     * that was already refusing us. Offline and DNS failures land here too, and
+     * backing off is the right answer for those as well.
+     */
+    throttledUntil.set(originOf(url), Date.now() + BACKOFF_MS);
+    throw error;
+  }
 
   if (response.status === 429) {
     throttledUntil.set(originOf(url), Date.now() + BACKOFF_MS);

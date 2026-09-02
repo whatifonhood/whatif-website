@@ -1877,23 +1877,77 @@ test.describe('the chart never mislabels what it is showing', () => {
         )?.dataset.timeframe ?? null,
     }));
 
-  test('a timeframe it cannot load leaves the chip on the one it is showing', async ({ page }) => {
-    const throttle = await stubMarket(page);
+  /*
+   * The one that matters: the chart must work with the API refusing everything.
+   *
+   * GeckoTerminal rate-limits hard and its 429 carries no CORS header, so in a
+   * browser the refusal is indistinguishable from a dead network — measured
+   * live, three of four requests came back 429, which is why every timeframe
+   * button looked broken. The candles ship with the site now, so the network is
+   * an upgrade rather than a dependency. `route.abort` reproduces exactly what
+   * the browser sees when that header is missing.
+   */
+  test('every timeframe works with the market API refusing everything', async ({ page }) => {
+    await page.route('**/api.geckoterminal.com/**', (route) => route.abort('failed'));
+    await page.route('**/api.dexscreener.com/**', (route) => route.abort('failed'));
     await page.goto('/stats/');
-    await page.waitForFunction(() => document.querySelectorAll('[data-candles] rect').length > 5);
 
-    const before = await shown(page);
-    expect(before.chip).toBe('day');
+    const drawn = () => page.locator('[data-candles] rect').count();
+    const chip = () =>
+      page.evaluate(
+        () =>
+          [...document.querySelectorAll<HTMLButtonElement>('button[data-timeframe]')].find(
+            (b) => b.getAttribute('aria-pressed') === 'true',
+          )?.dataset.timeframe ?? null,
+      );
 
-    throttle();
-    await page.locator('button[data-timeframe="quarter"]').click();
-    await expect(page.locator('[data-dash-status]')).toBeVisible();
+    await expect.poll(drawn, { message: 'the chart draws without the API' }).toBeGreaterThan(5);
 
-    const after = await shown(page);
-    expect(after.chip, 'the chip must describe the candles on screen').toBe('day');
-    expect(after.candles, 'the old candles stay rather than being half-replaced').toBe(
-      before.candles,
-    );
+    const seen = new Set<number>();
+    for (const frame of ['week', 'month', 'quarter', 'all', 'day'] as const) {
+      await page.locator(`button[data-timeframe="${frame}"]`).click();
+      await expect.poll(chip, { message: `${frame} must become the shown timeframe` }).toBe(frame);
+      const count = await drawn();
+      expect(count, `${frame} drew nothing`).toBeGreaterThan(5);
+      seen.add(count);
+    }
+    // Different timeframes hold different numbers of candles, so a single value
+    // across all five would mean nothing actually changed.
+    expect(seen.size, 'the timeframes must differ from each other').toBeGreaterThan(1);
+
+    await expect(page.locator('[data-chart-empty]')).toBeHidden();
+  });
+
+  /*
+   * The chip and the candles under it must agree.
+   *
+   * This used to prove it by cutting the network and checking the chip refused
+   * to move. It cannot any more, because every timeframe now ships with the
+   * site and there is no such thing as one the chart cannot show — which is the
+   * good kind of test failure. It proves the same property the other way: with
+   * the API dead, each timeframe draws exactly the number of candles committed
+   * for it, so the label is never describing somebody else's data.
+   */
+  test('the candles on screen are the ones the chip names', async ({ page }) => {
+    const committed = JSON.parse(
+      readFileSync(join('src', 'data', 'candles.json'), 'utf8'),
+    ) as Record<string, unknown[]>;
+
+    await page.route('**/api.geckoterminal.com/**', (route) => route.abort('failed'));
+    await page.route('**/api.dexscreener.com/**', (route) => route.abort('failed'));
+    await page.goto('/stats/');
+    await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+
+    const wrong: string[] = [];
+    for (const frame of ['day', 'week', 'month', 'quarter', 'all'] as const) {
+      await page.locator(`button[data-timeframe="${frame}"]`).click();
+      await expect.poll(async () => (await shown(page)).chip).toBe(frame);
+      const drawn = (await shown(page)).candles;
+      const expected = committed[frame]?.length ?? 0;
+      if (drawn !== expected)
+        wrong.push(`${frame}: chip says ${frame}, drew ${drawn} of ${expected}`);
+    }
+    expect(wrong, 'the chip must describe the candles on screen').toEqual([]);
   });
 
   test('a timeframe already seen still switches when the API refuses', async ({ page }) => {
