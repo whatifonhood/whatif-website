@@ -1304,6 +1304,9 @@ export function initDashboard(locale: string): void {
    * redraw — no request, no waiting, and the API is untouched however much
    * somebody scrubs around.
    */
+  /** The narrowest window the chart will zoom to, in candles. */
+  const MIN_SPAN = 8;
+
   const zoomAt = (ratio: number, factor: number) => {
     const total = loaded.length;
     if (total < 2) return;
@@ -1312,7 +1315,7 @@ export function initDashboard(locale: string): void {
     // Work out the new width first, then place it — clamping the width and the
     // position separately is what keeps this in range. Clamping the two edges
     // independently could leave start past end, which drew an empty chart.
-    const width = Math.max(8, Math.min(total, Math.round(span * factor)));
+    const width = Math.max(MIN_SPAN, Math.min(total, Math.round(span * factor)));
     const anchorIndex = view.start + ratio * span;
     const start = Math.max(0, Math.min(total - width, Math.round(anchorIndex - ratio * width)));
 
@@ -1324,16 +1327,30 @@ export function initDashboard(locale: string): void {
     'wheel',
     (event) => {
       if (loaded.length < 2) return;
-      // Only take the scroll when the gesture is a deliberate zoom. A plain
-      // vertical wheel over the chart should still scroll the page past it —
-      // cancelling every wheel event trapped anyone scrolling through.
-      const zooming =
-        event.ctrlKey || event.metaKey || Math.abs(event.deltaX) > Math.abs(event.deltaY);
-      if (!zooming) return;
+
+      /*
+       * The wheel zooms. Plainly, with no modifier held.
+       *
+       * It used to demand ctrl or cmd, on the reasoning that swallowing every
+       * wheel event would trap somebody scrolling down the page. True, but the
+       * cure was worse: a chart that does nothing when you scroll on it reads as
+       * broken, because every other chart on the internet zooms.
+       *
+       * The trap is avoided by giving the scroll back at the limits instead.
+       * Zoom out to the full range and the next scroll down goes to the page;
+       * zoom all the way in and the next scroll up does too. So the chart is
+       * never a hole you cannot scroll out of, and it still zooms on a plain
+       * wheel the way it should.
+       */
+      const out = event.deltaY > 0;
+      const span = view.end - view.start;
+      const spent = out ? span >= loaded.length : span <= MIN_SPAN;
+      if (spent) return;
+
       event.preventDefault();
       const box = wrap.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
-      zoomAt(ratio, event.deltaY > 0 ? 1.18 : 0.85);
+      zoomAt(ratio, out ? 1.18 : 0.85);
     },
     { passive: false },
   );
