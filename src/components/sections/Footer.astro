@@ -88,27 +88,36 @@ const headingTail = ` ${copy.footer.heading.accent}`;
           </div>
         </div>
 
-        <nav class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
-          <a href={localePath('/pfp/', locale)} class="hover:text-ink">{copy.nav.pfp}</a>
-          <a href={localePath('/memes/', locale)} class="hover:text-ink">{copy.pages.memes.title}</a
+        <nav class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
+          <a href={localePath('/pfp/', locale)} class="tap hover:text-ink">{copy.nav.pfp}</a>
+          <a href={localePath('/memes/', locale)} class="tap hover:text-ink"
+            >{copy.pages.memes.title}</a
           >
-          <a href={localePath('/stats/', locale)} class="hover:text-ink">{copy.pages.stats.title}</a
+          <a href={localePath('/stats/', locale)} class="tap hover:text-ink"
+            >{copy.pages.stats.title}</a
           >
-          <a href={localePath('/brand/', locale)} class="hover:text-ink">{copy.pages.brand.title}</a
+          <a href={localePath('/brand/', locale)} class="tap hover:text-ink"
+            >{copy.pages.brand.title}</a
           >
           <a
             href={MARKETS.contract}
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:text-ink"
+            class="tap hover:text-ink"
           >
             {copy.numbers.viewOnExplorer}
           </a>
         </nav>
       </div>
 
-      <!-- Anti-phishing: name the one real domain, every page, every language. -->
-      <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-lime/80">
+      <!--
+        Anti-phishing: name the one real domain, every page, every language.
+
+        Sentence case at 13px, not 11px uppercase. This is the line that decides
+        whether somebody buys from a clone, and it was set like a legal footer —
+        the treatment that tells a reader to skip it.
+      -->
+      <p class="font-mono text-[13px] leading-relaxed text-lime/90">
         {copy.footer.canonical}
       </p>
 

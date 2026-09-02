@@ -83,19 +83,22 @@ shareUrl.searchParams.set('url', `${SITE.url}/ask/day/${date}/`);
     >
       {
         previous ? (
-          <a href={`/ask/day/${previous}/`} class="text-faint transition-colors hover:text-lime">
+          <a
+            href={`/ask/day/${previous}/`}
+            class="tap text-faint transition-colors hover:text-lime"
+          >
             ← {previous}
           </a>
         ) : (
           <span />
         )
       }
-      <a href="/ask/day/" class="text-faint transition-colors hover:text-lime">
+      <a href="/ask/day/" class="tap text-faint transition-colors hover:text-lime">
         {page.dailyArchiveTitle}
       </a>
       {
         next ? (
-          <a href={`/ask/day/${next}/`} class="text-faint transition-colors hover:text-lime">
+          <a href={`/ask/day/${next}/`} class="tap text-faint transition-colors hover:text-lime">
             {next} →
           </a>
         ) : (

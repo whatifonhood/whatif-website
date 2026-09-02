@@ -58,7 +58,7 @@ const page = copy.pages.memes;
           data-vault-search
           placeholder={page.searchLabel}
           autocomplete="off"
-          class="w-full rounded-full border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-faint focus:border-lime/50 sm:w-56"
+          class="w-full rounded-full border border-line bg-surface px-4 py-2.5 text-base text-ink placeholder:text-faint focus:border-lime/50 sm:w-56 sm:text-sm"
         />
         <p
           role="status"
@@ -84,7 +84,7 @@ const page = copy.pages.memes;
             <a href={localePath(`/memes/${meme.slug}/`, locale)}>
               <img
                 src={`/memes/thumb/${meme.slug}.webp`}
-                srcset={`/memes/thumb/${meme.slug}.webp 400w, /memes/thumb2x/${meme.slug}.webp 800w`}
+                srcset={`/memes/thumb/${meme.slug}.webp 400w, /memes/thumb15x/${meme.slug}.webp 600w, /memes/thumb2x/${meme.slug}.webp 800w`}
                 sizes="(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw"
                 alt={meme.title}
                 width={meme.width}
@@ -106,7 +106,7 @@ const page = copy.pages.memes;
                 href={`/memes/full/${meme.slug}.webp`}
                 download={`whatif-${meme.slug}.webp`}
                 aria-label={`${page.download} ${meme.title}`}
-                class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-lime text-void transition-colors hover:bg-lime-pale"
+                class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime text-void transition-colors hover:bg-lime-pale sm:h-8 sm:w-8"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
                   <path
