@@ -1,0 +1,149 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE, type Locale } from '../../config/site.ts';
+import { localePath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import { getLearnContent, getLearnPages } from '../../lib/learn.ts';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * One Learn page, in one language.
+ *
+ * The Markdown renders through Astro's own pipeline, so the prose stays prose
+ * and nothing is injected as HTML from outside this repository.
+ */
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const copy = getCopy(locale);
+
+const all = getLearnPages(locale);
+const index = all.findIndex((page) => page.slug === slug);
+const entry = all[index];
+const next = all[index + 1];
+const previous = index > 0 ? all[index - 1] : undefined;
+
+const Content = getLearnContent(locale, slug);
+---
+
+<PageLayout
+  locale={locale}
+  title={entry?.title ?? copy.pages.learn.title}
+  description={entry?.summary ?? copy.pages.learn.intro}
+  eyebrow={copy.pages.learn.eyebrow}
+  heading={{ lead: entry?.title ?? '', accent: '' }}
+  intro={entry?.summary ?? ''}
+  socialImage={`${SITE.url}/og-default.jpg`}
+>
+  <div class="mx-auto w-full max-w-2xl px-5 py-12 sm:px-8">
+    <!--
+      A way out at the top, not only at the bottom. Somebody who opens a page and
+      realises it is not the one they wanted should not have to scroll a
+      thousand words to get back.
+    -->
+    <a
+      href={localePath('/learn/', locale)}
+      class="mb-8 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-lime"
+    >
+      <Icons name="arrow-up-right" size={11} class="-rotate-[135deg]" />
+      {copy.pages.learn.backToIndex}
+    </a>
+
+    <article class="prose-if">
+      {Content && <Content />}
+    </article>
+
+    <nav class="mt-14 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
+      {
+        previous ? (
+          <a
+            href={localePath(`/learn/${previous.slug}/`, locale)}
+            class="card p-4 transition-colors hover:border-lime/50"
+          >
+            <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+              {copy.pages.learn.previous}
+            </span>
+            <span class="mt-1 block text-sm font-semibold text-ink">{previous.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a
+            href={localePath(`/learn/${next.slug}/`, locale)}
+            class="card p-4 text-right transition-colors hover:border-lime/50 sm:col-start-2"
+          >
+            <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+              {copy.pages.learn.next}
+            </span>
+            <span class="mt-1 block text-sm font-semibold text-ink">{next.title}</span>
+          </a>
+        )
+      }
+    </nav>
+
+    <p class="mt-8 text-center">
+      <a
+        href={localePath('/learn/', locale)}
+        class="font-mono text-[11px] uppercase tracking-wider text-faint hover:text-lime"
+      >
+        {copy.pages.learn.backToIndex}
+      </a>
+    </p>
+  </div>
+</PageLayout>
+
+<style is:global>
+  /*
+   * Markdown produces its own elements, so these rules cannot be scoped —
+   * Astro only scopes what appears in a component's own template.
+   */
+  .prose-if h2 {
+    margin: 2.5rem 0 0.75rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .prose-if p {
+    margin-bottom: 1.15rem;
+    line-height: 1.75;
+    color: var(--color-muted);
+  }
+  .prose-if strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .prose-if ul {
+    margin: 0 0 1.15rem 1.1rem;
+    list-style: disc;
+  }
+  .prose-if li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .prose-if li::marker {
+    color: var(--color-faint);
+  }
+  .prose-if a {
+    color: var(--color-lime);
+    text-underline-offset: 3px;
+  }
+  .prose-if a:hover {
+    text-decoration: underline;
+  }
+  .prose-if code {
+    overflow-wrap: anywhere;
+    border-radius: 4px;
+    background: var(--color-surface-2);
+    padding: 0.1em 0.4em;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--color-ink);
+  }
+</style>

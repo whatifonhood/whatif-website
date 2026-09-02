@@ -11,7 +11,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run questions && npm run docs && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run questions && npm run docs && npm run learn && npm run build",
     "typecheck": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -36,7 +36,8 @@
     "machine": "node tools/check-machine.mjs",
     "history:clean": "node tools/clean-coin-history.mjs",
     "holders": "node tools/build-holders.mjs",
-    "docs": "node tools/check-docs.mjs"
+    "docs": "node tools/check-docs.mjs",
+    "learn": "node tools/check-learn.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

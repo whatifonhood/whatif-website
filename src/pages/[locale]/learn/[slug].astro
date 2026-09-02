@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LearnArticle from '../../../components/pages/LearnArticle.astro';
+import { LOCALES, type Locale } from '../../../config/site.ts';
+import { getLearnPages } from '../../../lib/learn.ts';
+
+/**
+ * One Learn page in every language except English.
+ *
+ * A path is built from the pages that actually exist in that language, so a
+ * missing translation is a missing route rather than an empty page. `npm run
+ * learn` fails the build before it can get that far.
+ */
+export const getStaticPaths = (() =>
+  LOCALES.filter((locale) => locale !== 'en').flatMap((locale) =>
+    getLearnPages(locale).map((page) => ({
+      params: { locale, slug: page.slug },
+      props: { locale, slug: page.slug },
+    })),
+  )) satisfies GetStaticPaths;
+
+const { locale, slug } = Astro.props as { locale: Locale; slug: string };
+---
+
+<LearnArticle locale={locale} slug={slug} />

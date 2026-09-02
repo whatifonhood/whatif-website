@@ -1,0 +1,65 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE, type Locale } from '../../config/site.ts';
+import { localePath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import { LEARN_CATEGORIES, getLearnPagesIn } from '../../lib/learn.ts';
+
+/**
+ * The Learn index, in one language.
+ *
+ * Safety pages come first, deliberately: they are what a newcomer actually
+ * needs, and on a site about a financial asset they are the part that has to be
+ * right. That is also why the section is translated at all — the tools were in
+ * four languages while the guidance on not losing your money was in one.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.learn;
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-default.jpg`}
+>
+  <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
+    <div class="flex flex-col gap-10">
+      {
+        LEARN_CATEGORIES.map((category) => {
+          const pages = getLearnPagesIn(locale, category);
+          return (
+            pages.length > 0 && (
+              <section>
+                <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+                  {page.categories[category]}
+                </h2>
+                <ol class="mt-4 grid gap-3 sm:grid-cols-2">
+                  {pages.map((entry) => (
+                    <li>
+                      <a
+                        href={localePath(`/learn/${entry.slug}/`, locale)}
+                        class="card flex h-full flex-col gap-2 p-6 transition-colors hover:border-lime/50"
+                      >
+                        <span class="text-lg font-semibold text-ink">{entry.title}</span>
+                        <span class="text-sm leading-relaxed text-muted">{entry.summary}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )
+          );
+        })
+      }
+    </div>
+  </div>
+</PageLayout>
