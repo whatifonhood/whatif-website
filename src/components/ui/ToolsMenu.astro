@@ -43,9 +43,9 @@ const copy = getCopy(locale);
       {
         TOOL_GROUPS.map((group, index) => (
           <section class:list={[index > 0 && 'mt-1 border-t border-line pt-1']}>
-            <h3 class="px-3 pb-1 pt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+            <p class="px-3 pb-1 pt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
               {copy.nav.toolGroups[group]}
-            </h3>
+            </p>
             <ul>
               {toolsIn(group).map((tool) => (
                 <li>
