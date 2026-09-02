@@ -65,13 +65,6 @@ export const ROADMAP: RoadmapItem[] = [
   {
     status: 'shipped',
     date: '2026-09-01',
-    title: 'A page for every coin',
-    body: 'Six hundred and sixty-four of them. Each one answers "what if I had bought this" for every year it has traded, worked out before the page loads.',
-    href: '/machine/doge/',
-  },
-  {
-    status: 'shipped',
-    date: '2026-09-01',
     title: 'The community wall',
     body: 'Real posts on the landing page, in our own type rather than embedded. The text is fetched once at build time — no third-party script, no iframe, nothing watching you read it.',
     href: '/#posts',
@@ -131,13 +124,6 @@ export const ROADMAP: RoadmapItem[] = [
     title: 'The deeper chart',
     body: 'Zoom, pan, a moving average, and every burn marked on the timeline where it happened.',
     href: '/stats/',
-  },
-  {
-    status: 'shipped',
-    date: '2026-09-01',
-    title: 'The whole market in the Machine',
-    body: 'Seven hundred and eighty coins with real monthly history, $IF among them, each one checked against sixteen thousand recomputed sums before it ships.',
-    href: '/machine/',
   },
 
   // --------------------------------------------------------------- building

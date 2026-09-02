@@ -79,16 +79,13 @@ export const WEEK_PATHS = [
   '/coins/full',
   '/coins/thumb',
   '/coins/og',
-  '/machine/logos',
-  '/machine/poses',
+  '/art',
   '/posts',
 ] as const;
 
 /*
  * Deliberately NOT cached for a week:
- *   /machine/h, /machine/*.json — price history the daily refresh rewrites, so
- *   a week-old copy would show week-old prices.
- *   /machine/, /coins/ — these are HTML routes. A prefix rule on them put every
+ *   /coins/ — an HTML route. A prefix rule on them put every
  *   deploy behind a seven-day cache, which is the bug this list was split to fix.
  */
 

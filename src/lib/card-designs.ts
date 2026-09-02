@@ -1,5 +1,5 @@
 /**
- * The four share cards.
+ * The three share cards.
  *
  * One file so they stay a family: the same ground, the same portal, the same
  * footer, the same type. Each one gets a single hero number or sentence and one
@@ -14,7 +14,6 @@ import {
   FAINT,
   INK,
   LIME,
-  WARN,
   fitLines,
   hash,
   paintBackdrop,
@@ -41,10 +40,6 @@ const PAD = 72;
  * what-if-meme/PFP-GENERATION-PLAN.md, same five-block prompt as the pool.
  */
 export const CARD_COINS = {
-  /** Reaching up a staircase of green candles. Rim: WHAT $IF EARLIER. */
-  machineWin: 'earlier',
-  /** Palm out, red candles falling past. Rim: DODGED IT. */
-  machineLoss: 'dodged',
   /** Looking up at a question mark written in stars. Rim: STILL ASKING. */
   ask: 'asking',
   /** One glowing coin cupped at the chest, a chain behind. Rim: READ THE CHAIN. */
@@ -61,142 +56,6 @@ function prepare(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
   return context;
-}
-
-// ---------------------------------------------------------------------------
-// The What $IF Machine
-// ---------------------------------------------------------------------------
-
-export interface MachineCardData {
-  symbol: string;
-  month: string;
-  amount: string;
-  value: string;
-  multiple: number;
-  verdict: string;
-  history: [string, number][];
-  entryIndex: number;
-}
-
-/**
- * The Machine's card.
- *
- * The portal's arc is the multiple: a loss barely opens it, a hundred-x closes
- * it completely. The price curve runs through the middle of the portal, with
- * the entry marked — so the picture and the number say the same thing.
- */
-export function drawMachineCard(
-  canvas: HTMLCanvasElement,
-  data: MachineCardData,
-  coin?: HTMLImageElement,
-): void {
-  const context = prepare(canvas);
-  if (!context) return;
-
-  const won = data.multiple >= 1;
-  const accent = won ? LIME : WARN;
-  paintBackdrop(context, hash(data.symbol + data.month));
-
-  // Sat high and right, clear of the block of type on the left.
-  const cx = CARD_WIDTH - 250;
-  const cy = 268;
-  const radius = 182;
-  // A multiple is unbounded, so the arc is set on a log scale: 1x is a quarter
-  // turn, 10x is a half, 1000x is all the way round.
-  const sweep = won ? Math.min(1, 0.25 + Math.log10(Math.max(1, data.multiple)) * 0.25) : 0.12;
-  paintPortal(context, cx, cy, radius, { accent, sweep, seed: hash(data.symbol) });
-
-  // The curve first, so the medallion sits on top of its own chart and the
-  // line reads as running out from behind it.
-  drawSpark(context, data.history, data.entryIndex, cx, cy, radius * 0.95, accent);
-  if (coin) paintMedallion(context, coin, cx, cy, 268, accent);
-
-  paintEyebrow(context, 'The What $IF Machine');
-
-  context.font = '400 26px "JetBrains Mono", monospace';
-  context.fillStyle = FAINT;
-  context.fillText(`${data.amount} of ${data.symbol}  ·  ${data.month}`, PAD, 146);
-
-  const multipleText =
-    data.multiple >= 100
-      ? `${Math.round(data.multiple).toLocaleString('en-US')}×`
-      : `${data.multiple.toFixed(1)}×`;
-  context.font = '900 italic 132px Archivo, sans-serif';
-  context.fillStyle = accent;
-  context.fillText(multipleText, PAD, 286);
-
-  context.font = '700 40px "JetBrains Mono", monospace';
-  context.fillStyle = INK;
-  context.fillText(`${data.amount} → ${data.value}`, PAD, 348);
-
-  // The verdict gets the full width UNDER the artwork, which the portal no
-  // longer reaches — so it can be set large without running into anything.
-  const verdict = fitLines(
-    context,
-    data.verdict,
-    (size) => `900 italic ${size}px Archivo, sans-serif`,
-    CARD_WIDTH - PAD * 2,
-    130,
-    56,
-    30,
-  );
-  let y = 470;
-  context.fillStyle = INK;
-  for (const line of verdict.lines.slice(0, 2)) {
-    context.fillText(line.toUpperCase(), PAD, y);
-    y += verdict.size * 1.12;
-  }
-
-  paintFooter(context, 'whatifonhood.com/machine', 'Historical prices · not financial advice');
-}
-
-/** The coin's whole history, drawn inside the portal. */
-function drawSpark(
-  context: CanvasRenderingContext2D,
-  history: [string, number][],
-  entryIndex: number,
-  cx: number,
-  cy: number,
-  radius: number,
-  accent: string,
-): void {
-  if (history.length < 2) return;
-  const prices = history.map(([, price]) => price);
-  const logs = prices.map((price) => Math.log10(Math.max(price, 1e-18)));
-  const low = Math.min(...logs);
-  const high = Math.max(...logs);
-  const span = high - low || 1;
-
-  const width = radius * 1.9;
-  const height = radius * 0.95;
-  const left = cx - width / 2;
-  const top = cy - height / 2;
-
-  const x = (i: number) => left + (i / Math.max(1, history.length - 1)) * width;
-  const y = (i: number) => top + height - ((logs[i]! - low) / span) * height;
-
-  context.save();
-  context.beginPath();
-  history.forEach((_, i) => (i === 0 ? context.moveTo(x(i), y(i)) : context.lineTo(x(i), y(i))));
-  context.strokeStyle = accent;
-  context.lineWidth = 3.5;
-  context.lineJoin = 'round';
-  context.shadowColor = accent;
-  context.shadowBlur = 18;
-  context.stroke();
-  context.shadowBlur = 0;
-
-  const entry = history[entryIndex];
-  if (entry) {
-    context.beginPath();
-    context.arc(x(entryIndex), y(entryIndex), 9, 0, Math.PI * 2);
-    context.fillStyle = '#080B07';
-    context.fill();
-    context.lineWidth = 3.5;
-    context.strokeStyle = INK;
-    context.stroke();
-  }
-  context.restore();
 }
 
 // ---------------------------------------------------------------------------

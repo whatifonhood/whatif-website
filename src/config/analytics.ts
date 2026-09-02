@@ -38,8 +38,6 @@ export const EVENTS = {
   /** Whether the generator gets used, and which formats people reach for. */
   memeMade: 'Meme Made',
   /** Which coins people compare against — a ranked list of what they regret. */
-  machineRun: 'Machine Run',
-  machineCard: 'Machine Card',
   pfpRoll: 'PFP Roll',
   pfpDownload: 'PFP Download',
   /** What actually gets posted, page by page. */

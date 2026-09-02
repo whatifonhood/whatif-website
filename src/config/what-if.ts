@@ -443,7 +443,7 @@ export function countPossibilities(): number {
  * How often each register comes up.
  *
  * The philosophical one leads: it is the question the whole coin is built on.
- * Money is the regret the Machine already answers in detail, and the market
+ * Money is the regret people arrive with already, and the market
  * jokes are garnish, so they take the smallest share.
  */
 export const WEIGHTS: Record<Category, number> = { deep: 0.62, money: 0.24, market: 0.14 };
