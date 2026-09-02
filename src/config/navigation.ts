@@ -21,18 +21,10 @@ export const TOOL_ROUTES = [
   { id: 'pfp', href: '/pfp/', group: 'play' },
   { id: 'memes', href: '/memes/', group: 'assets' },
   { id: 'brand', href: '/brand/', group: 'assets' },
-  // englishOnly: these two have no translated build yet, so a locale prefix
-  // would point at a page that does not exist. Sending a reader to the English
-  // one is worse than a translation and far better than a 404.
-  { id: 'learn', href: '/learn/', group: 'read', englishOnly: true },
-  { id: 'docs', href: '/docs/', group: 'read', englishOnly: true },
+  { id: 'learn', href: '/learn/', group: 'read' },
+  { id: 'docs', href: '/docs/', group: 'read' },
   { id: 'roadmap', href: '/roadmap/', group: 'read' },
-] as const satisfies readonly {
-  id: string;
-  href: string;
-  group: ToolGroup;
-  englishOnly?: boolean;
-}[];
+] as const satisfies readonly { id: string; href: string; group: ToolGroup }[];
 
 export type ToolId = (typeof TOOL_ROUTES)[number]['id'];
 
@@ -54,20 +46,50 @@ export function localePath(href: string, locale: string): string {
 }
 
 /**
- * Every route that exists in English only.
+ * The routes that exist in English only.
  *
- * `localePath` prefixes blindly, which is right for the pages that are built in
- * four languages and wrong for the ones that are not — it produced 438 links to
- * /zh/learn/, /es/docs/ and the like, none of which exist. Anything listed here
- * keeps its English path whatever locale the reader is in.
+ * `localePath` prefixes blindly, which is right for everything built in four
+ * languages and wrong for everything that is not. Blind prefixing produced 438
+ * tool links to /zh/learn/ and /es/docs/, and 36 hreflang tags advertising
+ * white-paper translations nobody had written — two different symptoms of the
+ * same missing question, which is why the answer lives in one place now.
+ *
+ * Every pattern here is a route with no twin under src/pages/[locale]/. Adding
+ * a translated build means deleting a line. tests/smoke.spec.ts walks the built
+ * output and fails if this list stops matching what Astro actually produced, so
+ * it cannot quietly go stale.
  */
-export const ENGLISH_ONLY: readonly string[] = TOOL_ROUTES.filter(
-  (tool) => 'englishOnly' in tool && tool.englishOnly,
-).map((tool) => tool.href);
+const ENGLISH_ONLY: readonly RegExp[] = [
+  /^\/docs\//, // the white paper
+  /^\/ask\/day\//, // the archive of past questions
+  /^\/pfp\/[^/]+\//, // one coin's own page — the generator itself is translated
+  /^\/404\/?$/,
+  /^\/rss\.xml$/,
+];
+
+/** Whether a page was built in the given language. */
+export function hasTranslation(pathname: string, locale: string): boolean {
+  if (locale === 'en') return true;
+  const base = basePath(pathname);
+  return !ENGLISH_ONLY.some((pattern) => pattern.test(base));
+}
 
 /** Like `localePath`, but never invents a translation that was not built. */
 export function toolPath(href: string, locale: string): string {
-  return ENGLISH_ONLY.includes(href) ? href : localePath(href, locale);
+  return hasTranslation(href, locale) ? localePath(href, locale) : href;
+}
+
+/**
+ * The page you are on, in another language.
+ *
+ * The language switcher used to go to that language's home page from wherever
+ * you were, so switching language on any sub-page — a Learn article, a meme, the
+ * dashboard — silently threw away your place. It keeps it now, and falls back to
+ * the home page only where there is genuinely nothing to keep.
+ */
+export function translatedPath(pathname: string, locale: string): string {
+  const base = basePath(pathname);
+  return hasTranslation(base, locale) ? localePath(base, locale) : localePath('/', locale);
 }
 
 /**
