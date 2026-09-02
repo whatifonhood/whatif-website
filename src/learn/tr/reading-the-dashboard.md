@@ -48,4 +48,4 @@ Zaman aralığı açıkça belirtilir, çünkü rakam sabit bir zaman aralığı
 
 Sözleşme doğrulandı, honeypot kontrolü, sabit arz, yakım adresi. Bunlar bizim tarafımızdan değil, üçüncü taraflarca beyan edilir ve her biri kontrolü yeniden çalıştırabileceğiniz yere bağlantı verir.
 
-Burada kilitli likidite veya sahipliği bırakılmış bir sözleşme hakkında hiçbir iddia bulunmadığını fark edeceksiniz. Bu iddialar, kanıtlayamadığımız için bu siteden kaldırıldı ve işlem bağlantıları olmadan geri gelmeyecekler.
+Bu sayfanın likiditenin kilitli olduğunu ya da sahipliğin bırakıldığını iddia etmediğini fark edeceksiniz. Bunların daha dar hâlleri ise hem doğru hem de doğrulanabilir: lansman pozisyonu kalıcı olarak kilitlidir, işlem yapılabilir derinliğin yaklaşık yarısı ise değildir ve sözleşmenin bırakacağı bir sahibi hiçbir zaman olmadı. Geniş hâlleri kaldırıldı ve işlem bağlantıları olmadan geri gelmeyecekler.

@@ -34,7 +34,7 @@ Lea el contrato en lugar de fiarse de la palabra de un sitio web, incluido este.
 
 ## Lo que este proyecto no afirma
 
-En este sitio no hay ninguna afirmación de liquidez bloqueada ni de renuncia a la propiedad. Ambas se eliminaron porque no se podían acreditar con enlaces a transacciones. Si las ve afirmadas en otro lugar bajo esta marca, tómelo como motivo de sospecha y no de tranquilidad.
+En este sitio no se dice "la liquidez está bloqueada", ni se dice que se haya renunciado a la propiedad. Lo que se dice en su lugar es más acotado y comprobable: la posición de liquidez del lanzamiento está bloqueada de forma permanente, y aproximadamente la mitad de la profundidad negociable no lo está; y el contrato nunca tuvo un propietario al que renunciar, lo cual es un hecho más fuerte que una renuncia. Si ve las versiones más amplias afirmadas en otro lugar bajo esta marca, tómelo como motivo de sospecha y no de tranquilidad.
 
 Tampoco hay hoja de ruta, ni utilidad, ni promesa de rentabilidad. $IF es una meme coin.
 

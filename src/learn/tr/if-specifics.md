@@ -34,7 +34,7 @@ Bir web sitesinin sözüne — bu site de dahil — güvenmek yerine sözleşmey
 
 ## Bu projenin iddia etmedikleri
 
-Bu sitede kilitli likidite iddiası da sahipliğin bırakıldığı iddiası da yoktur. İkisi de işlem bağlantılarıyla kanıtlanamadığı için kaldırıldı. Bu markanın adı altında başka bir yerde bunların öne sürüldüğünü görürseniz, bunu rahatlama değil şüphe sebebi sayın.
+Bu sitede “likidite kilitli” denmez, sahipliğin bırakıldığı da söylenmez. Bunun yerine söylenen şey daha dar ve doğrulanabilir: lansman likidite pozisyonu kalıcı olarak kilitlidir, işlem yapılabilir derinliğin kabaca yarısı ise değildir; ayrıca sözleşmenin bırakılacak bir sahibi hiçbir zaman olmadı, ki bu, sahipliğin bırakılmış olmasından daha güçlü bir olgudur. Bu markanın adı altında başka bir yerde bunların daha geniş hâllerinin öne sürüldüğünü görürseniz, bunu rahatlama değil şüphe sebebi sayın.
 
 Ayrıca yol haritası, kullanım alanı ve getiri vaadi de yoktur. $IF bir meme coindir.
 

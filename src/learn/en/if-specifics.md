@@ -28,13 +28,13 @@ Every burn is plotted on the [stats page](/stats/) as a cumulative curve built f
 
 ## Tax
 
-The $IF contract adds nothing on top of your trade. The one percent you will see quoted on the main pool is Uniswap's own fee tier, which goes to the people providing liquidity — not to this project.
+The $IF contract adds nothing on top of your trade. It has no fee logic in it at all. The one percent you will see quoted on the main pool is Uniswap's own fee tier, earned by the liquidity positions rather than by this project. The largest of those positions is the permanently locked launch position, and its share of that fee is swept by the launchpad that created the token: the $IF side is burned, the ETH side is not. None of it reaches this community.
 
 Read the contract rather than taking a website's word for it, including this one.
 
 ## What this project does not claim
 
-There is no locked-liquidity claim and no renounced-ownership claim on this site. Both were removed because they could not be evidenced with transaction links. If you see them asserted somewhere else under this brand, treat that as a reason for suspicion rather than comfort.
+This site does not say "liquidity is locked", and it does not say ownership was renounced. What it says instead is narrower and checkable: the launch liquidity position is permanently locked, and roughly half the tradeable depth is not; and the contract never had an owner to renounce in the first place, which is a stronger fact than a renouncement. If you see the broader versions asserted somewhere else under this brand, treat that as a reason for suspicion rather than comfort.
 
 There is also no roadmap, no utility and no promise of return. $IF is a meme coin.
 

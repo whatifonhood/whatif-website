@@ -26,7 +26,7 @@ A coin about a feeling makes no such promise. It cannot fail to deliver a produc
 Dropping the utility claim does not buy a free pass. It moves the burden somewhere harder:
 
 - **Every number on the site is checkable.** Not "audited" — checkable, by you, with a command we publish.
-- **Nothing is claimed that cannot be shown.** When we could not evidence the LP-lock claim, we deleted it rather than soften it.
+- **Nothing is claimed that cannot be shown.** When we could not evidence the LP-lock claim, we deleted it rather than soften it. When the evidence turned up, what went back was the narrower claim it supports, not the one that had been deleted.
 - **The unflattering numbers stay up.** The dashboard shows the price down as readily as up, and the holder table names the largest wallets whether or not that is comfortable.
 
 ## The survivorship problem
