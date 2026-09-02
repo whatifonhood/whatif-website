@@ -48,4 +48,4 @@ The window is stated explicitly, because the figure comes from a size-filtered q
 
 Contract verified, honeypot check, fixed supply, burn address. These are asserted by third parties, not by us, and each links to where you can re-run it.
 
-You will notice there is no claim here about locked liquidity or a renounced contract. Those claims were removed from this site because we could not evidence them, and they will not come back without transaction links.
+You will notice this page does not claim that liquidity is locked or that ownership was renounced. The narrower versions are both true and both checkable: the launch position is permanently locked while about half the tradeable depth is not, and the contract never had an owner to give up. The broad versions were removed and will not come back without transaction links.

@@ -17,7 +17,7 @@ Strip those two out and what is left is the actual holder concentration. At the 
 
 ## What we can and cannot tell you
 
-We can tell you the addresses, the balances, and which are contracts. All of that is on the chain.
+We can tell you the addresses, the balances, and which are contracts. All of that is on the chain. One caveat on that last part: several of the largest holders read as contracts on an explorer but are ordinary wallets using the delegation described in [The chain it runs on](/docs/the-chain/). They are people, and a concentration figure that files them as contracts is wrong in the flattering direction.
 
 We cannot tell you who the people behind those addresses are. Nobody can, without their cooperation. Any project claiming to know its holders' identities is either running KYC or guessing.
 

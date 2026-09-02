@@ -48,4 +48,4 @@ La ventana se indica de forma explícita, porque la cifra proviene de una consul
 
 Contrato verificado, comprobación de honeypot, suministro fijo, dirección de quema. Esto lo afirman terceros, no nosotros, y cada punto enlaza al lugar donde se puede volver a comprobar.
 
-Notará que aquí no hay ninguna afirmación sobre liquidez bloqueada ni sobre un contrato renunciado. Esas afirmaciones se retiraron de este sitio porque no pudimos aportar pruebas de ellas, y no volverán sin enlaces a transacciones.
+Notará que esta página no afirma que la liquidez esté bloqueada ni que se haya renunciado a la propiedad. Las versiones más acotadas son ciertas y comprobables las dos: la posición de lanzamiento está bloqueada de forma permanente mientras que alrededor de la mitad de la profundidad negociable no lo está, y el contrato nunca tuvo un propietario al que renunciar. Las versiones amplias se retiraron y no volverán sin enlaces a transacciones.

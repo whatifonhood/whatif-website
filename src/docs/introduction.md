@@ -11,7 +11,7 @@ That question is **what if**.
 
 Most white papers exist to make a token sound like a company. This one exists to do the opposite: to write down what $IF actually is, what it is not, and how to check both without believing anything on this page.
 
-There are twelve sections. Three explain the coin. Three prove the numbers. Three cover buying and holding it. Three say the uncomfortable parts out loud.
+There are sixteen sections. Three explain the coin. Three prove the numbers. Four take the chain, the launch, the liquidity and the burn apart. Three cover buying and holding it. Three say the uncomfortable parts out loud.
 
 If you read only one, read [Verify it yourself](/docs/verify-it-yourself/). Everything else in this paper is downstream of it.
 
