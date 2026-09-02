@@ -4,6 +4,7 @@ import { SITE, type Locale } from '../../config/site.ts';
 import { COINS, COIN_TIERS, COIN_TIER_ORDER } from '../../config/coins.ts';
 import { getCopy } from '../../content/index.ts';
 import Icons from '../../components/ui/Icons.astro';
+import Button from '../ui/Button.astro';
 
 /**
  * The PFP generator, as a page of this site rather than a separate app.
@@ -92,48 +93,36 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
         ></span>
       </div>
 
-      <button
-        type="button"
+      <Button
+        size="xl"
+        class="mt-8 aria-disabled:opacity-60"
         data-pfp-generate
         data-label-generate={page.generate}
         data-label-again={page.again}
-        class="mt-8 rounded-full bg-lime px-8 py-4 font-display text-base font-bold text-void transition-all duration-300 hover:-translate-y-0.5 hover:bg-lime-pale hover:shadow-[0_12px_36px_-12px_rgba(143,206,2,0.6)] aria-disabled:opacity-60"
       >
         {page.generate}
-      </button>
+      </Button>
 
       <p class="mt-4 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-faint">
         {page.hint}
       </p>
 
       <div data-pfp-actions hidden class="mt-6 flex flex-wrap justify-center gap-3">
-        <a
-          data-pfp-download
-          href="#"
-          download
-          class="inline-flex items-center gap-2 rounded-full bg-lime px-5 py-3 text-sm font-semibold text-void transition-colors hover:bg-lime-pale"
-        >
-          {page.download}
-        </a>
-        <a
-          data-pfp-card
-          href="#"
-          download
-          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-lime/50"
-        >
+        <Button href="#" data-pfp-download>{page.download}</Button>
+        <Button href="#" variant="secondary" data-pfp-card>
           {page.shareCard}
-        </a>
-        <a
-          data-pfp-x
+        </Button>
+        <Button
           href="#"
-          target="_blank"
-          rel="noopener noreferrer"
+          variant="secondary"
+          external
+          externalLabel={copy.common.externalLink}
+          data-pfp-x
           data-template={page.shareText('{name}', '{tier}')}
-          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-lime/50"
         >
           <Icons name="x" size={13} />
           {page.postOnX}
-        </a>
+        </Button>
       </div>
 
       <canvas data-pfp-canvas width="1200" height="675" class="sr-only" aria-hidden="true"></canvas>

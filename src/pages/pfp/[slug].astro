@@ -67,22 +67,24 @@ shareUrl.searchParams.set('url', `${SITE.url}/pfp/${coin.slug}`);
           {page.openGenerator}
           <Icons name="arrow-up-right" size={16} />
         </Button>
-        <a
+        <Button
           href={`/coins/full/${coin.slug}.png`}
+          variant="secondary"
+          size="lg"
           download={`what-if-${coin.slug}.png`}
-          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
         >
           {page.download}
-        </a>
-        <a
+        </Button>
+        <Button
           href={shareUrl.toString()}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+          variant="secondary"
+          size="lg"
+          external
+          externalLabel={copy.common.externalLink}
         >
           <Icons name="x" size={14} />
           {page.postOnX}
-        </a>
+        </Button>
       </div>
     </div>
   </div>
