@@ -42,6 +42,8 @@
      the machine card, but never actually defined — so all of them fell back to
      ordinary body ink and the warning read as normal text. */
   --color-warn: #f0a06a;
+  /* The second overlay on the chart, distinct from both accent and warning. */
+  --color-info: #5bc8f5;
   /* Borders on text inputs. --color-line is 1.41:1 on the page ground, which
      fails WCAG 1.4.11's 3:1 for a control boundary; this clears it. The
      decorative --color-line is left alone. */

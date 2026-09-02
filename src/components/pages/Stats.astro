@@ -114,7 +114,7 @@ const metrics = [
     <p
       data-dash-status
       hidden
-      class="mb-6 rounded-xl border-l-2 border-[#F0A06A] bg-[#F0A06A]/10 px-5 py-3 text-sm text-muted"
+      class="mb-6 rounded-xl border-l-2 border-warn bg-warn/10 px-5 py-3 text-sm text-muted"
       role="status"
     >
     </p>
@@ -426,7 +426,7 @@ const metrics = [
           <div class="text-right">
             <p
               data-metric="sells"
-              class="font-display text-3xl font-black italic tabular-nums text-[#F0A06A]"
+              class="font-display text-3xl font-black italic tabular-nums text-warn"
             >
               —
             </p>
@@ -669,9 +669,9 @@ const metrics = [
         The curve above shows the shape; this names the events behind it, and
         every row can be checked on the explorer by anyone who doubts it.
       -->
-      <h3 class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+      <h2 class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
         {page.biggestBurnsTitle}
-      </h3>
+      </h2>
       <ol class="mt-4 divide-y divide-line/60">
         {
           BIGGEST_BURNS.map((burn, index) => (
@@ -1080,7 +1080,7 @@ const metrics = [
     box-shadow: 0 0 0 3px rgb(143 206 2 / 0.16);
   }
   .trust-mark[data-state='fail'] {
-    background: var(--color-warn, #f0a06a);
+    background: var(--color-warn);
   }
 
   /* Burn curve */
@@ -1157,7 +1157,7 @@ const metrics = [
     color: var(--color-lime);
   }
   [data-change][data-direction='down'] {
-    color: #f0a06a;
+    color: var(--color-warn);
   }
 
   /* Chart */
@@ -1166,7 +1166,7 @@ const metrics = [
     --chart-colour: var(--color-lime);
   }
   .chart[data-direction='down'] {
-    --chart-colour: #f0a06a;
+    --chart-colour: var(--color-warn);
   }
 
   /* The icon-only chart-type buttons sit tighter than the text chips. */
@@ -1192,7 +1192,7 @@ const metrics = [
     background: linear-gradient(
       to right,
       var(--color-lime) 0 var(--buy-share, 50%),
-      #f0a06a var(--buy-share, 50%) 100%
+      var(--color-warn) var(--buy-share, 50%) 100%
     );
   }
 
@@ -1324,7 +1324,7 @@ const metrics = [
 
   .ema-line {
     fill: none;
-    stroke: #5bc8f5;
+    stroke: var(--color-info);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
   }
@@ -1416,8 +1416,8 @@ const metrics = [
   }
   .candle-wick[data-rising='false'],
   .candle-body[data-rising='false'] {
-    stroke: #f0a06a;
-    fill: #f0a06a;
+    stroke: var(--color-warn);
+    fill: var(--color-warn);
   }
   .candle-body {
     stroke: none;
@@ -1473,7 +1473,7 @@ const metrics = [
   }
   .feed-row[data-kind='sell'] .feed-kind {
     background: rgb(240 160 106 / 0.16);
-    color: #f0a06a;
+    color: var(--color-warn);
   }
 
   .feed-amount {
@@ -1554,7 +1554,7 @@ const metrics = [
     opacity: 0.85;
   }
   .pressure-bar[data-kind='sell'] {
-    fill: var(--color-warn, #f0a06a);
+    fill: var(--color-warn);
     opacity: 0.7;
   }
   .pressure-axis {
@@ -1584,7 +1584,7 @@ const metrics = [
     pointer-events: none;
   }
   .burn-mark {
-    stroke: var(--color-warn, #f0a06a);
+    stroke: var(--color-warn);
     stroke-width: 2;
     opacity: 0.75;
   }
@@ -1607,14 +1607,14 @@ const metrics = [
     color: var(--color-lime);
   }
   .chart-tip [data-tip-change][data-direction='down'] {
-    color: var(--color-warn, #f0a06a);
+    color: var(--color-warn);
   }
   .vol-bar[data-rising='true'] {
     fill: var(--color-lime);
     opacity: 0.45;
   }
   .vol-bar[data-rising='false'] {
-    fill: var(--color-warn, #f0a06a);
+    fill: var(--color-warn);
     opacity: 0.4;
   }
 </style>
