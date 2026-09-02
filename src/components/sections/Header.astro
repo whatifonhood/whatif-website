@@ -1,6 +1,6 @@
 ---
 import { LINKS, LOCALE_PATHS, MARKETS, type Locale } from '../../config/site.ts';
-import { TOOL_ROUTES, localePath } from '../../config/navigation.ts';
+import { TOOL_ROUTES, toolPath } from '../../config/navigation.ts';
 import { getCopy } from '../../content/index.ts';
 import Button from '../ui/Button.astro';
 import ToolsMenu from '../ui/ToolsMenu.astro';
@@ -138,7 +138,7 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
       {
         TOOL_ROUTES.map((tool) => (
           <a
-            href={localePath(tool.href, locale)}
+            href={toolPath(tool.href, locale)}
             class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface"
           >
             {copy.nav.tools[tool.id].label}
