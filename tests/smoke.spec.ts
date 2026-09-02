@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCALE_PATHS, LOCALES, TOKEN } from '../src/config/site.ts';
 import { questionForDate } from '../src/config/what-if.ts';
@@ -1259,4 +1259,46 @@ test.describe('the white paper', () => {
       ),
     ).toBe(0);
   });
+});
+
+/**
+ * No link on the site points at a page that does not exist.
+ *
+ * The locale-leak test asks whether a link stays in the reader's language. This
+ * asks the opposite question, and the two have opposite blind spots: for a
+ * while every non-English page linked to /zh/learn/, /es/docs/ and the like —
+ * 438 links, all 404, all invisible to a test that only looks for leaks into
+ * English.
+ */
+test('every internal link resolves to a real page', () => {
+  const dist = 'dist';
+  const pages: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith('.html')) pages.push(full);
+    }
+  };
+  walk(dist);
+  expect(pages.length, 'nothing was built').toBeGreaterThan(100);
+
+  const resolves = (href: string) => {
+    const path = href.split('#')[0]!.split('?')[0]!;
+    if (!path.startsWith('/')) return true;
+    const base = join(dist, path.replace(/^\/|\/$/g, ''));
+    return existsSync(join(base, 'index.html')) || existsSync(base);
+  };
+
+  const broken = new Map<string, number>();
+  for (const page of pages) {
+    const html = readFileSync(page, 'utf8');
+    for (const href of new Set(
+      [...html.matchAll(/(?:href|src)="(\/[^"#][^"]*)"/g)].map((m) => m[1]!),
+    )) {
+      if (!resolves(href)) broken.set(href, (broken.get(href) ?? 0) + 1);
+    }
+  }
+
+  expect([...broken.keys()].sort(), 'these links 404').toEqual([]);
 });

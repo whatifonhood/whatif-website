@@ -21,10 +21,18 @@ export const TOOL_ROUTES = [
   { id: 'pfp', href: '/pfp/', group: 'play' },
   { id: 'memes', href: '/memes/', group: 'assets' },
   { id: 'brand', href: '/brand/', group: 'assets' },
-  { id: 'learn', href: '/learn/', group: 'read' },
-  { id: 'docs', href: '/docs/', group: 'read' },
+  // englishOnly: these two have no translated build yet, so a locale prefix
+  // would point at a page that does not exist. Sending a reader to the English
+  // one is worse than a translation and far better than a 404.
+  { id: 'learn', href: '/learn/', group: 'read', englishOnly: true },
+  { id: 'docs', href: '/docs/', group: 'read', englishOnly: true },
   { id: 'roadmap', href: '/roadmap/', group: 'read' },
-] as const satisfies readonly { id: string; href: string; group: ToolGroup }[];
+] as const satisfies readonly {
+  id: string;
+  href: string;
+  group: ToolGroup;
+  englishOnly?: boolean;
+}[];
 
 export type ToolId = (typeof TOOL_ROUTES)[number]['id'];
 
@@ -43,6 +51,23 @@ export function toolsIn(group: ToolGroup) {
  */
 export function localePath(href: string, locale: string): string {
   return locale === 'en' ? href : `/${locale}${href}`;
+}
+
+/**
+ * Every route that exists in English only.
+ *
+ * `localePath` prefixes blindly, which is right for the pages that are built in
+ * four languages and wrong for the ones that are not — it produced 438 links to
+ * /zh/learn/, /es/docs/ and the like, none of which exist. Anything listed here
+ * keeps its English path whatever locale the reader is in.
+ */
+export const ENGLISH_ONLY: readonly string[] = TOOL_ROUTES.filter(
+  (tool) => 'englishOnly' in tool && tool.englishOnly,
+).map((tool) => tool.href);
+
+/** Like `localePath`, but never invents a translation that was not built. */
+export function toolPath(href: string, locale: string): string {
+  return ENGLISH_ONLY.includes(href) ? href : localePath(href, locale);
 }
 
 /**
