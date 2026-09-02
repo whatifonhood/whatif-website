@@ -2122,7 +2122,17 @@ export const BURNS: BurnEvent[] = [
     tokens: 26191,
     txHash: '0x40986f65155da4e536d572c743282da04900a48db5dab3877281ef38f13dd08f',
   },
+  {
+    time: 1788268429,
+    tokens: 50840,
+    txHash: '0xe7278ccbe3d1d471836c78da5197ccdb5d3571fe1cf760594d29d45b2e4715fd',
+  },
+  {
+    time: 1788297272,
+    tokens: 32330,
+    txHash: '0x2c0a401def3e716cb99cf3c831bcc3d8600c1fcea2f5b0fd8c3448ce4d5306d6',
+  },
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 51632548;
+export const BURNS_SCANNED_TO = 52470739;

@@ -16,7 +16,7 @@ export interface Holder {
 export const HOLDERS: Holder[] = [
   {
     address: '0x000000000000000000000000000000000000dEaD',
-    tokens: 93366065,
+    tokens: 93449236,
     kind: 'burn',
   },
   {
@@ -26,7 +26,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x39A200271525E9641e799127bdAB299DAeF21953',
-    tokens: 24744021,
+    tokens: 25585064,
     kind: 'pool',
   },
   {
@@ -92,4 +92,4 @@ export const HOLDERS: Holder[] = [
 ];
 
 /** When this list was read, as YYYY-MM-DD. */
-export const HOLDERS_CAPTURED = '2026-09-01';
+export const HOLDERS_CAPTURED = '2026-09-02';

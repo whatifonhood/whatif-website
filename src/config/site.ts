@@ -119,12 +119,12 @@ export const DATA_APIS = {
  * Refresh with `npm run snapshot` (see README) whenever the site is rebuilt.
  */
 export const TOKEN_SNAPSHOT = {
-  capturedAt: '2026-09-01',
-  priceUsd: 0.008241,
-  marketCapUsd: 7_472_171,
-  liquidityUsd: 399_068,
-  volume24hUsd: 570_229,
-  burnedTokens: 93_366_065,
+  capturedAt: '2026-09-02',
+  priceUsd: 0.007694,
+  marketCapUsd: 6_975_292,
+  liquidityUsd: 381_169,
+  volume24hUsd: 381_734,
+  burnedTokens: 93_449_236,
   holders: 6816,
 } as const;
 
