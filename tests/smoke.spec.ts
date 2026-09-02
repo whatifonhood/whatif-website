@@ -1173,11 +1173,6 @@ test.describe('the wall of posts', () => {
     // The pictures are lazy and the wall is near the bottom of the page.
     await page.locator('#posts').scrollIntoViewIfNeeded();
     await expect(page.locator('#posts img').first()).toBeVisible();
-    await page.waitForFunction(
-      () => [...document.querySelectorAll<HTMLImageElement>('#posts img')].every((i) => i.complete),
-      null,
-      { timeout: 15_000 },
-    );
 
     const images = await page.locator('#posts img').evaluateAll((nodes) =>
       nodes.map((node) => ({
@@ -1186,10 +1181,24 @@ test.describe('the wall of posts', () => {
       })),
     );
     expect(images.length, 'the wall has no pictures at all').toBeGreaterThan(0);
+
+    // Where each picture comes FROM is the point, and that is true of every one
+    // whether or not it has been scrolled to.
     for (const image of images) {
       expect(image.src, 'a picture is hotlinked from a third party').toMatch(/^\/posts\//);
-      expect(image.loaded, `${image.src} did not load`).toBe(true);
     }
+
+    // Every one is then fetched directly rather than waited for in the page.
+    // Waiting on `complete` was waiting for something that never happens — the
+    // wall is longer than a phone screen and a lazy image below the fold is
+    // deliberately never loaded — and this checks all of them rather than only
+    // the ones that happened to scroll into view.
+    const missing: string[] = [];
+    for (const image of images) {
+      const response = await page.request.get(image.src);
+      if (!response.ok()) missing.push(`${image.src} -> ${response.status()}`);
+    }
+    expect(missing, 'a picture on the wall points at a file that is not there').toEqual([]);
   });
 
   test('a post shows its author, handle and date', async ({ page }) => {
@@ -1797,5 +1806,104 @@ test.describe('it works the same in every engine', () => {
       return cta ? cta.getBoundingClientRect().bottom <= window.innerHeight : false;
     });
     expect(reachable, 'the Buy button must be on screen in landscape').toBe(true);
+  });
+});
+
+/**
+ * The timeframe chips are a label for the data on screen.
+ *
+ * GeckoTerminal rate-limits readily, and after one 429 every further request to
+ * that origin is refused for a minute. The chip used to be set on click and left
+ * there whatever came back, so a throttled switch lit up "7D" and left a day of
+ * candles underneath it — a chart lying about what it is showing, on the page
+ * whose whole argument is that the numbers are real.
+ *
+ * The API is stubbed rather than skipped: this behaviour only appears when the
+ * API is failing, which is exactly when a test that skips itself would skip.
+ */
+test.describe('the chart never mislabels what it is showing', () => {
+  const rows = (n: number, step: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const time = 1_788_000_000 - (n - 1 - i) * step;
+      const base = 0.008 + Math.sin(i / 7) * 0.0012;
+      return [time, base, base * 1.04, base * 0.96, base * 1.01, 8000 + i * 40];
+    }).reverse();
+
+  /** Serves candles until `stop()` is called, then refuses like a 429. */
+  const stubMarket = async (page: import('@playwright/test').Page) => {
+    let throttled = false;
+    await page.route('**/api.geckoterminal.com/**', (route) => {
+      const url = route.request().url();
+      if (!url.includes('/ohlcv/')) {
+        return route.fulfill({
+          contentType: 'application/json',
+          body: '{"data":{"attributes":{}}}',
+        });
+      }
+      if (throttled)
+        return route.fulfill({ status: 429, contentType: 'application/json', body: '{}' });
+      const limit = Number(new URL(url).searchParams.get('limit') ?? 24);
+      const step = url.includes('day?') ? 86_400 : url.includes('aggregate=4') ? 14_400 : 3_600;
+      return route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ data: { attributes: { ohlcv_list: rows(limit, step) } } }),
+      });
+    });
+    await page.route('**/api.dexscreener.com/**', (route) =>
+      route.fulfill({ contentType: 'application/json', body: '{"pairs":[]}' }),
+    );
+    return () => {
+      throttled = true;
+    };
+  };
+
+  const shown = (page: import('@playwright/test').Page) =>
+    page.evaluate(() => ({
+      candles: document.querySelectorAll('[data-candles] rect').length,
+      chip:
+        [...document.querySelectorAll<HTMLButtonElement>('button[data-timeframe]')].find(
+          (b) => b.getAttribute('aria-pressed') === 'true',
+        )?.dataset.timeframe ?? null,
+    }));
+
+  test('a timeframe it cannot load leaves the chip on the one it is showing', async ({ page }) => {
+    const throttle = await stubMarket(page);
+    await page.goto('/stats/');
+    await page.waitForFunction(() => document.querySelectorAll('[data-candles] rect').length > 5);
+
+    const before = await shown(page);
+    expect(before.chip).toBe('day');
+
+    throttle();
+    await page.locator('button[data-timeframe="quarter"]').click();
+    await expect(page.locator('[data-dash-status]')).toBeVisible();
+
+    const after = await shown(page);
+    expect(after.chip, 'the chip must describe the candles on screen').toBe('day');
+    expect(after.candles, 'the old candles stay rather than being half-replaced').toBe(
+      before.candles,
+    );
+  });
+
+  test('a timeframe already seen still switches when the API refuses', async ({ page }) => {
+    const throttle = await stubMarket(page);
+    await page.goto('/stats/');
+    await page.waitForFunction(() => document.querySelectorAll('[data-candles] rect').length > 5);
+
+    // Warm 7D, come back to 24H, then cut the network off.
+    await page.locator('button[data-timeframe="week"]').click();
+    await expect.poll(async () => (await shown(page)).chip).toBe('week');
+    const week = await shown(page);
+    await page.locator('button[data-timeframe="day"]').click();
+    await expect.poll(async () => (await shown(page)).chip).toBe('day');
+
+    throttle();
+    await page.locator('button[data-timeframe="week"]').click();
+    await expect
+      .poll(async () => (await shown(page)).chip, {
+        message: 'a timeframe already fetched needs no network to draw',
+      })
+      .toBe('week');
+    expect((await shown(page)).candles).toBe(week.candles);
   });
 });
