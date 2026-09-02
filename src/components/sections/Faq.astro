@@ -33,7 +33,7 @@ const copy = getCopy(locale);
         copy.faq.items.map((item, index) => (
           <details class="card group overflow-hidden open:border-lime/30" open={index === 0}>
             <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-surface-2">
-              <span class="font-display text-lg font-semibold text-ink">{item.q}</span>
+              <span class="min-w-0 font-display text-lg font-semibold text-ink">{item.q}</span>
               <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-lime/15 text-lime transition-transform group-open:rotate-45">
                 <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
                   <path
