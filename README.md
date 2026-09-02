@@ -121,24 +121,6 @@ Reads the live price, market cap and burn, and rewrites `TOKEN_SNAPSHOT` in
 `src/config/site.ts`. Run it before a release. (Blockscout blocks automated
 requests, so the holder count keeps its previous value and says so.)
 
-### …refresh the What $IF Machine's prices?
-
-```bash
-npm run history
-```
-
-Rebuilds the whole coin set: monthly prices from Binance, names, ranks and logos
-from CoinGecko. Both are keyless and public. The result is written into
-`public/machine/` and served from this origin, so the page never calls an API.
-
-### …widen the What $IF Machine's coin list?
-
-Copy `.env.example` to `.env`, add a free CoinGecko key, and run `npm run history`.
-Without a key the set is limited to coins Binance lists; with one it is the top
-coins by market cap, which is most of what people actually ask about. The key is
-read at build time only and never reaches the browser — the site itself still
-runs with no environment variables.
-
 ### …add a logo for another tool?
 
 Drop the file in `src/assets/logos`, add one line to `src/components/ui/ToolLogo.astro`,
@@ -161,12 +143,10 @@ Edit `tools/og-card.html`, then `npm run og`.
 | `npm run check`    | Typecheck, lint, format check and build — run before a PR |
 | `npm test`         | Playwright tests against a real build                     |
 | `npm run memes`    | Rebuild the meme vault (needs ImageMagick 7)              |
-| `npm run history`  | Refresh prices for the What $IF Machine                   |
 | `npm run snapshot` | Refresh the build-time token figures                      |
 | `npm run og`       | Re-render the social sharing card                         |
 | `npm run headers`  | Regenerate `public/_headers` and `vercel.json`            |
 | `npm run burns`    | Re-read the burn history from the chain                   |
-| `npm run coinlist` | Rebuild the Machine's coin index from CoinGecko           |
 
 ---
 
@@ -175,7 +155,7 @@ Edit `tools/og-card.html`, then `npm run og`.
 **Astro, with no UI framework.** Pages are prerendered to static HTML, so crawlers
 and social scrapers see real content and the browser paints before any JavaScript
 runs. The interactive parts — the starfield, the copy buttons, the meme filter, the
-question generator, the calculator, the live chart — are small TypeScript files
+question generator, the wallet lookup, the live chart — are small TypeScript files
 in `src/scripts/`, loaded per page. There is no React on the site; nothing here needed it.
 
 **Live figures degrade to snapshots.** The price, market cap and burn are

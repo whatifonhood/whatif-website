@@ -24,7 +24,7 @@ The dishonest case is anything that dresses this up as an investment thesis. If 
 
 Most go to zero. Not through fraud, usually — just through attention moving somewhere else, liquidity thinning out, and the last people in having nobody to sell to.
 
-A small number do not, and those are the ones everybody remembers, which is exactly the distortion that makes the whole category feel more promising than the numbers support. This is the survivorship bias the [What $IF Machine](/machine/) is built to make vivid: it shows you what the winners would have paid, which is precisely the calculation that convinces people to buy the next hundred losers.
+A small number do not, and those are the ones everybody remembers, which is exactly the distortion that makes the whole category feel more promising than the numbers support. That is survivorship bias: the winners are the ones you hear about, and the arithmetic of what they would have paid is precisely the calculation that convinces people to buy the next hundred losers.
 
 ## The questions worth asking before buying one
 

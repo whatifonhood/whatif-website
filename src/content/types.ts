@@ -299,56 +299,6 @@ export interface SiteCopy {
       /** Tooltip on a burn tick. Carries `{amount}`. */
       burnMark: string;
     };
-    machine: {
-      title: string;
-      heading: SplitHeading;
-      intro: string;
-      coinLabel: string;
-      /** Placeholder in the coin search box. */
-      searchPlaceholder: string;
-      noResults: string;
-      /** Shown when a coin's prices could not be fetched. */
-      loadFailed: string;
-      /** In a search result: "since 2013". */
-      searchSince: string;
-      /** In a search result, for a coin whose prices are fetched when picked. */
-      searchOnDemand: string;
-      amountLabel: string;
-      dateLabel: string;
-      calculate: string;
-      /** Shown before anything has been worked out. */
-      emptyState: string;
-      /** Labels around the result. */
-      investedLabel: string;
-      worthLabel: string;
-      boughtLabel: string;
-      entryLabel: string;
-      todayLabel: string;
-      coinCount: string;
-      resultLead: string;
-      multiplier: string;
-      /** The line offered as the X post. */
-      shareText: (
-        amount: string,
-        coin: string,
-        month: string,
-        value: string,
-        multiple: string,
-      ) => string;
-      /** The regret verdict on the share card, worst last. */
-      verdicts: { dodged: string; fine: string; ouch: string; painful: string; unbearable: string };
-      shareOnX: string;
-      /** The turn back towards $IF under the result. */
-      pivot: string;
-      pivotCta: string;
-      disclaimer: string;
-      /** Carries `{date}`, the day the price history was captured. */
-      pricesCaptured: string;
-      /** The section linking to the coins with a page of their own. */
-      workedOutTitle: string;
-      workedOutIntro: string;
-      workedOutMore: string;
-    };
     pfp: {
       title: string;
       heading: SplitHeading;

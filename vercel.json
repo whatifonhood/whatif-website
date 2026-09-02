@@ -152,16 +152,7 @@
       ]
     },
     {
-      "source": "/machine/logos/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=604800"
-        }
-      ]
-    },
-    {
-      "source": "/machine/poses/(.*)",
+      "source": "/art/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

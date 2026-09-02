@@ -21,7 +21,6 @@ const PAGES = [
   { name: 'memes', path: '/memes/' },
   { name: 'brand', path: '/brand/' },
   { name: 'stats', path: '/stats/' },
-  { name: 'machine', path: '/machine/' },
   { name: 'a single meme', path: '/memes/meme-two-buttons-sell-or-hold/' },
   { name: 'wallet lookup', path: '/holdings/' },
   { name: 'the generator', path: '/ask/' },
@@ -224,45 +223,6 @@ test.describe('accessibility basics', () => {
   });
 });
 
-/**
- * Shareable results.
- *
- * The calculator's whole point is that a number can be argued with, which needs
- * the result to survive being copied out of the address bar. The query string is
- * also the only untrusted input the site takes, so it is checked here too.
- */
-test.describe('the What $IF Machine remembers its result', () => {
-  test('a shared link reopens on the same calculation', async ({ page }) => {
-    await page.goto('/machine/?coin=DOGE&from=2021-05&amount=250');
-    await expect(page.locator('[data-chosen-ticker]')).toHaveText('DOGE', { timeout: 15_000 });
-    await expect(page.locator('[data-machine-amount]')).toHaveValue('250');
-    await expect(page.locator('[data-machine-month-label]')).toContainText('2021');
-  });
-
-  test('changing the inputs updates the address bar', async ({ page }) => {
-    await page.goto('/machine/');
-    await expect(page.locator('[data-chosen-ticker]')).not.toBeEmpty({ timeout: 15_000 });
-    await page.locator('[data-machine-amount]').fill('1234');
-    await expect(page).toHaveURL(/amount=1234/);
-  });
-
-  test('a hostile query string is discarded, not rendered', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (error) => errors.push(error.message));
-
-    await page.goto('/machine/?coin=<script>alert(1)</script>&from=zzzz&amount=-999');
-    // Falls back to the default coin rather than trusting any of it.
-    await expect(page.locator('[data-chosen-ticker]')).not.toBeEmpty({ timeout: 15_000 });
-
-    const leaked = await page.evaluate(() => document.body.innerHTML.includes('alert(1)'));
-    expect(leaked, 'a query value reached the DOM').toBe(false);
-    expect(errors).toEqual([]);
-
-    const amount = await page.locator('[data-machine-amount]').inputValue();
-    expect(Number(amount)).toBeGreaterThanOrEqual(1);
-  });
-});
-
 test.describe('every meme has a page', () => {
   test('the vault links to pages, not to raw image files', async ({ page }) => {
     await page.goto('/memes/');
@@ -286,7 +246,7 @@ test.describe('every meme has a page', () => {
 
 test('top-level pages do not all share one social card', async ({ page }) => {
   const cards = new Set<string>();
-  for (const path of ['/', '/stats/', '/machine/', '/memes/', '/pfp/', '/brand/', '/roadmap/']) {
+  for (const path of ['/', '/stats/', '/memes/', '/pfp/', '/brand/', '/roadmap/']) {
     await page.goto(path);
     const card = await page.locator('meta[property="og:image"]').getAttribute('content');
     cards.add(card ?? '');
@@ -602,7 +562,7 @@ test.describe('the chart can be navigated', () => {
 test.describe('a language keeps you in that language', () => {
   // The homepage alone was not enough: the vault leaked to the English meme
   // pages while the homepage was clean, because only the homepage was checked.
-  const PAGES = ['', 'memes/', 'stats/', 'machine/', 'pfp/', 'ask/'];
+  const PAGES = ['', 'memes/', 'stats/', 'pfp/', 'ask/'];
 
   /**
    * The rule, stated precisely: a link must stay in the reader's language
@@ -626,9 +586,7 @@ test.describe('a language keeps you in that language', () => {
         const english = await page.evaluate(() =>
           [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]')]
             .map((a) => a.getAttribute('href') ?? '')
-            .filter((href) =>
-              /^\/(stats|machine|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href),
-            ),
+            .filter((href) => /^\/(stats|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href)),
         );
 
         const leaks = [...new Set(english)].filter((href) => hasTranslation(href, locale));
@@ -653,7 +611,7 @@ test.describe('a language keeps you in that language', () => {
 });
 
 test.describe('hreflang names this page in each language', () => {
-  for (const path of ['/machine/', '/es/machine/', '/stats/', '/zh/ask/']) {
+  for (const path of ['/stats/', '/es/stats/', '/memes/', '/zh/ask/']) {
     test(`${path} points at its own translations`, async ({ page }) => {
       await page.goto(path);
       const links = page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])');
@@ -662,7 +620,7 @@ test.describe('hreflang names this page in each language', () => {
       const hrefs = await links.evaluateAll((nodes) =>
         nodes.map((node) => (node as HTMLLinkElement).href),
       );
-      // The page is /machine/, so every alternate must be a /machine/ too.
+      // The page is /stats/, so every alternate must be a /stats/ too.
       const tail = path.replace(/^\/(zh|tr|es)\//, '/');
       for (const href of hrefs) {
         expect(new URL(href).pathname.replace(/^\/(zh|tr|es)\//, '/')).toBe(tail);
@@ -671,38 +629,6 @@ test.describe('hreflang names this page in each language', () => {
       expect(new Set(hrefs).size).toBe(4);
     });
   }
-});
-
-/**
- * Accessible names on the controls that had none.
- *
- * A field whose label is a nearby span is unlabelled as far as a screen reader
- * is concerned, and a slider that reports its array index names no month.
- */
-test.describe('the Machine can be operated without seeing it', () => {
-  test('the amount field has a name', async ({ page }) => {
-    await page.goto('/machine/');
-    // Asserted through the accessibility tree, not the markup: the point is
-    // that a screen reader can announce the field, however it is labelled.
-    const named = await page
-      .locator('[data-machine-amount]')
-      .evaluate(
-        (node: HTMLInputElement) =>
-          node.labels?.[0]?.textContent?.trim() ?? node.getAttribute('aria-label'),
-      );
-    expect(named, 'the amount field has no accessible name').toBeTruthy();
-  });
-
-  test('the month slider says the month, not its index', async ({ page }) => {
-    await page.goto('/machine/');
-    await page.getByRole('combobox').or(page.locator('[data-machine-search]')).first().fill('doge');
-    await page.locator('.result-row').first().click();
-
-    const slider = page.locator('[data-machine-month]');
-    await expect(slider).toBeEnabled();
-    // A month name and a year — never a bare number.
-    await expect(slider).toHaveAttribute('aria-valuetext', /[A-Za-zÀ-鿿]+.*\d{4}|\d{4}/);
-  });
 });
 
 /**
@@ -748,60 +674,9 @@ test('no cache rule puts an HTML route behind a week', () => {
   for (const rule of weekly) {
     // Every long-cached prefix must be an asset directory, not a page route.
     expect(rule, `${rule} would also match an HTML page`).toMatch(
-      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|machine\/(logos|poses)|posts)\/\*$/,
+      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|posts|art)\/\*$/,
     );
   }
-});
-
-/**
- * A page per coin.
- *
- * These carry the answer already worked out in the HTML, so the test that
- * matters is that the arithmetic on the page is the arithmetic in the data —
- * recomputed here from the same committed file the build read.
- */
-test.describe('a coin has its own page', () => {
-  test('the numbers on it are the numbers in the history', async ({ page }) => {
-    await page.goto('/machine/doge/');
-
-    const history = JSON.parse(readFileSync('public/machine/h/DOGE.json', 'utf8')) as [
-      string,
-      number,
-    ][];
-    const now = history.at(-1)![1];
-
-    const rows = page.locator('tbody tr');
-    await expect(rows.first()).toBeVisible();
-
-    for (const row of await rows.all()) {
-      const cells = await row.locator('th, td').allTextContents();
-      const [, priceText, , multipleText] = cells;
-      const price = Number(priceText!.replace(/[$,]/g, ''));
-      const shown = Number(multipleText!.replace(/[×,]/g, ''));
-
-      // The row must name a price that is actually in the history.
-      expect(history.some(([, value]) => Math.abs(value - price) < price * 0.01)).toBe(true);
-      // And the multiple must be today's price over it.
-      expect(Math.abs(shown - now / price)).toBeLessThan(Math.max(0.1, shown * 0.02));
-    }
-  });
-
-  test('is reachable from the machine, and links back', async ({ page }) => {
-    await page.goto('/machine/');
-    // The section that exists to give these pages a route in.
-    const first = page
-      .locator('section[aria-labelledby="worked-out"] a[href^="/machine/"]')
-      .first();
-    await expect(first).toBeVisible();
-    await first.click();
-    await expect(page.locator('h1')).toContainText(/had bought/i);
-    await expect(page.locator('main a[href="/machine/"]').first()).toBeVisible();
-  });
-
-  test('does not claim a coin it has no page for', async ({ page }) => {
-    const response = await page.goto('/machine/definitely-not-a-coin/');
-    expect(response?.status()).toBe(404);
-  });
 });
 
 /**
@@ -1304,167 +1179,4 @@ test.describe('the wall of posts', () => {
       await expect(page.locator('#posts ul > li')).not.toHaveCount(0);
     }
   });
-});
-
-/**
- * Picking a coin in the Machine.
- *
- * Only the 780 coins with committed price history have a logo file; the other
- * seventeen thousand are searched from the long-tail index and have none, and
- * their logos live on a CDN the site's policy does not allow. Every row still
- * has to be readable and tell you something.
- */
-test.describe('the coin search', () => {
-  test('every row has a mark, a full name and a ticker', async ({ page }) => {
-    await page.goto('/machine/');
-    await page.locator('[data-machine-search]').fill('doge');
-    await expect(page.locator('.result-row').first()).toBeVisible();
-
-    for (const row of await page.locator('.result-row').all()) {
-      // Either the real logo or the lettered stand-in — never neither.
-      const marks = await row.locator('.result-logo, .result-mark').count();
-      expect(marks, 'a row has nothing where its picture should be').toBeGreaterThan(0);
-
-      const name = (await row.locator('.result-name').textContent()) ?? '';
-      expect(name.trim().length, 'the name column collapsed').toBeGreaterThan(1);
-      await expect(row.locator('.result-ticker')).not.toBeEmpty();
-      // The line that says how far back the Machine can go for this coin.
-      await expect(row.locator('.result-meta')).not.toBeEmpty();
-    }
-  });
-
-  test('the same coin is never offered twice', async ({ page }) => {
-    await page.goto('/machine/');
-    await page.locator('[data-machine-search]').fill('doge');
-    await expect(page.locator('.result-row').first()).toBeVisible();
-
-    const rows = await page
-      .locator('.result-row')
-      .evaluateAll((nodes) =>
-        nodes.map(
-          (node) =>
-            `${node.querySelector('.result-name')?.textContent}|${node.querySelector('.result-ticker')?.textContent}`,
-        ),
-      );
-    expect(rows.length).toBeGreaterThan(1);
-    // The long-tail index holds 270 pairs identical in symbol and name.
-    expect(new Set(rows).size, 'two rows a reader cannot tell apart').toBe(rows.length);
-  });
-
-  test('a coin with deep history says how far back it goes', async ({ page }) => {
-    await page.goto('/machine/');
-    await page.locator('[data-machine-search]').fill('bitcoin');
-    const first = page.locator('.result-row').first();
-    await expect(first).toBeVisible();
-    await expect(first.locator('.result-meta')).toContainText(/\d{4}/);
-  });
-});
-
-/**
- * The chart's furniture.
- *
- * A price scale, a time axis and a crosshair that names what it is pointing at
- * are what separate a chart from a picture of one. These check the parts that
- * can silently drift out of alignment — a label that no longer sits on its own
- * gridline is wrong in a way nobody notices until they trade on it.
- */
-test.describe('the chart can be read', () => {
-  const waitForChart = async (page: import('@playwright/test').Page) => {
-    await page.goto('/stats/');
-    try {
-      await expect(page.locator('[data-candles] rect').first()).toBeVisible({ timeout: 20_000 });
-      await page.waitForTimeout(600);
-    } catch {
-      test.skip(true, 'no market data available — the price API is throttling');
-    }
-  };
-
-  test('the price scale sits exactly on its gridlines', async ({ page }) => {
-    await waitForChart(page);
-
-    const offsets = await page.evaluate(() => {
-      const lines = [...document.querySelectorAll('.grid-line')];
-      const labels = [...document.querySelectorAll('[data-price-scale] span:not(.scale-tag)')];
-      return lines.map((line, i) => {
-        const a = line.getBoundingClientRect();
-        const b = labels[i]?.getBoundingClientRect();
-        return b ? Math.abs(b.top + b.height / 2 - a.top) : 999;
-      });
-    });
-
-    expect(offsets.length, 'the chart drew no price levels').toBeGreaterThan(1);
-    for (const off of offsets) {
-      expect(off, 'a price label has drifted off its gridline').toBeLessThan(2);
-    }
-  });
-
-  test('both axes are labelled', async ({ page }) => {
-    await waitForChart(page);
-    await expect(page.locator('[data-price-scale] span').first()).toContainText('$');
-    const times = await page.locator('[data-time-axis] span').allTextContents();
-    expect(times.length, 'the chart has no time axis').toBeGreaterThan(1);
-    for (const t of times) expect(t.trim()).not.toBe('');
-  });
-
-  test('the crosshair names the price and the time it points at', async ({ page }) => {
-    await waitForChart(page);
-    const box = await page.locator('[data-chart-wrap]').boundingBox();
-    if (!box) throw new Error('no chart');
-
-    // hover() rather than mouse.move(): the latter moves the virtual pointer
-    // without the enter that makes a browser dispatch pointermove to the
-    // element, so the handler never runs and the test fails on a working page.
-    await page
-      .locator('[data-chart-wrap]')
-      .hover({ position: { x: box.width * 0.5, y: box.height * 0.4 } });
-    await page.waitForTimeout(300);
-
-    await expect(page.locator('[data-crosshair]')).toHaveAttribute('opacity', '1');
-    await expect(page.locator('[data-crosshair-y]')).toHaveAttribute('opacity', '1');
-    await expect(page.locator('[data-price-scale] .scale-tag').first()).toContainText('$');
-    await expect(page.locator('[data-time-axis] .scale-tag')).not.toBeEmpty();
-  });
-
-  test('the reading line always shows a candle', async ({ page }) => {
-    await waitForChart(page);
-    // Before any hover it shows the most recent candle, so it is never blank.
-    const bar = page.locator('[data-ohlc]');
-    await expect(bar).toContainText('O');
-    await expect(bar).toContainText('VOL');
-    await expect(bar).toContainText('$');
-  });
-
-  test('the last price is marked on the scale', async ({ page }) => {
-    await waitForChart(page);
-    await expect(page.locator('[data-last-line]')).toHaveAttribute('opacity', '1');
-    await expect(page.locator('[data-price-scale] [data-last]')).toContainText('$');
-  });
-});
-
-/**
- * What comes back when you type a coin's name.
- *
- * Ranking an exact SYMBOL match above an exact NAME match put a #920 memecoin
- * tickered BITCOIN above Bitcoin itself — the first thing most people type.
- * The two are one tier now, broken by market-cap rank.
- */
-test('searching a major coin puts that coin first', async ({ page }) => {
-  await page.goto('/machine/');
-  const search = page.locator('[data-machine-search]');
-
-  for (const [query, expected] of [
-    ['bitcoin', 'BTC'],
-    ['btc', 'BTC'],
-    ['ethereum', 'ETH'],
-    ['doge', 'DOGE'],
-    ['solana', 'SOL'],
-  ] as const) {
-    await search.fill(query);
-    const first = page.locator('.result-row').first();
-    await expect(first).toBeVisible();
-    await expect(
-      first.locator('.result-ticker'),
-      `"${query}" should offer ${expected} first`,
-    ).toHaveText(expected);
-  }
 });

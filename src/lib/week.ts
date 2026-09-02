@@ -9,11 +9,9 @@
  * Nothing is estimated. Where the data cannot answer something, the field is
  * left undefined and the panel omits that line.
  */
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
 
 import { BURNS } from '../config/burns.ts';
-import { TOKEN } from '../config/site.ts';
+import DAILY_PRICES from '../data/if-daily-prices.json';
 
 const DAY = 86_400;
 const WEEK = 7 * DAY;
@@ -30,11 +28,15 @@ export interface WeekInSummary {
   priceNow?: number;
 }
 
-/** $IF's own daily price history, the same file the Machine reads. */
+/**
+ * $IF's own daily price history.
+ *
+ * This used to sit among the What $IF Machine's coin files. It is $IF's own
+ * data rather than the Machine's, so when the Machine was removed it moved
+ * here instead of going with it. Read at build time only — nothing fetches it.
+ */
 function ifHistory(): [string, number][] {
-  const file = join(process.cwd(), 'public', 'machine', 'h', `${TOKEN.symbol}.json`);
-  if (!existsSync(file)) return [];
-  return JSON.parse(readFileSync(file, 'utf8')) as [string, number][];
+  return DAILY_PRICES as [string, number][];
 }
 
 export function weekInSummary(): WeekInSummary {

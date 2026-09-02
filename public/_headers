@@ -40,10 +40,7 @@
 /coins/og/*
   Cache-Control: public, max-age=604800
 
-/machine/logos/*
-  Cache-Control: public, max-age=604800
-
-/machine/poses/*
+/art/*
   Cache-Control: public, max-age=604800
 
 /posts/*
