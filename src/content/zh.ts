@@ -18,6 +18,7 @@ export const zh: SiteCopy = {
       stats: { label: '数据', blurb: '每个数字都是实时的' },
       holdings: { label: '钱包查询', blurb: '无需连接' },
       learn: { label: '了解', blurb: '安全、基础与证据' },
+      docs: { label: '白皮书', blurb: '完整内容，白纸黑字' },
       roadmap: { label: '更新', blurb: '最新的变化' },
       brand: { label: '品牌', blurb: '标识与素材' },
     },

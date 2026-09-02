@@ -18,6 +18,7 @@ export const en: SiteCopy = {
       stats: { label: 'Stats', blurb: 'Every number, live' },
       holdings: { label: 'Wallet lookup', blurb: 'No connection needed' },
       learn: { label: 'Learn', blurb: 'Safety, basics, and proof' },
+      docs: { label: 'White paper', blurb: 'The whole thing, written down' },
       roadmap: { label: 'Updates', blurb: 'What changed, newest first' },
       brand: { label: 'Brand', blurb: 'Logos and artwork' },
     },

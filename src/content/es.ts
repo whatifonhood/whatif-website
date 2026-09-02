@@ -30,6 +30,7 @@ export const es: SiteCopy = {
       stats: { label: 'Datos', blurb: 'Cada número, en vivo' },
       holdings: { label: 'Consulta de wallet', blurb: 'Sin conectar nada' },
       learn: { label: 'Aprende', blurb: 'Seguridad, bases y pruebas' },
+      docs: { label: 'Libro blanco', blurb: 'Todo, por escrito' },
       roadmap: { label: 'Novedades', blurb: 'Lo último, primero' },
       brand: { label: 'Marca', blurb: 'Logos y material gráfico' },
     },

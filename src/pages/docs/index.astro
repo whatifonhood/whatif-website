@@ -1,0 +1,70 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import { DOCS_GROUPS } from '../../config/docs.ts';
+import { TOKEN } from '../../config/site.ts';
+import { getDocsPages } from '../../lib/docs.ts';
+
+/**
+ * The white paper's contents page.
+ *
+ * A paper about a coin that refuses to over-claim should open by saying what it
+ * is and what it deliberately leaves out, rather than with a mission statement.
+ */
+const pages = getDocsPages();
+---
+
+<Docs
+  locale="en"
+  title="The $IF white paper"
+  description="What $IF is, what it is not, how to buy it, and how to check every number for yourself."
+>
+  <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">White paper</p>
+  <h1 class="display-heading mt-3 text-4xl sm:text-5xl">
+    Everything about <span class="text-lime">$IF</span>, written down
+  </h1>
+  <p class="mt-5 text-lg leading-relaxed text-muted">
+    Twelve pages: what the coin is, what it is not, how to buy it, and the exact commands to check
+    every number here without taking our word for any of it.
+  </p>
+
+  <div class="mt-6 rounded-xl border border-line bg-surface p-5">
+    <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">The contract</p>
+    <p class="mt-2 break-all font-mono text-sm text-ink">{TOKEN.address}</p>
+    <p class="mt-2 text-sm text-faint">
+      One address, on Robinhood Chain. Anything else is not this coin.
+    </p>
+  </div>
+
+  <div class="mt-12 space-y-10">
+    {
+      DOCS_GROUPS.map((group) => (
+        <section>
+          <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{group.title}</h2>
+          <ul class="mt-4 divide-y divide-line/60">
+            {group.slugs.map((slug) => {
+              const page = pages.find((entry) => entry.slug === slug);
+              if (!page) return null;
+              return (
+                <li>
+                  <a href={`/docs/${slug}/`} class="group flex gap-4 py-4">
+                    <span class="pt-1 font-mono text-xs text-faint">
+                      {String(page.number).padStart(2, '0')}
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block font-semibold text-ink group-hover:text-lime">
+                        {page.title}
+                      </span>
+                      <span class="mt-0.5 block text-sm leading-relaxed text-muted">
+                        {page.summary}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Docs>

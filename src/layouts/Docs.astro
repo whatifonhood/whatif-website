@@ -1,0 +1,368 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/sections/Header.astro';
+import Footer from '../components/sections/Footer.astro';
+import Icons from '../components/ui/Icons.astro';
+import DocsNav from '../components/ui/DocsNav.astro';
+import { SITE, type Locale } from '../config/site.ts';
+import { getDocsPages } from '../lib/docs.ts';
+
+interface Props {
+  locale: Locale;
+  /** The page being read, or undefined on the contents page. */
+  slug?: string;
+  title: string;
+  description: string;
+}
+
+/**
+ * The white paper's shell.
+ *
+ * Three columns on a wide screen — contents, the page, and what is on it — and
+ * one column on a phone, where the contents collapse into a disclosure rather
+ * than a drawer. A drawer needs JavaScript to be usable; a <details> works
+ * before any of it loads and closes itself when a link is followed.
+ *
+ * The sidebar is rendered on every page rather than hydrated once, because the
+ * site is static and a whole-page navigation is already instant.
+ */
+const { locale, slug, title, description } = Astro.props;
+
+const pages = getDocsPages();
+const current = pages.find((page) => page.slug === slug);
+const index = pages.findIndex((page) => page.slug === slug);
+const previous = index > 0 ? pages[index - 1] : undefined;
+const next = index >= 0 ? pages[index + 1] : undefined;
+---
+
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  socialImage={`${SITE.url}/og-default.jpg`}
+>
+  <Header locale={locale} />
+
+  <main id="main" class="pt-16">
+    <div class="mx-auto flex w-full max-w-[1400px] gap-10 px-5 sm:px-8">
+      <!--
+        Contents, twice: a disclosure on a phone and a column from lg up. See
+        the note in DocsNav.astro for why this is not one <details>.
+      -->
+      <details class="docs-nav-mobile lg:hidden">
+        <summary class="docs-nav-summary">
+          <span>Contents</span>
+          <Icons name="chevron-down" size={14} />
+        </summary>
+        <div class="pt-5">
+          <DocsNav slug={slug} />
+        </div>
+      </details>
+
+      <div class="docs-nav hidden lg:block">
+        <DocsNav slug={slug} />
+      </div>
+
+      <article class="docs-body min-w-0 flex-1 py-12">
+        <slot />
+
+        {
+          (previous || next) && (
+            <nav
+              aria-label="More of the paper"
+              class="mt-16 grid gap-3 border-t border-line pt-8 sm:grid-cols-2"
+            >
+              {previous ? (
+                <a href={`/docs/${previous.slug}/`} class="docs-step">
+                  <span class="docs-step-label">← Previous</span>
+                  <span class="docs-step-title">{previous.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+              {next && (
+                <a href={`/docs/${next.slug}/`} class="docs-step sm:text-right">
+                  <span class="docs-step-label">Next →</span>
+                  <span class="docs-step-title">{next.title}</span>
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </article>
+
+      <!-- On this page. Built from the H2s the Markdown already has. -->
+      {
+        current && current.headings.length > 1 && (
+          <aside class="docs-toc" aria-label="On this page">
+            <p class="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+              On this page
+            </p>
+            <ul class="space-y-1.5">
+              {current.headings.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`} class="docs-toc-link">
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+    </div>
+  </main>
+
+  <Footer locale={locale} />
+</BaseLayout>
+
+<style is:global>
+  /* ------------------------------------------------------------------ docs
+     A documentation layout: contents on the left, the page in the middle,
+     what is on the page to the right. Only the middle column exists on a
+     phone; the other two fold away rather than overlaying the reading. */
+  .docs-nav-mobile {
+    border-bottom: 1px solid var(--color-line);
+    padding-block: 0.75rem;
+  }
+
+  .docs-nav-summary {
+    display: flex;
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-faint);
+  }
+  .docs-nav-summary::-webkit-details-marker {
+    display: none;
+  }
+  .docs-nav-mobile[open] .docs-nav-summary svg {
+    transform: rotate(180deg);
+  }
+  .docs-nav-summary svg {
+    transition: transform 0.2s ease;
+  }
+
+  @media (min-width: 1024px) {
+    .docs-nav {
+      position: sticky;
+      top: 4rem;
+      width: 16rem;
+      max-height: calc(100svh - 4rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border-bottom: 0;
+      border-right: 1px solid var(--color-line);
+      padding: 3rem 1.75rem 3rem 0;
+    }
+  }
+
+  .docs-link {
+    display: flex;
+    gap: 0.6rem;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-muted);
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .docs-link:hover {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .docs-link[aria-current='page'] {
+    background: var(--color-surface-2);
+    color: var(--color-lime);
+  }
+  .docs-number {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding-top: 0.15rem;
+    color: var(--color-faint);
+  }
+  .docs-link[aria-current='page'] .docs-number {
+    color: var(--color-lime);
+  }
+
+  /* The reading column. Measure capped near 70 characters. */
+  .docs-body {
+    max-width: 46rem;
+  }
+
+  .docs-toc {
+    display: none;
+  }
+  @media (min-width: 1280px) {
+    .docs-toc {
+      position: sticky;
+      top: 6rem;
+      display: block;
+      width: 13rem;
+      flex-shrink: 0;
+      align-self: flex-start;
+      padding-top: 3.5rem;
+    }
+  }
+  .docs-toc-link {
+    display: block;
+    border-left: 1px solid var(--color-line);
+    padding: 0.15rem 0 0.15rem 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-faint);
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .docs-toc-link:hover {
+    border-color: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  .docs-step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.9rem;
+    padding: 1rem 1.15rem;
+    transition: border-color 0.15s ease;
+  }
+  .docs-step:hover {
+    border-color: color-mix(in oklab, var(--color-lime) 45%, transparent);
+  }
+  .docs-step-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  .docs-step-title {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* ---- the prose itself */
+  .docs-prose > * + * {
+    margin-top: 1.15rem;
+  }
+  .docs-prose h2 {
+    margin-top: 3rem;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    scroll-margin-top: 6rem;
+  }
+  .docs-prose h3 {
+    margin-top: 2rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    scroll-margin-top: 6rem;
+  }
+  .docs-prose p,
+  .docs-prose li {
+    line-height: 1.75;
+    color: var(--color-muted);
+  }
+  .docs-prose strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .docs-prose a {
+    color: var(--color-lime);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in oklab, var(--color-lime) 40%, transparent);
+  }
+  .docs-prose a:hover {
+    text-decoration-color: var(--color-lime);
+  }
+  .docs-prose ul,
+  .docs-prose ol {
+    padding-left: 1.15rem;
+  }
+  .docs-prose ul {
+    list-style: disc;
+  }
+  .docs-prose ol {
+    list-style: decimal;
+  }
+  .docs-prose li + li {
+    margin-top: 0.45rem;
+  }
+  .docs-prose code {
+    border: 1px solid var(--color-line);
+    border-radius: 0.35rem;
+    background: var(--color-void);
+    padding: 0.1rem 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+  .docs-prose pre {
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: var(--color-void);
+    padding: 1rem 1.15rem;
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+  .docs-prose pre code {
+    border: 0;
+    padding: 0;
+    background: none;
+    font-size: inherit;
+  }
+  .docs-prose blockquote {
+    border-left: 2px solid var(--color-lime);
+    padding-left: 1rem;
+    color: var(--color-faint);
+    font-style: italic;
+  }
+  .docs-prose table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .docs-prose th,
+  .docs-prose td {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.6rem 1rem 0.6rem 0;
+    text-align: left;
+    vertical-align: top;
+  }
+  .docs-prose th {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  .docs-prose td {
+    color: var(--color-muted);
+  }
+  .docs-prose hr {
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    margin-block: 2.5rem;
+  }
+</style>

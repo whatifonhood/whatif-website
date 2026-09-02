@@ -1180,3 +1180,83 @@ test.describe('the wall of posts', () => {
     }
   });
 });
+
+/**
+ * The white paper.
+ *
+ * A docs section fails quietly — a page falls out of the sidebar and every
+ * other page still works, so nobody notices. These check the structure that
+ * holds it together rather than the prose.
+ */
+test.describe('the white paper', () => {
+  test('every page is reachable from the contents', async ({ page }) => {
+    await page.goto('/docs/');
+    const links = page.locator('a[href^="/docs/"]');
+    const hrefs = [
+      ...new Set(
+        await links.evaluateAll((nodes) =>
+          nodes.map((node) => new URL((node as HTMLAnchorElement).href).pathname),
+        ),
+      ),
+    ].filter((href) => href !== '/docs/');
+
+    expect(hrefs.length, 'the contents page lists nothing').toBeGreaterThan(10);
+    for (const href of hrefs) {
+      const response = await page.request.get(href);
+      expect(response.status(), `${href} is listed but does not exist`).toBe(200);
+    }
+  });
+
+  test('the sidebar marks where you are, and prev/next walks the order', async ({ page }) => {
+    await page.goto('/docs/how-to-buy/');
+    await expect(page.locator('.docs-nav .docs-link[aria-current="page"]')).toContainText(
+      'How to buy',
+    );
+
+    // Forward, then back, lands where it started.
+    const next = page.locator('.docs-step').last();
+    await next.click();
+    await expect(page.locator('h1')).toContainText('Wallets and custody');
+    await page.locator('.docs-step').first().click();
+    await expect(page.locator('h1')).toContainText('How to buy');
+  });
+
+  test('the contract address in the paper is the real one', async ({ page }) => {
+    for (const path of ['/docs/the-token/', '/docs/how-to-buy/', '/docs/reference/']) {
+      await page.goto(path);
+      const body = (await page.locator('.docs-prose, .docs-body').first().textContent()) ?? '';
+      const addresses = [...body.matchAll(/0x[0-9a-fA-F]{40}/g)].map((match) => match[0]);
+      expect(addresses.length, `${path} names no address`).toBeGreaterThan(0);
+      // Every 40-hex address on these pages must be one we actually publish.
+      for (const address of addresses) {
+        expect(
+          [
+            TOKEN.address.toLowerCase(),
+            TOKEN.primaryPool.toLowerCase(),
+            TOKEN.burnAddress.toLowerCase(),
+          ],
+          `${path} publishes an address that is not ours: ${address}`,
+        ).toContain(address.toLowerCase());
+      }
+    }
+  });
+
+  test('it is in the tools menu', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('a[href="/docs/"]').first()).toHaveCount(1);
+  });
+
+  test('the contents page opens the paper on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/docs/risks/');
+    // Collapsed to start, and it opens.
+    await expect(page.locator('.docs-nav-mobile .docs-link').first()).toBeHidden();
+    await page.locator('.docs-nav-summary').click();
+    await expect(page.locator('.docs-nav-mobile .docs-link').first()).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBe(0);
+  });
+});

@@ -1,0 +1,55 @@
+---
+import { DOCS_GROUPS } from '../../config/docs.ts';
+import { getDocsPages } from '../../lib/docs.ts';
+
+interface Props {
+  /** The page being read, so its entry can be marked current. */
+  slug?: string;
+}
+
+/**
+ * The white paper's contents list.
+ *
+ * Rendered twice by the layout — once inside a <details> for phones, once as a
+ * plain column from lg up. It lives in one component so the two can never drift
+ * apart, which is the only real cost of rendering it twice.
+ *
+ * Two renders rather than one <details> styled by breakpoint: a closed
+ * <details> hides its content through `::details-content`, which
+ * `content-visibility` governs rather than `display`, so CSS cannot reopen it
+ * at a breakpoint. Duplicating twelve links is cheaper than shipping a script
+ * to work around that.
+ */
+const { slug } = Astro.props;
+const pages = getDocsPages();
+---
+
+<nav aria-label="White paper contents">
+  {
+    DOCS_GROUPS.map((group) => (
+      <section class="mb-7">
+        <p class="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+          {group.title}
+        </p>
+        <ul class="space-y-0.5">
+          {group.slugs.map((entry) => {
+            const page = pages.find((item) => item.slug === entry);
+            if (!page) return null;
+            return (
+              <li>
+                <a
+                  href={`/docs/${entry}/`}
+                  class="docs-link"
+                  aria-current={entry === slug ? 'page' : undefined}
+                >
+                  <span class="docs-number">{String(page.number).padStart(2, '0')}</span>
+                  {page.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+</nav>
