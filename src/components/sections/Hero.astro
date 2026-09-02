@@ -125,14 +125,16 @@ const stats = [
           stats.map((stat) => (
             <div class="min-w-0">
               {/*
-                Sized for the longest locale, not for English. "US$386,77 mil"
-                is half again the width of "$386.77K" and overflowed its cell
-                into the one beside it on a 320px screen, leaving the two
-                figures as one unreadable run.
+                Shrinks to fit; never breaks.
+                Sized for the longest locale rather than for English — "US$386,77
+                mil" is half again the width of "$386.77K" — but a price is one
+                token and must stay on one line. Letting it wrap turned $0.00803
+                into "$0.0080" above a lone "3", which is worse than the overflow
+                it was meant to cure.
               */}
               <dd
                 data-stat={stat.key}
-                class="font-display text-[clamp(1rem,5.4vw,1.5rem)] font-black italic tabular-nums tracking-tight text-ink [overflow-wrap:anywhere]"
+                class="font-display text-[clamp(0.78rem,4.8vw,1.5rem)] font-black italic tabular-nums whitespace-nowrap tracking-tight text-ink"
               >
                 {stat.value}
               </dd>
