@@ -37,7 +37,8 @@
     "history:clean": "node tools/clean-coin-history.mjs",
     "holders": "node tools/build-holders.mjs",
     "docs": "node tools/check-docs.mjs",
-    "roadmap": "node tools/check-roadmap.mjs"
+    "roadmap": "node tools/check-roadmap.mjs",
+    "candles": "node tools/build-candles.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

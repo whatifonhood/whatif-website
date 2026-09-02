@@ -10,6 +10,7 @@
  * had. The site holds no API keys, so there is nothing here to leak.
  */
 import { DATA_APIS, TOKEN } from '../config/site.ts';
+import COMMITTED_CANDLES from '../data/candles.json';
 import { asPositiveNumber, fetchJson, isRecord } from './token-stats.ts';
 
 const GECKO = `https://api.geckoterminal.com/api/v2/networks/robinhood/pools/${TOKEN.primaryPool.toLowerCase()}`;
@@ -89,6 +90,45 @@ export async function getPairSnapshot(): Promise<PairSnapshot> {
 }
 
 /** Closing prices, oldest first, for the chart. */
+/**
+ * The candles committed at build time, one set per timeframe.
+ *
+ * These are the chart's floor, not a cache. GeckoTerminal rate-limits hard and
+ * its 429 carries no CORS header, so in a browser a refusal is indistinguishable
+ * from a dead network and cannot even be detected — which left every timeframe
+ * button looking broken whenever the API was busy. Committed data means the
+ * chart always draws; the live call is an upgrade on top of it.
+ *
+ * Refreshed by `npm run candles` in the daily job.
+ */
+export function committedCandles(timeframe: Timeframe): Candle[] {
+  return toCandles(COMMITTED_CANDLES[timeframe] ?? []);
+}
+
+/** [time, open, high, low, close, volume] rows into candles, oldest first. */
+function toCandles(list: unknown): Candle[] {
+  if (!Array.isArray(list)) return [];
+  const candles: Candle[] = [];
+  for (const row of list) {
+    if (!Array.isArray(row) || row.length < 6) continue;
+    const [time, open, high, low, close, volumeUsd] = row.map(Number) as (number | undefined)[];
+    if ([time, open, high, low, close].some((value) => value === undefined)) continue;
+    if (![time, open, high, low, close].every((v) => Number.isFinite(v) && (v as number) > 0)) {
+      continue;
+    }
+    candles.push({
+      time: time as number,
+      open: open as number,
+      close: close as number,
+      high: high as number,
+      low: low as number,
+      volumeUsd: volumeUsd ?? 0,
+    });
+  }
+  // GeckoTerminal returns newest first; a chart reads oldest to newest.
+  return candles.reverse();
+}
+
 export async function getPriceHistory(timeframe: Timeframe): Promise<Candle[]> {
   const { path, limit } = TIMEFRAMES[timeframe];
   const body = await fetchJson(`${GECKO}/ohlcv/${path}&limit=${limit}`);

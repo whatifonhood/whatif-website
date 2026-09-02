@@ -54,6 +54,12 @@ jobs:
       - name: Community wall
         run: npm run tweets
 
+      # The chart's floor. GeckoTerminal refuses most browser requests and its
+      # 429 has no CORS header, so the page cannot fetch these reliably at all —
+      # they ship with the site instead.
+      - name: Chart candles
+        run: npm run candles
+
       # A tool that returned nothing would otherwise commit an empty file over
       # good data, which is worse than being a day stale.
       - name: Refuse to commit empty data
@@ -62,6 +68,7 @@ jobs:
           test -s src/config/burns.ts
           test -s src/config/tweet-cards.ts
           test -s src/config/holders.ts
+          test -s src/data/candles.json
           node -e "
             const { BURNS } = await import('./src/config/burns.ts');
             if (BURNS.length === 0) { console.error('burns.ts came back empty'); process.exit(1); }
@@ -69,6 +76,12 @@ jobs:
             if (HOLDERS.length === 0) { console.error('holders.ts came back empty'); process.exit(1); }
             // 'test -s' passes on a file holding an empty array, because the
             // header and the type are still in it.
+            const candles = JSON.parse(await import('node:fs').then((fs) => fs.readFileSync('./src/data/candles.json', 'utf8')));
+            for (const [frame, rows] of Object.entries(candles)) {
+              if (!Array.isArray(rows) || rows.length < 2) {
+                console.error(`candles.json has no ${frame} candles`); process.exit(1);
+              }
+            }
             const { TWEET_URLS } = await import('./src/config/tweets.ts');
             const { TWEET_CARDS } = await import('./src/config/tweet-cards.ts');
             if (TWEET_URLS.length > 0 && TWEET_CARDS.length === 0) {
@@ -84,7 +97,7 @@ jobs:
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add src/config/site.ts src/config/burns.ts src/config/tweet-cards.ts \
-                  src/config/holders.ts
+                  src/config/holders.ts src/data/candles.json
           if git diff --cached --quiet; then
             echo 'Nothing changed today.'
           else

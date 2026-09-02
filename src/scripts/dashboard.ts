@@ -9,6 +9,7 @@
  * the site by several times, for one line and an area fill.
  */
 import {
+  committedCandles,
   getLargeTrades,
   LARGE_TRADE_USD,
   getPairSnapshot,
@@ -676,6 +677,13 @@ export function initDashboard(locale: string): void {
    */
   const cache = new Map<Timeframe, Candle[]>();
 
+  // Seeded from the candles committed at build time, so every timeframe has
+  // something to draw before a single request is made. See committedCandles().
+  for (const frame of ['day', 'week', 'month', 'quarter', 'all'] as Timeframe[]) {
+    const committed = committedCandles(frame);
+    if (committed.length >= 2) cache.set(frame, committed);
+  }
+
   const renderChart = async (timeframe: Timeframe, keepView = false): Promise<TaskResult> => {
     if (!chart) return 'skipped';
 
@@ -691,10 +699,21 @@ export function initDashboard(locale: string): void {
 
     const candles = await getPriceHistory(timeframe).catch(() => []);
     if (candles.length < 2) {
-      // Nothing has ever loaded, so there is nothing to leave on screen. Say so
-      // rather than showing an empty frame under working controls.
+      // The live call failed. If this timeframe has candles — from the build or
+      // from an earlier fetch — they are already on screen and the switch
+      // succeeded; only say something when there is genuinely nothing to show.
+      const fallback = cache.get(timeframe) ?? [];
+      if (fallback.length >= 2) {
+        if (loaded !== fallback) {
+          loaded = fallback;
+          view = { start: 0, end: fallback.length };
+          if (chartEmpty) chartEmpty.hidden = true;
+          paint();
+        }
+        return 'ok';
+      }
       if (chartEmpty && loaded.length === 0) chartEmpty.hidden = false;
-      return cached && cached.length >= 2 ? 'ok' : 'failed';
+      return 'failed';
     }
     if (chartEmpty) chartEmpty.hidden = true;
     cache.set(timeframe, candles);
