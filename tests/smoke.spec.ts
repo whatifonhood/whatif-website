@@ -1490,26 +1490,53 @@ test.describe('the site behaves on a phone', () => {
    * that breaks first. The offending element is reported by name because
    * "the page overflows by 14px" is not something anyone can act on.
    */
+  /*
+   * This asks whether anything is CUT OFF, not whether the page scrolls.
+   *
+   * global.css sets `html { overflow-x: clip }` deliberately, so the page can
+   * never scroll sideways — which means `scrollWidth - clientWidth` is always
+   * zero and an element hanging past the right edge is silently amputated
+   * rather than reachable. Measuring the page told us nothing; measuring the
+   * elements found a Spanish heading losing its last word, four dashboard
+   * figures losing their currency, and three chart buttons that had no pixels
+   * on screen at all.
+   *
+   * An element inside a horizontal scroller is exempt: the holders table is
+   * `min-w-[32rem]` inside `overflow-x-auto` on purpose, and scrolls.
+   */
   for (const width of [320, 360, 375, 390, 414, 428]) {
-    test(`nothing scrolls sideways at ${width}px`, async ({ page }, testInfo) => {
+    test(`nothing is cut off the right edge at ${width}px`, async ({ page }, testInfo) => {
       test.skip(testInfo.project.name !== 'mobile', phoneOnly);
       await page.setViewportSize({ width, height: 780 });
-      const broken: string[] = [];
+      const clipped: string[] = [];
       for (const path of PHONE_PAGES) {
         await page.goto(path);
-        const report = await page.evaluate(() => {
-          const doc = document.documentElement;
-          const over = doc.scrollWidth - doc.clientWidth;
-          if (over <= 0) return null;
-          // Name the widest thing sticking out, so the failure is actionable.
-          const culprits = [...document.querySelectorAll<HTMLElement>('body *')]
-            .filter((el) => el.getBoundingClientRect().right > doc.clientWidth + 1)
-            .map((el) => `${el.tagName.toLowerCase()}.${el.className.toString().slice(0, 40)}`);
-          return { over, culprit: culprits[0] ?? 'unknown' };
+        const found = await page.evaluate(() => {
+          const edge = document.documentElement.clientWidth;
+          const scrolls = (el: HTMLElement) => {
+            for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+              const overflowX = getComputedStyle(node).overflowX;
+              if (overflowX === 'auto' || overflowX === 'scroll') return true;
+            }
+            return false;
+          };
+          return [...document.querySelectorAll<HTMLElement>('body *')]
+            .filter((el) => {
+              const box = el.getBoundingClientRect();
+              // The marquee is wider than the screen by design and clipped by
+              // its own container.
+              if (el.closest('[class*=animate-marquee]')) return false;
+              return box.width > 0 && box.right > edge + 1 && !scrolls(el);
+            })
+            .slice(0, 3)
+            .map(
+              (el) =>
+                `${el.tagName.toLowerCase()}.${el.className.toString().slice(0, 30)} +${Math.round(el.getBoundingClientRect().right - edge)}px`,
+            );
         });
-        if (report) broken.push(`${path}: ${report.over}px past the edge (${report.culprit})`);
+        for (const one of found) clipped.push(`${path}  ${one}`);
       }
-      expect(broken, 'a phone should never scroll sideways').toEqual([]);
+      expect(clipped, 'content past the right edge is lost, not scrollable').toEqual([]);
     });
   }
 

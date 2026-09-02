@@ -127,7 +127,7 @@ const figures = [
               {/* Sized for the longest locale; see the same note in Hero.astro. */}
               <dd
                 data-stat={figure.key}
-                class="font-display text-xl font-black italic tabular-nums tracking-tight text-lime sm:text-2xl"
+                class="font-display text-[clamp(0.95rem,5.2vw,1.5rem)] font-black italic tabular-nums tracking-tight text-lime [overflow-wrap:anywhere]"
               >
                 {figure.value}
               </dd>

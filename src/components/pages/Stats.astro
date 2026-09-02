@@ -128,7 +128,7 @@ const metrics = [
           </p>
           <p
             data-metric="price"
-            class="mt-2 font-display text-4xl font-black italic tabular-nums tracking-tight text-ink sm:text-6xl"
+            class="mt-2 font-display text-[clamp(1.6rem,11vw,2.25rem)] font-black italic tabular-nums tracking-tight text-ink [overflow-wrap:anywhere] sm:text-6xl"
           >
             {formatUsd(TOKEN_SNAPSHOT.priceUsd, locale)}
           </p>
@@ -428,7 +428,12 @@ const metrics = [
         <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
           {page.buys} / {page.sells} · 24H
         </p>
-        <div class="mt-5 flex items-end justify-between gap-6">
+        <!--
+          Wraps rather than holding its three columns. At 200% zoom on a phone
+          the row needed 210px of a 147px card, and since the page cannot scroll
+          sideways the sell count was simply gone.
+        -->
+        <div class="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div>
             <p
               data-metric="buys"

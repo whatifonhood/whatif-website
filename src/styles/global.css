@@ -281,6 +281,17 @@ body {
   letter-spacing: -0.02em;
   line-height: 0.95;
   text-wrap: balance;
+  /*
+   * A long word has to be allowed to break.
+   *
+   * The page cannot scroll sideways by design, so an overflow here is not a
+   * scrollbar — it is the end of the word cut off and gone. "PREGUNTANDO." ran
+   * 12px past a 320px screen with no zoom at all, and at 200% zoom the English
+   * "ANSWERED." lost 117px of itself. Nothing else in the utility changes: this
+   * only applies when a single word has nowhere else to go.
+   */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 /* Small uppercase mono label that names a section. */

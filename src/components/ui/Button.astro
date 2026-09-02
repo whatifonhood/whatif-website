@@ -38,8 +38,14 @@ const {
   ...rest
 } = Astro.props;
 
+/*
+ * `max-w-full` and a wrapping label, because the page cannot scroll sideways:
+ * a button that will not fit is a button with its label cut off rather than one
+ * that overflows visibly. It shows up at 200% zoom, which is an ordinary
+ * low-vision setting rather than an edge case.
+ */
 const base =
-  'inline-flex items-center justify-center gap-2.5 rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5';
+  'inline-flex max-w-full flex-wrap items-center justify-center gap-2.5 rounded-full text-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5';
 
 const variants = {
   primary:
