@@ -1163,6 +1163,23 @@ const metrics = [
     stroke: none;
   }
 
+  /*
+   * The chart while a timeframe is loading.
+   *
+   * A tap on a chip used to give no sign anything was happening: on a slow
+   * connection you pressed 7D and watched the same chart for a second and a
+   * half. The chart itself dims rather than being replaced, so the candles you
+   * were reading stay readable while the new ones are fetched.
+   */
+  [data-chart-busy] [data-chart-wrap] {
+    opacity: 0.45;
+    transition: opacity 0.15s ease;
+  }
+  [data-chart-busy] .tf-chip,
+  [data-chart-busy] .chart-toggle {
+    pointer-events: none;
+  }
+
   /* Timeframe and change chips */
   .tf-chip,
   .change-chip {

@@ -664,16 +664,40 @@ export function initDashboard(locale: string): void {
    * edge, so the window is shifted by however many were added and the view stays
    * pointed at the same moment in time.
    */
+  /**
+   * Candles already fetched, per timeframe.
+   *
+   * Switching back to a timeframe you have seen is instant and needs no network,
+   * which is what makes the row of chips feel like a chart rather than a set of
+   * page loads. It is also what makes them work at all when the market API is
+   * rate-limiting: GeckoTerminal 429s readily, and after one refusal every
+   * further click failed for a minute. The chip lit up, the chart did not
+   * change, and the label then said 7D over a day of candles.
+   */
+  const cache = new Map<Timeframe, Candle[]>();
+
   const renderChart = async (timeframe: Timeframe, keepView = false): Promise<TaskResult> => {
     if (!chart) return 'skipped';
+
+    const cached = cache.get(timeframe);
+    // Draw what we already have before going to the network, so the switch is
+    // immediate and the fetch only refreshes it.
+    if (cached && cached.length >= 2 && !keepView) {
+      loaded = cached;
+      view = { start: 0, end: cached.length };
+      if (chartEmpty) chartEmpty.hidden = true;
+      paint();
+    }
+
     const candles = await getPriceHistory(timeframe).catch(() => []);
     if (candles.length < 2) {
       // Nothing has ever loaded, so there is nothing to leave on screen. Say so
       // rather than showing an empty frame under working controls.
       if (chartEmpty && loaded.length === 0) chartEmpty.hidden = false;
-      return 'failed';
+      return cached && cached.length >= 2 ? 'ok' : 'failed';
     }
     if (chartEmpty) chartEmpty.hidden = true;
+    cache.set(timeframe, candles);
 
     const zoomed = view.end - view.start < loaded.length;
     if (keepView && zoomed && loaded.length > 0) {
@@ -1107,14 +1131,44 @@ export function initDashboard(locale: string): void {
     /* storage unavailable */
   }
 
-  for (const button of root.querySelectorAll<HTMLButtonElement>('[data-timeframe]')) {
+  /**
+   * The timeframe chips.
+   *
+   * The pressed chip is a label for the data on screen, so it is only allowed to
+   * move once there is data to match it. It used to be set on click and left
+   * there whatever happened next: when the fetch failed the chart kept the
+   * previous timeframe's candles under a chip reading 7D, which is a chart
+   * lying about what it is showing.
+   */
+  const timeframeButtons = [...root.querySelectorAll<HTMLButtonElement>('button[data-timeframe]')];
+
+  const markTimeframe = (timeframe: Timeframe) => {
+    root.dataset.timeframe = timeframe;
+    for (const button of timeframeButtons) {
+      button.setAttribute('aria-pressed', String(button.dataset.timeframe === timeframe));
+    }
+  };
+
+  for (const button of timeframeButtons) {
     button.addEventListener('click', () => {
       const timeframe = button.dataset.timeframe as Timeframe;
-      root.dataset.timeframe = timeframe;
-      for (const other of root.querySelectorAll<HTMLButtonElement>('[data-timeframe]')) {
-        other.setAttribute('aria-pressed', String(other === button));
-      }
-      void renderChart(timeframe);
+      const showing = (root.dataset.timeframe as Timeframe) ?? 'day';
+      if (timeframe === showing) return;
+
+      // Busy while it is in flight, so a tap is visibly doing something even on
+      // a slow connection.
+      root.dataset.chartBusy = '';
+      void renderChart(timeframe).then((result) => {
+        delete root.dataset.chartBusy;
+        // Only relabel if the chart really is showing that timeframe now.
+        markTimeframe(result === 'failed' ? showing : timeframe);
+        // Say it out loud rather than letting a chip snap back for no visible
+        // reason. Reuses the banner the page already has for exactly this.
+        if (result === 'failed' && status) {
+          status.textContent = labels.failed;
+          status.hidden = false;
+        }
+      });
     });
   }
 

@@ -22,6 +22,36 @@ export interface TweetCard {
 
 export const TWEET_CARDS: TweetCard[] = [
   {
+    text: "You stop telling people. You don't stop holding.",
+    authorName: 'What $IF on Robinhood Chain',
+    authorHandle: 'WhatIFonHOOD',
+    avatar: '/posts/2094772271722434583-avatar.webp',
+    postedAt: '2026-09-01',
+    photos: [
+      {
+        src: '/posts/2094772271722434583-1.webp',
+        width: 1200,
+        height: 1200,
+      },
+    ],
+    url: 'https://x.com/WhatIFonHOOD/status/2094772271722434583',
+  },
+  {
+    text: 'Robinhood Chain just did $1.4B in a day.\n\nNew all-time high. +183% in a week.\n\nThey built it for tokenised stocks.\nThe memes moved in.\n\nWhat $IF that was always going to happen?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorHandle: 'WhatIFonHOOD',
+    avatar: '/posts/2094455176971362440-avatar.webp',
+    postedAt: '2026-08-31',
+    photos: [
+      {
+        src: '/posts/2094455176971362440-1.webp',
+        width: 1200,
+        height: 675,
+      },
+    ],
+    url: 'https://x.com/WhatIFonHOOD/status/2094455176971362440',
+  },
+  {
     text: 'What $IF @RobinhoodCrypto eventually lists the native meme of its own ecosystem?',
     authorName: 'What $IF on Robinhood Chain',
     authorHandle: 'WhatIFonHOOD',
@@ -65,5 +95,20 @@ export const TWEET_CARDS: TweetCard[] = [
       },
     ],
     url: 'https://x.com/WhatIFonHOOD/status/2093803407362625946',
+  },
+  {
+    text: 'What $IF I told you...\n\nThe answer is already drawn in the sand?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorHandle: 'WhatIFonHOOD',
+    avatar: '/posts/2089569584860799369-avatar.webp',
+    postedAt: '2026-08-18',
+    photos: [
+      {
+        src: '/posts/2089569584860799369-1.webp',
+        width: 1200,
+        height: 800,
+      },
+    ],
+    url: 'https://x.com/WhatIFonHOOD/status/2089569584860799369',
   },
 ];

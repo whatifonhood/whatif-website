@@ -48,6 +48,7 @@ const FULL_QUALITY = 82;
  */
 function seriesFor(slug) {
   if (slug.startsWith('gm-')) return 'gm';
+  if (slug.startsWith('meme-macro-')) return 'What $IF';
   if (slug.startsWith('meme-artefact-')) return 'Artefacts';
   if (slug.startsWith('meme-history-')) return 'History';
   if (slug.startsWith('meme-hood-') || slug.startsWith('rh-')) return 'Robinhood';
@@ -66,7 +67,7 @@ function seriesFor(slug) {
 function titleFor(slug) {
   const words = slug
     .replace(/^(meme|gm)-/, '')
-    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card)-/, '')
+    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro)-/, '')
     .split('-');
   const joined = words.join(' ');
   return joined.charAt(0).toUpperCase() + joined.slice(1);
@@ -140,6 +141,7 @@ for (const [index, file] of files.entries()) {
 
 const seriesOrder = [
   'Classics',
+  'What $IF',
   'Artefacts',
   'History',
   'Real life',
