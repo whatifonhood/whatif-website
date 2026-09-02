@@ -1,4 +1,5 @@
 import type { ToolGroup, ToolId } from '../config/navigation.ts';
+import type { RoadmapTrack as RoadmapTrackKey } from '../config/roadmap.ts';
 
 /**
  * The shape of every word on the site.
@@ -219,6 +220,10 @@ export interface SiteCopy {
       sellLabel: string;
       viewTx: string;
       loading: string;
+      /** Shown in place of the trade list when the trades never arrive. */
+      feedUnavailable: string;
+      /** Shown over the chart when there is no price history to draw. */
+      chartUnavailable: string;
       failed: string;
       /** Shown above the trade feed to say how far back it reaches. */
       feedNote: string;
@@ -382,8 +387,23 @@ export interface SiteCopy {
       statuses: { shipped: string; building: string; next: string; later: string };
       /** Follows the number of shipped items, e.g. "things shipped". */
       shippedCount: string;
-      /** Explains why nothing unshipped carries a date. */
-      note: string;
+      /** The three figures above the list. Each is a label under a number. */
+      record: { shipped: string; inProgress: string; latest: string };
+      /**
+       * What each track of work is for.
+       *
+       * Keyed by ROADMAP_TRACKS in src/config/roadmap.ts, so adding a track
+       * fails the build in four languages until every one of them names it.
+       */
+      tracks: Record<RoadmapTrackKey, { label: string; objective: string }>;
+      /** Above the dependency on an unshipped item, e.g. "Waiting on". */
+      needsLabel: string;
+      /** Above the success condition, e.g. "Done when". */
+      signalLabel: string;
+      /** The dated record of everything already shipped. */
+      log: { title: string; intro: string };
+      /** What the roadmap refuses to do — the reason to believe the rest of it. */
+      terms: { title: string; items: string[] };
     };
     holdings: {
       title: string;

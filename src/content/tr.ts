@@ -19,7 +19,7 @@ export const tr: SiteCopy = {
       holdings: { label: 'Cüzdan sorgusu', blurb: 'Bağlantı gerekmez' },
       learn: { label: 'Öğren', blurb: 'Güvenlik, temeller ve kanıt' },
       docs: { label: 'Teknik doküman', blurb: 'Her şey, yazılı hâlde' },
-      roadmap: { label: 'Güncellemeler', blurb: 'En yenisi en üstte' },
+      roadmap: { label: 'Yol haritası', blurb: 'Ne yapıldı, sırada ne var' },
       brand: { label: 'Marka', blurb: 'Logolar ve görseller' },
     },
     toolGroups: { data: 'Rakamlar', play: 'Oyna', assets: 'Görseller', read: 'Oku' },
@@ -218,7 +218,7 @@ export const tr: SiteCopy = {
       },
       {
         q: 'Vergi var mı?',
-        a: '$IF kontratı işlemenin üstüne hiçbir şey eklemiyor. Ana havuzda göreceğin %1, Uniswap’ın kendi komisyon kademesidir ve likidite sağlayanlara gider, bize değil. Kontrat Blockscout’ta açık — bir sitenin sözüne güvenmek yerine kendin oku.',
+        a: '$IF kontratı işlemenin üstüne hiçbir şey eklemiyor — kontratın içinde hiç komisyon mantığı yok. Ana havuzda göreceğin %1, Uniswap’ın kendi komisyon kademesidir ve likidite pozisyonlarının kazancıdır. Bunların en büyüğü kalıcı olarak kilitli lansman pozisyonu ve onun payını, tokeni oluşturan launchpad süpürüyor: $IF tarafı yakılıyor, ETH tarafı yakılmıyor. Bunun hiçbiri bu topluluğa ulaşmıyor. Akışın tamamı teknik dokümanda.',
       },
       {
         q: 'Ne kadarı yakıldı?',
@@ -303,6 +303,8 @@ export const tr: SiteCopy = {
       sellLabel: 'Satım',
       viewTx: 'Gör',
       loading: 'Zincir okunuyor…',
+      feedUnavailable: 'Son işlemler okunamadı. Yeniden deneniyor.',
+      chartUnavailable: 'Fiyat geçmişi şu an mevcut değil.',
       failed: 'Piyasa verisine şu an ulaşılamadı. Yukarıdaki rakamlar son derlemeden geliyor.',
       feedNote: 'IF/WETH havuzundaki en son işlemler.',
       biggestSell: 'En büyük satış',
@@ -451,7 +453,44 @@ export const tr: SiteCopy = {
         shipped: 'Yayına alındı',
       },
       shippedCount: 'şey yayına alındı',
-      note: 'Henüz gerçekleşmemiş hiçbir şey için tarih verilmiyor. Bu bir meme coin ve tarih, kriptoda tutulması en kolay bozulan sözdür — yayına alınanlarda tarih var, çünkü onlar zaten oldu.',
+      record: { shipped: 'Yayına alındı', inProgress: 'Yapılıyor', latest: 'En yenisi' },
+      tracks: {
+        proof: {
+          label: 'Kanıt',
+          objective:
+            'Bu sitedeki her sayı, bize güvenmeyen biri tarafından zincirden yeniden üretilebilir.',
+        },
+        tools: {
+          label: 'Araçlar',
+          objective:
+            'Açmaya değer şeyler. Hiçbiri cüzdan bağlamanı ya da bir şey imzalamanı istemez.',
+        },
+        words: {
+          label: 'Metin',
+          objective:
+            'Düşündüğün dilde okunur — güvende kalmayla ilgili sayfalar, bizimle ilgili olanlardan önce gelir.',
+        },
+        craft: {
+          label: 'Zanaat',
+          objective: 'Eski bir telefonda, kötü bir bağlantıda, ilk denemede çalışması gerekir.',
+        },
+      },
+      needsLabel: 'Bekleniyor',
+      signalLabel: 'Bitiş şartı',
+      log: {
+        title: 'Kayıt defteri',
+        intro:
+          'Şimdiye kadar yapılmış her şey, en yenisi en üstte, her biri kendine bağlantı veriyor. Bir yol haritasının gerçekten test edilmiş kısmı burasıdır.',
+      },
+      terms: {
+        title: 'Bu yol haritasının yapmayacakları',
+        items: [
+          'Henüz gerçekleşmemiş hiçbir şeye tarih vermek. Yayına alınanlarda tarih var, çünkü onlar zaten oldu; geri kalanına verilecek tarih, kriptoda tutulması en kolay bozulan sözdür.',
+          'Fiyattan, piyasa değerinden ya da bir hedeften söz etmek. Bu sayfadaki hiçbir şey, herhangi bir şeyi satın almak için bir sebep değildir.',
+          'Var olmadan ve açılabilir hale gelmeden bir ortaklık, borsa listelenmesi ya da entegrasyon duyurmak.',
+          'Cüzdan bağlamanı ya da bir mesaj imzalamanı isteyen bir şey yayına almak. Bu bir gün değişirse, bir özellik olarak görünmeden önce bu sayfada bir satır olarak görünecek.',
+        ],
+      },
     },
     holdings: {
       title: 'Cüzdan sorgusu',

@@ -15,8 +15,11 @@ import Icons from '../ui/Icons.astro';
  * The joke was good while there was nothing to show. There is now, so the
  * section shows the real thing and keeps the stamp.
  *
- * Only live and next work appears here; the full list, including everything
- * already shipped, is on /roadmap/.
+ * Only live and next work appears here; the full list — the delivery record,
+ * the four tracks, the dated log and the terms — is on /roadmap/.
+ *
+ * Each item carries its track, so the two pages speak the same language and a
+ * reader arriving at the full roadmap already knows what the chips mean.
  */
 interface Props {
   locale: Locale;
@@ -52,7 +55,8 @@ const shipped = ROADMAP.filter((item) => item.status === 'shipped').length;
           <ul class="mt-5 flex flex-col gap-4">
             {column.items.map((item) => (
               <li>
-                <p class="font-semibold text-ink">{item.title}</p>
+                <p class="track-chip">{page.tracks[item.track].label}</p>
+                <p class="mt-2 font-semibold text-ink">{item.title}</p>
                 <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
               </li>
             ))}
@@ -93,6 +97,18 @@ const shipped = ROADMAP.filter((item) => item.status === 'shipped').length;
     box-shadow: 0 0 0 4px rgb(143 206 2 / 0.18);
   }
   .road-dot[data-status='next'] {
-    background: var(--color-lime-mid, #86b50b);
+    background: var(--color-lime-mid);
+  }
+
+  .track-chip {
+    display: inline-block;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-lime) 14%, transparent);
+    padding: 0.2rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-lime);
   }
 </style>
