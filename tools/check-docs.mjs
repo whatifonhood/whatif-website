@@ -39,7 +39,6 @@ const known = new Set([
   '/ask/',
   '/pfp/',
   '/memes/',
-  '/learn/',
   '/brand/',
   '/roadmap/',
 ]);

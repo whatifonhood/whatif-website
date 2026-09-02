@@ -135,14 +135,6 @@ export const ROADMAP: RoadmapItem[] = [
     status: 'shipped',
     track: 'words',
     date: '2026-08-31',
-    title: 'The Learn section',
-    body: 'How to spot a scam, self-custody, how to read the dashboard — every claim linking to where you can check it.',
-    href: '/learn/',
-  },
-  {
-    status: 'shipped',
-    track: 'words',
-    date: '2026-08-31',
     title: 'Four languages',
     body: 'English, 中文, Türkçe and Español across every tool on the site.',
   },
@@ -225,13 +217,5 @@ export const ROADMAP: RoadmapItem[] = [
     title: 'The white paper',
     body: 'Twelve pages: the thesis, the token, the supply and the burn, who holds it, how to buy it, the risks, and a page listing what this project does not claim.',
     href: '/docs/',
-  },
-  {
-    status: 'shipped',
-    track: 'words',
-    date: '2026-09-02',
-    title: 'Safety in four languages',
-    body: 'The six Learn pages — spotting a scam, holding your own keys, reading the dashboard — now exist in Chinese, Turkish and Spanish. The tools were translated before the safety guidance was, which was the wrong way round.',
-    href: '/learn/',
   },
 ];

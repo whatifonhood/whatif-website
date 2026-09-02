@@ -33,10 +33,6 @@ What you have pulled lives in your own browser and is never sent anywhere. A cod
 
 The [memes](/memes/), full resolution, no watermark, no credit needed. Take them.
 
-## Learn
-
-The [Learn section](/learn/) covers how meme coins work, how Robinhood Chain works, how to read the dashboard, self-custody, and spotting a scam. It is written for someone who has not done this before.
-
 ## What is deliberately absent
 
 - **No wallet connection**, anywhere, for the reasons in [Wallets and custody](/docs/wallets-and-custody/).

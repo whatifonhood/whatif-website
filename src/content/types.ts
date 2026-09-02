@@ -364,19 +364,6 @@ export interface SiteCopy {
       /** `{question}` is replaced with the generated line. */
       shareText: string;
     };
-    learn: {
-      title: string;
-      eyebrow: string;
-      heading: SplitHeading;
-      intro: string;
-      backToIndex: string;
-      next: string;
-      previous: string;
-      /** Section headings on the index. */
-      categories: { safety: string; basics: string; token: string };
-      /** Shown under the title on a page, e.g. "Updated". */
-      updatedLabel: string;
-    };
     roadmap: {
       title: string;
       eyebrow: string;

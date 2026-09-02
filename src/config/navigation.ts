@@ -21,7 +21,6 @@ export const TOOL_ROUTES = [
   { id: 'pfp', href: '/pfp/', group: 'play' },
   { id: 'memes', href: '/memes/', group: 'assets' },
   { id: 'brand', href: '/brand/', group: 'assets' },
-  { id: 'learn', href: '/learn/', group: 'read' },
   { id: 'docs', href: '/docs/', group: 'read' },
   { id: 'roadmap', href: '/roadmap/', group: 'read' },
 ] as const satisfies readonly { id: string; href: string; group: ToolGroup }[];

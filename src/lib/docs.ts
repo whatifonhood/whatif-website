@@ -3,7 +3,7 @@
  *
  * The pages are ordinary Markdown rendered through Astro's own pipeline, so the
  * prose stays prose and nothing is injected as HTML from outside this
- * repository — the same rule the Learn section follows.
+ * repository.
  */
 import type { MarkdownInstance } from 'astro';
 

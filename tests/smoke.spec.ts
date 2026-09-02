@@ -455,10 +455,17 @@ test.describe('a question can be linked', () => {
   test('a tampered link falls back instead of rendering what it was given', async ({ page }) => {
     for (const bad of ['<script>alert(1)</script>', 'l99999', 'p0.999', 'nonsense']) {
       await page.goto(`/ask/?q=${encodeURIComponent(bad)}`);
-      const shown = (await page.locator('[data-ask-question]').textContent())?.trim() ?? '';
+      const question = page.locator('[data-ask-question]');
+      const shown = (await question.textContent())?.trim() ?? '';
       expect(shown.startsWith('What if')).toBe(true);
-      expect(shown).not.toContain('script');
+      // The payload itself must never appear, and nothing may have become
+      // markup. Testing for the bare word "script" was a false positive waiting
+      // to happen — one of the real questions is "What if the absence of a
+      // script is the freedom?" — and it never proved anything the two checks
+      // below do not.
       expect(shown).not.toContain(bad);
+      expect(await question.evaluate((el) => el.children.length)).toBe(0);
+      expect(shown).not.toMatch(/[<>]/);
     }
   });
 
@@ -1405,12 +1412,7 @@ test('the English-only list matches what was actually built', () => {
  * site written for people who are new and being careful.
  */
 test.describe('the language picker keeps your place', () => {
-  const KEEPS = [
-    '/learn/spotting-a-scam/',
-    '/zh/learn/self-custody-basics/',
-    '/stats/',
-    '/es/memes/',
-  ];
+  const KEEPS = ['/stats/', '/es/memes/'];
 
   for (const path of KEEPS) {
     test(`${path} offers the same page in every language`, async ({ page }) => {
@@ -1454,8 +1456,6 @@ const PHONE_PAGES = [
   '/memes/meme-two-buttons-sell-or-hold/',
   '/ask/',
   '/ask/day/2026-08-01/',
-  '/learn/',
-  '/learn/spotting-a-scam/',
   '/docs/',
   '/docs/the-token/',
   '/brand/',

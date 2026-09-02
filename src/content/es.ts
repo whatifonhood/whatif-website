@@ -29,7 +29,6 @@ export const es: SiteCopy = {
       memes: { label: 'La bóveda', blurb: 'Róbalos, son gratis' },
       stats: { label: 'Datos', blurb: 'Cada número, en vivo' },
       holdings: { label: 'Consulta de wallet', blurb: 'Sin conectar nada' },
-      learn: { label: 'Aprende', blurb: 'Seguridad, bases y pruebas' },
       docs: { label: 'Libro blanco', blurb: 'Todo, por escrito' },
       roadmap: { label: 'Hoja de ruta', blurb: 'Lo que está hecho, y lo que viene' },
       brand: { label: 'Marca', blurb: 'Logos y material gráfico' },
@@ -439,18 +438,6 @@ export const es: SiteCopy = {
       possibilities: 'preguntas posibles',
       hint: 'pulsa espacio para otra',
       shareText: '{question}\n\nSeguimos preguntando.',
-    },
-    learn: {
-      title: 'Aprende',
-      eyebrow: 'Aprende',
-      heading: { lead: 'Entiende', accent: 'lo que haces.' },
-      intro:
-        'Cómo funciona esto, cómo mantener tu dinero a salvo y cómo verificar por ti mismo cada afirmación de este sitio. La seguridad primero.',
-      backToIndex: 'Todas las páginas',
-      next: 'Siguiente:',
-      previous: 'Anterior:',
-      categories: { safety: 'Mantente a salvo', basics: 'Lo básico', token: 'Este token' },
-      updatedLabel: 'Actualizado',
     },
     roadmap: {
       title: 'Hoja de ruta',
