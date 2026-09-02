@@ -14,31 +14,40 @@
  * so out loud.
  */
 
+/**
+ * The sidebar headings are ids, not words.
+ *
+ * The paper is published in four languages, so a group's label belongs in
+ * src/content/<language>.ts with everything else a reader sees. Adding a group
+ * here fails typecheck until all four have named it.
+ */
+export const DOCS_GROUP_IDS = ['coin', 'proof', 'underTheHood', 'using', 'straight'] as const;
+export type DocsGroupId = (typeof DOCS_GROUP_IDS)[number];
+
 export interface DocsGroup {
-  /** Shown as the sidebar heading. */
-  title: string;
+  id: DocsGroupId;
   slugs: string[];
 }
 
 export const DOCS_GROUPS: DocsGroup[] = [
   {
-    title: 'The coin',
+    id: 'coin',
     slugs: ['introduction', 'the-thesis', 'the-token'],
   },
   {
-    title: 'Proof',
+    id: 'proof',
     slugs: ['supply-and-burn', 'who-holds-it', 'verify-it-yourself'],
   },
   {
-    title: 'Under the hood',
+    id: 'underTheHood',
     slugs: ['the-chain', 'the-launch', 'liquidity-and-the-lock', 'how-the-burn-works'],
   },
   {
-    title: 'Using it',
+    id: 'using',
     slugs: ['how-to-buy', 'wallets-and-custody', 'the-tools'],
   },
   {
-    title: 'Straight answers',
+    id: 'straight',
     slugs: ['risks', 'what-we-do-not-claim', 'reference'],
   },
 ];

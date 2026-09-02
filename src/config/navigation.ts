@@ -59,9 +59,7 @@ export function localePath(href: string, locale: string): string {
  * it cannot quietly go stale.
  */
 const ENGLISH_ONLY: readonly RegExp[] = [
-  /^\/docs\//, // the white paper
   /^\/ask\/day\//, // the archive of past questions
-  /^\/pfp\/[^/]+\//, // one coin's own page — the generator itself is translated
   /^\/404\/?$/,
   /^\/rss\.xml$/,
 ];

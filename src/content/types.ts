@@ -1,4 +1,5 @@
 import type { ToolGroup, ToolId } from '../config/navigation.ts';
+import type { DocsGroupId } from '../config/docs.ts';
 import type { RoadmapTrack as RoadmapTrackKey } from '../config/roadmap.ts';
 
 /**
@@ -363,6 +364,32 @@ export interface SiteCopy {
       hint: string;
       /** `{question}` is replaced with the generated line. */
       shareText: string;
+    };
+    /** The white paper: its contents page, and the furniture around every page. */
+    docs: {
+      title: string;
+      description: string;
+      eyebrow: string;
+      heading: SplitHeading;
+      intro: string;
+      /** Above the contract address on the contents page. */
+      contractLabel: string;
+      contractNote: string;
+      /**
+       * Sidebar headings, keyed by DOCS_GROUP_IDS in src/config/docs.ts, so a
+       * new group cannot ship until all four languages have named it.
+       */
+      groups: Record<DocsGroupId, string>;
+      /** The link at the top of the sidebar, back to the contents page. */
+      backToContents: string;
+      /** The collapsed contents on a phone. */
+      contents: string;
+      /** The column listing this page's own headings. */
+      onThisPage: string;
+      previous: string;
+      next: string;
+      /** aria-label for the prev/next pair. */
+      moreOfThePaper: string;
     };
     roadmap: {
       title: string;

@@ -1,0 +1,16 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CoinPage from '../../../components/pages/CoinPage.astro';
+import { COINS } from '../../../config/coins.ts';
+import { LOCALES, type Locale } from '../../../config/site.ts';
+
+/** Every coin's own page, in every language except English. */
+export const getStaticPaths = (() =>
+  LOCALES.filter((locale) => locale !== 'en').flatMap((locale) =>
+    COINS.map((coin) => ({ params: { locale, slug: coin.slug }, props: { locale, coin } })),
+  )) satisfies GetStaticPaths;
+
+const { locale, coin } = Astro.props as { locale: Locale; coin: (typeof COINS)[number] };
+---
+
+<CoinPage locale={locale} coin={coin} />

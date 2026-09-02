@@ -426,6 +426,31 @@ export const tr: SiteCopy = {
       hint: 'yenisi için boşluğa bas',
       shareText: '{question}\n\nHâlâ soruyoruz.',
     },
+    docs: {
+      title: '$IF teknik dokümanı',
+      description:
+        '$IF nedir, ne değildir, nasıl alınır ve buradaki her rakamı kendin nasıl doğrularsın.',
+      eyebrow: 'Teknik doküman',
+      heading: { lead: '$IF hakkında her şey,', accent: 'yazılı hâlde' },
+      intro:
+        'Coin nedir, ne değildir, nasıl alınır ve buradaki hiçbir rakam için sözümüze güvenmeden hepsini kendin doğrulayabileceğin komutlar.',
+      contractLabel: 'Sözleşme',
+      contractNote:
+        'Robinhood Chain üzerinde tek bir adres. Bunun dışındaki hiçbir şey bu coin değildir.',
+      groups: {
+        coin: 'Coin',
+        proof: 'Kanıt',
+        underTheHood: 'Kaputun altı',
+        using: 'Kullanım',
+        straight: 'Net cevaplar',
+      },
+      backToContents: 'Teknik doküman',
+      contents: 'İçindekiler',
+      onThisPage: 'Bu sayfada',
+      previous: 'Önceki',
+      next: 'Sonraki',
+      moreOfThePaper: 'Dokümanın devamı',
+    },
     roadmap: {
       title: 'Yol haritası',
       eyebrow: 'Yol haritası',

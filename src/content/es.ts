@@ -439,6 +439,30 @@ export const es: SiteCopy = {
       hint: 'pulsa espacio para otra',
       shareText: '{question}\n\nSeguimos preguntando.',
     },
+    docs: {
+      title: 'El libro blanco de $IF',
+      description:
+        'Qué es $IF, qué no es, cómo comprarlo y cómo comprobar cada cifra por tu cuenta.',
+      eyebrow: 'Libro blanco',
+      heading: { lead: 'Todo sobre $IF,', accent: 'por escrito' },
+      intro:
+        'Qué es la moneda, qué no es, cómo comprarla y los comandos exactos para comprobar cada cifra de esta página sin creerte nada de lo que decimos.',
+      contractLabel: 'El contrato',
+      contractNote: 'Una sola dirección, en Robinhood Chain. Cualquier otra no es esta moneda.',
+      groups: {
+        coin: 'La moneda',
+        proof: 'Pruebas',
+        underTheHood: 'Por dentro',
+        using: 'Cómo usarla',
+        straight: 'Respuestas claras',
+      },
+      backToContents: 'Libro blanco',
+      contents: 'Contenido',
+      onThisPage: 'En esta página',
+      previous: 'Anterior',
+      next: 'Siguiente',
+      moreOfThePaper: 'Más del libro blanco',
+    },
     roadmap: {
       title: 'Hoja de ruta',
       eyebrow: 'Hoja de ruta',

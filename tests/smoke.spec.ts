@@ -274,19 +274,26 @@ test.describe('the wallet lookup', () => {
       { value: 'hello', expect: /starts with 0x/i },
     ];
     /*
-     * A fresh page per case, because all three write into the same element.
-     * Asserting straight after the click let the previous case's message
-     * satisfy `toHaveText` — the text was never empty in between, so the
-     * retry loop had nothing to wait for and simply matched the stale one
-     * until it timed out. It surfaced first on Firefox, under the load of
-     * three projects running at once, but nothing about it was Firefox's.
+     * All three cases write into the same element, so the previous message is
+     * cleared before each one. Without that, asserting straight after a click
+     * let case one's text satisfy case two's `toHaveText`: the element was
+     * never empty in between, so the retry loop had nothing to wait for and
+     * matched the stale value until it timed out.
+     *
+     * Clearing rather than reloading. A reload races the module that attaches
+     * the submit handler, and the click then does nothing at all — which is
+     * the same failure wearing a different hat.
      */
+    const error = page.locator('[data-holdings-error]');
     for (const item of cases) {
-      await page.reload();
+      await error.evaluate((node: HTMLElement) => {
+        node.textContent = '';
+        node.hidden = true;
+      });
       await page.locator('[data-holdings-input]').fill(item.value);
       await page.locator('[data-holdings-form] button').click();
-      await expect(page.locator('[data-holdings-error]')).toBeVisible();
-      await expect(page.locator('[data-holdings-error]')).toHaveText(item.expect);
+      await expect(error).toBeVisible();
+      await expect(error).toHaveText(item.expect);
     }
   });
 
@@ -1421,7 +1428,7 @@ test('the English-only list matches what was actually built', () => {
  * site written for people who are new and being careful.
  */
 test.describe('the language picker keeps your place', () => {
-  const KEEPS = ['/stats/', '/es/memes/'];
+  const KEEPS = ['/stats/', '/es/memes/', '/docs/the-token/', '/zh/docs/risks/'];
 
   for (const path of KEEPS) {
     test(`${path} offers the same page in every language`, async ({ page }) => {
@@ -1437,9 +1444,13 @@ test.describe('the language picker keeps your place', () => {
     });
   }
 
-  /** No translation to keep: the white paper is English only. */
+  /**
+   * No translation to keep: the daily archive is English only, because the
+   * questions it archives are. The white paper used to be the example here and
+   * is not any more, which is the good kind of test failure.
+   */
   test('a page with no translation falls back to that language home', async ({ page }) => {
-    await page.goto('/docs/the-token/');
+    await page.goto('/ask/day/2026-08-01/');
     expect(await page.locator('a[hreflang="zh"]').first().getAttribute('href')).toBe('/zh/');
     await expect(
       page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])'),
