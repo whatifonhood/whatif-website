@@ -1176,6 +1176,32 @@ const metrics = [
     padding: 0.35rem 0.55rem;
   }
 
+  /*
+   * On a touch screen, every one of these is a 44px target.
+   *
+   * They were 30px tall — over the 24px WCAG minimum, but sitting directly
+   * above a chart that pans and zooms under the same finger, so a miss did not
+   * do nothing, it dragged the chart. Keyed off `pointer: coarse` rather than a
+   * width, because what makes a target hard to hit is the finger, not the
+   * viewport: a touchscreen laptop gets the big targets and a narrow desktop
+   * window does not need them.
+   */
+  @media (pointer: coarse) {
+    .tf-chip,
+    .chart-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      min-width: 44px;
+      padding-inline: 0.85rem;
+    }
+    .tf-chip-icon {
+      display: inline-flex;
+      padding-inline: 0.6rem;
+    }
+  }
+
   .chart-bound {
     position: absolute;
     right: 0.75rem;
