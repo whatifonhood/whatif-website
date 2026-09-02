@@ -11,13 +11,28 @@
 
 @import 'tailwindcss';
 
-/* Self-hosted. No third-party font host, no extra DNS lookup, no tracking.
-   Each file carries a unicode-range, so English pages fetch only latin. */
-@import '@fontsource/archivo/400.css';
-@import '@fontsource/archivo/600.css';
-@import '@fontsource/archivo/900-italic.css';
-@import '@fontsource/jetbrains-mono/400.css';
-@import '@fontsource/jetbrains-mono/700.css';
+/*
+ * Self-hosted. No third-party font host, no extra DNS lookup, no tracking.
+ *
+ * Subsets are named one by one rather than importing the whole weight, because
+ * the whole weight is Cyrillic, Greek and Vietnamese too — eleven files this
+ * site has no page for. Each face still carries its unicode-range, so a browser
+ * downloads only what the text on screen needs.
+ *
+ * latin covers English and Spanish, and Turkish dotless i (U+0131); latin-ext
+ * covers the rest of Turkish (ğ, ş, İ). Chinese has no coverage in either face
+ * and falls back to the system stack, which is what a CJK reader wants anyway.
+ */
+@import '@fontsource/archivo/latin-400.css';
+@import '@fontsource/archivo/latin-ext-400.css';
+@import '@fontsource/archivo/latin-600.css';
+@import '@fontsource/archivo/latin-ext-600.css';
+@import '@fontsource/archivo/latin-900-italic.css';
+@import '@fontsource/archivo/latin-ext-900-italic.css';
+@import '@fontsource/jetbrains-mono/latin-400.css';
+@import '@fontsource/jetbrains-mono/latin-ext-400.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
+@import '@fontsource/jetbrains-mono/latin-ext-700.css';
 
 @theme {
   /* Tailwind ships its own `lime` scale. Removing it means `text-lime-400`
