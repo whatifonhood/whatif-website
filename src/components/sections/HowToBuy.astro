@@ -74,6 +74,13 @@ const VENUES: Record<string, { url: string; logo: LogoName }> = {
   <h3 class="mt-16 font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
     {copy.buy.venuesTitle}
   </h3>
+  <!--
+    A row on a phone, a card from `sm` up.
+    Five stacked cards were 950px — a screen and a half of a 664px phone for
+    five outbound links, and the longest thing in the longest section on the
+    page. Laid on their side they are the same five links in half the height,
+    and closer to what a list of links wants to look like on a phone anyway.
+  -->
   <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" data-reveal>
     {
       copy.buy.venues.map((venue) => {
@@ -83,20 +90,30 @@ const VENUES: Record<string, { url: string; logo: LogoName }> = {
             href={target?.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="card card-hover shimmer group flex flex-col items-start gap-3 p-5"
+            class="card card-hover shimmer group flex flex-row items-center gap-4 p-4 sm:flex-col sm:items-start sm:gap-3 sm:p-5"
           >
-            <span class="grid h-12 w-12 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/10">
-              {target && <ToolLogo name={target.logo} size={30} class="h-[30px] w-[30px]" />}
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/10 sm:h-12 sm:w-12">
+              {target && (
+                <ToolLogo
+                  name={target.logo}
+                  size={30}
+                  class="h-[26px] w-[26px] sm:h-[30px] sm:w-[30px]"
+                />
+              )}
             </span>
-            <span class="flex items-center gap-1.5 font-display font-semibold text-ink">
-              {venue.label}
-              <Icons
-                name="arrow-up-right"
-                size={12}
-                class="text-faint transition-colors group-hover:text-lime"
-              />
+            <span class="min-w-0">
+              <span class="flex items-center gap-1.5 font-display font-semibold text-ink">
+                {venue.label}
+                <Icons
+                  name="arrow-up-right"
+                  size={12}
+                  class="text-faint transition-colors group-hover:text-lime"
+                />
+              </span>
+              <span class="mt-0.5 block text-sm leading-relaxed text-muted sm:mt-3">
+                {venue.blurb}
+              </span>
             </span>
-            <span class="text-sm leading-relaxed text-muted">{venue.blurb}</span>
           </a>
         );
       })
