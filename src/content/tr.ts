@@ -18,6 +18,7 @@ export const tr: SiteCopy = {
       stats: { label: 'Veriler', blurb: 'Her rakam canlı' },
       holdings: { label: 'Cüzdan sorgusu', blurb: 'Bağlantı gerekmez' },
       learn: { label: 'Öğren', blurb: 'Güvenlik, temeller ve kanıt' },
+      docs: { label: 'Teknik doküman', blurb: 'Her şey, yazılı hâlde' },
       roadmap: { label: 'Güncellemeler', blurb: 'En yenisi en üstte' },
       brand: { label: 'Marka', blurb: 'Logolar ve görseller' },
     },
