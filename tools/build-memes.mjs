@@ -10,9 +10,11 @@
  * Requires ImageMagick 7 (`brew install imagemagick`).
  */
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { writeConfig } from './lib/write-config.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -171,5 +173,8 @@ export const MEME_SERIES = ${JSON.stringify(seriesPresent)} as const;
 export const MEMES: Meme[] = ${JSON.stringify(entries, null, 2)};
 `;
 
-writeFileSync(join(root, 'src', 'config', 'memes.ts'), output);
+// Through writeConfig, not writeFileSync: JSON.stringify emits double quotes and
+// no trailing commas, which is not this repo's Prettier style, so every run left
+// `npm run format:check` failing on a file the generator had just written.
+await writeConfig(join(root, 'src', 'config', 'memes.ts'), output);
 process.stdout.write(`\n${entries.length} memes written\n`);
