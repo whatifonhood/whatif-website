@@ -31,7 +31,7 @@ export const es: SiteCopy = {
       holdings: { label: 'Consulta de wallet', blurb: 'Sin conectar nada' },
       learn: { label: 'Aprende', blurb: 'Seguridad, bases y pruebas' },
       docs: { label: 'Libro blanco', blurb: 'Todo, por escrito' },
-      roadmap: { label: 'Novedades', blurb: 'Lo último, primero' },
+      roadmap: { label: 'Hoja de ruta', blurb: 'Lo que está hecho, y lo que viene' },
       brand: { label: 'Marca', blurb: 'Logos y material gráfico' },
     },
     toolGroups: { data: 'Los números', play: 'Juega', assets: 'Recursos', read: 'Lee' },
@@ -225,7 +225,7 @@ export const es: SiteCopy = {
       },
       {
         q: '¿Hay algún impuesto?',
-        a: 'El contrato de $IF no añade nada por encima de tu operación. El 1 % que verás citado en el pool principal es la comisión propia de Uniswap, que va a quienes aportan liquidez — no a nosotros. El contrato es público en Blockscout; léelo en lugar de creerle a una página web.',
+        a: 'El contrato de $IF no añade nada por encima de tu operación — no lleva ninguna lógica de comisiones. El 1 % que verás citado en el pool principal es el tramo de comisión propio de Uniswap, que ganan las posiciones de liquidez. La mayor de ellas es la posición de lanzamiento, bloqueada de forma permanente, y su parte la recoge el launchpad que creó el token: la parte en $IF se quema, la parte en ETH no. Nada de eso llega a esta comunidad. El libro blanco tiene el flujo completo.',
       },
       {
         q: '¿Qué se ha quemado?',
@@ -310,6 +310,8 @@ export const es: SiteCopy = {
       sellLabel: 'Venta',
       viewTx: 'Ver',
       loading: 'Leyendo la cadena…',
+      feedUnavailable: 'No se pudieron leer las operaciones recientes. Reintentando.',
+      chartUnavailable: 'El historial de precios no está disponible ahora mismo.',
       failed:
         'No se pudo acceder a los datos de mercado en este momento. Las cifras de arriba son de la última compilación.',
       feedNote: 'Las operaciones más recientes en el pool IF/WETH.',
@@ -464,7 +466,44 @@ export const es: SiteCopy = {
         shipped: 'Ya lanzado',
       },
       shippedCount: 'cosas lanzadas hasta ahora',
-      note: 'No se promete ninguna fecha para lo que aún no ha ocurrido. Esto es una meme coin, y una fecha es la promesa más fácil de romper en cripto — lo lanzado lleva fecha porque ya pasó.',
+      record: { shipped: 'Lanzado', inProgress: 'En construcción', latest: 'Más reciente' },
+      tracks: {
+        proof: {
+          label: 'Pruebas',
+          objective:
+            'Cada número de este sitio puede reproducirlo desde la cadena alguien que no confíe en nosotros.',
+        },
+        tools: {
+          label: 'Herramientas',
+          objective:
+            'Cosas que vale la pena abrir. Ninguna te pide conectar una wallet ni firmar nada.',
+        },
+        words: {
+          label: 'Palabras',
+          objective:
+            'Que se lean en el idioma en el que piensas — las páginas sobre mantenerte a salvo antes que las que hablan de nosotros.',
+        },
+        craft: {
+          label: 'Oficio',
+          objective: 'Tiene que funcionar en un teléfono viejo, con mala conexión, a la primera.',
+        },
+      },
+      needsLabel: 'Depende de',
+      signalLabel: 'Listo cuando',
+      log: {
+        title: 'El registro',
+        intro:
+          'Todo lo ya construido, lo más nuevo primero, y cada cosa enlaza a sí misma. Esta es la parte de una hoja de ruta que sí se ha probado.',
+      },
+      terms: {
+        title: 'Lo que esta hoja de ruta no va a hacer',
+        items: [
+          'Ponerle fecha a algo que no ha ocurrido. Lo lanzado lleva fecha porque ya pasó; una fecha para el resto es la promesa más fácil de romper en cripto.',
+          'Mencionar un precio, una capitalización de mercado o un objetivo. Nada de esta página es una razón para comprar nada.',
+          'Listar una alianza, un listado o una integración antes de que exista y se pueda abrir.',
+          'Lanzar algo que te pida conectar una wallet o firmar un mensaje. Si eso cambia alguna vez, aparecerá en esta página como una línea antes de aparecer como una función.',
+        ],
+      },
     },
     holdings: {
       title: 'Consulta de wallet',

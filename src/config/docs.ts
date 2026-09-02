@@ -30,6 +30,10 @@ export const DOCS_GROUPS: DocsGroup[] = [
     slugs: ['supply-and-burn', 'who-holds-it', 'verify-it-yourself'],
   },
   {
+    title: 'Under the hood',
+    slugs: ['the-chain', 'the-launch', 'liquidity-and-the-lock', 'how-the-burn-works'],
+  },
+  {
     title: 'Using it',
     slugs: ['how-to-buy', 'wallets-and-custody', 'the-tools'],
   },

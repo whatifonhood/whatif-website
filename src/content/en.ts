@@ -19,7 +19,7 @@ export const en: SiteCopy = {
       holdings: { label: 'Wallet lookup', blurb: 'No connection needed' },
       learn: { label: 'Learn', blurb: 'Safety, basics, and proof' },
       docs: { label: 'White paper', blurb: 'The whole thing, written down' },
-      roadmap: { label: 'Updates', blurb: 'What changed, newest first' },
+      roadmap: { label: 'Roadmap', blurb: 'What is built, and what is next' },
       brand: { label: 'Brand', blurb: 'Logos and artwork' },
     },
     toolGroups: { data: 'The numbers', play: 'Play', assets: 'Assets', read: 'Read' },
@@ -213,7 +213,7 @@ export const en: SiteCopy = {
       },
       {
         q: 'Is there a tax?',
-        a: "Nothing is added by the $IF contract on top of your trade. The 1% you'll see quoted on the main pool is Uniswap's own fee tier, which goes to the people providing liquidity — not to us. The contract is public on Blockscout; read it rather than taking a website's word for it.",
+        a: "Nothing is added by the $IF contract on top of your trade — it has no fee logic in it at all. The 1% quoted on the main pool is Uniswap's own fee tier, earned by the liquidity positions. The largest of those is the permanently locked launch position, and its share is swept by the launchpad that created the token: the $IF side is burned, the ETH side is not. None of it reaches this community. The white paper has the whole flow.",
       },
       {
         q: 'What has been burned?',
@@ -298,6 +298,8 @@ export const en: SiteCopy = {
       sellLabel: 'Sell',
       viewTx: 'View',
       loading: 'Reading the chain…',
+      feedUnavailable: 'Could not read recent trades. Trying again.',
+      chartUnavailable: 'Price history is not available right now.',
       failed:
         'Could not reach the market data just now. The figures above are from the last build.',
       feedNote: 'The most recent trades on the IF/WETH pool.',
@@ -446,7 +448,44 @@ export const en: SiteCopy = {
         shipped: 'Already shipped',
       },
       shippedCount: 'things shipped so far',
-      note: 'No dates are promised for anything that has not happened yet. This is a meme coin, and a date is the easiest promise in crypto to break — shipped items are dated because those already happened.',
+      record: { shipped: 'Shipped', inProgress: 'Being built', latest: 'Most recent' },
+      tracks: {
+        proof: {
+          label: 'Proof',
+          objective:
+            'Every number on this site can be reproduced from the chain by somebody who does not trust us.',
+        },
+        tools: {
+          label: 'Tools',
+          objective:
+            'Things worth opening. None of them ask you to connect a wallet or sign anything.',
+        },
+        words: {
+          label: 'Words',
+          objective:
+            'Readable in the language you think in — the pages about staying safe before the pages about us.',
+        },
+        craft: {
+          label: 'Craft',
+          objective: 'It has to work on an old phone, on a bad connection, on the first try.',
+        },
+      },
+      needsLabel: 'Waiting on',
+      signalLabel: 'Done when',
+      log: {
+        title: 'The log',
+        intro:
+          'Everything already built, newest first, each one linking to itself. This is the part of a roadmap that has actually been tested.',
+      },
+      terms: {
+        title: 'What this roadmap will not do',
+        items: [
+          'Put a date on anything that has not happened. Shipped items carry a date because those already happened; a date on the rest is the easiest promise in crypto to break.',
+          'Mention a price, a market cap or a target. Nothing on this page is a reason to buy anything.',
+          'List a partnership, a listing or an integration before it exists and can be opened.',
+          'Ship anything that asks you to connect a wallet or sign a message. If that ever changes, it will appear on this page as a line before it appears as a feature.',
+        ],
+      },
     },
     holdings: {
       title: 'Wallet lookup',

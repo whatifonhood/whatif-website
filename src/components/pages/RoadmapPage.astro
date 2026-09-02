@@ -1,17 +1,29 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { ROADMAP, ROADMAP_STATUSES } from '../../config/roadmap.ts';
+import { ROADMAP, ROADMAP_STATUSES, ROADMAP_TRACKS } from '../../config/roadmap.ts';
 import { SITE, type Locale } from '../../config/site.ts';
+import { toolPath } from '../../config/navigation.ts';
 import { getCopy } from '../../content/index.ts';
+import Icons from '../ui/Icons.astro';
 
 /**
  * The roadmap.
  *
- * Shipped work stays on the page rather than being deleted once it lands. A
- * roadmap showing only the future is a wish list; the record of what actually
- * arrived is the part that earns any trust in the rest of it.
+ * Four parts, in the order they earn the reader's attention:
  *
- * No dates are promised for unshipped work, deliberately.
+ *   1. the record  — what has actually been delivered, as three figures
+ *   2. the tracks  — what the work is for, and how far each one has got
+ *   3. the work    — what is live, next and later, each with its dependency
+ *                    and the condition that will make it done
+ *   4. the log     — every shipped item, dated, linking to itself
+ *
+ * Then the terms: the four things this roadmap refuses to do. They are last
+ * because they are only worth reading once you have seen the record — and they
+ * are on the page rather than in a comment because a constraint nobody can read
+ * is not a constraint.
+ *
+ * No dates are promised for unshipped work, deliberately. `npm run roadmap`
+ * fails the build if one appears.
  */
 interface Props {
   locale: Locale;
@@ -26,7 +38,48 @@ const formatDate = (iso: string) =>
     new Date(`${iso}T12:00:00Z`),
   );
 
-const shippedCount = ROADMAP.filter((item) => item.status === 'shipped').length;
+const shipped = ROADMAP.filter((item) => item.status === 'shipped');
+const building = ROADMAP.filter((item) => item.status === 'building');
+
+/*
+ * The figures. Derived from the list rather than typed, so they cannot disagree
+ * with it, and neither is measured against "now" — a static page that says
+ * "3 days ago" is wrong by the following morning.
+ *
+ * The date of the most recent ship is a dateline under the row, not a third
+ * figure in it: set at the same size as two-digit counts it wrapped onto two
+ * lines and pulled the whole row off balance, and a long-form date is never the
+ * same length twice across four languages.
+ */
+const latest =
+  shipped
+    .map((item) => item.date ?? '')
+    .sort()
+    .at(-1) ?? '';
+const record = [
+  { value: String(shipped.length), label: page.record.shipped },
+  { value: String(building.length), label: page.record.inProgress },
+];
+
+/** Shipped per track, for the progress rail. */
+const tracks = ROADMAP_TRACKS.map((track) => {
+  const items = ROADMAP.filter((item) => item.track === track);
+  const done = items.filter((item) => item.status === 'shipped').length;
+  return { track, done, total: items.length, percent: (done / items.length) * 100 };
+});
+
+/** The log: shipped work grouped by the day it landed, newest first. */
+const days = [...new Set(shipped.map((item) => item.date ?? ''))]
+  .filter(Boolean)
+  .sort()
+  .reverse()
+  .map((date) => ({ date, items: shipped.filter((item) => item.date === date) }));
+
+/** Building, next and later. Shipped has its own section below. */
+const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((status) => ({
+  status,
+  items: ROADMAP.filter((item) => item.status === status),
+}));
 ---
 
 <PageLayout
@@ -39,61 +92,163 @@ const shippedCount = ROADMAP.filter((item) => item.status === 'shipped').length;
   socialImage={`${SITE.url}/og-roadmap.jpg`}
 >
   <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
-    <p class="mb-10 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
-      <span class="text-lime">{shippedCount}</span>
-      {' '}{page.shippedCount}
-    </p>
-
-    <div class="flex flex-col gap-12">
+    <!-- 1. The record. -->
+    <div class="border-y border-line py-7">
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-7">
+        {
+          record.map((figure) => (
+            <div>
+              <dd class="font-display text-4xl font-black italic tabular-nums tracking-tight text-ink sm:text-5xl">
+                {figure.value}
+              </dd>
+              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+                {figure.label}
+              </dt>
+            </div>
+          ))
+        }
+      </dl>
       {
-        ROADMAP_STATUSES.map((status) => {
-          const items = ROADMAP.filter((item) => item.status === status);
-          return (
+        latest && (
+          <p class="mt-6 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+            {page.record.latest}
+            {' · '}
+            <time datetime={latest} class="text-muted">
+              {formatDate(latest)}
+            </time>
+          </p>
+        )
+      }
+    </div>
+
+    <!-- 2. The tracks: what the work is for, and how far each has got. -->
+    <ul class="mt-12 grid gap-5 sm:grid-cols-2">
+      {
+        tracks.map(({ track, done, total, percent }) => (
+          <li class="track">
+            <div class="flex items-baseline justify-between gap-3">
+              <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+                {page.tracks[track].label}
+              </h2>
+              <p class="font-mono text-[10px] tabular-nums tracking-wider text-faint">
+                {done}/{total}
+              </p>
+            </div>
+            <p class="mt-2.5 text-sm leading-relaxed text-muted">{page.tracks[track].objective}</p>
+            <div
+              class="track-rail"
+              role="img"
+              aria-label={`${page.tracks[track].label}: ${done}/${total}`}
+            >
+              <span class="track-fill" style={`--done:${percent}%`} />
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- 3. The work in flight. -->
+    <div class="mt-14 flex flex-col gap-11">
+      {
+        openWork.map(
+          ({ status, items }) =>
             items.length > 0 && (
               <section>
-                <h2 class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em]">
+                <h2 class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
                   <span class="road-dot" data-status={status} aria-hidden="true" />
-                  <span class:list={[status === 'shipped' ? 'text-faint' : 'text-lime']}>
-                    {page.statuses[status]}
-                  </span>
+                  {page.statuses[status]}
                 </h2>
 
                 <ol class="mt-5 flex flex-col gap-3">
                   {items.map((item) => (
-                    <li class="card p-6" data-status={status}>
-                      <div class="flex flex-wrap items-baseline justify-between gap-2">
-                        <h3 class="text-lg font-semibold text-ink">{item.title}</h3>
-                        {item.date && (
-                          <time
-                            datetime={item.date}
-                            class="font-mono text-[10px] uppercase tracking-wider text-faint"
-                          >
-                            {formatDate(item.date)}
-                          </time>
-                        )}
-                      </div>
+                    <li class="card p-6">
+                      <p class="track-chip">{page.tracks[item.track].label}</p>
+                      <h3 class="mt-3 text-lg font-semibold text-ink">{item.title}</h3>
                       <p class="mt-2 leading-relaxed text-muted">{item.body}</p>
-                      {item.href && (
-                        <a
-                          href={item.href}
-                          class="mt-3 inline-block font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
-                        >
-                          {page.open}
-                        </a>
+
+                      {(item.needs || item.signal) && (
+                        <dl class="mt-5 flex flex-col gap-3 border-t border-line pt-4">
+                          {item.needs && (
+                            <div class="gate">
+                              <dt>{page.needsLabel}</dt>
+                              <dd>{item.needs}</dd>
+                            </div>
+                          )}
+                          {item.signal && (
+                            <div class="gate" data-signal>
+                              <dt>{page.signalLabel}</dt>
+                              <dd>{item.signal}</dd>
+                            </div>
+                          )}
+                        </dl>
                       )}
                     </li>
                   ))}
                 </ol>
               </section>
-            )
-          );
-        })
+            ),
+        )
       }
     </div>
 
-    <p class="mt-14 border-t border-line pt-8 text-sm leading-relaxed text-faint">
-      {page.note}
-    </p>
+    <!-- 4. The log. -->
+    <section class="mt-16">
+      <h2
+        class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
+      >
+        <span class="road-dot" data-status="shipped" aria-hidden="true"></span>
+        {page.log.title}
+      </h2>
+      <p class="mt-4 max-w-2xl leading-relaxed text-muted">{page.log.intro}</p>
+
+      <ol class="log mt-8">
+        {
+          days.map((day) => (
+            <li class="log-day">
+              <time datetime={day.date} class="log-date">
+                {formatDate(day.date)}
+              </time>
+              <ul class="mt-3 flex flex-col gap-3">
+                {day.items.map((item) => (
+                  <li class="card p-5">
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <p class="track-chip">{page.tracks[item.track].label}</p>
+                      <h3 class="font-semibold text-ink">{item.title}</h3>
+                    </div>
+                    <p class="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
+                    {item.href && (
+                      <a href={toolPath(item.href, locale)} class="log-link">
+                        {page.open}
+                        <Icons name="arrow-up-right" size={12} />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <!-- The terms. Last, because they are only worth reading after the record. -->
+    <section class="mt-16 border-t border-line pt-10">
+      <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+        {page.terms.title}
+      </h2>
+      <ol class="mt-5 flex flex-col gap-4">
+        {
+          page.terms.items.map((term, index) => (
+            <li class="flex gap-4">
+              <span class="mt-0.5 font-mono text-[11px] tabular-nums text-lime">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <p class="text-sm leading-relaxed text-faint">{term}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
   </div>
 </PageLayout>
 
@@ -109,20 +264,123 @@ const shippedCount = ROADMAP.filter((item) => item.status === 'shipped').length;
     box-shadow: 0 0 0 4px rgb(143 206 2 / 0.18);
   }
   .road-dot[data-status='next'] {
-    background: var(--color-lime-mid, #86b50b);
+    background: var(--color-lime-mid);
   }
   .road-dot[data-status='later'] {
     background: var(--color-line);
   }
   .road-dot[data-status='shipped'] {
-    background: var(--color-lime-deep, #305b05);
+    background: var(--color-lime-deep);
   }
 
-  /* Shipped work is history, so it sits back from the work that is live. */
-  .card[data-status='shipped'] {
-    opacity: 0.75;
+  /* ---- the tracks */
+  .track {
+    border-left: 2px solid var(--color-line);
+    padding-left: 1.15rem;
   }
-  .card[data-status='shipped']:hover {
-    opacity: 1;
+  .track-rail {
+    margin-top: 1rem;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--color-line);
+  }
+  .track-fill {
+    display: block;
+    height: 100%;
+    width: var(--done);
+    border-radius: 999px;
+    background: var(--color-lime);
+  }
+
+  .track-chip {
+    display: inline-block;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-lime) 14%, transparent);
+    padding: 0.2rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-lime);
+  }
+
+  /* ---- what an unshipped item is waiting on, and what will finish it */
+  .gate dt {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  .gate dd {
+    margin-top: 0.35rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .gate[data-signal] dd {
+    color: var(--color-ink);
+  }
+
+  /* ---- the log, as a dated rail */
+  .log-day {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  .log-day + .log-day {
+    margin-top: 2.25rem;
+  }
+  .log-day::before {
+    content: '';
+    position: absolute;
+    top: 0.55rem;
+    bottom: -2.25rem;
+    left: 3px;
+    width: 1px;
+    background: var(--color-line);
+  }
+  .log-day:last-child::before {
+    bottom: auto;
+    height: 0;
+  }
+  .log-day::after {
+    content: '';
+    position: absolute;
+    top: 0.4rem;
+    left: 0;
+    height: 7px;
+    width: 7px;
+    border-radius: 999px;
+    background: var(--color-lime-deep);
+  }
+  .log-date {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+
+  .log-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.85rem;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-lime);
+  }
+  .log-link:hover {
+    text-decoration: underline;
+  }
+  /* A 44px link needs no extra height on a mouse, where it is only a word. */
+  @media (pointer: fine) {
+    .log-link {
+      min-height: 0;
+      margin-top: 0.75rem;
+    }
   }
 </style>
