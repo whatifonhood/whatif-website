@@ -151,7 +151,7 @@ const metrics = [
         </div>
 
         <div class="flex flex-wrap items-center gap-4">
-          <div class="flex gap-1.5" role="group" aria-label={page.chartTitle}>
+          <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTitle}>
             {
               (['day', 'week', 'month', 'quarter', 'all'] as const).map((frame) => (
                 <button
@@ -166,7 +166,14 @@ const metrics = [
             }
           </div>
 
-          <div class="flex gap-1.5" role="group" aria-label={page.chartTypes.candles}>
+          <!--
+            flex-wrap, not nowrap. Eight controls at a 44px touch target are
+            440px wide; the card is 333px on a phone and clips what does not fit,
+            so Avg, EMA and Log were rendered past the right edge and could not
+            be tapped. The clip is also why nothing looked wrong: the page never
+            scrolled sideways, the buttons were simply not there.
+          -->
+          <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypes.candles}>
             {
               (['candles', 'line'] as const).map((type) => (
                 <button
@@ -269,6 +276,19 @@ const metrics = [
       <div data-ohlc class="ohlc-bar" aria-live="off"></div>
 
       <div data-chart-wrap class="chart-wrap relative border-t border-line">
+        <!--
+          Said, rather than left blank. When the price history cannot be
+          fetched the chart drew its frame and no candles, so the page showed an
+          empty dark rectangle under a full set of working controls and no
+          explanation at all.
+        -->
+        <p
+          data-chart-empty
+          hidden
+          class="absolute inset-0 z-10 grid place-items-center px-6 text-center font-mono text-[11px] uppercase tracking-wider text-faint"
+        >
+          {page.chartUnavailable}
+        </p>
         <svg
           data-chart
           data-direction="up"
@@ -391,7 +411,7 @@ const metrics = [
               href={MARKETS.contract}
               target="_blank"
               rel="noopener noreferrer"
-              class="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
+              class="tap mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
             >
               {page.viewTx}
               <Icons name="arrow-up-right" size={11} />
@@ -488,7 +508,7 @@ const metrics = [
       >
         <g data-pressure-bars></g>
       </svg>
-      <p class="mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">
+      <p class="note mt-3">
         {page.pressureNote}
       </p>
     </div>
@@ -568,7 +588,7 @@ const metrics = [
                 href={`${CHAIN.explorerUrl}/tx/${WEEK.largestBurn.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="mt-1 inline-block font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+                class="tap mt-1 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
               >
                 {page.viewTx}
                 <span class="sr-only">{copy.common.externalLink}</span>
@@ -577,7 +597,7 @@ const metrics = [
           )
         }
       </dl>
-      <p class="mt-5 font-mono text-[10px] uppercase tracking-wider text-faint">
+      <p class="note mt-5">
         {page.weekNote.replace('{date}', WEEK.to)}
       </p>
     </div>
@@ -614,7 +634,7 @@ const metrics = [
                       href={`${CHAIN.explorerUrl}/address/${holder.address}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-ink transition-colors hover:text-lime"
+                      class="-my-3 block py-3 text-ink transition-colors hover:text-lime"
                     >
                       {holder.address.slice(0, 8)}…{holder.address.slice(-6)}
                       <span class="sr-only">{copy.common.externalLink}</span>
@@ -638,7 +658,7 @@ const metrics = [
         </table>
       </div>
 
-      <p class="mt-4 font-mono text-[10px] uppercase tracking-wider text-faint">
+      <p class="note mt-4">
         {page.holderTableNote.replace('{date}', HOLDERS_CAPTURED)}
       </p>
     </div>
@@ -660,7 +680,7 @@ const metrics = [
         <path data-burns-line class="burn-line"></path>
         <g data-burns-dots></g>
       </svg>
-      <p class="mt-3 font-mono text-[10px] uppercase tracking-wider text-faint">
+      <p class="note mt-3">
         {page.burnHistoryNote}
       </p>
 
@@ -692,7 +712,7 @@ const metrics = [
                 href={`${CHAIN.explorerUrl}/tx/${burn.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="shrink-0 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+                class="tap -my-2.5 shrink-0 px-2 py-2.5 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
               >
                 {page.viewTx}
                 <span class="sr-only">{copy.common.externalLink}</span>
@@ -709,10 +729,16 @@ const metrics = [
         <p
           class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
         >
-          <span class="live-dot" aria-hidden="true"></span>
+          <!--
+            Hidden until a trade actually lands. It used to show from first
+            paint, so a page that never reached the API sat on "Reading the
+            chain…" under a live indicator — the one thing this site must not
+            do, on the page whose whole argument is that the numbers are real.
+          -->
+          <span data-feed-live class="live-dot" hidden aria-hidden="true"></span>
           {page.feedTitle}
         </p>
-        <p class="font-mono text-[10px] uppercase tracking-wider text-faint">
+        <p class="note">
           {page.feedNote}
           <span data-feed-updated class="ml-2 text-lime"></span>
           <!--
@@ -724,7 +750,12 @@ const metrics = [
       </div>
 
       <ul data-feed class="divide-y divide-line">
-        <li class="px-6 py-8 text-center font-mono text-[11px] uppercase tracking-wider text-faint">
+        <li
+          data-feed-status
+          data-label-loading={page.loading}
+          data-label-unavailable={page.feedUnavailable}
+          class="px-6 py-8 text-center font-mono text-[11px] uppercase tracking-wider text-faint"
+        >
           {page.loading}
         </li>
       </ul>
@@ -768,8 +799,11 @@ const metrics = [
       Attested checks.
 
       Everything here is asserted by somebody who is not us and links to where it
-      can be re-run. The LP-lock and renounce claims are deliberately absent —
-      they were removed for lack of proof and do not come back without one.
+      can be re-run. The broad "LP locked" and "ownership renounced" claims stay
+      off this panel: the first is only half true, since about half the tradeable
+      depth is ordinary withdrawable liquidity, and the second describes an event
+      that never happened, because the contract never had an owner to give up.
+      Both are set out in full in the white paper.
     -->
     <div class="card mt-3 p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.trustTitle}</p>
@@ -784,7 +818,7 @@ const metrics = [
                     href={CHECK_PROOF[check]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="underline decoration-line underline-offset-4 transition-colors hover:text-lime hover:decoration-lime"
+                    class="tap underline decoration-line underline-offset-4 transition-colors hover:text-lime hover:decoration-lime"
                   >
                     {page.checks[check]}
                     <span class="sr-only">{copy.common.externalLink}</span>
@@ -908,6 +942,21 @@ const metrics = [
   }
   [data-chart-wrap][data-panning='true'] {
     cursor: grabbing;
+  }
+
+  /*
+   * On a phone the grip gives the page back.
+   *
+   * `touch-action: none` is right for a mouse: the whole 24px band is a drag
+   * handle. On a touch screen it made a full-width band across the page where a
+   * vertical swipe resized the chart instead of scrolling — and this sits in the
+   * middle of the longest page on the site. Resizing a chart by dragging is a
+   * mouse affordance; scrolling past it is not optional.
+   */
+  @media (pointer: coarse) {
+    .chart-grip {
+      touch-action: pan-y;
+    }
   }
 
   .chart-grip {
@@ -1081,6 +1130,20 @@ const metrics = [
   }
   .trust-mark[data-state='fail'] {
     background: var(--color-warn);
+  }
+
+  /*
+   * The burn curve's dots are not touch targets.
+   *
+   * Thirty of them sit 2.19px apart in a 285px strip, so each anchor measured
+   * 1.71 x 4.8px. There is no size that makes thirty targets in 285px tappable
+   * — the honest answer is that they are a picture on a phone, and the ten
+   * largest burns below are the same transactions as real, labelled links.
+   */
+  @media (pointer: coarse) {
+    [data-burns-dots] a {
+      pointer-events: none;
+    }
   }
 
   /* Burn curve */

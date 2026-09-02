@@ -12,6 +12,13 @@ import heroArt from '../../assets/hero-cosmos.png';
  * background — so the browser's preload scanner starts fetching it during HTML
  * parsing, before any JavaScript. That single change is most of the difference
  * between a 35-second and a 2-second LCP on a slow phone.
+ *
+ * `min-h-svh`, not `min-h-screen`. 100vh on iOS Safari is the height of the
+ * viewport with the URL bar HIDDEN, so a 100vh hero is taller than what you can
+ * actually see and pushes its own buttons under the fold on first paint. `svh`
+ * is the small viewport — the bar showing — so everything here is visible the
+ * moment the page opens, and the extra space when the bar collapses falls
+ * harmlessly below.
  */
 interface Props {
   locale: Locale;
@@ -48,7 +55,7 @@ const stats = [
 ];
 ---
 
-<section id="top" class="relative flex min-h-screen items-center overflow-hidden">
+<section id="top" class="relative flex min-h-svh items-center overflow-hidden">
   <!-- Artwork.
        Contained rather than cover: covering the viewport scaled a square image
        up by about 1.6x and made it look soft. Its left edge is masked so it
@@ -75,7 +82,7 @@ const stats = [
   <!-- Scrim. The galaxy is bright; without this the buttons and the language
        switcher sit on near-white and disappear. -->
   <div
-    class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,7,0.92)_0%,rgba(8,11,7,0.7)_40%,rgba(8,11,7,0.95)_100%)] lg:bg-[linear-gradient(90deg,rgba(8,11,7,0.99)_0%,rgba(8,11,7,0.96)_30%,rgba(8,11,7,0.72)_52%,rgba(8,11,7,0.55)_75%,rgba(8,11,7,0.8)_100%)]"
+    class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,7,0.92)_0%,rgba(8,11,7,0.72)_38%,rgba(8,11,7,0.9)_70%,rgba(8,11,7,0.97)_100%)] lg:bg-[linear-gradient(90deg,rgba(8,11,7,0.99)_0%,rgba(8,11,7,0.96)_30%,rgba(8,11,7,0.72)_52%,rgba(8,11,7,0.55)_75%,rgba(8,11,7,0.8)_100%)]"
     aria-hidden="true"
   >
   </div>
@@ -115,10 +122,16 @@ const stats = [
       <dl class="enter enter-3 mt-12 grid max-w-lg grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
         {
           stats.map((stat) => (
-            <div>
+            <div class="min-w-0">
+              {/*
+                Sized for the longest locale, not for English. "US$386,77 mil"
+                is half again the width of "$386.77K" and overflowed its cell
+                into the one beside it on a 320px screen, leaving the two
+                figures as one unreadable run.
+              */}
               <dd
                 data-stat={stat.key}
-                class="font-display text-2xl font-black italic tabular-nums tracking-tight text-ink"
+                class="font-display text-xl font-black italic tabular-nums tracking-tight text-ink sm:text-2xl"
               >
                 {stat.value}
               </dd>
@@ -187,6 +200,25 @@ const stats = [
 </section>
 
 <style>
+  /*
+   * A short viewport is a phone on its side, not a small desktop window.
+   *
+   * At 342px tall the hero still reserved a full viewport plus portrait
+   * padding, so it rendered 718px — two screens — and the description, the Buy
+   * button and the live figures were all below the fold with nothing but the
+   * headline visible. Height, not width, is the thing to key off here.
+   */
+  @media (max-height: 480px) and (orientation: landscape) {
+    #top {
+      min-height: auto;
+    }
+    #top > div:last-child,
+    #top .relative {
+      padding-top: 5rem;
+      padding-bottom: 2.5rem;
+    }
+  }
+
   /* The active dot grows; driven by src/scripts/cosmic-statements.ts */
   [data-cosmic-dot].is-active {
     width: 1.75rem;

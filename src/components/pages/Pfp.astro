@@ -145,7 +145,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
           data-label-hide={page.hidePool}
           aria-expanded="false"
           aria-controls="pfp-pool"
-          class="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-lime"
+          class="tap inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-lime"
         >
           <span data-pool-label>{page.showPool}</span>
           <Icons name="chevron-down" size={12} />
@@ -214,7 +214,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     -->
     <details data-pfp-backup class="mt-6 rounded-2xl border border-line bg-surface p-6">
       <summary
-        class="cursor-pointer list-none font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-lime"
+        class="tap cursor-pointer list-none font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-lime"
       >
         {page.backupTitle}
       </summary>
@@ -237,7 +237,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
           spellcheck="false"
           autocomplete="off"
           placeholder={page.backupPlaceholder}
-          class="w-full resize-none rounded-xl border border-line bg-void/60 px-4 py-3 font-mono text-xs text-ink placeholder:text-faint focus:border-lime/50"
+          class="w-full resize-none rounded-xl border border-line bg-void/60 px-4 py-3 font-mono text-base text-ink placeholder:text-faint focus:border-lime/50 sm:text-xs"
         ></textarea>
       </label>
 
@@ -259,6 +259,8 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     border: 1px solid var(--color-line);
     border-radius: 999px;
     padding: 0.55rem 1.1rem;
+    /* 33px with a mouse is fine; a thumb wants the whole 44. */
+    min-height: 44px;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.6875rem;
     text-transform: uppercase;
@@ -269,6 +271,11 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
       border-color 0.2s;
   }
 
+  @media (pointer: fine) {
+    .pfp-backup-button {
+      min-height: 0;
+    }
+  }
   .pfp-backup-button:hover {
     color: var(--color-lime);
     border-color: color-mix(in oklab, var(--color-lime) 45%, transparent);

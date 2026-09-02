@@ -47,7 +47,7 @@ const page = copy.pages.ask;
       <!-- The way into the archive, which is otherwise unreachable. -->
       <a
         href="/ask/day/"
-        class="mt-4 inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-lime"
+        class="tap mt-4 inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-lime"
       >
         {page.dailyArchiveTitle} →
       </a>
@@ -93,7 +93,15 @@ const page = copy.pages.ask;
 
     <p class="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
       <span data-ask-total class="text-lime">—</span>
-      {' '}{page.possibilities} · {page.hint}
+      {' '}{page.possibilities}
+      {
+        /*
+        "Press space for another" is advice a phone cannot take, and the button
+        that does the same thing is directly above it. Shown to pointers that
+        have a keyboard beside them, hidden from the ones that do not.
+      */
+      }
+      <span class="hidden [@media(pointer:fine)]:inline"> · {page.hint}</span>
     </p>
 
     <!-- The card, shown as soon as there is a question rather than only on download. -->

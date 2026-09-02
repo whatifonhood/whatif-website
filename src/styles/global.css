@@ -14,25 +14,23 @@
 /*
  * Self-hosted. No third-party font host, no extra DNS lookup, no tracking.
  *
- * Subsets are named one by one rather than importing the whole weight, because
- * the whole weight is Cyrillic, Greek and Vietnamese too — eleven files this
- * site has no page for. Each face still carries its unicode-range, so a browser
- * downloads only what the text on screen needs.
+ * Whole weights, NOT @fontsource's per-subset files. This looks like the wrong
+ * choice and is not: a weight file declares one @font-face per subset and gives
+ * each one a `unicode-range`, so a browser downloads only the subsets the text
+ * on screen actually needs — three files on an English page. The per-subset
+ * files (`latin-400.css`, `latin-ext-400.css`, …) carry NO unicode-range at all,
+ * because each is already one subset, which means the browser has no way to rule
+ * any of them out and fetches every one. Naming subsets to "trim the fonts" cut
+ * the file count in the build from 21 to 10 and raised what a phone downloads
+ * from about 90KB to 137KB. Measured, not assumed.
  *
- * latin covers English and Spanish, and Turkish dotless i (U+0131); latin-ext
- * covers the rest of Turkish (ğ, ş, İ). Chinese has no coverage in either face
- * and falls back to the system stack, which is what a CJK reader wants anyway.
+ * The two faces above the fold are preloaded in BaseLayout.astro.
  */
-@import '@fontsource/archivo/latin-400.css';
-@import '@fontsource/archivo/latin-ext-400.css';
-@import '@fontsource/archivo/latin-600.css';
-@import '@fontsource/archivo/latin-ext-600.css';
-@import '@fontsource/archivo/latin-900-italic.css';
-@import '@fontsource/archivo/latin-ext-900-italic.css';
-@import '@fontsource/jetbrains-mono/latin-400.css';
-@import '@fontsource/jetbrains-mono/latin-ext-400.css';
-@import '@fontsource/jetbrains-mono/latin-700.css';
-@import '@fontsource/jetbrains-mono/latin-ext-700.css';
+@import '@fontsource/archivo/400.css';
+@import '@fontsource/archivo/600.css';
+@import '@fontsource/archivo/900-italic.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/700.css';
 
 @theme {
   /* Tailwind ships its own `lime` scale. Removing it means `text-lime-400`
@@ -175,6 +173,25 @@ body {
   color: var(--color-void);
 }
 
+/*
+ * A tap has to look like it landed.
+ *
+ * Tailwind's preflight sets `-webkit-tap-highlight-color: transparent`, which
+ * removes Safari's grey flash box, and nothing replaced it — so there was not a
+ * single `:active` rule anywhere on the site and a finger got no feedback at all
+ * between touching a control and the page changing. On a slow connection that
+ * reads as "it did not work", and people tap again.
+ *
+ * Coarse pointers only. With a mouse the hover state already does this job, and
+ * Tailwind's `hover:` utilities are themselves behind `(hover: hover)`, so they
+ * never latch on after a tap.
+ */
+@media (pointer: coarse) {
+  :where(a, button, summary, [role='button']):active {
+    opacity: 0.65;
+  }
+}
+
 /* A visible, brand-coloured focus ring on every interactive element. */
 :where(a, button, summary, input, textarea, select, [tabindex]):focus-visible {
   outline: 2px solid var(--color-lime);
@@ -196,6 +213,66 @@ body {
 }
 
 /* ---- Reusable pieces --------------------------------------------------- */
+/*
+ * A standalone text link, given a thumb.
+ *
+ * The site is read on phones, and a line of 11px mono type is a 16px-tall
+ * target — under the 24px WCAG 2.2 floor and well under the 44px a thumb
+ * actually wants. Padding each one individually drifts; this gives the link the
+ * height without moving anything around it, because the extra height is
+ * centred on the text rather than added below it.
+ *
+ * Only on a coarse pointer. With a mouse these are single words in running
+ * text and a 44px box around them would open gaps in the layout.
+ */
+@utility tap {
+  @media (pointer: coarse) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Both axes: "View" is "Gör" in Turkish, and a 20px-wide target is no
+       easier to hit than a 20px-tall one. */
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+}
+
+/*
+ * Small chips and secondary buttons, given a thumb.
+ *
+ * These are the controls that measured between 27px and 36px: the copy buttons
+ * beside the contract address, the coin pool toggle, the backup disclosure. All
+ * of them clear the 24px WCAG floor and all of them are fiddly with a finger.
+ * `tap` is for a line of text; this is for something that already has a box, so
+ * it keeps the box and only grows the height.
+ */
+@utility tap-box {
+  @media (pointer: coarse) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+}
+
+/*
+ * A footnote under a figure.
+ *
+ * The house label style is 10px uppercase mono, which is right for two or three
+ * words and wrong for a sentence: capitals remove the word shapes a reader
+ * scans by, and at 10px with letter-spacing a whole sentence becomes a wall.
+ * Six of these on the dashboard are complete sentences explaining where a
+ * number came from — the last thing that should be hard to read. Same face,
+ * same colour, same role in the hierarchy; sentence case, and big enough.
+ */
+@utility note {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--color-faint);
+}
+
 @utility display-heading {
   font-family: var(--font-display);
   font-weight: 900;

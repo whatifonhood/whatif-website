@@ -1235,21 +1235,38 @@ test.describe('the white paper', () => {
     await expect(page.locator('h1')).toContainText('How to buy');
   });
 
-  test('the contract address in the paper is the real one', async ({ page }) => {
+  /*
+   * Every address the paper prints is one somebody could paste into a wallet, so
+   * each one is declared here as well as written there. Adding an address to the
+   * paper is then a deliberate act rather than a typo that ships.
+   *
+   * The launchpad's addresses are on the list because the paper documents them —
+   * they are not ours, and the paper says so on the page. What must never happen
+   * is a WRONG $IF contract address, which is the one mistake on a meme coin
+   * site that costs somebody real money.
+   */
+  const DOCUMENTED_ADDRESSES = [
+    TOKEN.address, // $IF itself
+    TOKEN.primaryPool, // the IF/WETH 1% pool
+    TOKEN.burnAddress, // 0x…dEaD
+    '0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417', // NOXA's fee contract — every burn comes from here
+    '0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b', // NOXA's original fee wallet, the 20% IF cut of 11–12 July
+    '0x84F8E5a324466Deb7447048C014CF0245ce04afA', // the deployer
+    '0x7E035Fb048a31e0481b88074557415b1C187242B', // the locker's owner
+  ].map((address) => address.toLowerCase());
+
+  test('every address in the paper is one we meant to publish', async ({ page }) => {
     for (const path of ['/docs/the-token/', '/docs/how-to-buy/', '/docs/reference/']) {
       await page.goto(path);
       const body = (await page.locator('.docs-prose, .docs-body').first().textContent()) ?? '';
-      const addresses = [...body.matchAll(/0x[0-9a-fA-F]{40}/g)].map((match) => match[0]);
+      // The trailing boundary matters: without it the first 40 characters of a
+      // 64-character transaction hash read as an address that is not ours.
+      const addresses = [...body.matchAll(/0x[0-9a-fA-F]{40}\b/g)].map((match) => match[0]);
       expect(addresses.length, `${path} names no address`).toBeGreaterThan(0);
-      // Every 40-hex address on these pages must be one we actually publish.
       for (const address of addresses) {
         expect(
-          [
-            TOKEN.address.toLowerCase(),
-            TOKEN.primaryPool.toLowerCase(),
-            TOKEN.burnAddress.toLowerCase(),
-          ],
-          `${path} publishes an address that is not ours: ${address}`,
+          DOCUMENTED_ADDRESSES,
+          `${path} publishes an address nobody declared: ${address}`,
         ).toContain(address.toLowerCase());
       }
     }
@@ -1406,5 +1423,242 @@ test.describe('the language picker keeps your place', () => {
     await expect(
       page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])'),
     ).toHaveCount(0);
+  });
+});
+
+/**
+ * The phone is the primary device, so these are the checks that matter most.
+ *
+ * Most people who open this site open it on a phone. Everything below is a
+ * defect that only exists there — a desktop browser will never show it, and a
+ * narrow desktop window will not either, because the difference is the input
+ * device and the browser engine rather than the width.
+ */
+const PHONE_PAGES = [
+  '/',
+  '/stats/',
+  '/holdings/',
+  '/pfp/',
+  '/pfp/godface/',
+  '/memes/',
+  '/memes/meme-two-buttons-sell-or-hold/',
+  '/ask/',
+  '/ask/day/2026-08-01/',
+  '/learn/',
+  '/learn/spotting-a-scam/',
+  '/docs/',
+  '/docs/the-token/',
+  '/brand/',
+  '/roadmap/',
+  '/404',
+  '/zh/',
+  '/tr/stats/',
+  '/es/pfp/',
+];
+
+test.describe('the site behaves on a phone', () => {
+  /** Only the iPhone project; a narrow desktop window is not a phone. */
+  const phoneOnly = 'these only reproduce on a phone engine';
+
+  /*
+   * iOS Safari zooms the whole page in when you focus a field whose computed
+   * font-size is under 16px, and it does not zoom back out. You are left on a
+   * page twice the width of the screen, having only wanted to paste an address.
+   * The wallet lookup, the vault search and the restore-code box were all
+   * 12-14px and all did it.
+   */
+  test('no form field is small enough to trigger iOS zoom', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', phoneOnly);
+    const offenders: string[] = [];
+    for (const path of ['/holdings/', '/memes/', '/pfp/', '/ask/']) {
+      await page.goto(path);
+      const small = await page.evaluate(() =>
+        [...document.querySelectorAll('input, select, textarea')]
+          .map((el) => ({
+            tag: el.tagName.toLowerCase(),
+            size: Number.parseFloat(getComputedStyle(el).fontSize),
+          }))
+          .filter((field) => field.size < 16),
+      );
+      for (const field of small) offenders.push(`${path} ${field.tag} at ${field.size}px`);
+    }
+    expect(offenders, 'a field under 16px zooms iOS Safari in and never back out').toEqual([]);
+  });
+
+  /*
+   * 320px is an iPhone SE 1st gen and a folded Galaxy Fold, and it is the width
+   * that breaks first. The offending element is reported by name because
+   * "the page overflows by 14px" is not something anyone can act on.
+   */
+  for (const width of [320, 360, 375, 390, 414, 428]) {
+    test(`nothing scrolls sideways at ${width}px`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'mobile', phoneOnly);
+      await page.setViewportSize({ width, height: 780 });
+      const broken: string[] = [];
+      for (const path of PHONE_PAGES) {
+        await page.goto(path);
+        const report = await page.evaluate(() => {
+          const doc = document.documentElement;
+          const over = doc.scrollWidth - doc.clientWidth;
+          if (over <= 0) return null;
+          // Name the widest thing sticking out, so the failure is actionable.
+          const culprits = [...document.querySelectorAll<HTMLElement>('body *')]
+            .filter((el) => el.getBoundingClientRect().right > doc.clientWidth + 1)
+            .map((el) => `${el.tagName.toLowerCase()}.${el.className.toString().slice(0, 40)}`);
+          return { over, culprit: culprits[0] ?? 'unknown' };
+        });
+        if (report) broken.push(`${path}: ${report.over}px past the edge (${report.culprit})`);
+      }
+      expect(broken, 'a phone should never scroll sideways').toEqual([]);
+    });
+  }
+
+  /*
+   * WCAG 2.2 requires 24x24. 44x44 is the size a thumb actually needs, and the
+   * chart controls sit directly above a surface that pans under the same
+   * finger, so a miss there does something rather than nothing.
+   */
+  test('every control is big enough to hit', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', phoneOnly);
+    const small: string[] = [];
+    for (const path of PHONE_PAGES) {
+      await page.goto(path);
+      const targets = await page.evaluate(() =>
+        [
+          ...document.querySelectorAll<HTMLElement>(
+            'a, button, summary, input, textarea, select, [role="button"]',
+          ),
+        ]
+          .filter((el) => {
+            const box = el.getBoundingClientRect();
+            if (box.width === 0 || box.height === 0 || el.offsetParent === null) return false;
+            // Not a target if it cannot be tapped: the burn curve's dots are a
+            // picture on a phone, and the same transactions are links below it.
+            if (getComputedStyle(el).pointerEvents === 'none') return false;
+            // WCAG 2.2 SC 2.5.8 exempts a target whose size is set by the
+            // line-height of the text it sits in — a link inside a sentence.
+            // Padding one to 44px would open holes in the paragraph around it.
+            if (getComputedStyle(el).display === 'inline') return false;
+            // The skip link is 1x1 until it takes focus, at which point it is
+            // full size. It is checked by its own test.
+            if (el.classList.contains('sr-only')) return false;
+            return true;
+          })
+          .map((el) => {
+            const box = el.getBoundingClientRect();
+            return {
+              what: `${el.tagName.toLowerCase()}${el.getAttribute('aria-label') ? `[${el.getAttribute('aria-label')}]` : ''}`,
+              w: Math.round(box.width),
+              h: Math.round(box.height),
+              text: (el.textContent ?? '').trim().slice(0, 24),
+            };
+          })
+          .filter((target) => target.w < 24 || target.h < 24),
+      );
+      for (const target of targets) {
+        small.push(`${path} ${target.what} "${target.text}" is ${target.w}x${target.h}`);
+      }
+    }
+    expect(small, 'WCAG 2.2 target size: nothing tappable may be under 24x24').toEqual([]);
+  });
+});
+
+/**
+ * The chart can be read with a finger.
+ *
+ * A finger has no hover, so every touch on the chart begins with a pointerdown.
+ * The pan handler used to claim the gesture on that first event, which set
+ * `panning` before the crosshair handler ran — so the crosshair, the tooltip and
+ * the OHLC readout, the things that make the chart readable rather than
+ * decorative, could not be reached from a phone at all. A mouse never showed it,
+ * because a mouse moves without a button down.
+ *
+ * The market API is stubbed here rather than skipped. The other chart tests skip
+ * themselves when GeckoTerminal throttles, which means a regression in this
+ * behaviour could ship on any day the API was busy.
+ */
+test.describe('the chart reads under a finger', () => {
+  /** Well-formed OHLCV so the chart draws without reaching the network. */
+  const candles = (at: number) =>
+    Array.from({ length: 240 }, (_, i) => {
+      const time = at - (239 - i) * 3600;
+      const base = 0.008 + Math.sin(i / 9) * 0.0006;
+      return [time, base, base * 1.02, base * 0.98, base * 1.005, 12_000 + i * 30];
+    }).reverse();
+
+  test('a tap reads the candle, a drag moves the chart', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'this only reproduces on a touch pointer');
+
+    await page.route('**/api.geckoterminal.com/**', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify(
+          route.request().url().includes('/ohlcv/')
+            ? { data: { attributes: { ohlcv_list: candles(1_788_000_000) } } }
+            : { data: { attributes: {} } },
+        ),
+      }),
+    );
+
+    await page.goto('/stats/');
+    const chart = page.locator('[data-chart-wrap]');
+    await expect(chart).toBeVisible();
+    await page.waitForFunction(() => document.querySelectorAll('[data-chart] rect').length > 10);
+
+    const state = () =>
+      page.evaluate(() => ({
+        crosshair: document.querySelector('[data-crosshair]')?.getAttribute('opacity'),
+        tipHidden: document.querySelector('[data-tip]')?.hasAttribute('hidden'),
+        panning: document.querySelector<HTMLElement>('[data-chart-wrap]')?.dataset.panning ?? null,
+      }));
+
+    /** A touch pointer event at the plot's midpoint, offset horizontally. */
+    const touch = (type: string, dx: number) =>
+      page.evaluate(
+        ([kind, offset]) => {
+          const el = document.querySelector('[data-chart-wrap]')!;
+          const box = el.getBoundingClientRect();
+          el.dispatchEvent(
+            new PointerEvent(kind as string, {
+              bubbles: true,
+              pointerId: 1,
+              pointerType: 'touch',
+              isPrimary: true,
+              clientX: box.left + box.width / 2 + (offset as number),
+              clientY: box.top + box.height / 2,
+            }),
+          );
+        },
+        [type, dx] as [string, number],
+      );
+
+    expect(await state()).toMatchObject({ crosshair: '0', tipHidden: true });
+
+    await touch('pointerdown', 0);
+    expect(await state(), 'a tap should read the candle under it').toMatchObject({
+      crosshair: '1',
+      tipHidden: false,
+    });
+
+    // Under the slop threshold: still a read, not a drag.
+    await touch('pointermove', 3);
+    expect(await state(), 'a 3px wobble is not a drag').toMatchObject({
+      crosshair: '1',
+      panning: null,
+    });
+
+    await touch('pointermove', 60);
+    expect(await state(), 'a real drag pans and drops the stale reading').toMatchObject({
+      crosshair: '0',
+      tipHidden: true,
+      panning: 'true',
+    });
+
+    await touch('pointerup', 60);
+    await touch('pointerdown', -40);
+    expect(await state(), 'and the chart is readable again afterwards').toMatchObject({
+      crosshair: '1',
+      tipHidden: false,
+    });
   });
 });

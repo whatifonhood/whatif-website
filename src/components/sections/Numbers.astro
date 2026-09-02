@@ -73,7 +73,7 @@ const figures = [
         <div class="mt-3 flex flex-wrap items-center gap-2">
           <button
             type="button"
-            class="js-copy inline-flex items-center gap-2 rounded-full bg-lime px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-void transition-colors hover:bg-lime-pale"
+            class="js-copy tap-box inline-flex items-center gap-2 rounded-full bg-lime px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-void transition-colors hover:bg-lime-pale"
             data-copy-value={TOKEN.address}
             data-copy-label={copy.numbers.copy}
             data-copied-label={copy.numbers.copied}
@@ -123,10 +123,11 @@ const figures = [
       <dl class="mt-10 grid grid-cols-2 gap-3">
         {
           figures.map((figure) => (
-            <div class="card card-hover p-5 text-center">
+            <div class="card card-hover min-w-0 p-5 text-center">
+              {/* Sized for the longest locale; see the same note in Hero.astro. */}
               <dd
                 data-stat={figure.key}
-                class="font-display text-2xl font-black italic tabular-nums tracking-tight text-lime"
+                class="font-display text-xl font-black italic tabular-nums tracking-tight text-lime sm:text-2xl"
               >
                 {figure.value}
               </dd>

@@ -31,6 +31,21 @@ import { CHAIN, TOKEN } from '../config/site.ts';
 const REFRESH_MS = 15_000;
 
 /**
+ * How many refresh ticks pass between the expensive reads.
+ *
+ * Everything used to be refetched on every tick, which on a phone left open at
+ * the dashboard came to 400-800KB a minute — 20-40MB an hour of somebody's
+ * mobile data, to watch a number that moves in the third decimal place.
+ *
+ * The price snapshot is one small response and stays on the fast tick, because
+ * it is the thing the page claims is live. A full candle history, the day's
+ * biggest trades and the holder count do not change meaningfully in fifteen
+ * seconds and are read once a minute instead. A timeframe change still redraws
+ * the chart immediately; this only governs the unattended refresh.
+ */
+const SLOW_EVERY = 4;
+
+/**
  * What one refresh task reports back.
  *
  * The banner used to be driven by `results.every(r => r.status === 'rejected')`,
@@ -436,6 +451,9 @@ export function initDashboard(locale: string): void {
   const chartHigh = root.querySelector<HTMLElement>('[data-chart-high]');
   const chartLow = root.querySelector<HTMLElement>('[data-chart-low]');
   const feed = root.querySelector<HTMLElement>('[data-feed]');
+  /** The live dot, and the message that replaces the chart when it has nothing. */
+  const feedLive = root.querySelector<HTMLElement>('[data-feed-live]');
+  const chartEmpty = root.querySelector<HTMLElement>('[data-chart-empty]');
   const status = root.querySelector<HTMLElement>('[data-dash-status]');
   const labels = {
     buy: root.dataset.labelBuy ?? 'Buy',
@@ -649,7 +667,13 @@ export function initDashboard(locale: string): void {
   const renderChart = async (timeframe: Timeframe, keepView = false): Promise<TaskResult> => {
     if (!chart) return 'skipped';
     const candles = await getPriceHistory(timeframe).catch(() => []);
-    if (candles.length < 2) return 'failed';
+    if (candles.length < 2) {
+      // Nothing has ever loaded, so there is nothing to leave on screen. Say so
+      // rather than showing an empty frame under working controls.
+      if (chartEmpty && loaded.length === 0) chartEmpty.hidden = false;
+      return 'failed';
+    }
+    if (chartEmpty) chartEmpty.hidden = true;
 
     const zoomed = view.end - view.start < loaded.length;
     if (keepView && zoomed && loaded.length > 0) {
@@ -672,8 +696,18 @@ export function initDashboard(locale: string): void {
   const renderTrades = async (): Promise<TaskResult> => {
     if (!feed) return 'skipped';
     const trades = await getRecentTrades().catch(() => []);
-    if (trades.length === 0) return 'failed';
+    if (trades.length === 0) {
+      // Rows that arrived earlier stay: they are stale, not wrong, and the
+      // timestamp beside the title says when. With nothing ever fetched, the
+      // placeholder stops saying it is still reading something.
+      const status = feed.querySelector<HTMLElement>('[data-feed-status]');
+      if (status && seenTrades.size === 0) {
+        status.textContent = status.dataset.labelUnavailable ?? status.textContent;
+      }
+      return 'failed';
+    }
     lastTrades = trades;
+    if (feedLive) feedLive.hidden = false;
 
     const firstRun = seenTrades.size === 0;
     const rows = trades.slice(0, 25).map((trade) => {
@@ -1005,16 +1039,23 @@ export function initDashboard(locale: string): void {
     }
   };
 
+  let tick = 0;
+
   const refresh = async () => {
+    // The first pass reads everything; after that the expensive calls take
+    // every fourth turn. See SLOW_EVERY.
+    const slow = tick % SLOW_EVERY === 0;
+    tick += 1;
+
     const results = await Promise.allSettled([
       renderSnapshot(),
       // Redrawing under a pointer makes the chart jump while it is being read.
-      holding || panFrom
-        ? Promise.resolve()
+      holding || panFrom || !slow
+        ? Promise.resolve('skipped' as TaskResult)
         : renderChart((root.dataset.timeframe as Timeframe) ?? 'day', true),
       renderTrades(),
-      renderExtremes(),
-      renderTokenInfo(),
+      slow ? renderExtremes() : Promise.resolve('skipped' as TaskResult),
+      slow ? renderTokenInfo() : Promise.resolve('skipped' as TaskResult),
     ]);
     // A task that was skipped says nothing about whether the data is reachable,
     // so it does not count either way. The banner appears when everything that
@@ -1245,14 +1286,34 @@ export function initDashboard(locale: string): void {
 
   let panFrom: { x: number; start: number; end: number } | null = null;
 
+  /**
+   * How far a pointer travels before a touch counts as a drag rather than a read.
+   *
+   * A finger has no hover state, so every touch on the chart begins with a
+   * `pointerdown`. Declaring the pan on that first event meant every tap was a
+   * drag, `panning` was set before the crosshair handler ever ran, and the
+   * crosshair, the tooltip and the OHLC readout — the things that make the
+   * chart readable rather than decorative — could not be reached by a finger at
+   * all. A mouse never showed it, because a mouse moves without a button down.
+   */
+  const PAN_SLOP = 6;
+
   wrap?.addEventListener('pointerdown', (event) => {
     if (loaded.length < 2) return;
     panFrom = { x: event.clientX, start: view.start, end: view.end };
-    wrap.dataset.panning = 'true';
   });
 
   wrap?.addEventListener('pointermove', (event) => {
     if (!panFrom || !wrap) return;
+    // The drag starts only once the pointer has actually gone somewhere; until
+    // then the move belongs to the crosshair, which runs after this handler.
+    if (wrap.dataset.panning !== 'true') {
+      if (Math.abs(event.clientX - panFrom.x) < PAN_SLOP) return;
+      wrap.dataset.panning = 'true';
+      // The tap that began this drag put a crosshair on a candle. Once it turns
+      // out to be a drag, that reading is of a candle the pointer has left.
+      hideCrosshair();
+    }
     const box = wrap.getBoundingClientRect();
     const span = panFrom.end - panFrom.start;
     // Move by whole candles, in the opposite direction to the drag.
