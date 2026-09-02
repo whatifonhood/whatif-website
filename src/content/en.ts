@@ -17,7 +17,6 @@ export const en: SiteCopy = {
       memes: { label: 'The vault', blurb: 'Free to steal' },
       stats: { label: 'Stats', blurb: 'Every number, live' },
       holdings: { label: 'Wallet lookup', blurb: 'No connection needed' },
-      learn: { label: 'Learn', blurb: 'Safety, basics, and proof' },
       docs: { label: 'White paper', blurb: 'The whole thing, written down' },
       roadmap: { label: 'Roadmap', blurb: 'What is built, and what is next' },
       brand: { label: 'Brand', blurb: 'Logos and artwork' },
@@ -421,18 +420,6 @@ export const en: SiteCopy = {
       possibilities: 'possible questions',
       hint: 'press space for another',
       shareText: '{question}\n\nStill asking.',
-    },
-    learn: {
-      title: 'Learn',
-      eyebrow: 'Learn',
-      heading: { lead: 'Know what', accent: 'you are doing.' },
-      intro:
-        'How this works, how to keep your money safe, and how to check every claim on this site for yourself. Safety first.',
-      backToIndex: 'All pages',
-      next: 'Next:',
-      previous: 'Previous:',
-      categories: { safety: 'Staying safe', basics: 'The basics', token: 'This token' },
-      updatedLabel: 'Updated',
     },
     roadmap: {
       title: 'Roadmap',

@@ -17,7 +17,6 @@ export const tr: SiteCopy = {
       memes: { label: 'Kasa', blurb: 'Çalması serbest' },
       stats: { label: 'Veriler', blurb: 'Her rakam canlı' },
       holdings: { label: 'Cüzdan sorgusu', blurb: 'Bağlantı gerekmez' },
-      learn: { label: 'Öğren', blurb: 'Güvenlik, temeller ve kanıt' },
       docs: { label: 'Teknik doküman', blurb: 'Her şey, yazılı hâlde' },
       roadmap: { label: 'Yol haritası', blurb: 'Ne yapıldı, sırada ne var' },
       brand: { label: 'Marka', blurb: 'Logolar ve görseller' },
@@ -426,18 +425,6 @@ export const tr: SiteCopy = {
       possibilities: 'olası soru',
       hint: 'yenisi için boşluğa bas',
       shareText: '{question}\n\nHâlâ soruyoruz.',
-    },
-    learn: {
-      title: 'Öğren',
-      eyebrow: 'Öğren',
-      heading: { lead: 'Ne yaptığını', accent: 'bil.' },
-      intro:
-        'Bunun nasıl işlediği, paranı nasıl güvende tutacağın ve bu sitedeki her iddiayı kendin nasıl kontrol edeceğin. Önce güvenlik.',
-      backToIndex: 'Tüm sayfalar',
-      next: 'Sonraki:',
-      previous: 'Önceki:',
-      categories: { safety: 'Güvende kal', basics: 'Temeller', token: 'Bu token' },
-      updatedLabel: 'Güncellendi',
     },
     roadmap: {
       title: 'Yol haritası',
