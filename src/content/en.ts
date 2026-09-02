@@ -421,6 +421,30 @@ export const en: SiteCopy = {
       hint: 'press space for another',
       shareText: '{question}\n\nStill asking.',
     },
+    docs: {
+      title: 'The $IF white paper',
+      description:
+        'What $IF is, what it is not, how to buy it, and how to check every number for yourself.',
+      eyebrow: 'White paper',
+      heading: { lead: 'Everything about $IF,', accent: 'written down' },
+      intro:
+        'What the coin is, what it is not, how to buy it, and the exact commands to check every number here without taking our word for any of it.',
+      contractLabel: 'The contract',
+      contractNote: 'One address, on Robinhood Chain. Anything else is not this coin.',
+      groups: {
+        coin: 'The coin',
+        proof: 'Proof',
+        underTheHood: 'Under the hood',
+        using: 'Using it',
+        straight: 'Straight answers',
+      },
+      backToContents: 'White paper',
+      contents: 'Contents',
+      onThisPage: 'On this page',
+      previous: 'Previous',
+      next: 'Next',
+      moreOfThePaper: 'More of the paper',
+    },
     roadmap: {
       title: 'Roadmap',
       eyebrow: 'Roadmap',

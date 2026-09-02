@@ -1,8 +1,12 @@
 ---
 import { DOCS_GROUPS } from '../../config/docs.ts';
+import type { Locale } from '../../config/site.ts';
+import { localePath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
 import { getDocsPages } from '../../lib/docs.ts';
 
 interface Props {
+  locale: Locale;
   /** The page being read, so its entry can be marked current. */
   slug?: string;
 }
@@ -20,27 +24,32 @@ interface Props {
  * at a breakpoint. Duplicating twelve links is cheaper than shipping a script
  * to work around that.
  */
-const { slug } = Astro.props;
-const pages = getDocsPages();
+const { locale, slug } = Astro.props;
+const labels = getCopy(locale).pages.docs;
+const pages = getDocsPages(locale);
 ---
 
-<nav aria-label="White paper contents">
+<nav aria-label={labels.title}>
   <!--
     The way back to the front of the paper.
     Every page linked deeper into the paper and none of them linked to its
     contents, so once you were inside there was no way back to the beginning
     short of the browser button.
   -->
-  <a href="/docs/" class="docs-home" aria-current={slug === undefined ? 'page' : undefined}>
+  <a
+    href={localePath('/docs/', locale)}
+    class="docs-home"
+    aria-current={slug === undefined ? 'page' : undefined}
+  >
     <span class="docs-home-mark" aria-hidden="true">←</span>
-    White paper
+    {labels.backToContents}
   </a>
 
   {
     DOCS_GROUPS.map((group) => (
       <section class="mb-7">
         <p class="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
-          {group.title}
+          {labels.groups[group.id]}
         </p>
         <ul class="space-y-0.5">
           {group.slugs.map((entry) => {
@@ -49,7 +58,7 @@ const pages = getDocsPages();
             return (
               <li>
                 <a
-                  href={`/docs/${entry}/`}
+                  href={localePath(`/docs/${entry}/`, locale)}
                   class="docs-link"
                   aria-current={entry === slug ? 'page' : undefined}
                 >

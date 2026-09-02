@@ -1,0 +1,74 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import { DOCS_GROUPS } from '../../config/docs.ts';
+import { TOKEN, type Locale } from '../../config/site.ts';
+import { localePath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import { getDocsPages } from '../../lib/docs.ts';
+
+/**
+ * The white paper's contents page, in one language.
+ *
+ * A paper about a coin that refuses to over-claim should open by saying what it
+ * is and what it deliberately leaves out, rather than with a mission statement.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.docs;
+const pages = getDocsPages(locale);
+---
+
+<Docs locale={locale} title={page.title} description={page.description}>
+  <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.eyebrow}</p>
+  <h1 class="display-heading mt-3 text-4xl sm:text-5xl">
+    {page.heading.lead}{' '}<span class="text-lime">{page.heading.accent}</span>
+  </h1>
+  <p class="mt-5 text-lg leading-relaxed text-muted">{page.intro}</p>
+
+  <div class="mt-6 rounded-xl border border-line bg-surface p-5">
+    <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+      {page.contractLabel}
+    </p>
+    <p class="mt-2 break-all font-mono text-sm text-ink">{TOKEN.address}</p>
+    <p class="mt-2 text-sm text-faint">{page.contractNote}</p>
+  </div>
+
+  <div class="mt-12 space-y-10">
+    {
+      DOCS_GROUPS.map((group) => (
+        <section>
+          <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+            {page.groups[group.id]}
+          </h2>
+          <ul class="mt-4 divide-y divide-line/60">
+            {group.slugs.map((slug) => {
+              const entry = pages.find((item) => item.slug === slug);
+              if (!entry) return null;
+              return (
+                <li>
+                  <a href={localePath(`/docs/${slug}/`, locale)} class="group flex gap-4 py-4">
+                    <span class="pt-1 font-mono text-xs text-faint">
+                      {String(entry.number).padStart(2, '0')}
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block font-semibold text-ink group-hover:text-lime">
+                        {entry.title}
+                      </span>
+                      <span class="mt-0.5 block text-sm leading-relaxed text-muted">
+                        {entry.summary}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Docs>

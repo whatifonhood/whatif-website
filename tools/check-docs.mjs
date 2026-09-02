@@ -1,39 +1,25 @@
 /**
- * Checks the white paper hangs together.
+ * Checks the white paper hangs together, in every language.
  *
  * A docs section fails quietly: a page drops out of the sidebar and nobody
- * notices because every other page still works. These are the three ways that
- * happens, all of them caught before a build ships.
+ * notices because every other page still works. On a paper whose whole argument
+ * is that its numbers are checkable, a page that silently is not there — or is
+ * there in English on a Chinese reader's screen — is worse than a build error.
  *
  * Run with `npm run docs`. It is part of `npm run check`.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 import { DOCS_ORDER } from '../src/config/docs.ts';
+import { LOCALES } from '../src/config/site.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsDir = join(root, 'src', 'docs');
 
-const files = readdirSync(docsDir)
-  .filter((name) => name.endsWith('.md'))
-  .map((name) => name.replace(/\.md$/, ''));
-
-const problems = [];
-
-// 1. Every page in the reading order exists, and every file is in the order.
-for (const slug of DOCS_ORDER) {
-  if (!files.includes(slug)) problems.push(`${slug}: in the sidebar with no Markdown behind it`);
-}
-for (const slug of files) {
-  if (!DOCS_ORDER.includes(slug)) problems.push(`${slug}: has a page but no place in the sidebar`);
-}
-
-// 2. Frontmatter, and internal links that point at something real.
-const known = new Set([
-  ...DOCS_ORDER.map((slug) => `/docs/${slug}/`),
-  '/docs/',
+/** Pages a chapter may link to, before the locale prefix. */
+const SITE_ROUTES = [
   '/stats/',
   '/holdings/',
   '/ask/',
@@ -41,17 +27,81 @@ const known = new Set([
   '/memes/',
   '/brand/',
   '/roadmap/',
-]);
+  '/docs/',
+];
 
-for (const slug of files) {
-  const text = readFileSync(join(docsDir, `${slug}.md`), 'utf8');
-  const front = /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '';
-  if (!/^title: .+$/m.test(front)) problems.push(`${slug}: no title in the frontmatter`);
-  if (!/^summary: .+$/m.test(front)) problems.push(`${slug}: no summary in the frontmatter`);
+const slugsIn = (locale) => {
+  const dir = join(docsDir, locale);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((name) => name.endsWith('.md'))
+    .map((name) => name.replace(/\.md$/, ''))
+    .sort();
+};
 
-  for (const [, href] of text.matchAll(/\]\((\/[^)#]*)\)/g)) {
-    const path = href.endsWith('/') ? href : `${href}/`;
-    if (!known.has(path)) problems.push(`${slug}: links to ${href}, which is not a page`);
+const read = (locale, slug) => readFileSync(join(docsDir, locale, `${slug}.md`), 'utf8');
+const frontmatter = (text) => /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '';
+const field = (front, name) => new RegExp(`^${name}: (.+)$`, 'm').exec(front)?.[1]?.trim();
+const headings = (text) => (text.match(/^## /gm) ?? []).length;
+
+const problems = [];
+const english = slugsIn('en');
+
+// 1. The reading order and the English files agree.
+for (const slug of DOCS_ORDER) {
+  if (!english.includes(slug))
+    problems.push(`en/${slug}: in the sidebar with no Markdown behind it`);
+}
+for (const slug of english) {
+  if (!DOCS_ORDER.includes(slug))
+    problems.push(`en/${slug}: has a page but no place in the sidebar`);
+}
+
+for (const locale of LOCALES) {
+  const slugs = slugsIn(locale);
+
+  // 2. Every English page is translated, and nothing exists that English lacks.
+  for (const slug of english) {
+    if (!slugs.includes(slug)) problems.push(`${locale}/${slug}: not translated`);
+  }
+  for (const slug of slugs) {
+    if (!english.includes(slug)) problems.push(`${locale}/${slug}: has no English original`);
+  }
+
+  for (const slug of slugs.filter((one) => english.includes(one))) {
+    const text = read(locale, slug);
+    const front = frontmatter(text);
+    const source = read('en', slug);
+
+    // 3. Frontmatter: both fields present, and actually translated.
+    for (const name of ['title', 'summary']) {
+      if (field(front, name) === undefined) {
+        problems.push(`${locale}/${slug}: frontmatter has no ${name}`);
+      } else if (locale !== 'en' && field(front, name) === field(frontmatter(source), name)) {
+        problems.push(`${locale}/${slug}: ${name} is still the English text`);
+      }
+    }
+
+    // 4. Same shape as the original. A translation that quietly dropped a
+    //    section would still build and still read fine on its own.
+    if (headings(text) !== headings(source)) {
+      problems.push(
+        `${locale}/${slug}: ${headings(text)} sections, English has ${headings(source)}`,
+      );
+    }
+
+    // 5. Links point at a page that exists, in the reader's own language.
+    const known = new Set([
+      ...SITE_ROUTES.map((route) => (locale === 'en' ? route : `/${locale}${route}`)),
+      ...DOCS_ORDER.map((other) =>
+        locale === 'en' ? `/docs/${other}/` : `/${locale}/docs/${other}/`,
+      ),
+    ]);
+    for (const [, href] of text.matchAll(/\]\((\/[^)#]*)\)/g)) {
+      const path = href.endsWith('/') ? href : `${href}/`;
+      if (!known.has(path))
+        problems.push(`${locale}/${slug}: links to ${href}, which is not a page`);
+    }
   }
 }
 
@@ -61,4 +111,6 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-console.warn(`${files.length} white paper pages checked. Sidebar, frontmatter and links all hold.`);
+console.warn(
+  `${english.length} white paper pages checked in ${LOCALES.length} languages. Sidebar, frontmatter and links all hold.`,
+);

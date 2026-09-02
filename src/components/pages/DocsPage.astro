@@ -1,0 +1,42 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import type { Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import { getDocsContent, getDocsPages } from '../../lib/docs.ts';
+
+/**
+ * One page of the white paper, in one language.
+ *
+ * The Markdown renders through Astro's own pipeline, so the prose stays prose
+ * and nothing is injected as HTML from outside this repository.
+ */
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const copy = getCopy(locale);
+const labels = copy.pages.docs;
+const page = getDocsPages(locale).find((entry) => entry.slug === slug);
+const Content = getDocsContent(locale, slug);
+---
+
+<Docs
+  locale={locale}
+  slug={slug}
+  title={page?.title ?? labels.title}
+  description={page?.summary ?? labels.description}
+>
+  <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+    {page && labels.groups[page.group as keyof typeof labels.groups]} · {
+      String(page?.number ?? 0).padStart(2, '0')
+    }
+  </p>
+  <h1 class="display-heading mt-3 text-3xl sm:text-4xl">{page?.title}</h1>
+  {page?.summary && <p class="mt-4 text-lg leading-relaxed text-muted">{page.summary}</p>}
+
+  <div class="docs-prose mt-10">
+    {Content && <Content />}
+  </div>
+</Docs>

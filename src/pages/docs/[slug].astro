@@ -1,36 +1,13 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import Docs from '../../layouts/Docs.astro';
+import DocsPage from '../../components/pages/DocsPage.astro';
 import { DOCS_ORDER } from '../../config/docs.ts';
-import { getDocsContent, getDocsPages } from '../../lib/docs.ts';
 
-/**
- * One page of the white paper.
- *
- * The Markdown renders through Astro's own pipeline, so the prose stays prose
- * and nothing is injected as HTML from outside this repository.
- */
+/** The English white paper, served from the root. */
 export const getStaticPaths = (() =>
-  DOCS_ORDER.map((slug) => ({ params: { slug } }))) satisfies GetStaticPaths;
+  DOCS_ORDER.map((slug) => ({ params: { slug }, props: { slug } }))) satisfies GetStaticPaths;
 
-const { slug } = Astro.params;
-const page = getDocsPages().find((entry) => entry.slug === slug);
-const Content = getDocsContent(slug ?? '');
+const { slug } = Astro.props as { slug: string };
 ---
 
-<Docs
-  locale="en"
-  slug={slug}
-  title={page?.title ?? 'White paper'}
-  description={page?.summary ?? ''}
->
-  <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
-    {page?.group} · {String(page?.number ?? 0).padStart(2, '0')}
-  </p>
-  <h1 class="display-heading mt-3 text-3xl sm:text-4xl">{page?.title}</h1>
-  {page?.summary && <p class="mt-4 text-lg leading-relaxed text-muted">{page.summary}</p>}
-
-  <div class="docs-prose mt-10">
-    {Content && <Content />}
-  </div>
-</Docs>
+<DocsPage locale="en" slug={slug} />

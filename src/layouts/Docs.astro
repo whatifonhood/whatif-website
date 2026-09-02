@@ -5,6 +5,8 @@ import Footer from '../components/sections/Footer.astro';
 import Icons from '../components/ui/Icons.astro';
 import DocsNav from '../components/ui/DocsNav.astro';
 import { SITE, type Locale } from '../config/site.ts';
+import { localePath } from '../config/navigation.ts';
+import { getCopy } from '../content/index.ts';
 import { getDocsPages } from '../lib/docs.ts';
 
 interface Props {
@@ -28,7 +30,9 @@ interface Props {
  */
 const { locale, slug, title, description } = Astro.props;
 
-const pages = getDocsPages();
+const copy = getCopy(locale);
+const labels = copy.pages.docs;
+const pages = getDocsPages(locale);
 const current = pages.find((page) => page.slug === slug);
 const index = pages.findIndex((page) => page.slug === slug);
 const previous = index > 0 ? pages[index - 1] : undefined;
@@ -60,16 +64,16 @@ const next = index >= 0 ? pages[index + 1] : undefined;
       -->
       <details class="docs-nav-mobile lg:hidden">
         <summary class="docs-nav-summary">
-          <span>Contents</span>
+          <span>{labels.contents}</span>
           <Icons name="chevron-down" size={14} />
         </summary>
         <div class="pt-5">
-          <DocsNav slug={slug} />
+          <DocsNav locale={locale} slug={slug} />
         </div>
       </details>
 
       <div class="docs-nav hidden lg:block">
-        <DocsNav slug={slug} />
+        <DocsNav locale={locale} slug={slug} />
       </div>
 
       <article class="docs-body min-w-0 flex-1 py-12">
@@ -78,20 +82,20 @@ const next = index >= 0 ? pages[index + 1] : undefined;
         {
           (previous || next) && (
             <nav
-              aria-label="More of the paper"
+              aria-label={labels.moreOfThePaper}
               class="mt-16 grid gap-3 border-t border-line pt-8 sm:grid-cols-2"
             >
               {previous ? (
-                <a href={`/docs/${previous.slug}/`} class="docs-step">
-                  <span class="docs-step-label">← Previous</span>
+                <a href={localePath(`/docs/${previous.slug}/`, locale)} class="docs-step">
+                  <span class="docs-step-label">← {labels.previous}</span>
                   <span class="docs-step-title">{previous.title}</span>
                 </a>
               ) : (
                 <span />
               )}
               {next && (
-                <a href={`/docs/${next.slug}/`} class="docs-step sm:text-right">
-                  <span class="docs-step-label">Next →</span>
+                <a href={localePath(`/docs/${next.slug}/`, locale)} class="docs-step sm:text-right">
+                  <span class="docs-step-label">{labels.next} →</span>
                   <span class="docs-step-title">{next.title}</span>
                 </a>
               )}
@@ -103,9 +107,9 @@ const next = index >= 0 ? pages[index + 1] : undefined;
       <!-- On this page. Built from the H2s the Markdown already has. -->
       {
         current && current.headings.length > 1 && (
-          <aside class="docs-toc" aria-label="On this page">
+          <aside class="docs-toc" aria-label={labels.onThisPage}>
             <p class="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
-              On this page
+              {labels.onThisPage}
             </p>
             <ul class="space-y-1.5">
               {current.headings.map((heading) => (
