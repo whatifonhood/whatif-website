@@ -38,6 +38,11 @@ const PAD = 72;
  *
  * Generated from the character reference sheet through the pipeline in
  * what-if-meme/PFP-GENERATION-PLAN.md, same five-block prompt as the pool.
+ *
+ * Kept at 512px, not the 800px the pool uses. The medallion is drawn at 250px
+ * inside a 1200px card, so 800px was about three times what any pixel of it
+ * needed — and on /ask/ the card is painted on load, which made it 132KB of a
+ * 359KB page for artwork nobody could see at that resolution.
  */
 export const CARD_COINS = {
   /** Looking up at a question mark written in stars. Rim: STILL ASKING. */
