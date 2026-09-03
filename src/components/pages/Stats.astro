@@ -941,11 +941,23 @@ const metrics = [
     display: inline-flex;
   }
 
+  /*
+   * The grab cursor is a promise, so only make it when it can be kept.
+   *
+   * Panning is a no-op while the whole range is already on screen — there is
+   * nowhere to pan to — and the chart opens that way. Advertising a drag the
+   * chart cannot perform is what made it read as broken: you pull, nothing
+   * moves, and there is no way to tell that nothing was supposed to. Zoom in
+   * (wheel, pinch, or the +/- buttons) and the cursor says so.
+   */
   [data-chart-wrap] {
-    cursor: grab;
+    cursor: default;
     touch-action: pan-y;
   }
-  [data-chart-wrap][data-panning='true'] {
+  [data-zoomed='true'] [data-chart-wrap] {
+    cursor: grab;
+  }
+  [data-zoomed='true'] [data-chart-wrap][data-panning='true'] {
     cursor: grabbing;
   }
 
