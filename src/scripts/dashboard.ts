@@ -1326,20 +1326,33 @@ export function initDashboard(locale: string): void {
   /** The narrowest window the chart will zoom to, in candles. */
   const MIN_SPAN = 8;
 
-  const zoomAt = (ratio: number, factor: number) => {
+  /**
+   * Put `width` candles on screen, with candle `index` sitting at `ratio`
+   * across the plot.
+   *
+   * Both zoom gestures land here, because both are the same question asked
+   * twice: how wide is the window, and what stays put while it changes. The
+   * wheel keeps the candle under the cursor still; a pinch keeps the candle
+   * between the two fingers still.
+   *
+   * Work out the new width first, then place it — clamping the width and the
+   * position separately is what keeps this in range. Clamping the two edges
+   * independently could leave start past end, which drew an empty chart.
+   */
+  const placeView = (index: number, ratio: number, width: number) => {
     const total = loaded.length;
     if (total < 2) return;
 
-    const span = view.end - view.start;
-    // Work out the new width first, then place it — clamping the width and the
-    // position separately is what keeps this in range. Clamping the two edges
-    // independently could leave start past end, which drew an empty chart.
-    const width = Math.max(MIN_SPAN, Math.min(total, Math.round(span * factor)));
-    const anchorIndex = view.start + ratio * span;
-    const start = Math.max(0, Math.min(total - width, Math.round(anchorIndex - ratio * width)));
+    const w = Math.max(MIN_SPAN, Math.min(total, Math.round(width)));
+    const start = Math.max(0, Math.min(total - w, Math.round(index - ratio * w)));
 
-    view = { start, end: start + width };
+    view = { start, end: start + w };
     paint();
+  };
+
+  const zoomAt = (ratio: number, factor: number) => {
+    const span = view.end - view.start;
+    placeView(view.start + ratio * span, ratio, span * factor);
   };
 
   wrap?.addEventListener(
@@ -1388,12 +1401,71 @@ export function initDashboard(locale: string): void {
    */
   const PAN_SLOP = 6;
 
+  /**
+   * Pinch to zoom.
+   *
+   * A phone has no wheel, so until this existed the only way to zoom on a touch
+   * screen was the small +/- pair in the toolbar — and a finger reaches for a
+   * pinch first. That also made the drag look broken rather than merely
+   * unzoomed: panning is a no-op while the whole range is already on screen, so
+   * somebody who could not zoom in could never pan either, and the chart
+   * ignored every gesture they tried.
+   *
+   * `touch-action: pan-y` on the wrap is what makes this reachable. It leaves
+   * vertical scrolling to the browser and keeps the page's own pinch-zoom off
+   * this element, so both fingers arrive here as ordinary pointer events.
+   */
+  const pointers = new Map<number, number>();
+  /** Where the pinch began: finger gap, plus the candle held still between them. */
+  let pinchFrom: { gap: number; ratio: number; span: number; anchor: number } | null = null;
+
+  /** The gap between the two fingers, in CSS pixels. */
+  const fingerGap = (): number => {
+    const [a, b] = [...pointers.values()];
+    return a === undefined || b === undefined ? 0 : Math.abs(a - b);
+  };
+
+  /** Where the midpoint between the fingers falls across the plot, 0 to 1. */
+  const fingerRatio = (): number => {
+    const [a, b] = [...pointers.values()];
+    if (a === undefined || b === undefined || !wrap) return 0.5;
+    const box = wrap.getBoundingClientRect();
+    return Math.min(1, Math.max(0, ((a + b) / 2 - box.left) / box.width));
+  };
+
   wrap?.addEventListener('pointerdown', (event) => {
     if (loaded.length < 2) return;
+    pointers.set(event.pointerId, event.clientX);
+
+    if (pointers.size === 2) {
+      // A second finger turns a drag into a pinch. The half-finished drag is
+      // abandoned rather than blended in, or the chart lurches sideways as the
+      // second finger lands.
+      panFrom = null;
+      const span = view.end - view.start;
+      const ratio = fingerRatio();
+      pinchFrom = { gap: fingerGap(), ratio, span, anchor: view.start + ratio * span };
+      if (wrap) wrap.dataset.panning = 'true';
+      hideCrosshair();
+      return;
+    }
+
     panFrom = { x: event.clientX, start: view.start, end: view.end };
   });
 
   wrap?.addEventListener('pointermove', (event) => {
+    if (pointers.has(event.pointerId)) pointers.set(event.pointerId, event.clientX);
+
+    if (pinchFrom) {
+      const gap = fingerGap();
+      // Fingers apart means fewer candles across the same width, so the window
+      // narrows by the same proportion the gap widened.
+      if (gap > 0 && pinchFrom.gap > 0) {
+        placeView(pinchFrom.anchor, pinchFrom.ratio, pinchFrom.span * (pinchFrom.gap / gap));
+      }
+      return;
+    }
+
     if (!panFrom || !wrap) return;
     // The drag starts only once the pointer has actually gone somewhere; until
     // then the move belongs to the crosshair, which runs after this handler.
@@ -1414,9 +1486,14 @@ export function initDashboard(locale: string): void {
     paint();
   });
 
-  const endPan = () => {
+  const endPan = (event?: PointerEvent) => {
+    if (event) pointers.delete(event.pointerId);
+    // A pinch is over when a finger leaves. The one still down does not take
+    // over the drag: it has travelled since the pinch began, and resuming from
+    // that stale origin threw the chart across the screen.
+    if (pointers.size < 2) pinchFrom = null;
     panFrom = null;
-    if (wrap) delete wrap.dataset.panning;
+    if (wrap && pointers.size === 0) delete wrap.dataset.panning;
   };
   wrap?.addEventListener('pointerup', endPan);
   wrap?.addEventListener('pointercancel', endPan);

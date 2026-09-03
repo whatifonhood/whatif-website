@@ -1919,6 +1919,125 @@ test.describe('the chart never mislabels what it is showing', () => {
   });
 
   /*
+   * Zooming and panning, by every means the chart offers.
+   *
+   * These are the gestures that were reported broken, and they were: on a phone
+   * the only zoom was a small +/- pair in the toolbar, so a finger could not
+   * zoom at all, and panning does nothing while the whole range is already on
+   * screen. The result was a chart that ignored every gesture a touch user
+   * tried.
+   *
+   * Note the scroll-into-view and the viewport clamp below. An earlier version
+   * of this measured a drag at the wrap's centre, which on a short viewport is
+   * off the bottom of the screen — the events went nowhere and it reported the
+   * chart dead when it was working. Read the coordinates, not just the result.
+   */
+  const chartState = (page: import('@playwright/test').Page) =>
+    page.evaluate(() => {
+      const rects = [...document.querySelectorAll('[data-candles] rect')];
+      return {
+        candles: rects.length,
+        firstX: rects[0]?.getAttribute('x') ?? null,
+        zoomed: document.querySelector('[data-dashboard]')?.getAttribute('data-zoomed') ?? '',
+      };
+    });
+
+  /** The chart's centre, clamped to somewhere the pointer can actually reach. */
+  async function chartCentre(page: import('@playwright/test').Page) {
+    const wrap = page.locator('[data-chart-wrap]');
+    await wrap.scrollIntoViewIfNeeded();
+    const box = (await wrap.boundingBox())!;
+    const height = page.viewportSize()!.height;
+    return { x: box.x + box.width / 2, y: Math.min(box.y + box.height / 2, height - 24), box };
+  }
+
+  test('the +/- buttons zoom and a drag then pans', async ({ page }) => {
+    await page.goto('/stats/');
+    await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+
+    const full = await chartState(page);
+    expect(full.zoomed, 'the chart opens showing everything').toBe('false');
+
+    for (let i = 0; i < 3; i++) await page.locator('[data-chart-zoom="in"]').click();
+    const zoomed = await chartState(page);
+    expect(zoomed.candles, 'zooming in must show fewer candles').toBeLessThan(full.candles);
+    expect(zoomed.zoomed).toBe('true');
+
+    // Only now is there anywhere to pan to, which is why the cursor only offers
+    // the grab once the chart is zoomed.
+    const { x, y } = await chartCentre(page);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    for (let step = 1; step <= 12; step++) await page.mouse.move(x - step * 14, y);
+    await page.mouse.up();
+
+    const panned = await chartState(page);
+    expect(panned.firstX, 'dragging must move the candles').not.toBe(zoomed.firstX);
+
+    await page.locator('[data-chart-reset]').click();
+    expect((await chartState(page)).candles, 'reset puts it all back').toBe(full.candles);
+  });
+
+  test('two fingers pinch to zoom', async ({ page }) => {
+    await page.goto('/stats/');
+    await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+    const before = await chartState(page);
+
+    /*
+     * Dispatched pointer events rather than a real gesture, because the browsers
+     * in this suite disagree about how to synthesise one and only Chromium can
+     * be driven through CDP. What is under test is our handler — that two
+     * pointers moving apart narrow the window and moving together widen it —
+     * not the engine's touch routing.
+     */
+    const pinch = (from: number, to: number) =>
+      page.evaluate(
+        ([startGap, endGap]: [number, number]) => {
+          const wrap = document.querySelector('[data-chart-wrap]')!;
+          const box = wrap.getBoundingClientRect();
+          const midX = box.left + box.width / 2;
+          const midY = box.top + box.height / 2;
+
+          const finger = (type: string, id: number, x: number) =>
+            wrap.dispatchEvent(
+              new PointerEvent(type, {
+                pointerId: id,
+                pointerType: 'touch',
+                isPrimary: id === 1,
+                clientX: x,
+                clientY: midY,
+                bubbles: true,
+                cancelable: true,
+              }),
+            );
+
+          finger('pointerdown', 1, midX - startGap / 2);
+          finger('pointerdown', 2, midX + startGap / 2);
+          const STEPS = 12;
+          for (let step = 1; step <= STEPS; step++) {
+            const gap = startGap + ((endGap - startGap) * step) / STEPS;
+            finger('pointermove', 1, midX - gap / 2);
+            finger('pointermove', 2, midX + gap / 2);
+          }
+          finger('pointerup', 1, midX);
+          finger('pointerup', 2, midX);
+        },
+        [from, to] as [number, number],
+      );
+
+    // Fingers apart: the gap grows, so the window narrows.
+    await pinch(120, 300);
+    const apart = await chartState(page);
+    expect(apart.candles, 'fingers apart must zoom in').toBeLessThan(before.candles);
+    expect(apart.zoomed).toBe('true');
+
+    // And back together, which must widen it again.
+    await pinch(300, 120);
+    const together = await chartState(page);
+    expect(together.candles, 'fingers together must zoom back out').toBeGreaterThan(apart.candles);
+  });
+
+  /*
    * The chip and the candles under it must agree.
    *
    * This used to prove it by cutting the network and checking the chip refused
