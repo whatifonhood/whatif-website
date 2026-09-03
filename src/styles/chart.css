@@ -1,0 +1,585 @@
+/*
+ * The chart's own styles.
+ *
+ * Everything below paints an element that dashboard.ts, chart-draw.ts or
+ * chart-interaction.ts creates at runtime, or a control that only ever appears
+ * inside the chart panel. Astro scopes what it can see in a template, so the
+ * runtime ones cannot be scoped at all — they were three separate
+ * `<style is:global>` blocks in Stats.astro, each added after the last and each
+ * carrying a comment pointing back at the one before it.
+ *
+ * Three global blocks in one component are global anyway; the split only bought
+ * three places to look. Stats.astro imports this file and nothing else does, so
+ * it still ships only on the page that has a chart.
+ */
+/* ---------------------------------------------------------------- chart
+   The SVG stretches to fill its box, so both scales are HTML sitting in
+   padding reserved on the wrapper. Anything drawn as SVG text here would be
+   squashed horizontally along with the candles. */
+.chart-wrap {
+  padding-right: 62px;
+  padding-bottom: 22px;
+}
+
+.price-scale,
+.time-axis {
+  position: absolute;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--color-faint);
+  pointer-events: none;
+  user-select: none;
+}
+
+.price-scale {
+  top: 0;
+  right: 0;
+  bottom: 22px;
+  width: 62px;
+}
+.price-scale span {
+  position: absolute;
+  right: 8px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.time-axis {
+  left: 0;
+  right: 62px;
+  bottom: 0;
+  height: 22px;
+}
+.time-axis span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  top: 4px;
+}
+
+/* The two tags that ride the scales with the crosshair, and the one that
+   marks the last close. A tag has a solid ground so it stays readable over
+   whatever it lands on. */
+.scale-tag {
+  position: absolute;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+.price-scale .scale-tag {
+  right: 4px;
+  transform: translateY(-50%);
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+.price-scale .scale-tag[data-last] {
+  background: var(--color-lime);
+  color: var(--color-void);
+}
+.time-axis .scale-tag {
+  top: 2px;
+  transform: translateX(-50%);
+  background: var(--color-ink);
+  color: var(--color-void);
+}
+
+.grid-line {
+  stroke: var(--color-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.55;
+}
+
+.last-line {
+  stroke: var(--color-lime);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.75;
+}
+
+.ema-line {
+  fill: none;
+  stroke: var(--color-info);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The reading line above the chart. */
+.ohlc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0 1.5rem 0.85rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--color-faint);
+  min-height: 1.5rem;
+}
+@media (min-width: 640px) {
+  .ohlc-bar {
+    padding-inline: 2rem;
+  }
+}
+.ohlc-bar b {
+  font-weight: 400;
+  color: var(--color-faint);
+}
+.ohlc-bar span {
+  color: var(--color-ink);
+}
+.ohlc-bar [data-direction='up'] {
+  color: var(--color-lime);
+}
+.ohlc-bar [data-direction='down'] {
+  color: var(--color-warn);
+}
+
+/* Reproduce panel. A command must be copyable verbatim, so it scrolls
+   rather than wrapping — a wrapped curl pasted into a shell is a broken one. */
+.reproduce-command {
+  overflow-x: auto;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  background: var(--color-void);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Holder labels. Burned is the reassuring case, so it gets the site's accent;
+   a pool is infrastructure, not a holding; a bare contract is neither. */
+.holder-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-faint);
+  white-space: nowrap;
+}
+
+.holder-tag[data-kind='burn'] {
+  border-color: color-mix(in oklab, var(--color-lime) 40%, transparent);
+  color: var(--color-lime);
+}
+
+.holder-tag[data-kind='pool'] {
+  border-color: color-mix(in oklab, var(--color-ink) 25%, transparent);
+  color: var(--color-muted);
+}
+
+/* An unidentified address gets no chip at all — an empty label is honest,
+   a made-up one is not. */
+.holder-tag[data-kind='unknown'] {
+  border-color: transparent;
+}
+
+.candle-wick {
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.candle-wick[data-rising='true'],
+.candle-body[data-rising='true'] {
+  stroke: var(--color-lime);
+  fill: var(--color-lime);
+}
+.candle-wick[data-rising='false'],
+.candle-body[data-rising='false'] {
+  stroke: var(--color-warn);
+  fill: var(--color-warn);
+}
+.candle-body {
+  stroke: none;
+}
+
+/* Line mode. Same colours, driven by the same data-direction. */
+.line-stroke {
+  fill: none;
+  stroke: var(--chart-colour, #8fce02);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.line-area {
+  fill: var(--chart-colour, #8fce02);
+  opacity: 0.16;
+  stroke: none;
+}
+.line-dot {
+  fill: var(--chart-colour, #8fce02);
+}
+
+/* Trade feed.
+   A real grid with its own column widths: the previous version let five
+   values collapse into one run of text with nothing separating them. */
+.feed-row {
+  display: grid;
+  grid-template-columns: 3.6rem minmax(5rem, 1fr) minmax(5rem, 1fr) 7rem 4.5rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  transition: background-color 0.4s ease;
+}
+.feed-row:hover {
+  background: var(--color-surface-2);
+}
+
+.feed-kind {
+  border-radius: 999px;
+  padding: 0.2rem 0;
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.feed-row[data-kind='buy'] .feed-kind {
+  background: color-mix(in srgb, var(--color-lime) 18%, transparent);
+  color: var(--color-lime);
+}
+.feed-row[data-kind='sell'] .feed-kind {
+  background: rgb(240 160 106 / 0.16);
+  color: var(--color-warn);
+}
+
+.feed-amount {
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.feed-tokens {
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.feed-wallet {
+  color: var(--color-faint);
+  text-align: right;
+}
+.feed-wallet:hover {
+  color: var(--color-lime);
+  text-decoration: underline;
+}
+.feed-time {
+  color: var(--color-faint);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A trade that has appeared since the last refresh flashes once. */
+@keyframes feed-in {
+  from {
+    background: color-mix(in srgb, var(--color-lime) 22%, transparent);
+  }
+  to {
+    background: transparent;
+  }
+}
+.feed-row[data-new] {
+  animation: feed-in 2.4s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-row[data-new] {
+    animation: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .feed-row {
+    grid-template-columns: 3.2rem minmax(0, 1fr) 4.2rem;
+    gap: 0.6rem;
+    padding: 0.65rem 1rem;
+  }
+  .feed-tokens,
+  .feed-wallet {
+    display: none;
+  }
+}
+/*
+ * Created by src/scripts/dashboard.ts at runtime, so these cannot be scoped —
+ * Astro only scopes what appears in the template above.
+ */
+.pressure-bar[data-kind='buy'] {
+  fill: var(--color-lime);
+  opacity: 0.85;
+}
+.pressure-bar[data-kind='sell'] {
+  fill: var(--color-warn);
+  opacity: 0.7;
+}
+.pressure-axis {
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+.burn-dot {
+  fill: var(--color-void);
+  stroke: var(--color-lime);
+  stroke-width: 2;
+  transition: r 0.15s ease;
+}
+.burn-dot:hover {
+  r: 5;
+  fill: var(--color-lime);
+}
+/* Drawn at runtime — see the note on the other global block. */
+.ma-line {
+  fill: none;
+  stroke: var(--color-gold, #e4d98e);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.burn-mark {
+  stroke: var(--color-warn);
+  stroke-width: 2;
+  opacity: 0.75;
+}
+.burn-mark:hover {
+  opacity: 1;
+  stroke-width: 3;
+}
+.chart-tip b {
+  display: block;
+  color: var(--color-faint);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chart-tip [data-tip-change] {
+  margin-left: 0.4rem;
+}
+.chart-tip [data-tip-change][data-direction='up'] {
+  color: var(--color-lime);
+}
+.chart-tip [data-tip-change][data-direction='down'] {
+  color: var(--color-warn);
+}
+.vol-bar[data-rising='true'] {
+  fill: var(--color-lime);
+  opacity: 0.45;
+}
+.vol-bar[data-rising='false'] {
+  fill: var(--color-warn);
+  opacity: 0.4;
+}
+
+/* ---------------------------------------------------------------------------
+ * The chart panel's controls.
+ *
+ * These sat in Stats.astro's scoped block, interleaved with rules for the
+ * concentration bars, the trust marks and the burn curve — twelve sections of
+ * styles in one 400-line list, in no order. They style markup that only appears
+ * inside the chart panel, so they live with the chart now.
+ * ------------------------------------------------------------------------- */
+/* Reset only appears once there is something to reset. */
+.chart-reset {
+  display: none;
+}
+[data-zoomed='true'] .chart-reset {
+  display: inline-flex;
+}
+
+/*
+ * On a phone the grip gives the page back.
+ *
+ * `touch-action: none` is right for a mouse: the whole 24px band is a drag
+ * handle. On a touch screen it made a full-width band across the page where a
+ * vertical swipe resized the chart instead of scrolling — and this sits in the
+ * middle of the longest page on the site. Resizing a chart by dragging is a
+ * mouse affordance; scrolling past it is not optional.
+ */
+@media (pointer: coarse) {
+  .chart-grip {
+    touch-action: pan-y;
+  }
+}
+
+.chart-grip {
+  display: flex;
+  /* 24px is the WCAG 2.5.8 minimum target, and this one sits flush against a
+     pannable chart where a miss does something else entirely. */
+  height: 24px;
+  cursor: ns-resize;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+  touch-action: none;
+}
+.chart-grip:hover .chart-grip-bar,
+.chart-grip:focus-visible .chart-grip-bar,
+.chart-grip[data-dragging='true'] .chart-grip-bar {
+  background: var(--color-lime);
+  width: 64px;
+}
+.chart-grip:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: -2px;
+}
+.chart-grip-bar {
+  height: 3px;
+  width: 40px;
+  border-radius: 999px;
+  background: var(--color-line);
+  transition:
+    background-color 0.15s ease,
+    width 0.15s ease;
+}
+
+/* Height is driven by the grip; the SVG scales to whatever box it gets. */
+.chart {
+  height: var(--chart-height, 16rem);
+}
+@media (min-width: 640px) {
+  .chart {
+    height: var(--chart-height, 20rem);
+  }
+}
+
+.crosshair {
+  stroke: var(--color-lime);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.chart-tip {
+  position: absolute;
+  top: 0.75rem;
+  z-index: 2;
+  min-width: 8.5rem;
+  transform: translateX(-50%);
+  border-radius: 0.6rem;
+  border: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-void) 92%, transparent);
+  padding: 0.55rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-ink);
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+[data-chart-busy] .tf-chip,
+[data-chart-busy] .chart-toggle {
+  pointer-events: none;
+}
+
+/* Timeframe and change chips */
+.tf-chip,
+.change-chip {
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface-2);
+  padding: 0.35rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+.tf-chip:hover,
+.chart-toggle:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-lime) 45%, var(--color-line));
+}
+
+/*
+ * The chart's own controls. These share the timeframe chips' shape so the row
+ * reads as one set of controls rather than pills followed by loose words —
+ * the class was referenced but never defined, so they were plain text.
+ */
+.chart-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface-2);
+  padding: 0.35rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+.chart-toggle[aria-pressed='true'] {
+  background: var(--color-lime);
+  border-color: var(--color-lime);
+  color: var(--color-void);
+}
+.tf-chip[aria-pressed='true'] {
+  background: var(--color-lime);
+  border-color: var(--color-lime);
+  color: var(--color-void);
+}
+.change-chip {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+.change-window {
+  color: var(--color-faint);
+}
+
+/* Chart */
+.chart {
+  overflow: visible;
+  --chart-colour: var(--color-lime);
+}
+.chart[data-direction='down'] {
+  --chart-colour: var(--color-warn);
+}
+
+/* The icon-only chart-type buttons sit tighter than the text chips. */
+.tf-chip-icon {
+  display: inline-grid;
+  place-items: center;
+  padding: 0.35rem 0.55rem;
+}
+
+/*
+ * On a touch screen, every one of these is a 44px target.
+ *
+ * They were 30px tall — over the 24px WCAG minimum, but sitting directly
+ * above a chart that pans and zooms under the same finger, so a miss did not
+ * do nothing, it dragged the chart. Keyed off `pointer: coarse` rather than a
+ * width, because what makes a target hard to hit is the finger, not the
+ * viewport: a touchscreen laptop gets the big targets and a narrow desktop
+ * window does not need them.
+ */
+@media (pointer: coarse) {
+  .tf-chip,
+  .chart-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding-inline: 0.85rem;
+  }
+  .tf-chip-icon {
+    display: inline-flex;
+    padding-inline: 0.6rem;
+  }
+}
