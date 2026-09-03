@@ -82,25 +82,25 @@ export const en: SiteCopy = {
 
   thesis: {
     eyebrow: 'The thesis',
-    heading: { lead: 'One question.', accent: 'Infinite upside.' },
+    heading: { lead: 'One question.', accent: 'No promises.' },
     intro:
       "$IF isn't a utility token. It's not governance. It's the 3am thought every human has had, minted on the newest chain in the game.",
     pillars: [
       {
         title: 'It starts with a question',
-        body: 'Every trade you ever regretted began with "what if?" $IF takes the question seriously enough to put it on a chain.',
+        body: 'Every trade you regret began with "what if?". $IF is that thought, minted — a coin about the feeling, not a forecast of what comes next.',
       },
       {
         title: 'Built on Robinhood Chain',
-        body: 'Fast blocks, cheap gas, and the name that dragged a generation into the market. Robinhood started as a what if too.',
+        body: 'Fast blocks, cheap gas, and the name that pulled a generation into the market. The chain is new and $IF is one of the first coins on it — that is where it stands, not a prediction of where it goes.',
       },
       {
         title: 'Already burned, and gone for good',
-        body: '{burned} $IF — {burnedPercent} of the supply — sits in a burn address nobody holds the keys to. That is not a promise — it is a balance you can read yourself.',
+        body: '{burned} $IF — {burnedPercent} of the supply — sits in an address nobody holds the keys to. Not a plan and not a schedule: a balance you can read right now.',
       },
       {
-        title: 'Check everything',
-        body: "The contract, the pool, the burn and the holder count are all public. We link to every one of them. Don't trust a website — including this one.",
+        title: "Don't trust this page",
+        body: 'The contract, the pool, the burn and the holder count are all public, and every figure here links to the one it came from. Check them, then decide.',
       },
     ],
   },

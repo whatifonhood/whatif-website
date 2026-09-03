@@ -95,25 +95,25 @@ export const es: SiteCopy = {
 
   thesis: {
     eyebrow: 'La tesis',
-    heading: { lead: 'Una pregunta.', accent: 'Potencial infinito.' },
+    heading: { lead: 'Una pregunta.', accent: 'Sin promesas.' },
     intro:
       '$IF no es un token de utilidad. No es gobernanza. Es ese pensamiento de las 3 de la mañana que todos hemos tenido, acuñado en la cadena más nueva del juego.',
     pillars: [
       {
         title: 'Todo empieza con una pregunta',
-        body: 'Cada operación de la que te arrepentiste empezó con un "¿y si?". $IF se toma la pregunta lo bastante en serio como para ponerla en una cadena.',
+        body: 'Cada operación de la que te arrepentiste empezó con un "¿y si?". $IF es ese pensamiento acuñado: una moneda sobre la sensación, no un pronóstico de lo que viene.',
       },
       {
         title: 'Construido en Robinhood Chain',
-        body: 'Bloques rápidos, gas barato y el nombre que arrastró a toda una generación al mercado. Robinhood también empezó siendo un "¿y si?".',
+        body: 'Bloques rápidos, gas barato y el nombre que arrastró a una generación al mercado. La cadena es nueva y $IF es una de las primeras monedas en ella: es dónde está, no una predicción de a dónde va.',
       },
       {
         title: 'Ya quemado, y para siempre',
-        body: '{burned} $IF — {burnedPercent} del suministro — están en una dirección de quema cuyas claves no tiene nadie. Eso no es una promesa: es un saldo que puedes leer tú mismo.',
+        body: '{burned} $IF — {burnedPercent} del suministro — está en una dirección cuyas claves no tiene nadie. Ni un plan ni un calendario: un saldo que puedes leer ahora mismo.',
       },
       {
-        title: 'Verifícalo todo',
-        body: 'El contrato, el pool, la quema y el número de holders son públicos. Enlazamos cada uno. No confíes en una página web — tampoco en esta.',
+        title: 'No confíes en esta página',
+        body: 'El contrato, el pool, la quema y el número de holders son públicos, y cada cifra de aquí enlaza con su origen. Compruébalo y luego decide.',
       },
     ],
   },

@@ -82,25 +82,25 @@ export const tr: SiteCopy = {
 
   thesis: {
     eyebrow: 'Fikir',
-    heading: { lead: 'Tek bir soru.', accent: 'Sonsuz ihtimal.' },
+    heading: { lead: 'Tek bir soru.', accent: 'Hiçbir vaat yok.' },
     intro:
       '$IF bir fayda tokeni değil, yönetişim tokeni de değil. Herkesin gece 3’te aklına gelen o düşüncenin, oyundaki en yeni zincire kazınmış hâli.',
     pillars: [
       {
         title: 'Her şey bir soruyla başlar',
-        body: 'Pişman olduğun her işlem “ya olsaydı?” ile başladı. $IF bu soruyu zincire yazacak kadar ciddiye alıyor.',
+        body: 'Pişman olduğun her işlem “ya olsaydı?” ile başladı. $IF o düşüncenin basılmış hâli — bir hissin parası, sonrasının tahmini değil.',
       },
       {
         title: 'Robinhood Chain üzerine kurulu',
-        body: 'Hızlı bloklar, ucuz gas ve bir nesli piyasaya çeken isim. Robinhood da bir “ya olsaydı” olarak başlamıştı.',
+        body: 'Hızlı bloklar, ucuz gas ve bir nesli piyasaya çeken isim. Zincir yeni ve $IF üzerindeki ilk coinlerden biri — bulunduğu yer bu, gideceği yerin tahmini değil.',
       },
       {
-        title: 'Yüzde dokuzu şimdiden gitti',
-        body: '{burned} $IF, anahtarı kimsede olmayan bir yakma adresinde duruyor. Bu bir söz değil — kendi gözünle okuyabileceğin bir bakiye.',
+        title: 'Çoktan yakıldı, geri gelmiyor',
+        body: '{burned} $IF — arzın {burnedPercent} kadarı — anahtarları kimsede olmayan bir adreste duruyor. Plan da değil takvim de: şu anda okuyabileceğin bir bakiye.',
       },
       {
-        title: 'Her şeyi kendin doğrula',
-        body: 'Kontrat, havuz, yakılan miktar ve cüzdan sayısı tamamen açık; hepsine link verdik. Hiçbir siteye güvenme — buna dâhil.',
+        title: 'Bu sayfaya güvenme',
+        body: 'Kontrat, havuz, yakım ve cüzdan sayısı tamamen açık; buradaki her rakam geldiği yere bağlanıyor. Kendin bak, sonra karar ver.',
       },
     ],
   },
