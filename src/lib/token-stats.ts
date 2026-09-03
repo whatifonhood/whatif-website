@@ -54,6 +54,16 @@ const throttledUntil = new Map<string, number>();
 const BACKOFF_MS = 60_000;
 
 /**
+ * The largest response we will read into memory.
+ *
+ * These endpoints answer in single-digit kilobytes. The cap is not about them
+ * behaving normally — it is what stops a compromised or simply broken upstream
+ * from handing the tab an unbounded stream and freezing the phone it is running
+ * on. 2 MB is roughly a thousand times the largest real response.
+ */
+const MAX_BYTES = 2_000_000;
+
+/**
  * Backoff is per-origin.
  *
  * It used to be a single module-level timestamp, so one 429 from GeckoTerminal
@@ -81,6 +91,27 @@ export async function fetchJson(url: string, init?: RequestInit): Promise<unknow
       ...init,
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: { accept: 'application/json', ...(init?.headers ?? {}) },
+      /*
+       * Three deliberate restrictions on how this request may behave.
+       *
+       * `credentials: 'omit'` — never attach cookies or HTTP auth to a
+       * third-party call. Nothing here needs them, and a request that carries
+       * an ambient credential is a request that can be made to act on the
+       * user's behalf by whoever receives it.
+       *
+       * `redirect: 'error'` — these endpoints answer 200 directly (checked),
+       * so a redirect means something has changed that we did not agree to.
+       * Following it would let a hijacked or misconfigured API point us at an
+       * origin the CSP was written before anybody had heard of. Failing instead
+       * costs nothing: the caller already has to survive a failed request.
+       *
+       * `referrerPolicy: 'no-referrer'` — the page URL says which coin, wallet
+       * or question the reader is looking at. That is the reader's business,
+       * not the data provider's.
+       */
+      credentials: 'omit',
+      redirect: 'error',
+      referrerPolicy: 'no-referrer',
     });
   } catch (error) {
     /*
@@ -102,7 +133,23 @@ export async function fetchJson(url: string, init?: RequestInit): Promise<unknow
     throw new Error(`${url} responded 429`);
   }
   if (!response.ok) throw new Error(`${url} responded ${response.status}`);
-  return response.json();
+
+  /*
+   * Check what arrived before parsing it.
+   *
+   * `response.json()` will happily parse a body served as text/html, which is
+   * how a captive portal or an error page ends up being treated as data. And it
+   * reads the whole stream first, so a body with no end is a frozen tab. Read
+   * the text with a cap, confirm the type, then parse.
+   */
+  const type = response.headers.get('content-type') ?? '';
+  if (!/^application\/(json|.*\+json)/i.test(type)) {
+    throw new Error(`${url} answered ${type || 'no content type'}, not JSON`);
+  }
+
+  const body = await response.text();
+  if (body.length > MAX_BYTES) throw new Error(`${url} answered more than ${MAX_BYTES} bytes`);
+  return JSON.parse(body);
 }
 
 /** Price, market cap, liquidity and volume for the main IF/WETH pool. */

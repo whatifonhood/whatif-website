@@ -28,13 +28,19 @@ const { locale } = Astro.props;
 const copy = getCopy(locale);
 
 /**
- * The ten largest burns.
+ * The ten most recent burns.
  *
- * Sorted from the committed event log rather than fetched: these are historical
- * facts that only change when a bigger burn happens, and the daily refresh
- * picks that up.
+ * This was the ten LARGEST, and as a list it had stopped moving. The biggest
+ * burns all happened in the launch window, when the pool was turning over many
+ * times what it does now, so the top ten was fixed the week it was written and
+ * nothing that has burned since could ever enter it. A list that cannot change
+ * tells a reader nothing about whether the burn is still running — which is the
+ * one thing this section exists to show.
+ *
+ * Sorted from the committed event log rather than fetched: the daily refresh
+ * appends new burns, so this moves on its own.
  */
-const BIGGEST_BURNS = [...BURNS].sort((a, b) => b.tokens - a.tokens).slice(0, 10);
+const LATEST_BURNS = [...BURNS].sort((a, b) => b.time - a.time).slice(0, 10);
 
 const burnDate = (seconds: number) =>
   new Date(seconds * 1000).toLocaleDateString(locale, {
@@ -690,20 +696,17 @@ const metrics = [
       </p>
 
       <!--
-        The largest burns, each one linked to the transaction that made it.
+        The most recent burns, each one linked to the transaction that made it.
         The curve above shows the shape; this names the events behind it, and
         every row can be checked on the explorer by anyone who doubts it.
       -->
       <h2 class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
-        {page.biggestBurnsTitle}
+        {page.latestBurnsTitle}
       </h2>
       <ol class="mt-4 divide-y divide-line/60">
         {
-          BIGGEST_BURNS.map((burn, index) => (
+          LATEST_BURNS.map((burn) => (
             <li class="flex items-baseline gap-4 py-2.5">
-              <span class="w-5 shrink-0 font-mono text-[11px] tabular-nums text-faint">
-                {index + 1}
-              </span>
               <span class="font-mono text-sm tabular-nums text-ink">
                 {formatCount(burn.tokens, locale)}
                 <span class="text-faint">{TOKEN.symbol}</span>

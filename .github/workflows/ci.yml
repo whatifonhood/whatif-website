@@ -5,17 +5,27 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege: this workflow only ever reads the repository.
 permissions:
   contents: read
+
+# Third-party actions are pinned by commit SHA, not by tag.
+#
+# A tag is a mutable pointer. Whoever controls the action's repository can move
+# `v4` to any commit they like, and every workflow that trusts the tag runs the
+# new code on its next build — which is precisely how the tj-actions compromise
+# reached thousands of repositories in 2025. A SHA cannot be moved. The comment
+# after each one records which release it was, so upgrading stays a deliberate
+# edit rather than something that happens to us.
 
 jobs:
   check:
     name: Typecheck, lint and build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -42,8 +52,8 @@ jobs:
     name: Browser tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -54,7 +64,7 @@ jobs:
       # every push and half the suite had never actually run here.
       - run: npx playwright install --with-deps chromium webkit
       - run: npm test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: failure()
         with:
           name: playwright-report
@@ -65,11 +75,11 @@ jobs:
     name: Dependencies and secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -82,6 +92,6 @@ jobs:
 
       # The site is built to have no secrets; this makes sure it stays that way.
       - name: Scan for secrets
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

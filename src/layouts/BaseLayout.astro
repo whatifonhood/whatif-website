@@ -8,6 +8,7 @@
  * Policy in public/_headers can be as tight as it is.
  */
 import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
+import { jsonLd } from '../lib/json-ld.ts';
 import { basePath, hasTranslation, localePath } from '../config/navigation.ts';
 
 /*
@@ -118,7 +119,7 @@ const organizationSchema = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={shareImage} />
 
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(organizationSchema)} />
+    <script type="application/ld+json" is:inline set:html={jsonLd(organizationSchema)} />
   </head>
 
   <body class="bg-void text-ink antialiased">

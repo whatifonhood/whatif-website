@@ -28,6 +28,21 @@ import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/for
 import { setLiveText } from '../lib/live-text.ts';
 import { BURNS, BURNS_SCANNED_TO } from '../config/burns.ts';
 import { CHAIN, TOKEN } from '../config/site.ts';
+import { recall, remember, type PrefKey } from '../lib/preferences.ts';
+import {
+  CHART_H,
+  PLOT_H,
+  SVG_NS,
+  drawAverage,
+  drawBurnMarks,
+  drawCandles,
+  drawEma,
+  drawLine,
+  drawPriceScale,
+  drawTimeAxis,
+  drawVolume,
+  makeScale,
+} from './chart-draw.ts';
 
 const REFRESH_MS = 15_000;
 
@@ -60,251 +75,6 @@ type TaskResult = 'ok' | 'failed' | 'skipped';
 
 /** Transaction hashes already on screen, so new ones can be highlighted. */
 const seenTrades = new Set<string>();
-
-const SVG_NS = 'http://www.w3.org/2000/svg';
-
-/** Price plot height. The volume lane sits underneath it. */
-const PLOT_H = 252;
-/** The SVG's full height, price lane plus volume lane. */
-const CHART_H = 320;
-const VOL_TOP = 264;
-const VOL_H = 52;
-
-/**
- * Maps a price to a y position, linearly or logarithmically.
- *
- * A log axis makes equal percentage moves look equal, which is the honest way
- * to read a chart that has covered several orders of magnitude. Values are
- * floored at the smallest positive price first — a zero would take log to
- * negative infinity and blank the chart.
- */
-function makeScale(min: number, max: number, log: boolean) {
-  const padY = 14;
-  const height = PLOT_H;
-  if (log) {
-    const lo = Math.log(Math.max(min, Number.MIN_VALUE));
-    const hi = Math.log(Math.max(max, Number.MIN_VALUE));
-    const span = hi - lo || 1;
-    return (value: number) =>
-      padY + (1 - (Math.log(Math.max(value, Number.MIN_VALUE)) - lo) / span) * (height - padY * 2);
-  }
-  const span = max - min || max || 1;
-  return (value: number) => padY + (1 - (value - min) / span) * (height - padY * 2);
-}
-
-/**
- * Round price levels to label an axis with.
- *
- * A scale reading 0.008173, 0.008460, 0.008747 is arithmetically correct and
- * useless — the eye cannot place a price against it. These are the round
- * numbers a person would have chosen: 1, 2, 2.5 or 5 times a power of ten,
- * whichever gives roughly the requested number of lines inside the range.
- */
-function niceLevels(min: number, max: number, count = 5): number[] {
-  if (!(max > min)) return [];
-  const rough = (max - min) / count;
-  const magnitude = 10 ** Math.floor(Math.log10(rough));
-  const step =
-    [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((candidate) => candidate >= rough) ??
-    10 * magnitude;
-
-  const levels: number[] = [];
-  for (let value = Math.ceil(min / step) * step; value <= max; value += step) {
-    levels.push(Number(value.toFixed(12)));
-  }
-  return levels;
-}
-
-/**
- * The price scale down the right, and the lines it names across the plot.
- *
- * On a log axis the levels are placed by the same scale the candles use, so a
- * line always sits exactly where its price is rather than where a linear
- * reading of the label would put it.
- */
-function drawPriceScale(
-  svg: SVGSVGElement,
-  scaleEl: HTMLElement | null,
-  min: number,
-  max: number,
-  y: (value: number) => number,
-  locale: string,
-): void {
-  const grid = svg.querySelector('[data-grid]');
-  if (grid) grid.replaceChildren();
-  if (scaleEl) scaleEl.replaceChildren();
-  if (!(max > min)) return;
-
-  const levels = niceLevels(min, max);
-  const lines: SVGElement[] = [];
-
-  for (const level of levels) {
-    const at = y(level);
-    const line = document.createElementNS(SVG_NS, 'line');
-    line.setAttribute('x1', '0');
-    line.setAttribute('x2', '1000');
-    line.setAttribute('y1', at.toFixed(2));
-    line.setAttribute('y2', at.toFixed(2));
-    line.setAttribute('class', 'grid-line');
-    lines.push(line);
-
-    if (scaleEl) {
-      const label = document.createElement('span');
-      // The scale is positioned over the price lane only, so a percentage of
-      // PLOT_H puts a label exactly on its own line however tall the box is.
-      label.style.top = `${(at / CHART_H) * 100}%`;
-      label.textContent = formatUsd(level, locale);
-      scaleEl.append(label);
-    }
-  }
-  grid?.append(...lines);
-}
-
-/**
- * The dates along the bottom.
- *
- * How many, and how precise, follows the window: hours within a day, days
- * within a quarter, months beyond that.
- */
-function drawTimeAxis(axis: HTMLElement | null, candles: Candle[], locale: string): void {
-  if (!axis) return;
-  axis.replaceChildren();
-  if (candles.length < 2) return;
-
-  const span = (candles[candles.length - 1]!.time - candles[0]!.time) * 1000;
-  const day = 86_400_000;
-  const format = new Intl.DateTimeFormat(locale, {
-    ...(span <= 2 * day
-      ? { hour: '2-digit', minute: '2-digit' }
-      : span <= 120 * day
-        ? { day: 'numeric', month: 'short' }
-        : { month: 'short', year: '2-digit' }),
-  });
-
-  const wanted = 5;
-  const step = Math.max(1, Math.floor(candles.length / wanted));
-  for (let i = Math.floor(step / 2); i < candles.length; i += step) {
-    const candle = candles[i];
-    if (!candle) continue;
-    const label = document.createElement('span');
-    label.style.left = `${((i + 0.5) / candles.length) * 100}%`;
-    label.textContent = format.format(new Date(candle.time * 1000));
-    axis.append(label);
-  }
-}
-
-/** An exponential moving average, which reacts faster than a flat one. */
-function drawEma(
-  svg: SVGSVGElement,
-  candles: Candle[],
-  y: (v: number) => number,
-  period = 21,
-): void {
-  const layer = svg.querySelector('[data-ema]');
-  if (!layer) return;
-  layer.replaceChildren();
-  if (candles.length < period) return;
-
-  const k = 2 / (period + 1);
-  let ema = candles.slice(0, period).reduce((sum, c) => sum + c.close, 0) / period;
-  const points: string[] = [];
-  for (const [index, candle] of candles.entries()) {
-    if (index >= period) ema = candle.close * k + ema * (1 - k);
-    if (index < period - 1) continue;
-    const x = ((index + 0.5) / candles.length) * 1000;
-    points.push(`${points.length === 0 ? 'M' : 'L'}${x.toFixed(2)},${y(ema).toFixed(2)}`);
-  }
-
-  const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', points.join(' '));
-  path.setAttribute('class', 'ema-line');
-  layer.append(path);
-}
-
-/** Volume bars under the price, coloured by whether the candle closed up. */
-function drawVolume(svg: SVGSVGElement, candles: Candle[]): void {
-  const layer = svg.querySelector('[data-volume]');
-  if (!layer) return;
-
-  const peak = Math.max(...candles.map((c) => c.volumeUsd), 1);
-  const slot = 1000 / candles.length;
-  const width = Math.max(1, Math.min(20, slot * 0.62));
-
-  const bars = candles.map((candle, index) => {
-    const height = (candle.volumeUsd / peak) * VOL_H;
-    const bar = document.createElementNS(SVG_NS, 'rect');
-    bar.setAttribute('x', (slot * (index + 0.5) - width / 2).toFixed(2));
-    bar.setAttribute('width', width.toFixed(2));
-    bar.setAttribute('y', (VOL_TOP + VOL_H - height).toFixed(2));
-    bar.setAttribute('height', Math.max(0.5, height).toFixed(2));
-    bar.setAttribute('class', 'vol-bar');
-    bar.dataset.rising = String(candle.close >= candle.open);
-    return bar;
-  });
-  layer.replaceChildren(...bars);
-}
-
-/**
- * Draws candlesticks into an SVG.
- *
- * A wick from low to high, a body from open to close, lime when the candle
- * closed up and warm when it closed down. Drawn by hand rather than with a
- * charting library, which would be several times the weight of the whole page.
- */
-function drawCandles(
-  svg: SVGSVGElement,
-  candles: Candle[],
-  log = false,
-): { high: number; low: number } {
-  const width = 1000;
-
-  const max = Math.max(...candles.map((c) => c.high));
-  const min = Math.min(...candles.map((c) => c.low));
-  const y = makeScale(min, max, log);
-  const slot = width / candles.length;
-  const bodyWidth = Math.max(2, Math.min(22, slot * 0.62));
-
-  const layer = svg.querySelector('[data-candles]');
-  if (!layer) return { high: max, low: min };
-
-  const parts: SVGElement[] = [];
-  for (const [index, candle] of candles.entries()) {
-    const centre = slot * (index + 0.5);
-    const rising = candle.close >= candle.open;
-
-    const wick = document.createElementNS(SVG_NS, 'line');
-    wick.setAttribute('x1', centre.toFixed(2));
-    wick.setAttribute('x2', centre.toFixed(2));
-    wick.setAttribute('y1', y(candle.high).toFixed(2));
-    wick.setAttribute('y2', y(candle.low).toFixed(2));
-    wick.setAttribute('class', 'candle-wick');
-    wick.dataset.rising = String(rising);
-
-    const top = y(Math.max(candle.open, candle.close));
-    const bottom = y(Math.min(candle.open, candle.close));
-    const body = document.createElementNS(SVG_NS, 'rect');
-    body.setAttribute('x', (centre - bodyWidth / 2).toFixed(2));
-    body.setAttribute('y', top.toFixed(2));
-    body.setAttribute('width', bodyWidth.toFixed(2));
-    // A doji would be invisible at zero height.
-    body.setAttribute('height', Math.max(1.5, bottom - top).toFixed(2));
-    body.setAttribute('class', 'candle-body');
-    body.dataset.rising = String(rising);
-
-    parts.push(wick, body);
-  }
-  layer.replaceChildren(...parts);
-
-  return { high: max, low: min };
-}
-
-/**
- * Trade sizes, not token prices.
- *
- * The shared formatter keeps four significant digits below a tenth of a cent so
- * memecoin prices stay meaningful — but applied to a dust trade that renders as
- * "$0.000000002497", which is noise in a feed of dollar amounts.
- */
 function formatTradeUsd(value: number, locale: string): string {
   return value < 0.01 ? '<$0.01' : formatUsd(value, locale);
 }
@@ -313,124 +83,6 @@ function formatTradeUsd(value: number, locale: string): string {
  * Draws a closing-price line with an area fill, for people who find candles
  * noisy. Same data, same scale — only the marks change.
  */
-function drawLine(
-  svg: SVGSVGElement,
-  candles: Candle[],
-  log = false,
-): { high: number; low: number } {
-  const width = 1000;
-  const height = PLOT_H;
-
-  const closes = candles.map((c) => c.close);
-  const max = Math.max(...candles.map((c) => c.high));
-  const min = Math.min(...candles.map((c) => c.low));
-
-  const x = (i: number) => (i / Math.max(1, candles.length - 1)) * width;
-  const y = makeScale(min, max, log);
-
-  const path = closes
-    .map((c, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(2)},${y(c).toFixed(2)}`)
-    .join(' ');
-
-  const layer = svg.querySelector('[data-candles]');
-  if (!layer) return { high: max, low: min };
-
-  const area = document.createElementNS(SVG_NS, 'path');
-  area.setAttribute('d', `${path} L${width},${height} L0,${height} Z`);
-  area.setAttribute('class', 'line-area');
-
-  const line = document.createElementNS(SVG_NS, 'path');
-  line.setAttribute('d', path);
-  line.setAttribute('class', 'line-stroke');
-
-  const dot = document.createElementNS(SVG_NS, 'circle');
-  dot.setAttribute('r', '4');
-  dot.setAttribute('cx', x(candles.length - 1).toFixed(2));
-  dot.setAttribute('cy', y(closes[closes.length - 1] ?? min).toFixed(2));
-  dot.setAttribute('class', 'line-dot');
-
-  layer.replaceChildren(area, line, dot);
-  return { high: max, low: min };
-}
-
-/**
- * A moving average over the visible candles.
- *
- * Averaged over the window on screen, so zooming in gives a line that follows
- * what you are actually looking at rather than one computed once and stretched.
- */
-function drawAverage(
-  svg: SVGSVGElement,
-  candles: Candle[],
-  y: (value: number) => number,
-  period: number,
-): void {
-  const layer = svg.querySelector('[data-average]');
-  if (!layer) return;
-  layer.replaceChildren();
-  if (candles.length < period) return;
-
-  const width = 1000;
-  const step = width / candles.length;
-  const points: string[] = [];
-
-  for (let i = period - 1; i < candles.length; i += 1) {
-    let sum = 0;
-    for (let back = 0; back < period; back += 1) sum += candles[i - back]!.close;
-    points.push(`${(step * (i + 0.5)).toFixed(2)},${y(sum / period).toFixed(2)}`);
-  }
-  if (points.length < 2) return;
-
-  const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', `M${points.join(' L')}`);
-  path.setAttribute('class', 'ma-line');
-  layer.append(path);
-}
-
-/**
- * Burns, marked where they happened.
- *
- * Only the ones inside the visible window, so zooming in reveals individual
- * burns rather than a smear of ticks across the whole axis.
- */
-function drawBurnMarks(
-  svg: SVGSVGElement,
-  candles: Candle[],
-  burns: { time: number; tokens: number }[],
-  locale: string,
-  /** e.g. "{amount} burned", from the copy files. */
-  template: string,
-): void {
-  const layer = svg.querySelector('[data-burn-marks]');
-  if (!layer || candles.length < 2) return;
-
-  const first = candles[0]!.time;
-  const last = candles[candles.length - 1]!.time;
-  const span = last - first || 1;
-
-  const marks = burns
-    .filter((burn) => burn.time >= first && burn.time <= last)
-    .map((burn) => {
-      const x = ((burn.time - first) / span) * 1000;
-      const mark = document.createElementNS(SVG_NS, 'line');
-      mark.setAttribute('x1', x.toFixed(2));
-      mark.setAttribute('x2', x.toFixed(2));
-      mark.setAttribute('y1', String(PLOT_H - 16));
-      mark.setAttribute('y2', String(PLOT_H));
-      mark.setAttribute('class', 'burn-mark');
-
-      const title = document.createElementNS(SVG_NS, 'title');
-      title.textContent = template.replace(
-        '{amount}',
-        Math.round(burn.tokens).toLocaleString(locale),
-      );
-      mark.append(title);
-      return mark;
-    });
-
-  layer.replaceChildren(...marks);
-}
-
 function shortWallet(address: string): string {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
@@ -1129,25 +781,17 @@ export function initDashboard(locale: string): void {
         other.setAttribute('aria-pressed', String(other === button));
       }
       // Remember the choice; it is a preference, not page state.
-      try {
-        localStorage.setItem('whatif.chartType', root.dataset.chartType);
-      } catch {
-        /* storage unavailable — the choice just will not persist */
-      }
+      remember('chartType', root.dataset.chartType);
       void renderChart((root.dataset.timeframe as Timeframe) ?? 'day');
     });
   }
 
-  try {
-    const saved = localStorage.getItem('whatif.chartType');
-    if (saved === 'line' || saved === 'candles') {
-      root.dataset.chartType = saved;
-      for (const button of root.querySelectorAll<HTMLButtonElement>('[data-chart-type]')) {
-        button.setAttribute('aria-pressed', String(button.dataset.chartType === saved));
-      }
+  const savedType = recall('chartType');
+  if (savedType === 'line' || savedType === 'candles') {
+    root.dataset.chartType = savedType;
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-chart-type]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.chartType === savedType));
     }
-  } catch {
-    /* storage unavailable */
   }
 
   /**
@@ -1516,39 +1160,46 @@ export function initDashboard(locale: string): void {
     });
   }
 
-  const averageButton = root.querySelector<HTMLButtonElement>('[data-chart-average]');
-  averageButton?.addEventListener('click', () => {
-    const next = root.dataset.showAverage !== 'true';
-    root.dataset.showAverage = String(next);
-    averageButton.setAttribute('aria-pressed', String(next));
-    try {
-      localStorage.setItem('whatif.chartAverage', String(next));
-    } catch {
-      /* storage unavailable */
-    }
-    paint();
-  });
-  const emaButton = root.querySelector<HTMLButtonElement>('[data-chart-ema]');
-  emaButton?.addEventListener('click', () => {
-    const next = root.dataset.showEma !== 'true';
-    root.dataset.showEma = String(next);
-    emaButton.setAttribute('aria-pressed', String(next));
-    try {
-      localStorage.setItem('whatif.chartAverage', String(next));
-    } catch {
-      /* storage unavailable */
-    }
-    paint();
-  });
+  /**
+   * A toolbar button that flips a flag, remembers it, and redraws.
+   *
+   * There were three of these written out longhand — moving average, EMA and
+   * log scale — each about fifteen near-identical lines. The EMA one saved
+   * under the moving average's key, so turning the EMA on quietly changed a
+   * different setting, and the EMA's own state was never restored because
+   * nobody wrote the matching read. Both are what a copied block with one
+   * identifier left behind looks like once it has been in the file a while.
+   *
+   * Written once and called three times, that particular mistake has nowhere
+   * left to happen: the key is an argument, given at the call site, next to the
+   * flag it belongs to.
+   */
+  const wireToggle = (
+    selector: string,
+    pref: PrefKey,
+    flag: 'showAverage' | 'showEma' | 'logScale',
+    redraw: () => void,
+  ) => {
+    const button = root.querySelector<HTMLButtonElement>(selector);
+    if (!button) return;
 
-  try {
-    if (localStorage.getItem('whatif.chartAverage') === 'true') {
-      root.dataset.showAverage = 'true';
-      averageButton?.setAttribute('aria-pressed', 'true');
+    button.addEventListener('click', () => {
+      const next = root.dataset[flag] !== 'true';
+      root.dataset[flag] = String(next);
+      button.setAttribute('aria-pressed', String(next));
+      remember(pref, String(next));
+      redraw();
+    });
+
+    if (recall(pref) === 'true') {
+      root.dataset[flag] = 'true';
+      button.setAttribute('aria-pressed', 'true');
     }
-  } catch {
-    /* storage unavailable */
-  }
+  };
+
+  // The overlays only change what is drawn over the candles, so they repaint.
+  wireToggle('[data-chart-average]', 'chartAverage', 'showAverage', paint);
+  wireToggle('[data-chart-ema]', 'chartEma', 'showEma', paint);
 
   wrap?.addEventListener('pointermove', moveCrosshair);
   wrap?.addEventListener('pointerdown', moveCrosshair);
@@ -1574,11 +1225,7 @@ export function initDashboard(locale: string): void {
     const clamped = Math.round(Math.min(MAX_H, Math.max(MIN_H, height)));
     root.style.setProperty('--chart-height', `${clamped}px`);
     grip?.setAttribute('aria-valuenow', String(clamped));
-    try {
-      localStorage.setItem('whatif.chartHeight', String(clamped));
-    } catch {
-      /* storage unavailable — the size just will not persist */
-    }
+    remember('chartHeight', String(clamped));
     return clamped;
   };
 
@@ -1631,35 +1278,14 @@ export function initDashboard(locale: string): void {
       event.preventDefault();
     });
 
-    try {
-      const saved = Number(localStorage.getItem('whatif.chartHeight'));
-      if (Number.isFinite(saved) && saved > 0) applyHeight(saved);
-    } catch {
-      /* storage unavailable */
-    }
+    const savedHeight = Number(recall('chartHeight'));
+    if (Number.isFinite(savedHeight) && savedHeight > 0) applyHeight(savedHeight);
   }
 
-  const logButton = root.querySelector<HTMLButtonElement>('[data-chart-log]');
-  logButton?.addEventListener('click', () => {
-    const next = root.dataset.logScale !== 'true';
-    root.dataset.logScale = String(next);
-    logButton.setAttribute('aria-pressed', String(next));
-    try {
-      localStorage.setItem('whatif.chartLog', String(next));
-    } catch {
-      /* storage unavailable — the choice just will not persist */
-    }
+  // A log scale changes the axis, not just an overlay, so this one re-renders.
+  wireToggle('[data-chart-log]', 'chartLog', 'logScale', () => {
     void renderChart((root.dataset.timeframe as Timeframe) ?? 'day');
   });
-
-  try {
-    if (localStorage.getItem('whatif.chartLog') === 'true') {
-      root.dataset.logScale = 'true';
-      logButton?.setAttribute('aria-pressed', 'true');
-    }
-  } catch {
-    /* storage unavailable */
-  }
 
   /**
    * Keeping the page live without anyone reloading it.

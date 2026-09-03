@@ -91,17 +91,25 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
   intro={page.intro}
   socialImage={`${SITE.url}/og-roadmap.jpg`}
 >
-  <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
-    <!-- 1. The record. -->
-    <div class="border-y border-line py-7">
-      <dl class="grid grid-cols-2 gap-x-6 gap-y-7">
+  <div class="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8">
+    <!--
+      1. The record.
+
+      Figures on the left, the date of the most recent ship on the right. The
+      date is not a third figure: set at the size of a two-digit count it wraps,
+      and a long-form date is never the same length twice across four languages.
+    -->
+    <div
+      class="flex flex-wrap items-end justify-between gap-x-10 gap-y-6 border-y border-line py-7"
+    >
+      <dl class="flex gap-x-12 sm:gap-x-16">
         {
           record.map((figure) => (
             <div>
               <dd class="font-display text-4xl font-black italic tabular-nums tracking-tight text-ink sm:text-5xl">
                 {figure.value}
               </dd>
-              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+              <dt class="mt-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
                 {figure.label}
               </dt>
             </div>
@@ -110,10 +118,10 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
       </dl>
       {
         latest && (
-          <p class="mt-6 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          <p class="font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
             {page.record.latest}
             {' · '}
-            <time datetime={latest} class="text-muted">
+            <time datetime={latest} class="whitespace-nowrap text-muted">
               {formatDate(latest)}
             </time>
           </p>
@@ -122,7 +130,7 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
     </div>
 
     <!-- 2. The tracks: what the work is for, and how far each has got. -->
-    <ul class="mt-12 grid gap-5 sm:grid-cols-2">
+    <ul class="mt-12 grid gap-x-8 gap-y-7 sm:grid-cols-2">
       {
         tracks.map(({ track, done, total, percent }) => (
           <li class="track">
@@ -130,44 +138,66 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
               <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
                 {page.tracks[track].label}
               </h2>
-              <p class="font-mono text-[10px] tabular-nums tracking-wider text-faint">
+              <p class="whitespace-nowrap font-mono text-[10px] tabular-nums tracking-wider text-faint">
                 {done}/{total}
               </p>
             </div>
             <p class="mt-2.5 text-sm leading-relaxed text-muted">{page.tracks[track].objective}</p>
-            <div
-              class="track-rail"
+            {/*
+              The rail is SVG, and its width is an attribute rather than a style.
+
+              It used to be a span carrying `style="--done:57%"`. An inline style
+              attribute is blocked by `style-src 'self'`, so the variable was
+              never set, `width: var(--done)` fell back to auto, and every rail
+              rendered full — a roadmap showing four finished tracks when only
+              one was. It looked right in local preview, where no CSP is applied,
+              which is exactly how it survived. An SVG width is a presentation
+              attribute, not CSS: nothing has to be relaxed for it to work.
+            */}
+            <svg
+              class="rail"
+              viewBox="0 0 100 3"
+              preserveAspectRatio="none"
               role="img"
               aria-label={`${page.tracks[track].label}: ${done}/${total}`}
             >
-              <span class="track-fill" style={`--done:${percent}%`} />
-            </div>
+              <rect class="rail-bed" x="0" y="0" width="100" height="3" />
+              <rect class="rail-done" x="0" y="0" width={percent.toFixed(2)} height="3" />
+            </svg>
           </li>
         ))
       }
     </ul>
 
-    <!-- 3. The work in flight. -->
-    <div class="mt-14 flex flex-col gap-11">
+    <!--
+      3. The work in flight, as a board.
+
+      Building, next and later are three states of the same pipeline, so on a
+      wide screen they sit side by side and can be compared at a glance. Stacked
+      one after another they read as three unrelated lists, and the page spent
+      most of its height saying so.
+    -->
+    <div class="mt-16 grid gap-x-7 gap-y-12 lg:grid-cols-3">
       {
         openWork.map(
           ({ status, items }) =>
             items.length > 0 && (
               <section>
-                <h2 class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+                <h2 class="column-head">
                   <span class="road-dot" data-status={status} aria-hidden="true" />
                   {page.statuses[status]}
+                  <span class="column-count">{items.length}</span>
                 </h2>
 
-                <ol class="mt-5 flex flex-col gap-3">
+                <ol class="mt-4 flex flex-col gap-3">
                   {items.map((item) => (
-                    <li class="card p-6">
+                    <li class="card p-5">
                       <p class="track-chip">{page.tracks[item.track].label}</p>
-                      <h3 class="mt-3 text-lg font-semibold text-ink">{item.title}</h3>
-                      <p class="mt-2 leading-relaxed text-muted">{item.body}</p>
+                      <h3 class="mt-3 font-semibold leading-snug text-ink">{item.title}</h3>
+                      <p class="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
 
                       {(item.needs || item.signal) && (
-                        <dl class="mt-5 flex flex-col gap-3 border-t border-line pt-4">
+                        <dl class="mt-4 flex flex-col gap-3 border-t border-line pt-3.5">
                           {item.needs && (
                             <div class="gate">
                               <dt>{page.needsLabel}</dt>
@@ -191,31 +221,37 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
       }
     </div>
 
-    <!-- 4. The log. -->
-    <section class="mt-16">
-      <h2
-        class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
-      >
+    <!--
+      4. The log.
+
+      Fourteen shipped items as fourteen full cards was two thirds of the page,
+      all at the same visual weight, which made the record of what landed harder
+      to read the more there was of it. A log is a reference: dense rows under a
+      date, scanned rather than studied.
+    -->
+    <section class="mt-20 border-t border-line pt-10">
+      <h2 class="column-head">
         <span class="road-dot" data-status="shipped" aria-hidden="true"></span>
         {page.log.title}
+        <span class="column-count">{shipped.length}</span>
       </h2>
       <p class="mt-4 max-w-2xl leading-relaxed text-muted">{page.log.intro}</p>
 
-      <ol class="log mt-8">
+      <ol class="mt-9 flex flex-col gap-9">
         {
           days.map((day) => (
             <li class="log-day">
               <time datetime={day.date} class="log-date">
                 {formatDate(day.date)}
               </time>
-              <ul class="mt-3 flex flex-col gap-3">
+              <ul class="log-entries">
                 {day.items.map((item) => (
-                  <li class="card p-5">
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                      <p class="track-chip">{page.tracks[item.track].label}</p>
+                  <li class="log-entry">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
                       <h3 class="font-semibold text-ink">{item.title}</h3>
+                      <p class="track-chip">{page.tracks[item.track].label}</p>
                     </div>
-                    <p class="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
+                    <p class="mt-1.5 text-sm leading-relaxed text-muted">{item.body}</p>
                     {item.href && (
                       <a href={toolPath(item.href, locale)} class="log-link">
                         {page.open}
@@ -232,11 +268,11 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
     </section>
 
     <!-- The terms. Last, because they are only worth reading after the record. -->
-    <section class="mt-16 border-t border-line pt-10">
+    <section class="mt-20 border-t border-line pt-10">
       <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
         {page.terms.title}
       </h2>
-      <ol class="mt-5 flex flex-col gap-4">
+      <ol class="mt-5 grid max-w-4xl gap-x-10 gap-y-4 sm:grid-cols-2">
         {
           page.terms.items.map((term, index) => (
             <li class="flex gap-4">
@@ -278,18 +314,23 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
     border-left: 2px solid var(--color-line);
     padding-left: 1.15rem;
   }
-  .track-rail {
+  /*
+   * Square ends, deliberately. `preserveAspectRatio="none"` stretches the rail
+   * to whatever width the column is, and a corner radius stretches with it —
+   * rounded ends would arrive as lopsided ellipses at some breakpoints and not
+   * others. Square is the same shape at every width.
+   */
+  .rail {
+    display: block;
     margin-top: 1rem;
     height: 3px;
-    border-radius: 999px;
-    background: var(--color-line);
+    width: 100%;
   }
-  .track-fill {
-    display: block;
-    height: 100%;
-    width: var(--done);
-    border-radius: 999px;
-    background: var(--color-lime);
+  .rail-bed {
+    fill: var(--color-line);
+  }
+  .rail-done {
+    fill: var(--color-lime);
   }
 
   .track-chip {
@@ -322,36 +363,33 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
     color: var(--color-ink);
   }
 
-  /* ---- the log, as a dated rail */
+  /* ---- section headings: findable at a glance, with what they hold */
+  .column-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-lime);
+  }
+  .column-count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-faint);
+  }
+
+  /*
+   * ---- the log: a date, then its entries in a column beside it.
+   *
+   * On a wide screen the date sits in its own gutter, so the eye can run down
+   * the dates alone and stop at one. Below 60rem there is no room for a gutter
+   * and it stacks, which is the same reading order with less width.
+   */
   .log-day {
-    position: relative;
-    padding-left: 1.5rem;
-  }
-  .log-day + .log-day {
-    margin-top: 2.25rem;
-  }
-  .log-day::before {
-    content: '';
-    position: absolute;
-    top: 0.55rem;
-    bottom: -2.25rem;
-    left: 3px;
-    width: 1px;
-    background: var(--color-line);
-  }
-  .log-day:last-child::before {
-    bottom: auto;
-    height: 0;
-  }
-  .log-day::after {
-    content: '';
-    position: absolute;
-    top: 0.4rem;
-    left: 0;
-    height: 7px;
-    width: 7px;
-    border-radius: 999px;
-    background: var(--color-lime-deep);
+    display: grid;
+    gap: 0.75rem 2rem;
   }
   .log-date {
     font-family: var(--font-mono);
@@ -359,6 +397,27 @@ const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped').map((
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-faint);
+    white-space: nowrap;
+  }
+  .log-entries {
+    display: flex;
+    flex-direction: column;
+  }
+  .log-entry {
+    border-top: 1px solid var(--color-line);
+    padding: 1rem 0;
+  }
+  .log-entry:last-child {
+    padding-bottom: 0;
+  }
+
+  @media (min-width: 60rem) {
+    .log-day {
+      grid-template-columns: 9.5rem 1fr;
+    }
+    .log-date {
+      padding-top: 1rem;
+    }
   }
 
   .log-link {

@@ -350,7 +350,7 @@ export const tr: SiteCopy = {
       holderTokens: 'Token',
       holderShare: 'Arzdaki payı',
       holderKinds: { burn: 'Yakıldı', pool: 'Likidite havuzu', contract: 'Sözleşme', unknown: '—' },
-      biggestBurnsTitle: 'En büyük on yakım',
+      latestBurnsTitle: 'Son yakımlar',
       sinceLead: 'Son ziyaretinden bu yana, {ago}',
       sincePrice: 'Fiyat {change} hareket etti, {price} oldu.',
       sinceBurned: '{amount} $IF yakıldı.',

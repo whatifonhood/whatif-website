@@ -15,6 +15,22 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
 
+  /*
+   * No syntax highlighter on the white paper's code blocks.
+   *
+   * Shiki colours each token with an inline `style` attribute, and `style-src
+   * 'self'` drops every one of them — so the colours never reached a reader,
+   * on any of the four language builds. What they did reach was the HTML: ten
+   * dead attributes per page, shipped to say nothing.
+   *
+   * The blocks are shell commands, and .docs-prose pre in src/layouts/Docs.astro
+   * already gives them the site's own frame, background and mono face. That is
+   * what a visitor has always actually seen. This makes the markup say so.
+   */
+  markdown: {
+    syntaxHighlight: false,
+  },
+
   // One page per language, each on its own indexable URL: / , /zh/ , /tr/ , /es/
   i18n: {
     defaultLocale: 'en',

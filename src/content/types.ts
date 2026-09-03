@@ -273,7 +273,7 @@ export interface SiteCopy {
       holderShare: string;
       holderKinds: { burn: string; pool: string; contract: string; unknown: string };
       /** The largest burns, each linked to its transaction. */
-      biggestBurnsTitle: string;
+      latestBurnsTitle: string;
       /**
        * "Since you were last here". Shown only to a returning reader, compared
        * against figures kept in their own browser.
