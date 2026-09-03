@@ -340,7 +340,7 @@ export const zh: SiteCopy = {
       holderTokens: '代币数量',
       holderShare: '占总量比例',
       holderKinds: { burn: '已销毁', pool: '流动性池', contract: '合约', unknown: '—' },
-      biggestBurnsTitle: '最大的十次销毁',
+      latestBurnsTitle: '最近的销毁',
       sinceLead: '自你上次来访，{ago}',
       sincePrice: '价格变动 {change}，现为 {price}。',
       sinceBurned: '销毁了 {amount} $IF。',

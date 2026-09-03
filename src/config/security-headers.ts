@@ -39,6 +39,28 @@ function policy(imgSrc: string): string {
     "object-src 'none'",
     "manifest-src 'self'",
     'upgrade-insecure-requests',
+    /*
+     * Trusted Types: the browser refuses to let a string reach innerHTML at all.
+     *
+     * `script-src 'self'` stops an attacker loading a script. It does nothing
+     * about DOM XSS, where the payload never becomes a script tag — it is a
+     * string written into an existing sink. This directive closes that door in
+     * the engine rather than in review: assigning a plain string to innerHTML,
+     * outerHTML, insertAdjacentHTML or a script src throws a TypeError.
+     *
+     * `trusted-types 'none'` is the strict form — not one policy may be created,
+     * so there is no escape hatch to be abused later. The site can afford the
+     * strict form because it already writes every dynamic value with
+     * textContent; see src/lib/live-text.ts, which exists to make that the only
+     * way to put an API response on the page. This turns that convention from
+     * something a reviewer has to notice into something the browser enforces.
+     *
+     * Cross-browser since February 2026 (Firefox last). Older browsers ignore
+     * the directive, so nothing is broken by shipping it — they simply keep the
+     * protection the rest of the policy already gives them.
+     */
+    "require-trusted-types-for 'script'",
+    "trusted-types 'none'",
   ].join('; ');
 }
 

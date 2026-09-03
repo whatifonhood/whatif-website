@@ -1951,6 +1951,47 @@ test.describe('the chart never mislabels what it is showing', () => {
     return { x: box.x + box.width / 2, y: Math.min(box.y + box.height / 2, height - 24), box };
   }
 
+  /*
+   * Each chart toggle remembers itself, and only itself.
+   *
+   * The EMA button used to save under the moving average's key. Turning the EMA
+   * on therefore changed a setting the reader had not touched, and the EMA's own
+   * state was never restored because no read matched the write. Both survived
+   * because nothing checked that a preference came back — so this checks.
+   */
+  test('a chart toggle is remembered without disturbing its neighbours', async ({ page }) => {
+    await page.goto('/stats/');
+    await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+
+    const ema = page.locator('[data-chart-ema]');
+    const average = page.locator('[data-chart-average]');
+    expect(await ema.getAttribute('aria-pressed')).toBe('false');
+    expect(await average.getAttribute('aria-pressed')).toBe('false');
+
+    await ema.click();
+    expect(await ema.getAttribute('aria-pressed')).toBe('true');
+    expect(
+      await average.getAttribute('aria-pressed'),
+      'turning on the EMA must not touch the moving average',
+    ).toBe('false');
+
+    await page.reload();
+    await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+    expect(await ema.getAttribute('aria-pressed'), 'the EMA must come back on').toBe('true');
+    expect(
+      await average.getAttribute('aria-pressed'),
+      'the moving average must come back off',
+    ).toBe('false');
+
+    // And the keys are genuinely separate on the device, not just in the UI.
+    const stored = await page.evaluate(() => ({
+      ema: localStorage.getItem('whatif.chartEma'),
+      average: localStorage.getItem('whatif.chartAverage'),
+    }));
+    expect(stored.ema).toBe('true');
+    expect(stored.average, 'the average key must not have been written').not.toBe('true');
+  });
+
   test('the +/- buttons zoom and a drag then pans', async ({ page }) => {
     await page.goto('/stats/');
     await expect.poll(() => page.locator('[data-candles] rect').count()).toBeGreaterThan(5);

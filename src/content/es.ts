@@ -363,7 +363,7 @@ export const es: SiteCopy = {
         contract: 'Contrato',
         unknown: '—',
       },
-      biggestBurnsTitle: 'Las diez quemas más grandes',
+      latestBurnsTitle: 'Las quemas más recientes',
       sinceLead: 'Desde tu última visita, {ago}',
       sincePrice: 'El precio se movió {change}, hasta {price}.',
       sinceBurned: 'Se quemaron {amount} $IF.',

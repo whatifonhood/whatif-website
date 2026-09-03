@@ -345,7 +345,7 @@ export const en: SiteCopy = {
       holderTokens: 'Tokens',
       holderShare: 'Share of supply',
       holderKinds: { burn: 'Burned', pool: 'Liquidity pool', contract: 'Contract', unknown: '—' },
-      biggestBurnsTitle: 'The ten largest burns',
+      latestBurnsTitle: 'The latest burns',
       sinceLead: 'Since you were last here, {ago}',
       sincePrice: 'The price moved {change}, to {price}.',
       sinceBurned: '{amount} $IF was burned.',

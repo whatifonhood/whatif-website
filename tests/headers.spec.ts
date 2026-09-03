@@ -228,3 +228,41 @@ test('the build-time figures are not stale', async () => {
     `the snapshot is ${Math.round(days)} days old — run \`npm run snapshot\``,
   ).toBeLessThan(SNAPSHOT_MAX_AGE_DAYS);
 });
+
+/**
+ * No page may ship an inline `style` attribute.
+ *
+ * `style-src 'self'` blocks them, and it does so silently: the browser drops
+ * the declaration and renders whatever the stylesheet said instead. That is not
+ * a hypothetical. The roadmap set each progress rail's width with
+ * `style="--done:57%"`, the variable never arrived, `width: var(--done)` fell
+ * back to auto, and all four rails rendered full — the page claimed four
+ * finished tracks when one was finished. It looked correct in local preview,
+ * where no CSP is applied, and on production nobody could see that the numbers
+ * beside the bars disagreed with them.
+ *
+ * This reads the built HTML rather than the live DOM on purpose. Setting a
+ * property through the CSSOM — `el.style.setProperty(...)`, which is how the
+ * chart carries its height — is explicitly NOT blocked by CSP, and produces a
+ * style attribute at runtime. Only what the build wrote into the markup is the
+ * problem, and only the build output shows that.
+ */
+test('nothing in the built HTML carries an inline style attribute', async () => {
+  const { globSync } = await import('node:fs');
+  const pages = globSync('dist/**/*.html');
+  expect(pages.length, 'no built HTML found — run `npm run build` first').toBeGreaterThan(10);
+
+  const offenders: string[] = [];
+  for (const page of pages) {
+    const html = readFileSync(page, 'utf8');
+    for (const match of html.matchAll(/<[^>]+\sstyle="([^"]*)"/g)) {
+      offenders.push(`${page}: style="${match[1]?.slice(0, 60)}"`);
+      break; // one example per page is enough to find it
+    }
+  }
+
+  expect(
+    offenders.slice(0, 10),
+    'an inline style attribute is dropped by style-src and renders as if it were never written',
+  ).toEqual([]);
+});
