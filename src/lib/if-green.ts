@@ -99,8 +99,11 @@ function drawFramed(context: CanvasRenderingContext2D, portrait: Portrait, size:
  * first — and only the field, never the output — is what keeps the flats flat.
  */
 function blur(field: Float32Array, size: number, radius: number): Float32Array {
-  let source = field;
-  let target = new Float32Array(field.length);
+  // Both halves of the swap below must be the same type. `field` arrives as the
+  // default Float32Array (backed by ArrayBufferLike); a freshly constructed one
+  // is narrower, and the two cannot be exchanged until they agree.
+  let source: Float32Array<ArrayBufferLike> = field;
+  let target: Float32Array<ArrayBufferLike> = new Float32Array(field.length);
   for (let pass = 0; pass < 2; pass += 1) {
     // Horizontal.
     for (let y = 0; y < size; y += 1) {
@@ -149,7 +152,8 @@ function blur(field: Float32Array, size: number, radius: number): Float32Array {
 function normalise(field: Float32Array): void {
   const buckets = new Uint32Array(256);
   for (let i = 0; i < field.length; i += 1) {
-    buckets[clamp(Math.round(field[i]! * 255), 0, 255)] += 1;
+    const bucket = clamp(Math.round(field[i]! * 255), 0, 255);
+    buckets[bucket] = (buckets[bucket] ?? 0) + 1;
   }
   const floor = field.length * 0.02;
   const ceiling = field.length * 0.98;
