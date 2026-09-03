@@ -1,6 +1,17 @@
 /**
  * The question generator.
  *
+ * ENGLISH ONLY, ON PURPOSE. This is the one part of the site that is not
+ * translated, and it must stay that way. "What if" is the name of the coin, not
+ * a phrase the page happens to use, and every question is a variation on it —
+ * translate the question and the brand goes with it. A reader on /zh/ask/ gets
+ * the page in Chinese and the question in English because the question IS the
+ * thing they came for, and it is the same thing in every language.
+ *
+ * So the banks and patterns below have no locale dimension, and adding one is
+ * not an oversight waiting to be corrected. If a future reader thinks this file
+ * looks unfinished next to src/content/, it is not.
+ *
  * THE RULE THIS FILE EXISTS TO ENFORCE: only vary what is interchangeable
  * within a single idea, and never join two ideas.
  *
