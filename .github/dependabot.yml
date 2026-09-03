@@ -1,0 +1,33 @@
+# Keeping dependencies current, which `npm audit` in CI does not do.
+#
+# The audit step fails the build on a KNOWN vulnerability. That is the floor,
+# not the goal: it says nothing until somebody publishes an advisory, and by
+# then the upgrade is urgent rather than routine. This opens the routine ones as
+# pull requests instead, so the version gap stays small and a security release
+# is a one-line bump rather than a major-version migration under pressure.
+#
+# Grouped deliberately. Fifteen separate pull requests a week is how a bot gets
+# muted, and a muted bot is worse than no bot.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Patch and minor together: these are meant to be read once and merged.
+      routine:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+    # Majors arrive on their own, because each one needs its own read.
+    labels: ['dependencies']
+
+  # The workflows pin actions by SHA, which means nothing moves them but this.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ['dependencies']
