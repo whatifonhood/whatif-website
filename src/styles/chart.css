@@ -583,3 +583,57 @@
     padding-inline: 0.6rem;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Rules that cross the ChartPanel boundary.
+ *
+ * `[data-zoomed]` and `[data-chart-busy]` are set at runtime on the dashboard
+ * root, which lives in Stats.astro, while `[data-chart-wrap]` is inside
+ * ChartPanel.astro. A scoped rule cannot span two components, so these have to
+ * be global — and they were not caught when the chart's styles moved, because
+ * that pass matched class selectors and these are attribute selectors.
+ *
+ * They matter more than they look: `touch-action: pan-y` on the wrapper is what
+ * lets a finger pinch and drag the chart instead of the browser scrolling the
+ * page, and the cursor rules are what stop the chart offering a grab it cannot
+ * honour. Both silently reverted to `auto` when the markup moved out.
+ * ------------------------------------------------------------------------- */
+
+/*
+ * The grab cursor is a promise, so only make it when it can be kept.
+ *
+ * Panning is a no-op while the whole range is already on screen — there is
+ * nowhere to pan to — and the chart opens that way. Advertising a drag the
+ * chart cannot perform is what made it read as broken: you pull, nothing
+ * moves, and there is no way to tell that nothing was supposed to. Zoom in
+ * (wheel, pinch, or the +/- buttons) and the cursor says so.
+ */
+[data-chart-wrap] {
+  cursor: default;
+  touch-action: pan-y;
+}
+[data-zoomed='true'] [data-chart-wrap] {
+  cursor: grab;
+}
+[data-zoomed='true'] [data-chart-wrap][data-panning='true'] {
+  cursor: grabbing;
+}
+
+/*
+ * The chart while a timeframe is loading.
+ *
+ * A tap on a chip used to give no sign anything was happening: on a slow
+ * connection you pressed 7D and watched the same chart for a second and a
+ * half. The chart itself dims rather than being replaced, so the candles you
+ * were reading stay readable while the new ones are fetched.
+ */
+[data-chart-busy] [data-chart-wrap] {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+[data-change][data-direction='up'] {
+  color: var(--color-lime);
+}
+[data-change][data-direction='down'] {
+  color: var(--color-warn);
+}
