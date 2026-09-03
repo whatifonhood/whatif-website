@@ -37,8 +37,18 @@ const proofFor: Record<number, { href: string; label: string }> = {
     {
       copy.thesis.pillars.map((pillar, index) => {
         const proof = proofFor[index];
+        /*
+         * Content runs from the top; only the proof link is pushed down.
+         *
+         * The card used to be `justify-between`, which shares the leftover
+         * height out between the number and the text. Cards in a row are the
+         * same height and their bodies are not, so each shared out a different
+         * amount and no two titles in a row began on the same line. `mt-auto`
+         * on the link alone keeps the bottoms aligned without moving anything
+         * above it.
+         */
         return (
-          <article class="card card-hover shimmer group flex flex-col justify-between p-6">
+          <article class="card card-hover shimmer group flex flex-col p-6">
             <span class="font-mono text-xs text-faint">{String(index + 1).padStart(2, '0')}</span>
             <div class="mt-8">
               <h3 class="font-display text-xl font-semibold text-ink">{pillar.title}</h3>
@@ -47,18 +57,18 @@ const proofFor: Record<number, { href: string; label: string }> = {
                 text={pillar.body}
                 class="mt-2 leading-relaxed text-muted"
               />
-              {proof && (
-                <a
-                  href={proof.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="tap mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
-                >
-                  {proof.label}
-                  <Icons name="arrow-up-right" size={12} />
-                </a>
-              )}
             </div>
+            {proof && (
+              <a
+                href={proof.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tap mt-auto inline-flex items-center gap-1.5 pt-5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
+              >
+                {proof.label}
+                <Icons name="arrow-up-right" size={12} />
+              </a>
+            )}
           </article>
         );
       })
