@@ -17,7 +17,7 @@ npm run dev          # http://localhost:4321
 `--depth 1` is worth it. The full history is around 430 MB, almost all of it
 meme and coin artwork, and you almost certainly do not need it.
 
-Node 22 or newer. No environment variables, no database, no accounts, no API
+Node 22.12 or newer (`.nvmrc` says so). No environment variables, no database, no accounts, no API
 keys — the site builds and runs with nothing configured. `.env.example` exists
 only for one optional data-regeneration script.
 

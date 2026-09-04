@@ -1,7 +1,7 @@
 # What the licence covers, and what it does not
 
 LICENSE is the MIT licence, verbatim, and it applies to the **source code** of
-this site: everything in `src/`, `tools/`, `tests/`, `netlify/`, and the
+this site: everything in `src/`, `tools/`, `tests/`, and the
 configuration at the root. Fork it, learn from it, build something else with
 it, send changes back. That is what it is here for.
 
@@ -18,7 +18,6 @@ able to run it locally, not because they are free to reuse:
 | `public/brand/` | The wordmark, the monogram, the token logo, the brand kit |
 | `public/memes/` | The meme artwork |
 | `public/coins/` | The coin illustrations |
-| `public/forge/` | The Forge's reference artwork |
 | `public/art/`, `public/posts/`, `public/cards/` | Social and campaign artwork |
 | `src/assets/` | Artwork compiled into the build |
 

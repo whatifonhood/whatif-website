@@ -6,7 +6,7 @@ A static site: every page is HTML generated at build time. There is no server, n
 database, no login and **no environment variables** — clone it, install, and it runs.
 
 ```bash
-npm install
+npm install      # Node 22.12 or newer
 npm run dev      # http://localhost:4321
 ```
 
@@ -16,24 +16,33 @@ npm run dev      # http://localhost:4321
 
 ```
 src/
-  config/site.ts        Every fact: contract address, chain, links.  ← start here
-  config/ecosystem.ts   The tools listed in the Ecosystem section
-  config/memes.ts       Generated — the meme vault index
-  config/coin-history.ts Generated — prices for the What $IF Machine
-  content/en.ts         Every word on the site, in English
-  content/zh.ts         …in Chinese
-  content/tr.ts         …in Turkish
-  content/types.ts      The shape all three must match
-  components/sections/  One file per section of the landing page
-  components/ui/        Shared pieces: Button, Card, Eyebrow, CopyField
-  scripts/              Browser code, one file per behaviour
-  lib/                  Data fetching and number formatting
-  layouts/              Page shells
-  pages/                One file per URL
-  styles/global.css     The design system: colours, type, spacing
-public/                 Files served as-is: favicons, _headers, the PFP generator
-tools/                  Build-time scripts (see "Regenerating things")
-tests/                  Playwright tests
+  config/site.ts          Every fact: contract address, chain, links.  ← start here
+  config/navigation.ts    Which pages exist, in which languages
+  config/security-headers.ts  The one place the CSP and every response header is defined
+  config/roadmap.ts       The roadmap: tracks, status, what each item is waiting on
+  config/docs.ts          The white paper's order and grouping (pages are in src/docs/)
+  config/what-if.ts       The question generator: banks, patterns, lines
+  config/memes.ts         Generated — the meme vault index
+  config/coins.ts         The PFP generator's coins and rarity tiers
+  config/burns.ts         Generated — every burn, read from the chain
+  config/holders.ts       Generated — the largest holders, labelled
+  config/tweets.ts        Which posts are on the community wall (tweet-cards.ts is generated from it)
+  content/en.ts           Every word on the site, in English
+  content/zh.ts …tr.ts …es.ts   …in Chinese, Turkish and Spanish
+  content/types.ts        The shape all four must match — a missing translation fails the build
+  docs/<lang>/*.md        The white paper, sixteen pages per language
+  data/candles.json       Generated — chart candles, so the chart works before any request
+  components/sections/    One file per section of the landing page
+  components/pages/       One file per tool page (stats, vault, pfp, ask, docs, roadmap…)
+  components/ui/          Shared pieces: Button, CopyField, Eyebrow, Icons, Section…
+  scripts/                Browser code, one file per behaviour
+  lib/                    Data fetching, validation and number formatting
+  layouts/                Page shells
+  pages/                  One file per URL
+  styles/global.css       The design system: colours, type, spacing
+public/                   Files served as-is: favicons, artwork, _headers
+tools/                    Build-time scripts (see "Regenerating things")
+tests/                    Playwright tests
 ```
 
 Two rules keep this navigable:
@@ -199,8 +208,9 @@ keys, no database, no user data. What is left is guarded deliberately.
 - **Dependencies** are pinned by `package-lock.json`, installed with `npm ci` in
   CI, and audited on every run.
 
-If you find something, open an issue without a proof-of-concept and we will get
-in touch.
+Found a security problem? Please do not open a public issue. Use the private
+**Report a vulnerability** form under the repository's Security tab — see
+[SECURITY.md](SECURITY.md).
 
 ---
 

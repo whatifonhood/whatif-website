@@ -63,7 +63,7 @@ En `data.attributes.holders.count`.
 ## Los mayores titulares
 
 ```
-curl -s 'https://robinhoodchain.blockscout.com/api/v2/tokens/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1/holders'
+curl -s -A 'Mozilla/5.0' 'https://robinhoodchain.blockscout.com/api/v2/tokens/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1/holders'
 ```
 
 ## ¿El lanzador se llevó de verdad el 11% en la transacción de lanzamiento?

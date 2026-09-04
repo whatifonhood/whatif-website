@@ -14,7 +14,7 @@
     "url": "https://github.com/sethwilliamharriman/whatif-website/issues"
   },
   "engines": {
-    "node": ">=20.3.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "astro dev",

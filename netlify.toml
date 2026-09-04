@@ -5,7 +5,7 @@
   publish = "dist"
 
 [build.environment]
-  # Astro 7 requires Node 20.3 or newer.
+  # Astro 7 requires Node 22.12 or newer.
   NODE_VERSION = "22"
 
 # Deploy previews get the same headers as production but must not be indexed.

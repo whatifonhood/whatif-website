@@ -63,7 +63,7 @@ curl -s 'https://api.geckoterminal.com/api/v2/networks/robinhood/tokens/0x232CDF
 ## En büyük sahipler
 
 ```
-curl -s 'https://robinhoodchain.blockscout.com/api/v2/tokens/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1/holders'
+curl -s -A 'Mozilla/5.0' 'https://robinhoodchain.blockscout.com/api/v2/tokens/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1/holders'
 ```
 
 ## Lansmanı yapan taraf lansman işleminde gerçekten 11% aldı mı?

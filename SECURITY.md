@@ -15,7 +15,8 @@ be named, that is fine too.
 
 ## What is in scope
 
-This is a static site with no accounts, no database and no user data. That
+This is a static site with no server code, no accounts, no database and no
+user data. That
 rules out most of what a bug bounty usually covers, so the things that actually
 matter here are:
 
@@ -25,11 +26,6 @@ matter here are:
 - **Supply chain.** A dependency or GitHub Action that could execute code in
   the build. Actions are pinned by SHA and dependencies by lockfile — a way to
   move either is in scope.
-- **The Forge endpoints** (`netlify/functions/`). These are the only server
-  code on the site and the only place with a budget attached. Anything that
-  spends someone else's generations, bypasses the per-person cap, or reaches
-  another visitor's photo or job is in scope and is the highest-value thing
-  here.
 - **Header and policy weakening.** A route that quietly serves a laxer CSP than
   `src/config/security-headers.ts` intends.
 
