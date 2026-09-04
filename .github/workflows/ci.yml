@@ -86,10 +86,22 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # Fail on anything a real attacker could use. Low-severity advisories in
-      # build-only tooling do not block a deploy of a static site.
+      # OSV-Scanner over the lockfile, pinned by version and checksum.
+      #
+      # This was `npm audit --audit-level=high`. On 4 September 2026 it started
+      # failing on every run with "400 Bad Request … this endpoint is being
+      # retired": the runner's bundled npm still calls the registry's quick-audit
+      # endpoint, which is going away, while the same lockfile audits clean on a
+      # current npm. A gate that fails for reasons unrelated to the code trains
+      # everyone to ignore it. OSV covers the npm advisory database and more,
+      # does not depend on the registry's endpoint churn, and exits non-zero on
+      # any finding. (`npm ci` above still prints its own audit summary.)
       - name: Audit dependencies
-        run: npm audit --audit-level=high
+        run: |
+          curl -sSfL -o osv-scanner https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64
+          echo "f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+          ./osv-scanner scan source -L package-lock.json
 
       # The site is built to have no secrets; this makes sure it stays that way.
       #
