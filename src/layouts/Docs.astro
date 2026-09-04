@@ -80,7 +80,7 @@ const next = index >= 0 ? pages[index + 1] : undefined;
         /* On this page, for phones: the column version below only exists from xl. */
         current && current.headings.length > 1 && (
           <details class="docs-toc-mobile lg:hidden">
-            <summary class="docs-nav-summary docs-toc-summary">
+            <summary class="docs-toc-summary">
               <span>{labels.onThisPage}</span>
               <Icons name="chevron-down" size={14} />
             </summary>
@@ -174,7 +174,8 @@ const next = index >= 0 ? pages[index + 1] : undefined;
     padding-block: 0.75rem;
   }
 
-  .docs-nav-summary {
+  .docs-nav-summary,
+  .docs-toc-summary {
     display: flex;
     cursor: pointer;
     list-style: none;
@@ -190,14 +191,16 @@ const next = index >= 0 ? pages[index + 1] : undefined;
     letter-spacing: 0.16em;
     color: var(--color-faint);
   }
-  .docs-nav-summary::-webkit-details-marker {
+  .docs-nav-summary::-webkit-details-marker,
+  .docs-toc-summary::-webkit-details-marker {
     display: none;
   }
   .docs-nav-mobile[open] .docs-nav-summary svg,
   .docs-toc-mobile[open] .docs-toc-summary svg {
     transform: rotate(180deg);
   }
-  .docs-nav-summary svg {
+  .docs-nav-summary svg,
+  .docs-toc-summary svg {
     transition: transform 0.2s ease;
   }
 
