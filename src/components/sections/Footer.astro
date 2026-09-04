@@ -88,7 +88,10 @@ const headingTail = ` ${copy.footer.heading.accent}`;
           </div>
         </div>
 
-        <nav class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
+        <nav
+          aria-label={copy.footer.navLabel}
+          class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted"
+        >
           <a href={localePath('/pfp/', locale)} class="tap hover:text-ink">{copy.nav.pfp}</a>
           <a href={localePath('/memes/', locale)} class="tap hover:text-ink"
             >{copy.pages.memes.title}</a

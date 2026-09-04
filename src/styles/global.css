@@ -540,3 +540,8 @@ html[data-motion='reduced'] .enter {
   opacity: 1;
   transform: none;
 }
+
+/* Set by nav.ts while the mobile menu is open, so the page behind it holds still. */
+html.menu-open {
+  overflow: hidden;
+}

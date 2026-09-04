@@ -203,23 +203,34 @@
 .candle-body {
   stroke: none;
 }
+/*
+ * Rising candles are hollow, the convention every charting package offers, so
+ * direction survives without the colour. The fill matches the plot behind it,
+ * which is what hides the wick inside the body.
+ */
+.candle-body[data-rising='true'] {
+  fill: var(--color-void);
+  stroke: var(--color-lime);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
 
 /* Line mode. Same colours, driven by the same data-direction. */
 .line-stroke {
   fill: none;
-  stroke: var(--chart-colour, #8fce02);
+  stroke: var(--chart-colour, var(--color-lime));
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
 .line-area {
-  fill: var(--chart-colour, #8fce02);
+  fill: var(--chart-colour, var(--color-lime));
   opacity: 0.16;
   stroke: none;
 }
 .line-dot {
-  fill: var(--chart-colour, #8fce02);
+  fill: var(--chart-colour, var(--color-lime));
 }
 
 /* Trade feed.
@@ -339,7 +350,7 @@
 /* Drawn at runtime — see the note on the other global block. */
 .ma-line {
   fill: none;
-  stroke: var(--color-gold, #e4d98e);
+  stroke: var(--color-gold);
   stroke-width: 2;
   stroke-linejoin: round;
   opacity: 0.85;

@@ -29,7 +29,7 @@ const description = `${coin.name} — a ${tierLabel} $IF coin. ${page.intro}`;
 
 const shareUrl = new URL('https://x.com/intent/post');
 shareUrl.searchParams.set('text', page.shareText(coin.name, tierLabel));
-shareUrl.searchParams.set('url', `${SITE.url}${localePath(`/pfp/${coin.slug}`, locale)}`);
+shareUrl.searchParams.set('url', `${SITE.url}${localePath(`/pfp/${coin.slug}/`, locale)}`);
 ---
 
 <PageLayout

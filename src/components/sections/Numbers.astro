@@ -131,8 +131,11 @@ const figures = [
       <dl class="mt-10 grid grid-cols-2 gap-2 sm:gap-3">
         {
           figures.map((figure) => (
-            <div class="card card-hover min-w-0 p-3 text-center sm:p-5">
+            <div class="card card-hover min-w-0 p-3 text-center sm:p-5 flex flex-col-reverse">
               {/* Shrinks to fit; a number never breaks. See the note in Hero.astro. */}
+              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+                {figure.label}
+              </dt>
               <dd
                 data-stat={figure.key}
                 class:list={[
@@ -142,9 +145,6 @@ const figures = [
               >
                 {figure.value}
               </dd>
-              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
-                {figure.label}
-              </dt>
             </div>
           ))
         }

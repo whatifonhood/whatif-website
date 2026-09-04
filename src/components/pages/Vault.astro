@@ -33,7 +33,12 @@ const page = copy.pages.memes;
     <!-- Filters -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-wrap gap-2">
-        <button type="button" data-vault-filter="all" aria-pressed="true" class="vault-chip">
+        <button
+          type="button"
+          data-vault-filter="all"
+          aria-pressed="true"
+          class="vault-chip tap-box"
+        >
           {page.all}
         </button>
         {
@@ -42,7 +47,7 @@ const page = copy.pages.memes;
               type="button"
               data-vault-filter={series}
               aria-pressed="false"
-              class="vault-chip"
+              class="vault-chip tap-box"
             >
               {series}
             </button>
@@ -58,7 +63,7 @@ const page = copy.pages.memes;
           data-vault-search
           placeholder={page.searchLabel}
           autocomplete="off"
-          class="w-full rounded-full border border-line bg-surface px-4 py-2.5 text-base text-ink placeholder:text-faint focus:border-lime/50 sm:w-56"
+          class="w-full rounded-full border border-field bg-surface px-4 py-2.5 text-base text-ink placeholder:text-faint focus:border-lime/50 sm:w-56"
         />
         <p
           role="status"
@@ -72,6 +77,17 @@ const page = copy.pages.memes;
     </div>
 
     <!-- Grid -->
+    <svg class="absolute h-0 w-0 overflow-hidden" aria-hidden="true"
+      ><symbol id="i-download" viewBox="0 0 24 24"
+        ><path
+          d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path></symbol
+      ></svg
+    >
     <ul class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {
         MEMES.map((meme, index) => (
@@ -97,7 +113,9 @@ const page = copy.pages.memes;
             </a>
             <div class="flex items-center justify-between gap-2 p-3">
               <div class="min-w-0">
-                <p class="truncate text-sm font-semibold text-ink">{meme.title}</p>
+                <p class="line-clamp-2 text-sm font-semibold text-ink [overflow-wrap:anywhere]">
+                  {meme.title}
+                </p>
                 <p class="font-mono text-[10px] uppercase tracking-wider text-faint">
                   {meme.series}
                 </p>
@@ -105,18 +123,12 @@ const page = copy.pages.memes;
               <a
                 href={`/memes/full/${meme.slug}.webp`}
                 download={`whatif-${meme.slug}.webp`}
+                tabindex="-1"
                 aria-label={`${page.download} ${meme.title}`}
-                class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime text-void transition-colors hover:bg-lime-pale sm:h-8 sm:w-8"
+                class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime text-void transition-colors hover:bg-lime-pale [@media(pointer:fine)]:h-8 [@media(pointer:fine)]:w-8"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                <svg width="14" height="14" aria-hidden="true">
+                  <use href="#i-download" />
                 </svg>
               </a>
             </div>

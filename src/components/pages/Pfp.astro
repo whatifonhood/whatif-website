@@ -1,4 +1,5 @@
 ---
+import { localePath } from '../../config/navigation.ts';
 import PageLayout from '../../layouts/PageLayout.astro';
 import { SITE, type Locale } from '../../config/site.ts';
 import { COINS, COIN_TIERS, COIN_TIER_ORDER } from '../../config/coins.ts';
@@ -178,7 +179,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
                     */}
                     <a
                       data-pool-link
-                      data-href={`/pfp/${coin.slug}`}
+                      data-href={localePath(`/pfp/${coin.slug}/`, locale)}
                       class="pfp-pool-face block"
                       aria-hidden="true"
                     >
@@ -237,7 +238,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
           spellcheck="false"
           autocomplete="off"
           placeholder={page.backupPlaceholder}
-          class="w-full resize-none rounded-xl border border-line bg-void/60 px-4 py-3 font-mono text-base text-ink placeholder:text-faint focus:border-lime/50"
+          class="w-full resize-none rounded-xl border border-field bg-void/60 px-4 py-3 font-mono text-base text-ink placeholder:text-faint focus:border-lime/50"
         ></textarea>
       </label>
 
@@ -295,7 +296,11 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     position: absolute;
     inset: -12%;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--tier-glow, rgb(143 206 2 / 0.28)), transparent 68%);
+    background: radial-gradient(
+      circle,
+      var(--tier-glow, color-mix(in srgb, var(--color-lime) 28%, transparent)),
+      transparent 68%
+    );
     animation: glow 4s ease-in-out infinite;
   }
   .pfp-coin-img {
@@ -315,33 +320,33 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
 
   /* Rarity tints the glow and the chip. */
   [data-tier='uncommon'] {
-    --tier-glow: rgb(196 220 67 / 0.3);
+    --tier-glow: color-mix(in srgb, var(--color-lime-pale) 30%, transparent);
   }
   [data-tier='rare'] {
-    --tier-glow: rgb(91 200 245 / 0.32);
+    --tier-glow: color-mix(in srgb, var(--color-info) 32%, transparent);
   }
   [data-tier='legendary'] {
-    --tier-glow: rgb(228 217 142 / 0.4);
+    --tier-glow: color-mix(in srgb, var(--color-gold) 40%, transparent);
   }
   [data-tier='none'] {
-    --tier-glow: rgb(143 206 2 / 0.12);
+    --tier-glow: color-mix(in srgb, var(--color-lime) 12%, transparent);
   }
 
   .pfp-tier-chip[data-tier='common'] {
-    color: #8fce02;
-    border-color: rgb(143 206 2 / 0.4);
+    color: var(--color-lime);
+    border-color: color-mix(in srgb, var(--color-lime) 40%, transparent);
   }
   .pfp-tier-chip[data-tier='uncommon'] {
-    color: #c4dc43;
-    border-color: rgb(196 220 67 / 0.4);
+    color: var(--color-lime-pale);
+    border-color: color-mix(in srgb, var(--color-lime-pale) 40%, transparent);
   }
   .pfp-tier-chip[data-tier='rare'] {
-    color: #5bc8f5;
-    border-color: rgb(91 200 245 / 0.4);
+    color: var(--color-info);
+    border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
   }
   .pfp-tier-chip[data-tier='legendary'] {
-    color: #e4d98e;
-    border-color: rgb(228 217 142 / 0.45);
+    color: var(--color-gold);
+    border-color: color-mix(in srgb, var(--color-gold) 45%, transparent);
   }
 
   .pfp-dot {
@@ -353,13 +358,13 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
     background: var(--color-lime);
   }
   [data-tier-dot='uncommon'] {
-    background: #c4dc43;
+    background: var(--color-lime-pale);
   }
   [data-tier-dot='rare'] {
-    background: #5bc8f5;
+    background: var(--color-info);
   }
   [data-tier-dot='legendary'] {
-    background: #e4d98e;
+    background: var(--color-gold);
   }
 
   /* Coins start locked and unlock once this browser has pulled them. */

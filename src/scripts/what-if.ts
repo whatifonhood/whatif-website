@@ -124,6 +124,11 @@ export function initWhatIf(locale: string): void {
   };
 
   const ask = () => {
+    // Space works from the question itself; focusing it after each ask is what
+
+    // makes the hint true on a fresh load.
+
+    output?.focus({ preventScroll: true });
     current = nextQuestion(recent);
     recent.push(current.id);
     if (recent.length > MEMORY) recent.shift();

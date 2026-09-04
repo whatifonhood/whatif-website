@@ -29,6 +29,14 @@ export function initToolsMenu(): void {
 
     const close = (control: HTMLButtonElement) => setOpen(menu, control, false);
 
+    // Tabbing out of an open menu closes it; otherwise it stays expanded behind
+
+    // the focus, which a screen reader reports as still open.
+
+    menu.addEventListener('focusout', (event) => {
+      if (!menu.contains(event.relatedTarget as Node | null)) close(toggle);
+    });
+
     toggle.addEventListener('click', () => {
       setOpen(menu, toggle, toggle.getAttribute('aria-expanded') !== 'true');
     });

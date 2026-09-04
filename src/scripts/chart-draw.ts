@@ -9,7 +9,7 @@
  * on its own — and the part worth testing directly, which was impossible while
  * they were locked inside a module that starts a polling loop on import.
  *
- * The co-ordinate space is fixed by the SVG viewBox in Stats.astro: 1000 wide,
+ * The co-ordinate space is fixed by the SVG viewBox in src/components/stats/ChartPanel.astro: 1000 wide,
  * 320 tall, with the price plot in the top 252 and the volume bars below it.
  * Nothing here reads real pixels, so the whole thing scales with the element.
  */
@@ -22,6 +22,8 @@ export const SVG_NS = 'http://www.w3.org/2000/svg';
 export const PLOT_H = 252;
 /** The SVG's full height, price lane plus volume lane. */
 export const CHART_H = 320;
+/** The viewBox width every x-position is computed against. */
+export const CHART_W = 1000;
 export const VOL_TOP = 264;
 export const VOL_H = 52;
 
@@ -214,7 +216,7 @@ export function drawCandles(
   candles: Candle[],
   log = false,
 ): { high: number; low: number } {
-  const width = 1000;
+  const width = CHART_W;
 
   const max = Math.max(...candles.map((c) => c.high));
   const min = Math.min(...candles.map((c) => c.low));
@@ -268,7 +270,7 @@ export function drawLine(
   candles: Candle[],
   log = false,
 ): { high: number; low: number } {
-  const width = 1000;
+  const width = CHART_W;
   const height = PLOT_H;
 
   const closes = candles.map((c) => c.close);
@@ -320,7 +322,7 @@ export function drawAverage(
   layer.replaceChildren();
   if (candles.length < period) return;
 
-  const width = 1000;
+  const width = CHART_W;
   const step = width / candles.length;
   const points: string[] = [];
 

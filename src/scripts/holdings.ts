@@ -112,18 +112,23 @@ export function initHoldings(locale: string): void {
     if (error) {
       error.textContent = message;
       error.hidden = false;
+      // The message is announced; this ties it to the field it is about.
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', error.id || 'address-error');
     }
   };
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const address = input.value.trim();
+    const address = input.value.trim().replace(/^0X/, '0x');
 
     if (!ADDRESS.test(address)) {
       fail(diagnose(address, labels));
       return;
     }
     if (error) error.hidden = true;
+    input.removeAttribute('aria-invalid');
+    input.removeAttribute('aria-describedby');
 
     // Clear the previous answer before fetching the next. It used to stay on
     // screen while a new address loaded, so for a second or two the page showed

@@ -25,7 +25,7 @@ const page = copy.pages.brand;
   locale={locale}
   title={page.title}
   description={page.intro}
-  eyebrow="For anyone making $IF things"
+  eyebrow={page.eyebrow}
   heading={page.heading}
   intro={page.intro}
   socialImage={`${SITE.url}/og-brand.jpg`}
@@ -47,7 +47,7 @@ const page = copy.pages.brand;
 
       <p class="mx-auto mt-6 max-w-xl leading-relaxed text-muted">{page.kitNote}</p>
       <p class="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
-        ZIP · 53 MB · no attribution needed
+        {page.fileNote}
       </p>
     </div>
 
@@ -69,7 +69,8 @@ const page = copy.pages.brand;
     <p
       class="mt-10 rounded-xl border-l-2 border-lime bg-lime/[0.06] px-5 py-4 text-sm leading-relaxed text-muted"
     >
-      {copy.footer.canonical} Contract{' '}
+      {copy.footer.canonical}
+      {page.contractLabel}{' '}
       <code class="break-all font-mono text-ink">{TOKEN.address}</code>. Questions, or want
       something that is not in here? <a
         href={LINKS.x}

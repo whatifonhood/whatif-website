@@ -18,6 +18,8 @@ export function initCopyButtons(): void {
         .writeText(value)
         .then(() => {
           button.textContent = copiedLabel;
+          const status = button.parentElement?.querySelector<HTMLElement>('[data-copy-status]');
+          if (status) status.textContent = button.textContent;
           button.classList.add('text-lime');
           window.setTimeout(() => {
             button.textContent = idleLabel;

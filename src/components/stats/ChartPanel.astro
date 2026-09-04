@@ -80,7 +80,7 @@ const page = copy.pages.stats;
           be tapped. The clip is also why nothing looked wrong: the page never
           scrolled sideways, the buttons were simply not there.
         -->
-      <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypes.candles}>
+      <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypeLabel}>
         {
           (['candles', 'line'] as const).map((type) => (
             <button
@@ -180,7 +180,7 @@ const page = copy.pages.stats;
       worth using has one, and it is what makes the crosshair readable rather
       than decorative.
     -->
-  <div data-ohlc class="ohlc-bar" aria-live="off"></div>
+  <div id="chart-ohlc" data-ohlc class="ohlc-bar" aria-live="off"></div>
 
   <div data-chart-wrap class="chart-wrap relative border-t border-line">
     <!--

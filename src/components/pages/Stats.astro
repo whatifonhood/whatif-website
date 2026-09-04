@@ -133,16 +133,16 @@ const metrics = [
     <dl class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
       {
         metrics.map((metric) => (
-          <div class="card card-hover p-5 sm:p-6">
-            <dd
-              data-metric={metric.key}
-              class="font-display text-2xl font-black italic tabular-nums tracking-tight text-lime sm:text-3xl"
-            >
-              {metric.value}
-            </dd>
+          <div class="card card-hover p-5 sm:p-6 flex flex-col-reverse">
             <dt class="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
               {metric.label}
             </dt>
+            <dd
+              data-metric={metric.key}
+              class="min-w-0 [overflow-wrap:anywhere] font-display text-2xl font-black italic tabular-nums tracking-tight text-lime sm:text-3xl"
+            >
+              {metric.value}
+            </dd>
           </div>
         ))
       }
@@ -346,10 +346,10 @@ const metrics = [
               >
                 {WEEK.priceNow >= WEEK.priceThen ? '+' : ''}
                 {formatPercent(((WEEK.priceNow - WEEK.priceThen) / WEEK.priceThen) * 100, locale)}
+                <span class="mt-1 block font-mono text-[11px] text-faint">
+                  {formatUsd(WEEK.priceThen, locale)} → {formatUsd(WEEK.priceNow, locale)}
+                </span>
               </dd>
-              <p class="mt-1 font-mono text-[11px] text-faint">
-                {formatUsd(WEEK.priceThen, locale)} → {formatUsd(WEEK.priceNow, locale)}
-              </p>
             </div>
           )
         }
@@ -360,10 +360,10 @@ const metrics = [
           </dt>
           <dd class="mt-1.5 font-display text-2xl font-semibold tabular-nums text-ink">
             {formatCompact(WEEK.burnedTokens, locale)}
+            <span class="mt-1 block font-mono text-[11px] text-faint">
+              {page.weekBurnCount.replace('{count}', String(WEEK.burnCount))}
+            </span>
           </dd>
-          <p class="mt-1 font-mono text-[11px] text-faint">
-            {page.weekBurnCount.replace('{count}', String(WEEK.burnCount))}
-          </p>
         </div>
 
         {
@@ -389,7 +389,7 @@ const metrics = [
         }
       </dl>
       <p class="note mt-5">
-        {page.weekNote.replace('{date}', WEEK.to)}
+        {page.weekNote.replace('{date}', WEEK.to.replace(/-/g, '\u2011'))}
       </p>
     </div>
 
@@ -450,7 +450,7 @@ const metrics = [
       </div>
 
       <p class="note mt-4">
-        {page.holderTableNote.replace('{date}', HOLDERS_CAPTURED)}
+        {page.holderTableNote.replace('{date}', HOLDERS_CAPTURED.replace(/-/g, '\u2011'))}
       </p>
     </div>
 

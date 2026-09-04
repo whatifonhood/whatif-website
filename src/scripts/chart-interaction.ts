@@ -234,6 +234,39 @@ export function attachChartInteraction(ctx: ChartContext): ChartPointer {
     repaint();
   };
 
+  /*
+   * Keyboard: the arrow keys walk the candles and Home/End jump to the ends. The
+   * reading line already shows whichever candle is under the crosshair, so this
+   * only moves the crosshair without a pointer. The svg is tabindex=0 and
+   * aria-describedby the reading line, in ChartPanel.astro.
+   */
+  let keyIndex = -1;
+  chart?.addEventListener('keydown', (event) => {
+    const list = drawn();
+    if (!list.length || !chart) return;
+    const step = { ArrowLeft: -1, ArrowRight: 1, Home: -Infinity, End: Infinity }[event.key];
+    if (step === undefined) return;
+    event.preventDefault();
+    const current = keyIndex < 0 ? list.length - 1 : keyIndex;
+    keyIndex = Number.isFinite(step)
+      ? Math.max(0, Math.min(list.length - 1, current + step))
+      : step < 0
+        ? 0
+        : list.length - 1;
+    const box = chart.getBoundingClientRect();
+    moveCrosshair(
+      new PointerEvent('pointermove', {
+        clientX: box.left + ((keyIndex + 0.5) / list.length) * box.width,
+        clientY: box.top + box.height / 2,
+        pointerType: 'mouse',
+      }),
+    );
+  });
+  chart?.addEventListener('blur', () => {
+    keyIndex = -1;
+    hideCrosshair();
+  });
+
   const zoomAt = (ratio: number, factor: number) => {
     const span = currentView().end - currentView().start;
     placeView(currentView().start + ratio * span, ratio, span * factor);

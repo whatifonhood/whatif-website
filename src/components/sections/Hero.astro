@@ -127,7 +127,7 @@ const stats = [
       <dl class="enter enter-3 mt-12 grid max-w-lg grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
         {
           stats.map((stat) => (
-            <div class="min-w-0 @container">
+            <div class="min-w-0 @container flex flex-col-reverse">
               {/*
                 Shrinks to fit its CELL; never breaks.
                 It used to shrink with the viewport (vw), which is the wrong
@@ -138,15 +138,15 @@ const stats = [
                 must stay on one line — wrapping once turned $0.00803 into
                 "$0.0080" above a lone "3".
               */}
+              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+                {stat.label}
+              </dt>
               <dd
                 data-stat={stat.key}
                 class="font-display text-[clamp(0.8rem,17cqi,1.5rem)] font-black italic tabular-nums whitespace-nowrap tracking-tight text-ink"
               >
                 {stat.value}
               </dd>
-              <dt class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
-                {stat.label}
-              </dt>
             </div>
           ))
         }

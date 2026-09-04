@@ -24,6 +24,7 @@ export function initNav(): void {
   const closeLabel = toggle.dataset.labelClose ?? openLabel;
 
   const setOpen = (open: boolean) => {
+    document.documentElement.classList.toggle('menu-open', open);
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? closeLabel : openLabel);
     menu.hidden = !open;

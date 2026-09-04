@@ -740,6 +740,20 @@ export function initDashboard(locale: string): void {
           const title = document.createElementNS(SVG_NS, 'title');
           title.textContent = `${formatCompact(point.total, locale)} ${TOKEN.symbol}`;
 
+          // A 7px dot is not a target. A transparent 28px disc behind it is.
+
+          const hit = document.createElementNS(SVG_NS, 'circle');
+
+          hit.setAttribute('cx', dot.getAttribute('cx') ?? '0');
+
+          hit.setAttribute('cy', dot.getAttribute('cy') ?? '0');
+
+          hit.setAttribute('r', '14');
+
+          hit.setAttribute('fill', 'transparent');
+
+          anchor.append(hit);
+
           anchor.append(dot, title);
           return anchor;
         });

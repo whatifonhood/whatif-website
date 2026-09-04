@@ -98,6 +98,8 @@ const showDate = (iso: string) => {
             {card.photos.map((photo) => (
               <img
                 src={photo.src}
+                srcset={`${photo.src.replace(/\.webp$/, '@800.webp')} 800w, ${photo.src} 1200w`}
+                sizes="(min-width: 1024px) 393px, calc(100vw - 2.5rem)"
                 alt=""
                 width={photo.width}
                 height={photo.height}
