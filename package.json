@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "description": "Official website for What $IF ($IF) on Robinhood Chain.",
+  "license": "MIT",
+  "homepage": "https://whatifonhood.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sethwilliamharriman/whatif-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sethwilliamharriman/whatif-website/issues"
+  },
   "engines": {
     "node": ">=20.3.0"
   },
