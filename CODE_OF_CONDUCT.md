@@ -26,13 +26,15 @@ project is represented.
 
 ## Enforcement
 
-Report anything to **[redacted]**. Reports are handled
-privately and the reporter's identity is not shared.
+Report anything through the repository's **Security → Report a vulnerability**
+form — it is the one private channel GitHub gives a repository, and it works for
+conduct as well as code. Reports are handled privately and the reporter's
+identity is not shared.
 
-I will read it, decide, and act — a warning, a deleted comment, or a ban,
-depending on what happened. I will tell you what I decided. I am one person
-maintaining a memecoin website, not a committee: expect a fair hearing and a
-plain answer, not a formal process.
+The maintainers will read it, decide, and act — a warning, a deleted comment, or
+a ban, depending on what happened — and tell you what was decided. This is a
+small project, not a committee: expect a fair hearing and a plain answer, not a
+formal process.
 
 Maintainers who do not hold to this are subject to it too.
 

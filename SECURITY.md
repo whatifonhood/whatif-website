@@ -2,14 +2,13 @@
 
 **Please do not open a public issue for a security problem.**
 
-Use GitHub's private reporting — the **Security** tab, then **Report a
-vulnerability** — or email **[redacted]** with `SECURITY` in
-the subject.
+Use GitHub's private reporting: the **Security** tab of this repository, then
+**Report a vulnerability**. It opens a private thread that only the maintainers
+can see, and it needs no email address on either side.
 
-Tell me what you found, how to reproduce it, and what an attacker gets. A rough
-note that lets me reproduce it beats a polished report that does not. You will
-get a reply within **72 hours**, and I will tell you what I am doing about it
-and when.
+Say what you found, how to reproduce it, and what an attacker gets. A rough
+note that reproduces beats a polished report that does not. You will get a
+reply within **72 hours** saying what is being done about it and when.
 
 If you would like credit, say so and you will get it. If you would rather not
 be named, that is fine too.
