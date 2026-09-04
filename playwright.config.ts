@@ -14,12 +14,20 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 0,
+  /*
+   * Firefox on a loaded GitHub runner sometimes takes over 30 seconds just to
+   * land on a page — the same test passes alone in two. That is the runner, not
+   * the site, so on CI the budget is doubled rather than the test loosened; a
+   * genuine hang still fails, at 60 seconds instead of 30.
+   */
+  timeout: process.env.CI ? 60_000 : 30_000,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
 
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
+    navigationTimeout: process.env.CI ? 45_000 : undefined,
   },
 
   /*
