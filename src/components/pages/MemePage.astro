@@ -29,8 +29,22 @@ const { locale, meme } = Astro.props;
 const copy = getCopy(locale);
 const page = copy.pages.meme;
 
-/** Three more from the same series, so the page is a doorway not a dead end. */
-const siblings = MEMES.filter((m) => m.series === meme.series && m.slug !== meme.slug).slice(0, 3);
+/**
+ * Three more from the same series, so the page is a doorway not a dead end.
+ * The three AFTER this one, wrapping round: every page in a series used to
+ * show the same first three, so the doorway led to the same room every time.
+ */
+const inSeries = MEMES.filter((m) => m.series === meme.series);
+const at = Math.max(
+  0,
+  inSeries.findIndex((m) => m.slug === meme.slug),
+);
+const rest = inSeries.filter((m) => m.slug !== meme.slug);
+// In `rest`, the element at `at` is the one that followed this meme.
+const siblings = Array.from(
+  { length: Math.min(3, rest.length) },
+  (_, index) => rest[(at + index) % rest.length]!,
+);
 
 const url = `${SITE.url}${localePath(`/memes/${meme.slug}/`, locale)}`;
 
@@ -69,10 +83,21 @@ shareUrl.searchParams.set('url', url);
         href={`/memes/full/${meme.slug}.webp`}
         size="lg"
         download={`whatif-${meme.slug}.webp`}
+        data-meme-file
       >
         {page.download}
         <Icons name="arrow-up-right" size={16} />
       </Button>
+      <!-- The X intent cannot attach the picture, so a plain link is the other way to pass it on. -->
+      <button
+        type="button"
+        class="js-copy inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+        data-copy-value={url}
+        data-copy-label={page.copyLink}
+        data-copied-label={copy.numbers.copied}
+      >
+        {page.copyLink}
+      </button>
       <a
         href={shareUrl.toString()}
         target="_blank"
@@ -90,7 +115,7 @@ shareUrl.searchParams.set('url', url);
           <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
             {page.more} {meme.series}
           </h2>
-          <ul class="mt-5 grid grid-cols-3 gap-4">
+          <ul class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
             {siblings.map((sibling) => (
               <li class="card group overflow-hidden">
                 <a href={localePath(`/memes/${sibling.slug}/`, locale)}>
@@ -103,7 +128,9 @@ shareUrl.searchParams.set('url', url);
                     decoding="async"
                     class="aspect-square w-full bg-surface-2 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
-                  <p class="truncate p-3 text-sm font-semibold text-ink">{sibling.title}</p>
+                  <p class="line-clamp-2 p-3 text-sm font-semibold text-ink [overflow-wrap:anywhere]">
+                    {sibling.title}
+                  </p>
                 </a>
               </li>
             ))}
@@ -122,3 +149,8 @@ shareUrl.searchParams.set('url', url);
     </p>
   </div>
 </PageLayout>
+
+<script>
+  import { initMemeShare } from '../../scripts/meme-share.ts';
+  initMemeShare();
+</script>

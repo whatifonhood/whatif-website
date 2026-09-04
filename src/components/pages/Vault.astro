@@ -30,9 +30,14 @@ const page = copy.pages.memes;
   socialImage={`${SITE.url}/og-memes.jpg`}
 >
   <div data-vault class="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
-    <!-- Filters -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex flex-wrap gap-2">
+    <!--
+      Filters. On a phone the bar sticks and the chips scroll sideways in one
+      row: fifteen chips wrapped to four rows and the first screen was all
+      filter and no meme; and once you were 20,000px down there was no way to
+      change the filter without scrolling back up.
+    -->
+    <div class="vault-bar flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="vault-chips flex gap-2 sm:flex-wrap">
         <button
           type="button"
           data-vault-filter="all"
@@ -123,6 +128,7 @@ const page = copy.pages.memes;
               <a
                 href={`/memes/full/${meme.slug}.webp`}
                 download={`whatif-${meme.slug}.webp`}
+                data-meme-file
                 tabindex="-1"
                 aria-label={`${page.download} ${meme.title}`}
                 class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime text-void transition-colors hover:bg-lime-pale [@media(pointer:fine)]:h-8 [@media(pointer:fine)]:w-8"
@@ -137,11 +143,41 @@ const page = copy.pages.memes;
       }
     </ul>
 
-    <p data-vault-empty hidden class="py-16 text-center text-muted">{page.empty}</p>
+    <div data-vault-empty hidden class="py-16 text-center text-muted">
+      <p>{page.empty}</p>
+      <!-- A way out. The only reset used to be scrolling back up to "All". -->
+      <button type="button" data-vault-reset class="vault-chip tap-box mt-4">{page.showAll}</button>
+    </div>
   </div>
 </PageLayout>
 
 <style>
+  @media (max-width: 639px) {
+    .vault-bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin: 0 -1.25rem;
+      padding: 0.75rem 1.25rem;
+      background: color-mix(in srgb, var(--color-void) 92%, transparent);
+      backdrop-filter: blur(8px);
+    }
+    .vault-chips {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      /* Room for the pressed chip's outline, which the overflow box would clip. */
+      padding: 2px;
+      margin: -2px;
+    }
+    .vault-chips::-webkit-scrollbar {
+      display: none;
+    }
+    .vault-chip {
+      flex: none;
+    }
+  }
+
   .vault-chip {
     border-radius: 9999px;
     border: 1px solid var(--color-line);
@@ -170,5 +206,7 @@ const page = copy.pages.memes;
 
 <script>
   import { initVault } from '../../scripts/vault.ts';
+  import { initMemeShare } from '../../scripts/meme-share.ts';
   initVault();
+  initMemeShare();
 </script>
