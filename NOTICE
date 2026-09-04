@@ -1,0 +1,38 @@
+# What the licence covers, and what it does not
+
+LICENSE is the MIT licence, verbatim, and it applies to the **source code** of
+this site: everything in `src/`, `tools/`, `tests/`, `netlify/`, and the
+configuration at the root. Fork it, learn from it, build something else with
+it, send changes back. That is what it is here for.
+
+It does **not** apply to the brand.
+
+## Reserved — all rights reserved
+
+The following are creative and trade-mark assets of the $IF project. They are
+published here because the site needs them to build and because you should be
+able to run it locally, not because they are free to reuse:
+
+| Path | What it is |
+|---|---|
+| `public/brand/` | The wordmark, the monogram, the token logo, the brand kit |
+| `public/memes/` | The meme artwork |
+| `public/coins/` | The coin illustrations |
+| `public/forge/` | The Forge's reference artwork |
+| `public/art/`, `public/posts/`, `public/cards/` | Social and campaign artwork |
+| `src/assets/` | Artwork compiled into the build |
+
+"$IF", "What $IF" and the IF man character are marks of the project.
+
+**You may not** use these to represent another token, project or product, or in
+any way that suggests this project endorses yours. A fork that keeps the code
+and replaces the artwork is entirely welcome; a fork that keeps the artwork and
+launches a coin is not.
+
+If you want to use an asset for something — press, a write-up, a community
+thing — ask. The answer is usually yes.
+
+## Third-party
+
+Dependencies keep their own licences; see `package.json` and the lockfile. The
+fonts are Archivo and JetBrains Mono, both under the SIL Open Font License.

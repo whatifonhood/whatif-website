@@ -1,0 +1,25 @@
+name: An idea
+description: Something the site should do, or do better
+labels: ['idea']
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should it do
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Who is it for, and what do they get
+      description: >
+        The strongest case is a reader who cannot currently do something they
+        reasonably expect to.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        Two things this project will not do, so nobody spends time writing them
+        up: promise a price or a target, and ask a visitor to connect a wallet
+        or sign a message to read a page. Both are listed on `/roadmap`.
