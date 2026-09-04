@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCALE_PATHS, LOCALES, SITE, TOKEN } from '../src/config/site.ts';
@@ -551,6 +551,7 @@ test.describe('the chart can be navigated', () => {
   test('zooming in narrows it, and zooming out never empties it', async ({ page }) => {
     const candles = await waitForCandles(page);
     const atStart = await candles.count();
+    await openChartOptions(page);
 
     // The buttons rather than the wheel: a phone has no scroll wheel, so this
     // is both the portable test and the path a touch user actually takes.
@@ -573,6 +574,7 @@ test.describe('the chart can be navigated', () => {
     // wheel at all, and a phone has no scroll wheel either — the buttons are
     // what a real visitor uses there, so that is what gets exercised.
     const box = await page.locator('[data-chart-wrap]').boundingBox();
+    await openChartOptions(page);
     if (box && test.info().project.name === 'desktop') {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.wheel(0, -600);
@@ -593,6 +595,7 @@ test.describe('the chart can be navigated', () => {
   test('the moving average draws over the visible window', async ({ page }) => {
     await waitForCandles(page);
     await expect(page.locator('.ma-line')).toHaveCount(0);
+    await openChartOptions(page);
     await page.locator('[data-chart-average]').click();
     await expect(page.locator('.ma-line')).toHaveCount(1);
   });
@@ -922,6 +925,19 @@ test.describe('every day so far', () => {
 });
 
 /** Escapes a sentence so it can be matched literally inside a RegExp. */
+/**
+ * The secondary chart controls fold behind an "Options" chip on touchscreens
+ * (see .chart-more in chart.css). A test that taps one of them on the mobile
+ * project has to open the fold first, the way a thumb would.
+ */
+async function openChartOptions(page: Page): Promise<void> {
+  const more = page.locator('[data-chart-more]');
+  if ((await more.count()) === 0) return;
+  if (!(await more.evaluate((node) => (node as HTMLDetailsElement).open))) {
+    await page.locator('.chart-more-summary').click();
+  }
+}
+
 function escapeForRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -1982,6 +1998,7 @@ test.describe('the chart never mislabels what it is showing', () => {
     expect(await ema.getAttribute('aria-pressed')).toBe('false');
     expect(await average.getAttribute('aria-pressed')).toBe('false');
 
+    await openChartOptions(page);
     await ema.click();
     expect(await ema.getAttribute('aria-pressed')).toBe('true');
     expect(
@@ -2013,6 +2030,7 @@ test.describe('the chart never mislabels what it is showing', () => {
     const full = await chartState(page);
     expect(full.zoomed, 'the chart opens showing everything').toBe('false');
 
+    await openChartOptions(page);
     for (let i = 0; i < 3; i++) await page.locator('[data-chart-zoom="in"]').click();
     const zoomed = await chartState(page);
     expect(zoomed.candles, 'zooming in must show fewer candles').toBeLessThan(full.candles);
@@ -2180,5 +2198,84 @@ test.describe('a line of your own', () => {
     await page.locator('[data-ask-own] button[type="submit"]').click();
     await expect(page.locator('[data-ask-question]')).toHaveText(before ?? '');
     await expect(page.locator('[data-ask-own-input]')).toBeFocused();
+  });
+});
+
+/**
+ * What changed on the dashboard and the wallet lookup after the tool review.
+ */
+test.describe('the chart controls fold on a touchscreen', () => {
+  test('secondary controls are one tap away on a phone, and always open on a mouse', async ({
+    page,
+  }) => {
+    await page.goto('/stats/');
+    const more = page.locator('[data-chart-more]');
+    const isOpen = () => more.evaluate((node) => (node as HTMLDetailsElement).open);
+    if (test.info().project.name === 'mobile') {
+      expect(await isOpen(), 'folded on touch').toBe(false);
+      await expect(page.locator('.chart-more-summary')).toBeVisible();
+      await page.locator('.chart-more-summary').click();
+      expect(await isOpen()).toBe(true);
+      await expect(page.locator('[data-chart-log]')).toBeVisible();
+    } else {
+      expect(await isOpen(), 'open on a mouse').toBe(true);
+      await expect(page.locator('.chart-more-summary')).toBeHidden();
+    }
+  });
+
+  test('the chart itself takes focus and reads the OHLC line', async ({ page }) => {
+    await page.goto('/stats/');
+    const svg = page.locator('[data-chart]');
+    await expect(svg).toHaveAttribute('tabindex', '0');
+    await expect(svg).toHaveAttribute('aria-describedby', 'chart-ohlc');
+  });
+});
+
+test.describe('a stale chart says so', () => {
+  test('when the candle feed is unreachable the reading line dates the candles', async ({
+    page,
+  }) => {
+    await page.route('**/api.geckoterminal.com/**', (route) => route.abort());
+    await page.goto('/stats/');
+    const note = page.locator('[data-chart-stale]');
+    await expect(note).toBeVisible({ timeout: 20_000 });
+    await expect(note).not.toHaveText('');
+    // Candles still drew from the committed history.
+    expect(await page.locator('[data-candles] rect').count()).toBeGreaterThan(5);
+  });
+});
+
+test.describe('the wallet lookup knows the addresses on the stats page', () => {
+  const BURN = '0x000000000000000000000000000000000000dEaD';
+
+  test('the burn address is named, not called a whale, and links to the explorer', async ({
+    page,
+  }) => {
+    // The chain is mocked: this tests the page, not the RPC's mood under load.
+    await page.route('**/rpc.mainnet.chain.robinhood.com/**', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          result: `0x${(93_734_842n * 10n ** 18n).toString(16)}`,
+        }),
+      }),
+    );
+    await page.goto('/holdings/');
+    // With a line break in the middle, the way a chat app wraps it.
+    await page.fill('[data-holdings-input]', `${BURN.slice(0, 20)}\n${BURN.slice(20)}`);
+    await page.locator('[data-holdings-form] button[type="submit"]').click();
+    const result = page.locator('[data-holdings-result]');
+    await expect(result).toBeVisible({ timeout: 20_000 });
+    const band = (await page.locator('[data-out="band"]').textContent()) ?? '';
+    expect(band.toLowerCase()).not.toContain('whale');
+    expect(band.length).toBeGreaterThan(0);
+    await expect(page.locator('[data-out="share"]')).toContainText('%');
+    await expect(page.locator('[data-holdings-explorer]')).toHaveAttribute(
+      'href',
+      new RegExp(`/address/${BURN}$`, 'i'),
+    );
+    await expect(page.locator('[data-holdings-form] button[type="submit"]')).toBeEnabled();
   });
 });
