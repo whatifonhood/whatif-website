@@ -10,7 +10,7 @@
  * Requires ImageMagick 7 (`brew install imagemagick`).
  */
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,11 +18,24 @@ import { writeConfig } from './lib/write-config.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const source = resolve(root, '..', 'what-if-meme', 'brand-pack', 'meme-pack', 'memes');
+const source = process.env.BRAND_PACK_DIR
+  ? resolve(process.env.BRAND_PACK_DIR, 'meme-pack', 'memes')
+  : resolve(root, '..', 'what-if-meme', 'brand-pack', 'meme-pack', 'memes');
+// Checked BEFORE the rm loop below. This script deletes and rewrites every
+// published meme; run on a machine without the pack it used to delete 828
+// committed files and then crash on readdir.
+if (!existsSync(source)) {
+  console.error(`meme pack not found at ${source} — set BRAND_PACK_DIR to your checkout`);
+  process.exit(1);
+}
 const thumbDir = join(root, 'public', 'memes', 'thumb');
 const thumbMidDir = join(root, 'public', 'memes', 'thumb15x');
 const thumb2xDir = join(root, 'public', 'memes', 'thumb2x');
 const fullDir = join(root, 'public', 'memes', 'full');
+// What the meme PAGE shows. /full/ stays as the download; nobody should be
+// handed a 1.5 MB master to look at a picture that renders 400–900px wide.
+const displayDir = join(root, 'public', 'memes', 'display');
+const DISPLAY_WIDTH = 1200;
 
 /*
  * Three thumbnail widths, offered through a srcset.
@@ -93,7 +106,7 @@ function dimensionsOf(file) {
  * directory it does not own. If a meme is withdrawn, delete its four files by
  * hand and remove it from src/config/memes.ts.
  */
-for (const directory of [thumbDir, thumbMidDir, thumb2xDir, fullDir]) {
+for (const directory of [thumbDir, thumbMidDir, thumb2xDir, displayDir, fullDir]) {
   rmSync(directory, { recursive: true, force: true });
   mkdirSync(directory, { recursive: true });
 }
@@ -115,6 +128,7 @@ for (const [index, file] of files.entries()) {
     [THUMB_WIDTH, thumbDir],
     [THUMB_MID_WIDTH, thumbMidDir],
     [THUMB_2X_WIDTH, thumb2xDir],
+    [DISPLAY_WIDTH, displayDir],
   ]) {
     execFileSync('magick', [
       input,

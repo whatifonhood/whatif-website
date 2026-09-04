@@ -8,13 +8,21 @@
  * Run with `npm run brandkit`.
  */
 import { execFileSync } from 'node:child_process';
+import sharp from 'sharp';
 import { cpSync, mkdirSync, rmSync, writeFileSync, existsSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const pack = resolve(root, '..', 'what-if-meme', 'brand-pack');
+// The source pack is a private checkout that sits beside this one on the
+// maintainer's machine. Anyone else points BRAND_PACK_DIR at their copy; with
+// neither, the script says so and stops rather than zipping a README.
+const pack = process.env.BRAND_PACK_DIR ?? resolve(root, '..', 'what-if-meme', 'brand-pack');
+if (!existsSync(pack)) {
+  console.error(`brand pack not found at ${pack} — set BRAND_PACK_DIR to your checkout`);
+  process.exit(1);
+}
 const staging = resolve(root, '.brand-kit-build');
 const outFile = join(root, 'public', 'brand', 'what-if-brand-kit.zip');
 
@@ -71,7 +79,9 @@ const CONTENTS = [
 const README = `WHAT $IF — BRAND KIT
 ====================
 
-Everything you need to make $IF content. Take it, use it, no permission needed.
+Everything you need to make $IF community content. Use it for $IF: posts,
+memes, stickers, videos. Not for another token, project or product, and
+nothing here implies endorsement — see NOTICE in the repository.
 
 WHAT IS IN HERE
   01-token-logo        The coin. Use for the token: DEX listings, wallets,
@@ -139,15 +149,31 @@ for (const [from, to] of CONTENTS) {
   }
   const destination = join(staging, to);
   mkdirSync(dirname(destination), { recursive: true });
-  cpSync(source, destination);
+  if (extname(source) === '.png') {
+    // Re-encoded rather than copied. The source PNGs carry text chunks from
+    // the generator that made them — an `hf-job-id` per image and creation
+    // timestamps — and a zip that is downloaded from the public site is not
+    // the place for them. sharp writes a fresh PNG with no ancillary chunks.
+    await sharp(source).png().toFile(destination);
+  } else {
+    cpSync(source, destination);
+  }
   copied += 1;
+}
+
+if (copied === 0) {
+  console.error('nothing copied — refusing to publish a brand kit that is only a README');
+  process.exit(1);
 }
 
 writeFileSync(join(staging, 'README.txt'), README);
 
 rmSync(outFile, { force: true });
 mkdirSync(dirname(outFile), { recursive: true });
-execFileSync('zip', ['-r', '-q', outFile, '.'], { cwd: staging });
+// -X drops the "extra fields" zip records by default: Unix UID/GID and local
+// timestamps of whoever ran the build, which is exactly what a public file
+// should not say.
+execFileSync('zip', ['-r', '-q', '-X', outFile, '.'], { cwd: staging });
 rmSync(staging, { recursive: true, force: true });
 
 const size = (statSync(outFile).size / 1024 / 1024).toFixed(1);

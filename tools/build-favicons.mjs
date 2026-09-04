@@ -21,14 +21,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const master = resolve(
-  root,
-  '..',
-  'what-if-meme',
-  'brand-pack',
-  'favicon',
-  'favicon-master-2048.png',
-);
+const master = process.env.BRAND_PACK_DIR
+  ? resolve(process.env.BRAND_PACK_DIR, 'favicon', 'favicon-master-2048.png')
+  : resolve(root, '..', 'what-if-meme', 'brand-pack', 'favicon', 'favicon-master-2048.png');
 const outDir = join(root, 'public');
 
 /**
