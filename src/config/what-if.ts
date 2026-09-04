@@ -472,17 +472,6 @@ export interface Question {
   id: string;
 }
 
-/** Deterministic generator, so a date always produces the same question. */
-function seeded(seed: number): () => number {
-  let t = seed >>> 0;
-  return () => {
-    t = (t + 0x6d2b79f5) >>> 0;
-    let r = Math.imul(t ^ (t >>> 15), 1 | t);
-    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
-    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 function hash(text: string): number {
   let value = 2166136261;
   for (let i = 0; i < text.length; i += 1) {
@@ -546,8 +535,80 @@ export function randomQuestion(): Question {
  * makes it worth posting about together. `iso` is a plain YYYY-MM-DD string so
  * the caller decides the timezone rather than this guessing.
  */
+/**
+ * The question for a given day.
+ *
+ * Not a seeded random draw. Seeding a generator with the date and drawing once
+ * made each day independent of every other, and independent draws from a pool
+ * of ~2,400 collide often: six of the first 57 archive pages already carried a
+ * question another day had, and by day 365 the archive would have repeated
+ * itself 165 times — 165 URLs with an identical title, a duplicate-content
+ * problem and a boring one.
+ *
+ * Instead every question in the space is given a number, and the day walks
+ * through the space in a fixed shuffled order: day n gets question
+ * (n × STRIDE) mod TOTAL, with STRIDE coprime to TOTAL so the walk visits every
+ * question exactly once before it repeats. Still deterministic — the same date
+ * is the same question on every build — but no two days share one until every
+ * question has had a day.
+ */
 export function questionForDate(iso: string): Question {
-  return build(seeded(hash(iso)));
+  const total = countPossibilities();
+  const day = Math.floor(Date.UTC(...isoParts(iso)) / 86_400_000);
+  // A large odd prime that is coprime to any TOTAL not divisible by it; the
+  // rotation by hash() shifts where the walk starts so the sequence is not
+  // guessable from the day count alone.
+  const stride = coprimeStride(total);
+  const index = (((day % total) + total) % total) * stride + (hash(EPOCH_SALT) % total);
+  return questionAt(index % total);
+}
+
+const EPOCH_SALT = 'what-if-daily';
+
+function isoParts(iso: string): [number, number, number] {
+  const [y, m, d] = iso.split('-').map(Number);
+  return [y ?? 1970, (m ?? 1) - 1, d ?? 1];
+}
+
+/** The first odd number ≥ ⌊total·0.618⌋ that shares no factor with total. */
+function coprimeStride(total: number): number {
+  let candidate = Math.floor(total * 0.618) | 1;
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+  while (gcd(candidate, total) !== 1) candidate += 2;
+  return candidate;
+}
+
+/**
+ * The question numbered `index` in the full space: lines first, then every
+ * pattern with every combination of its slots, in a fixed order. This is the
+ * same numbering countPossibilities() counts, so `index` is exhaustive and
+ * collision-free by construction.
+ */
+function questionAt(index: number): Question {
+  if (index < LINES.length) return { text: LINES[index]!.text, id: `l${index}` };
+  let remaining = index - LINES.length;
+  for (const [patternIndex, pattern] of PATTERNS.entries()) {
+    const slots = [...pattern.text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+    const sizes = slots.map((slot) => BANKS[slot]?.length ?? 1);
+    const count = sizes.reduce((n, size) => n * size, 1);
+    if (remaining >= count) {
+      remaining -= count;
+      continue;
+    }
+    // Mixed-radix decode of `remaining` into one pick per slot.
+    const picked: number[] = [];
+    let rest = remaining;
+    for (const size of sizes) {
+      picked.push(rest % size);
+      rest = Math.floor(rest / size);
+    }
+    const text = slots.reduce(
+      (current, slot, i) => current.replace(`{${slot}}`, BANKS[slot]?.[picked[i]!] ?? ''),
+      pattern.text,
+    );
+    return { text, id: `p${patternIndex}.${picked.join('.')}` };
+  }
+  return { text: LINES[0]!.text, id: 'l0' };
 }
 
 /**
