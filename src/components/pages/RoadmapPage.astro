@@ -209,7 +209,7 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
 
         <ol class="mt-8 flex flex-col gap-10">
           {
-            days.map((day) => (
+            days.slice(0, 2).map((day) => (
               <li class="day">
                 <time datetime={day.date} class="day-date">
                   {formatDate(day.date)}
@@ -238,6 +238,49 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
             ))
           }
         </ol>
+        {
+          /* Sixteen shipped items today, doubling in a month: the older days fold. */
+          days.length > 2 && (
+            <details class="log-earlier mt-8">
+              <summary class="log-earlier-summary">
+                {page.earlier}
+                <span class="stage-count">
+                  <span class="sr-only">, </span>
+                  {days.slice(2).reduce((sum, day) => sum + day.items.length, 0)}
+                </span>
+              </summary>
+              <ol class="mt-6 flex flex-col gap-10">
+                {days.slice(2).map((day) => (
+                  <li class="day">
+                    <time datetime={day.date} class="day-date">
+                      {formatDate(day.date)}
+                    </time>
+                    <ul class="day-entries">
+                      {day.items.map((item) => (
+                        <li class="entry">
+                          <div class="entry-head">
+                            <h3 class="text-[15px] font-semibold leading-snug text-ink">
+                              {item.href ? (
+                                <a href={toolPath(item.href, locale)} class="entry-link">
+                                  {item.title}
+                                  <Icons name="arrow-up-right" size={12} />
+                                </a>
+                              ) : (
+                                item.title
+                              )}
+                            </h3>
+                            <p class="entry-track">{page.tracks[item.track].label}</p>
+                          </div>
+                          <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          )
+        }
       </li>
     </ol>
 
@@ -301,7 +344,7 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
   }
   .record-tile dt {
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-faint);
@@ -350,7 +393,7 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
     background: color-mix(in oklab, var(--color-lime) 14%, transparent);
     padding: 0.2rem 0.6rem;
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-lime);
@@ -481,7 +524,7 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
   }
   .gate dt {
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-faint);
@@ -539,7 +582,7 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
   }
   .entry-track {
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-faint);
@@ -551,6 +594,31 @@ const days = [...new Set(shipped.map((item) => item.date ?? ''))]
     .day-date {
       padding-top: 1rem;
     }
+  }
+
+  .log-earlier-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    cursor: pointer;
+    list-style: none;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-lime);
+  }
+  .log-earlier-summary::-webkit-details-marker {
+    display: none;
+  }
+  .log-earlier-summary::before {
+    content: '+';
+    font-family: var(--font-display);
+    font-weight: 900;
+  }
+  .log-earlier[open] .log-earlier-summary::before {
+    content: '−';
   }
 
   /* The title is the link; a separate "take a look" line doubled every row. */

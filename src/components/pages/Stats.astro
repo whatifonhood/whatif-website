@@ -128,8 +128,10 @@ const metrics = [
     >
     </p>
 
-    <!-- Price and the chart -->
-    <ChartPanel locale={locale} />
+    <!-- Price and the chart. The ids are what the roadmap's shipped items open. -->
+    <div id="chart" class="scroll-mt-20">
+      <ChartPanel locale={locale} />
+    </div>
     <!-- Headline metrics -->
     <dl class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
       {
@@ -317,8 +319,10 @@ const metrics = [
       src/scripts/since-last-visit.ts.
     -->
     <aside
+      id="since"
       data-since
       hidden
+      class:list={['scroll-mt-20']}
       data-label-lead={page.sinceLead}
       data-label-price={page.sincePrice}
       data-label-burned={page.sinceBurned}
@@ -407,7 +411,7 @@ const metrics = [
       top row here is the burn address and the third is the pool everybody
       trades against — unlabelled, both read as whales.
     -->
-    <div class="card mt-3 p-6 sm:p-8">
+    <div id="holders" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
         {page.holderTableTitle}
       </p>
@@ -472,7 +476,7 @@ const metrics = [
     </div>
 
     <!-- Burn history -->
-    <div class="card mt-3 p-6 sm:p-8">
+    <div id="burns" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
         {page.burnHistoryTitle}
       </p>
@@ -529,7 +533,7 @@ const metrics = [
     </div>
 
     <!-- Live trades -->
-    <div class="card mt-3 overflow-hidden">
+    <div id="trades" class="card mt-3 scroll-mt-20 overflow-hidden">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4">
         <p
           class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
@@ -610,7 +614,7 @@ const metrics = [
       that never happened, because the contract never had an owner to give up.
       Both are set out in full in the white paper.
     -->
-    <div class="card mt-3 p-6 sm:p-8">
+    <div id="checks" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
       <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.trustTitle}</p>
       <ul data-trust class="mt-5 grid gap-2.5 sm:grid-cols-2">
         {
@@ -650,7 +654,7 @@ const metrics = [
       constants the running code uses, so it cannot drift into being wrong
       without the site being wrong the same way.
     -->
-    <details class="card mt-3 p-6 sm:p-8">
+    <details id="reproduce" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
       <summary class="cursor-pointer list-none">
         <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
           {page.reproduceTitle}

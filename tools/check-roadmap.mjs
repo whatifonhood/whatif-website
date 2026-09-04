@@ -59,6 +59,18 @@ for (const item of ROADMAP) {
   }
 }
 
+/**
+ * Where a shipped item may open. Same list check-docs keeps, plus the landing
+ * page and its anchors. An href that matches nothing here is a link to a 404
+ * that nothing else would ever notice.
+ */
+const ROUTE = /^(\/|\/(stats|holdings|ask|ask\/day|pfp|memes|brand|roadmap|docs)\/)(#[a-z0-9-]+)?$/;
+for (const item of ROADMAP) {
+  if (item.href && !ROUTE.test(item.href)) {
+    problems.push(`"${item.title}": href "${item.href}" is not a page this site builds`);
+  }
+}
+
 const titles = ROADMAP.map((item) => item.title);
 for (const title of new Set(titles)) {
   if (titles.filter((other) => other === title).length > 1) {

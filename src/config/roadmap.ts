@@ -76,6 +76,14 @@ export const ROADMAP: RoadmapItem[] = [
   },
 
   // ------------------------------------------------------------------- next
+  {
+    status: 'next',
+    track: 'craft',
+    title: 'Every tool one tap from the front page',
+    body: 'The question generator, the wallet lookup and the white paper can only be reached through the Tools menu. Each tool should be offered on the landing page where it is relevant.',
+    needs: 'Nothing but a decision on where each link sits. The pages exist.',
+    signal: 'Every tool is reachable from the landing page without opening a menu.',
+  },
 
   // ------------------------------------------------------------------ later
   {
@@ -158,7 +166,7 @@ export const ROADMAP: RoadmapItem[] = [
     date: '2026-09-01',
     title: 'Check every number yourself',
     body: 'The exact command behind each figure on the dashboard, built from the same addresses the page uses. Paste any of them into a terminal and check us.',
-    href: '/stats/',
+    href: '/stats/#reproduce',
   },
   {
     status: 'shipped',
@@ -166,7 +174,7 @@ export const ROADMAP: RoadmapItem[] = [
     date: '2026-09-01',
     title: 'Who holds it',
     body: 'The fifteen largest holdings, with the burn address and the liquidity pool named rather than left looking like whales. Every row links to the address.',
-    href: '/stats/',
+    href: '/stats/#holders',
   },
   {
     status: 'shipped',
@@ -174,7 +182,7 @@ export const ROADMAP: RoadmapItem[] = [
     date: '2026-09-01',
     title: 'Who can change the contract',
     body: 'Read from the chain instead of claimed. The contract has no owner function at all — a stronger fact than any promise, and one anyone can check.',
-    href: '/stats/',
+    href: '/stats/#checks',
   },
   {
     status: 'shipped',
@@ -190,7 +198,7 @@ export const ROADMAP: RoadmapItem[] = [
     date: '2026-09-01',
     title: 'Since you were last here',
     body: 'Come back and the dashboard says what moved. Compared against figures your own browser kept — nothing is sent anywhere.',
-    href: '/stats/',
+    href: '/stats/#since',
   },
   {
     status: 'shipped',
@@ -198,7 +206,7 @@ export const ROADMAP: RoadmapItem[] = [
     date: '2026-09-01',
     title: 'The deeper chart',
     body: 'Zoom, pan, a moving average, and every burn marked on the timeline where it happened.',
-    href: '/stats/',
+    href: '/stats/#chart',
   },
   {
     status: 'shipped',
