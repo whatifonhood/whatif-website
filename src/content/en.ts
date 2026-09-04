@@ -424,6 +424,9 @@ export const en: SiteCopy = {
       download: 'Download card',
       possibilities: 'possible questions',
       hint: 'press space for another',
+      ownLabel: 'Or write your own',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: 'Draw the card',
       shareText: '{question}\n\nStill asking.',
     },
     docs: {

@@ -423,6 +423,9 @@ export const tr: SiteCopy = {
       download: 'Kartı indir',
       possibilities: 'olası soru',
       hint: 'yenisi için boşluğa bas',
+      ownLabel: 'Ya da kendin yaz',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: 'Kartı çiz',
       shareText: '{question}\n\nHâlâ soruyoruz.',
     },
     docs: {

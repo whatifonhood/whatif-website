@@ -381,6 +381,10 @@ export interface SiteCopy {
       /** Follows the counted total, e.g. "possible questions". */
       possibilities: string;
       hint: string;
+      /** Writing your own line. The "What if" is fixed; the visitor finishes it. */
+      ownLabel: string;
+      ownPlaceholder: string;
+      ownButton: string;
       /** `{question}` is replaced with the generated line. */
       shareText: string;
     };

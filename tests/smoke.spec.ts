@@ -2146,3 +2146,39 @@ test.describe('the chart never mislabels what it is showing', () => {
     expect((await shown(page)).candles).toBe(week.candles);
   });
 });
+
+/**
+ * Writing your own line. The words go on the canvas and nowhere else: not into
+ * the page as HTML, and not into the address bar, so nobody can mint a link to
+ * this site that shows a sentence we did not write.
+ */
+test.describe('a line of your own', () => {
+  test('is drawn on the card and never put in the address bar', async ({ page }) => {
+    await page.goto('/ask/');
+    await page.fill('[data-ask-own-input]', 'What if the dog one actually makes it??');
+    await page.locator('[data-ask-own] button[type="submit"]').click();
+
+    await expect(page.locator('[data-ask-question]')).toHaveText(
+      'What if the dog one actually makes it?',
+    );
+    expect(new URL(page.url()).searchParams.has('q'), 'an own line has no shareable id').toBe(
+      false,
+    );
+    await expect(page.locator('[data-ask-copy]')).toBeHidden();
+    await expect(page.locator('[data-ask-download]')).toHaveAttribute('href', /^blob:/);
+
+    // Asking for another puts everything back.
+    await page.locator('[data-ask-again]').click();
+    expect(new URL(page.url()).searchParams.has('q')).toBe(true);
+    await expect(page.locator('[data-ask-copy]')).toBeVisible();
+  });
+
+  test('an empty line draws nothing and keeps the question', async ({ page }) => {
+    await page.goto('/ask/');
+    const before = await page.locator('[data-ask-question]').textContent();
+    await page.fill('[data-ask-own-input]', '   what if   ');
+    await page.locator('[data-ask-own] button[type="submit"]').click();
+    await expect(page.locator('[data-ask-question]')).toHaveText(before ?? '');
+    await expect(page.locator('[data-ask-own-input]')).toBeFocused();
+  });
+});

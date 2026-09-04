@@ -21,6 +21,26 @@ import { CARD_COINS, coinArt, drawAskCard } from '../lib/card-designs.ts';
 /** How many recent questions to avoid repeating. */
 const MEMORY = 60;
 
+/** The most a visitor can type after "What if". The card fits it; a novel would not. */
+const OWN_MAX = 120;
+
+/**
+ * A visitor's own line, made into a question.
+ *
+ * Whatever they typed is trimmed, relieved of a "what if" they may have typed
+ * anyway, and given the one question mark. Empty in, empty out.
+ */
+export function ownQuestion(raw: string): string {
+  const rest = raw
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^what\s+\$?if\b[\s,:]*/i, '')
+    .replace(/[\s?.!…]+$/u, '')
+    .slice(0, OWN_MAX)
+    .trim();
+  return rest ? `What if ${rest}?` : '';
+}
+
 /** Avoids showing the same question twice in a session. */
 function nextQuestion(recent: string[]): Question {
   for (let attempt = 0; attempt < 20; attempt += 1) {
@@ -67,6 +87,12 @@ export function initWhatIf(locale: string): void {
 
   const recent: string[] = [];
   let current = randomQuestion();
+  /*
+   * True while the question on screen was typed rather than drawn. An own line
+   * has no id, so it gets no `?q=` in the address bar and no "copy link" —
+   * this site never serves a URL that shows words it did not write.
+   */
+  let own = false;
   let cardUrl: string | null = null;
   let redrawTimer: number | undefined;
 
@@ -97,8 +123,10 @@ export function initWhatIf(locale: string): void {
     // The address bar matches the screen, so the question can be sent to
     // somebody. The id is indices, never the words — see the note in the config.
     const url = new URL(window.location.href);
-    url.searchParams.set('q', current.id);
+    if (own) url.searchParams.delete('q');
+    else url.searchParams.set('q', current.id);
     window.history.replaceState(null, '', url);
+    if (copyButton) copyButton.hidden = own;
 
     const answer = answerInput?.value.trim() ?? '';
 
@@ -125,10 +153,9 @@ export function initWhatIf(locale: string): void {
 
   const ask = () => {
     // Space works from the question itself; focusing it after each ask is what
-
     // makes the hint true on a fresh load.
-
     output?.focus({ preventScroll: true });
+    own = false;
     current = nextQuestion(recent);
     recent.push(current.id);
     if (recent.length > MEMORY) recent.shift();
@@ -138,6 +165,23 @@ export function initWhatIf(locale: string): void {
   };
 
   again?.addEventListener('click', ask);
+
+  const ownForm = root.querySelector<HTMLFormElement>('[data-ask-own]');
+  const ownInput = ownForm?.querySelector<HTMLInputElement>('[data-ask-own-input]');
+  ownForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const text = ownQuestion(ownInput?.value ?? '');
+    if (!text) {
+      ownInput?.focus();
+      return;
+    }
+    own = true;
+    // Everything but the words comes from a drawn question, so the card and
+    // the share text see the same shape they always do.
+    current = { ...randomQuestion(), id: '', text };
+    render();
+    track('Own Question Drawn');
+  });
 
   // Typing redraws the card, but not on every keystroke.
   answerInput?.addEventListener('input', () => {

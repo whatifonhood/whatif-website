@@ -444,6 +444,9 @@ export const es: SiteCopy = {
       download: 'Descargar tarjeta',
       possibilities: 'preguntas posibles',
       hint: 'pulsa espacio para otra',
+      ownLabel: 'O escribe la tuya',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: 'Dibuja la tarjeta',
       shareText: '{question}\n\nSeguimos preguntando.',
     },
     docs: {

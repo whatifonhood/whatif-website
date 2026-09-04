@@ -91,6 +91,14 @@ export const ROADMAP: RoadmapItem[] = [
   // ---------------------------------------------------------------- shipped
   {
     status: 'shipped',
+    track: 'tools',
+    date: '2026-09-04',
+    title: 'Write your own question',
+    body: 'Finish the sentence yourself and the card is drawn for it, on your own device. Nothing typed is stored, sent, or put into a link.',
+    href: '/ask/',
+  },
+  {
+    status: 'shipped',
     track: 'proof',
     date: '2026-08-31',
     title: 'The live dashboard',

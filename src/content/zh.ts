@@ -415,6 +415,9 @@ export const zh: SiteCopy = {
       download: '下载卡片',
       possibilities: '种可能的问题',
       hint: '按空格换一个',
+      ownLabel: '或者自己写一个',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: '画成卡片',
       shareText: '{question}\n\n还在问。',
     },
     docs: {
