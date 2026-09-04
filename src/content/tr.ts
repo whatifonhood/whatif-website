@@ -12,7 +12,7 @@ export const tr: SiteCopy = {
     ],
     toolsLabel: 'Araçlar',
     tools: {
-      ask: { label: 'Daha iyi bir soru sor', blurb: 'Merak etmenin bir milyon yolu' },
+      ask: { label: 'Daha iyi bir soru sor', blurb: 'Her soru iki kelimenin bir çeşitlemesi' },
       pfp: { label: 'Kendi paranı bul', blurb: 'Dört nadirlik, biri senin' },
       memes: { label: 'Kasa', blurb: 'Çalması serbest' },
       stats: { label: 'Veriler', blurb: 'Her rakam canlı' },
@@ -39,13 +39,16 @@ export const tr: SiteCopy = {
       'Sonsuz meraklılar için bir meme coin. Ya daha önce alsaydın? Ya elinde tutsaydın? Ya bu gerçekten o ise?',
     buy: '$IF Al',
     chart: 'Grafik',
+    riskNote:
+      'İçsel değeri olmayan, getiri beklentisi taşımayan bir meme coin. Yatırdığının tamamını kaybedebilirsin.',
   },
 
   posts: {
     eyebrow: 'Akıştan',
     readOnX: 'X’te oku',
     heading: { lead: 'İnsanlar hâlâ', accent: 'soruyor.' },
-    intro: 'Topluluğun paylaştıkları. Gömülmüyor, burada çiziliyor — takip kodu yok, iframe yok.',
+    intro:
+      'Bizim ve topluluğun paylaştıkları. Gömülmüyor, burada çiziliyor — takip kodu yok, iframe yok.',
     follow: "X'te takip et",
   },
 
@@ -58,8 +61,6 @@ export const tr: SiteCopy = {
     'bu o ise?',
     'Ya',
     'hiç satmasaydık?',
-    'Ya',
-    'bir milyara ulaşırsa?',
   ],
 
   cosmic: {
@@ -181,18 +182,7 @@ export const tr: SiteCopy = {
   },
 
   roadmap: {
-    eyebrow: 'Yatırımcılar sorup duruyor',
-    heading: { lead: 'Peki…', accent: 'yol haritası?' },
-    fileName: 'if_roadmap_final_v3.pdf',
-    lastEdited: '1 sayfa · son düzenleme: hiçbir zaman',
-    quarters: [
-      'Ç1 — ya olsaydı',
-      'Ç2 — ya olsaydı',
-      'Ç3 — hâlâ soruyoruz',
-      'Ç4 — meme, muhtemelen',
-    ],
     stamp: 'Hâlâ soruyoruz.',
-    footnote: 'Yol haritası yok. Fayda yok. Söz yok. Yalnızca eğlence amaçlıdır.',
   },
 
   faq: {
@@ -245,6 +235,7 @@ export const tr: SiteCopy = {
     disclaimer:
       '$IF, içsel değeri olmayan ve finansal getiri beklentisi taşımayan bir meme coin’dir. Buradaki hiçbir şey yatırım tavsiyesi değildir. Kendi araştırmanı yap.',
     builtBy: 'Herkes geliştiricidir.',
+    reduceMotion: 'Hareketi azalt',
   },
 
   pages: {

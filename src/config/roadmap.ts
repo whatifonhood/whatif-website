@@ -21,9 +21,9 @@
  * something that has not happened — see `terms` in the content files, which
  * says so on the page rather than only in this comment.
  *
- * `href` is passed through `toolPath`, never `localePath`: the white paper and
- * the daily archive are built in English only, and blindly prefixing them
- * produced six links to /zh/docs/ and /tr/ask/day/ that answer 404.
+ * `href` is passed through `toolPath`, never `localePath`: the daily archive is
+ * built in English only, and blindly prefixing it produced links to
+ * /tr/ask/day/ that answer 404.
  *
  * To update: change a `status`, add the `date` it shipped, and — wherever there
  * is a page to open — an `href` pointing at the thing itself. A claim on a
@@ -76,15 +76,6 @@ export const ROADMAP: RoadmapItem[] = [
   },
 
   // ------------------------------------------------------------------- next
-  {
-    status: 'next',
-    track: 'words',
-    title: 'The white paper in every language',
-    body: 'Twelve pages covering the thesis, the token, the supply, how to buy it and what we do not claim — currently English only, while the tools around it are in four languages.',
-    needs: 'Nothing. The English is written and the section is built.',
-    signal:
-      'A reader in Turkish can get from the landing page to the supply figures without leaving their own language.',
-  },
 
   // ------------------------------------------------------------------ later
   {
@@ -95,15 +86,6 @@ export const ROADMAP: RoadmapItem[] = [
     needs:
       'Layered artwork that does not exist yet. Traits have to be drawn to register against each other, which is a different job from drawing 150 finished coins.',
     signal: 'The pool stops being the only way to get a picture.',
-  },
-  {
-    status: 'later',
-    track: 'tools',
-    title: 'Holder features',
-    body: 'Wallet connection, a signed login, and things that unlock by balance.',
-    needs:
-      'A reason. The wallet lookup is the test: it answers the same question with nothing to connect and nothing to sign, and if that turns out to be enough then this never needs building.',
-    signal: 'Enough people ask for something the lookup genuinely cannot do.',
   },
 
   // ---------------------------------------------------------------- shipped
@@ -212,10 +194,18 @@ export const ROADMAP: RoadmapItem[] = [
   },
   {
     status: 'shipped',
+    track: 'words',
+    date: '2026-09-02',
+    title: 'The white paper in every language',
+    body: 'All sixteen pages in Chinese, Turkish and Spanish as well as English, so a reader can get from the landing page to the supply figures without leaving their own language.',
+    href: '/docs/',
+  },
+  {
+    status: 'shipped',
     track: 'proof',
     date: '2026-09-02',
     title: 'The white paper',
-    body: 'Twelve pages: the thesis, the token, the supply and the burn, who holds it, how to buy it, the risks, and a page listing what this project does not claim.',
+    body: 'Sixteen pages: the thesis, the token, the supply and the burn, who holds it, how to buy it, the risks, and a page listing what this project does not claim.',
     href: '/docs/',
   },
 ];

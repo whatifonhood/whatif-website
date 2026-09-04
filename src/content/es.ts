@@ -24,7 +24,10 @@ export const es: SiteCopy = {
     ],
     toolsLabel: 'Herramientas',
     tools: {
-      ask: { label: 'Hazte una pregunta mejor', blurb: 'Un millón de formas de dudar' },
+      ask: {
+        label: 'Hazte una pregunta mejor',
+        blurb: 'Cada pregunta es una variación de dos palabras',
+      },
       pfp: { label: 'Encuentra tu moneda', blurb: 'Cuatro rarezas, una es tuya' },
       memes: { label: 'La bóveda', blurb: 'Róbalos, son gratis' },
       stats: { label: 'Datos', blurb: 'Cada número, en vivo' },
@@ -51,6 +54,8 @@ export const es: SiteCopy = {
       'La meme coin para los eternamente curiosos. ¿Y si hubieras entrado antes? ¿Y si hubieras aguantado? ¿Y si esta es la buena?',
     buy: 'Compra $IF',
     chart: 'Gráfico',
+    riskNote:
+      'Una meme coin sin valor intrínseco ni expectativa de retorno. Puedes perder todo lo que pongas.',
   },
 
   posts: {
@@ -58,7 +63,7 @@ export const es: SiteCopy = {
     readOnX: 'Ver en X',
     heading: { lead: 'La gente sigue', accent: 'preguntando.' },
     intro:
-      'Lo que publica la comunidad. Se muestra aquí, no se incrusta — sin rastreadores, sin iframes.',
+      'Lo que publicamos nosotros y la comunidad. Se muestra aquí, no se incrusta — sin rastreadores, sin iframes.',
     follow: 'Síguenos en X',
   },
 
@@ -71,8 +76,6 @@ export const es: SiteCopy = {
     'esta es la buena?',
     '¿Y si',
     'nunca vendemos?',
-    '¿Y si',
-    'llega a mil millones?',
   ],
 
   cosmic: {
@@ -193,13 +196,7 @@ export const es: SiteCopy = {
   },
 
   roadmap: {
-    eyebrow: 'Los inversores no dejan de preguntar',
-    heading: { lead: 'Entonces…', accent: '¿hoja de ruta?' },
-    fileName: 'if_hoja_de_ruta_final_v3.pdf',
-    lastEdited: '1 página · última edición: nunca',
-    quarters: ['T1 — y si', 'T2 — y si', 'T3 — seguimos preguntando', 'T4 — memes, seguramente'],
     stamp: 'Seguimos preguntando.',
-    footnote: 'Sin hoja de ruta. Sin utilidad. Sin promesas. Solo con fines de entretenimiento.',
   },
 
   faq: {
@@ -252,6 +249,7 @@ export const es: SiteCopy = {
     disclaimer:
       '$IF es una meme coin sin valor intrínseco y sin ninguna expectativa de retorno financiero. Nada de lo que hay aquí es asesoramiento financiero. Investiga por tu cuenta.',
     builtBy: 'Todos somos el dev.',
+    reduceMotion: 'Reducir movimiento',
   },
 
   pages: {

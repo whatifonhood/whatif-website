@@ -12,7 +12,7 @@ export const en: SiteCopy = {
     ],
     toolsLabel: 'Tools',
     tools: {
-      ask: { label: 'Ask a better question', blurb: 'A million ways to wonder' },
+      ask: { label: 'Ask a better question', blurb: 'Every question is a variation on two words' },
       pfp: { label: 'Find your coin', blurb: 'Four rarities, one is yours' },
       memes: { label: 'The vault', blurb: 'Free to steal' },
       stats: { label: 'Stats', blurb: 'Every number, live' },
@@ -39,13 +39,16 @@ export const en: SiteCopy = {
       'The meme coin for the perpetually curious. What if you aped earlier? What if you held? What if this is the one?',
     buy: 'Buy $IF',
     chart: 'Chart',
+    riskNote:
+      'A meme coin with no intrinsic value and no expectation of return. You can lose everything you put in.',
   },
 
   posts: {
     eyebrow: 'From the timeline',
     readOnX: 'Read on X',
     heading: { lead: 'People are', accent: 'still asking.' },
-    intro: 'What the community is posting. Rendered here, not embedded — no tracker, no iframe.',
+    intro:
+      'What we and the community are posting. Rendered here, not embedded — no tracker, no iframe.',
     follow: 'Follow on X',
   },
 
@@ -58,8 +61,6 @@ export const en: SiteCopy = {
     'this is the one?',
     'What if',
     'we never sold?',
-    'What if',
-    'it hits a billion?',
   ],
 
   cosmic: {
@@ -181,13 +182,7 @@ export const en: SiteCopy = {
   },
 
   roadmap: {
-    eyebrow: 'Investors keep asking',
-    heading: { lead: 'So…', accent: 'roadmap?' },
-    fileName: 'if_roadmap_final_v3.pdf',
-    lastEdited: '1 page · last edited: never',
-    quarters: ['Q1 — what if', 'Q2 — what if', 'Q3 — still asking', 'Q4 — memes, probably'],
     stamp: 'Still asking.',
-    footnote: 'No roadmap. No utility. No promises. For entertainment purposes only.',
   },
 
   faq: {
@@ -240,6 +235,7 @@ export const en: SiteCopy = {
     disclaimer:
       '$IF is a meme coin with no intrinsic value and no expectation of financial return. Nothing here is financial advice. Do your own research.',
     builtBy: 'Everybody is the dev.',
+    reduceMotion: 'Reduce motion',
   },
 
   pages: {

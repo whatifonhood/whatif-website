@@ -56,7 +56,13 @@ export interface SiteCopy {
     description: string;
     buy: string;
     chart: string;
-    /** Small print under the stat strip. */
+    /**
+     * Under the buy button, at body size, in every language. The hero is the
+     * regret hook — "what if you aped earlier?" — and a regret hook next to a
+     * Buy button with no risk statement in sight is the exact shape financial-
+     * promotion rules describe. The footer disclaimer is three screens away.
+     */
+    riskNote: string;
   };
 
   /** The wall of posts. Hidden entirely when there is nothing to show. */
@@ -134,14 +140,12 @@ export interface SiteCopy {
     cta: string;
   };
 
+  /**
+   * One line survives from the site's original joke roadmap: the mantra. The
+   * real roadmap's copy lives under `pages.roadmap`.
+   */
   roadmap: {
-    eyebrow: string;
-    heading: SplitHeading;
-    fileName: string;
-    lastEdited: string;
-    quarters: string[];
     stamp: string;
-    footnote: string;
   };
 
   faq: {
@@ -161,6 +165,8 @@ export interface SiteCopy {
     canonical: string;
     disclaimer: string;
     builtBy: string;
+    /** The button that stops every animation on the site. */
+    reduceMotion: string;
   };
 
   /** Page-level copy for the sub-pages. */

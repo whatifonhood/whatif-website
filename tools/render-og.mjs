@@ -61,7 +61,7 @@ const PAGES = [
     file: 'og-ask.jpg',
     kicker: 'The generator',
     title: 'Ask a better question',
-    sub: 'Over a million ways to wonder',
+    sub: 'Every question is a variation on two words',
   },
   {
     file: 'og-roadmap.jpg',

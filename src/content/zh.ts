@@ -12,7 +12,7 @@ export const zh: SiteCopy = {
     ],
     toolsLabel: '工具',
     tools: {
-      ask: { label: '问一个更好的问题', blurb: '一百万种发问方式' },
+      ask: { label: '问一个更好的问题', blurb: '每个问题都是那两个字的变奏' },
       pfp: { label: '找到你的币', blurb: '四种稀有度，总有一枚是你' },
       memes: { label: '迷因库', blurb: '随便拿' },
       stats: { label: '数据', blurb: '每个数字都是实时的' },
@@ -39,13 +39,14 @@ export const zh: SiteCopy = {
       '为永远好奇的人打造的迷因币。如果你早点买入会怎样？如果你一直持有会怎样？如果这就是那一个会怎样？',
     buy: '购买 $IF',
     chart: '图表',
+    riskNote: '一枚没有内在价值、也不应期待任何回报的迷因币。你投进来的钱可能全部赔掉。',
   },
 
   posts: {
     eyebrow: '来自时间线',
     readOnX: '在 X 上查看',
     heading: { lead: '大家还在', accent: '问。' },
-    intro: '社区正在发布的内容。在这里呈现，而不是嵌入 —— 没有追踪器，没有 iframe。',
+    intro: '我们和社区正在发布的内容。在这里呈现，而不是嵌入 —— 没有追踪器，没有 iframe。',
     follow: '在 X 上关注',
   },
 
@@ -58,8 +59,6 @@ export const zh: SiteCopy = {
     '这就是那一个？',
     '如果',
     '我们从不卖出？',
-    '如果',
-    '它冲上十亿？',
   ],
 
   cosmic: {
@@ -179,13 +178,7 @@ export const zh: SiteCopy = {
   },
 
   roadmap: {
-    eyebrow: '投资者总在问',
-    heading: { lead: '那么…', accent: '路线图呢？' },
-    fileName: 'if_roadmap_final_v3.pdf',
-    lastEdited: '1 页 · 上次编辑：从未',
-    quarters: ['Q1 —— 如果', 'Q2 —— 如果', 'Q3 —— 还在问', 'Q4 —— 大概是迷因'],
     stamp: '还在问。',
-    footnote: '没有路线图，没有实用功能，没有承诺。仅供娱乐。',
   },
 
   faq: {
@@ -238,6 +231,7 @@ export const zh: SiteCopy = {
     disclaimer:
       '$IF 是一枚没有内在价值、也不应期待任何财务回报的迷因币。本站内容不构成投资建议。请自行研究（DYOR）。',
     builtBy: '每个人都是开发者。',
+    reduceMotion: '减少动效',
   },
 
   pages: {
