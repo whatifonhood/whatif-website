@@ -5,7 +5,7 @@ import Button from '../../../components/ui/Button.astro';
 import Icons from '../../../components/ui/Icons.astro';
 import { SITE } from '../../../config/site.ts';
 import { getCopy } from '../../../content/index.ts';
-import { DAILY_FIRST, everyDayTo, questionForDate } from '../../../config/what-if.ts';
+import { DAILY_FIRST, dailyHorizon, everyDayTo, questionForDate } from '../../../config/what-if.ts';
 
 /**
  * A page for each day's question.
@@ -20,8 +20,9 @@ import { DAILY_FIRST, everyDayTo, questionForDate } from '../../../config/what-i
  * having and worth crawling. Any other question still gets a shareable link
  * through `/ask/?q=<id>`, which restores it exactly.
  */
+// Built to tomorrow, not today — see dailyHorizon().
 export const getStaticPaths = (() =>
-  everyDayTo(new Date().toISOString().slice(0, 10)).map((date) => ({
+  everyDayTo(dailyHorizon()).map((date) => ({
     params: { date },
     props: { date, question: questionForDate(date) },
   }))) satisfies GetStaticPaths;
@@ -42,8 +43,8 @@ const readable = new Date(`${date}T00:00:00Z`).toLocaleDateString(locale, {
 });
 
 const previous = date > DAILY_FIRST ? shift(date, -1) : undefined;
-const today = new Date().toISOString().slice(0, 10);
-const next = date < today ? shift(date, 1) : undefined;
+const lastBuilt = dailyHorizon();
+const next = date < lastBuilt ? shift(date, 1) : undefined;
 
 /** The neighbouring day, as YYYY-MM-DD. */
 function shift(from: string, days: number): string {

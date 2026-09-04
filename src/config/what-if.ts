@@ -661,6 +661,20 @@ export const DAILY_FIRST = '2026-07-11';
  * this reading a clock, so a build is reproducible and a test can ask for a
  * fixed range.
  */
+/**
+ * The last day the archive is built for: tomorrow, in UTC.
+ *
+ * The archive builds at 05:12 UTC, and the question on /ask/ follows the
+ * visitor's local date, so until the build ran the day's question had no page
+ * — for somebody in Sydney, most of their evening. One day of headroom covers
+ * every timezone.
+ */
+export function dailyHorizon(now = new Date()): string {
+  const day = new Date(now);
+  day.setUTCDate(day.getUTCDate() + 1);
+  return day.toISOString().slice(0, 10);
+}
+
 export function everyDayTo(to: string): string[] {
   const days: string[] = [];
   const end = Date.parse(`${to}T00:00:00Z`);

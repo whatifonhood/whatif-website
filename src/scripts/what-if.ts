@@ -16,7 +16,8 @@ import {
   type Question,
 } from '../config/what-if.ts';
 import { track } from '../lib/analytics.ts';
-import { CARD_COINS, coinArt, drawAskCard } from '../lib/card-designs.ts';
+import { CARD_COINS, coinArt, drawAskCard, readyFonts } from '../lib/card-designs.ts';
+import { canvasBlob, shareOrDownload } from '../lib/share.ts';
 
 /** How many recent questions to avoid repeating. */
 const MEMORY = 60;
@@ -61,6 +62,7 @@ async function drawCard(
   question: string,
   answer: string,
 ): Promise<void> {
+  await readyFonts();
   drawAskCard(canvas, question, answer, await cardCoin(CARD_COINS.ask));
 }
 
@@ -110,10 +112,16 @@ export function initWhatIf(locale: string): void {
       String(today.getMonth() + 1).padStart(2, '0'),
       String(today.getDate()).padStart(2, '0'),
     ].join('-');
-    daily.textContent = questionForDate(iso).text;
+    const todays = questionForDate(iso);
+    daily.textContent = todays.text;
+    // One tap to answer it, instead of archive → day → back.
+    const answerToday = root.querySelector<HTMLAnchorElement>('[data-ask-daily-answer]');
+    if (answerToday) answerToday.href = `?q=${encodeURIComponent(todays.id)}`;
   }
 
   const render = () => {
+    // A "Link copied." from the last question is not true of this one.
+    if (status) status.textContent = '';
     output.textContent = current.text;
     // Re-triggering the animation is what makes each one feel like an arrival.
     output.classList.remove('is-new');
@@ -181,6 +189,20 @@ export function initWhatIf(locale: string): void {
     current = { ...randomQuestion(), id: '', text };
     render();
     track('Own Question Drawn');
+    // On a phone the card is a screen below the form; show the person what they made.
+    canvas?.scrollIntoView({
+      block: 'nearest',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
+  });
+
+  // The download hands the card to the share sheet where the device has one.
+  download?.addEventListener('click', (event) => {
+    if (!canvas) return;
+    event.preventDefault();
+    void canvasBlob(canvas).then((blob) => {
+      if (blob) void shareOrDownload(blob, 'what-if.png', current.text);
+    });
   });
 
   // Typing redraws the card, but not on every keystroke.
