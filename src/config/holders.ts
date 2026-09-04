@@ -16,7 +16,7 @@ export interface Holder {
 export const HOLDERS: Holder[] = [
   {
     address: '0x000000000000000000000000000000000000dEaD',
-    tokens: 93578227,
+    tokens: 93734842,
     kind: 'burn',
   },
   {
@@ -25,14 +25,14 @@ export const HOLDERS: Holder[] = [
     kind: 'unknown',
   },
   {
-    address: '0x39A200271525E9641e799127bdAB299DAeF21953',
-    tokens: 28144348,
-    kind: 'pool',
-  },
-  {
     address: '0xb64325a69cCD29C54b7d9e70b0F306fa9B2b2697',
     tokens: 22580002,
     kind: 'contract',
+  },
+  {
+    address: '0x39A200271525E9641e799127bdAB299DAeF21953',
+    tokens: 16212555,
+    kind: 'pool',
   },
   {
     address: '0x1bF457573fAec8F6eB90A23BF8a149107D0Af6Bc',
@@ -56,23 +56,28 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x918FCe7Ee04C2f353746e571b4ddA2E663fE0735',
-    tokens: 12000904,
+    tokens: 12600460,
     kind: 'contract',
   },
   {
     address: '0xcAF284Fd315322b02bAEb9c8116883F1Dd20497d',
-    tokens: 10230619,
+    tokens: 12493412,
+    kind: 'unknown',
+  },
+  {
+    address: '0x43F2613C1E3C0305D6CC4f6a2905Eed456b7C195',
+    tokens: 9533468,
+    kind: 'unknown',
+  },
+  {
+    address: '0x7Ff8bbf9C8AB106db589e7863fb100525F61CCe5',
+    tokens: 9279686,
     kind: 'unknown',
   },
   {
     address: '0x8EfC646EbE93feeBfDBd36359BeCfC62716d244e',
-    tokens: 9689071,
+    tokens: 9274632,
     kind: 'contract',
-  },
-  {
-    address: '0x43F2613C1E3C0305D6CC4f6a2905Eed456b7C195',
-    tokens: 9494091,
-    kind: 'unknown',
   },
   {
     address: '0xA24509fdcCa6CE6dA70A81152c7d075529653D8C',
@@ -84,12 +89,7 @@ export const HOLDERS: Holder[] = [
     tokens: 9037367,
     kind: 'unknown',
   },
-  {
-    address: '0x52e7D850bd4EfB9e91382B4Cfd938712f1bb1040',
-    tokens: 9009899,
-    kind: 'unknown',
-  },
 ];
 
 /** When this list was read, as YYYY-MM-DD. */
-export const HOLDERS_CAPTURED = '2026-09-03';
+export const HOLDERS_CAPTURED = '2026-09-04';
