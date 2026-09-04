@@ -58,11 +58,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Both, because playwright.config.ts runs two projects: desktop is
-      # Chromium and mobile is iPhone 13, which is WebKit. Installing only
-      # chromium made every mobile test fail to launch — so this job was red on
-      # every push and half the suite had never actually run here.
-      - run: npx playwright install --with-deps chromium webkit
+      # Every browser, with no list to keep in step.
+      #
+      # This used to name the browsers it wanted. It said chromium, then
+      # chromium and webkit, and each time a project was added to
+      # playwright.config.ts somebody had to remember to come back here. The
+      # third one — firefox — was added and nobody did, so every run since has
+      # failed on `Executable doesn't exist`, and the whole suite has been red
+      # while the code it was meant to be guarding went out anyway.
+      #
+      # A list that has to be kept in step with another file will eventually not
+      # be. Installing all of them costs about a minute and cannot drift.
+      - run: npx playwright install --with-deps
       - run: npm test
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: failure()
