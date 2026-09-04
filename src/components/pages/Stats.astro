@@ -117,6 +117,7 @@ const metrics = [
     data-label-sell={page.sellLabel}
     data-label-view={page.viewTx}
     data-label-failed={page.failed}
+    data-label-as-of={copy.numbers.asOf}
     class="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8"
   >
     <p
@@ -268,6 +269,8 @@ const metrics = [
           <span data-band="next20More"></span>
           <span data-band="rest"></span>
         </div>
+        <!-- The top ten includes the burn address and the pool; say so. -->
+        <p class="note mt-3">{page.concentrationNote}</p>
         <ul class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
           {
             (['top10', 'next20', 'next20More', 'rest'] as const).map((band) => (
@@ -299,6 +302,10 @@ const metrics = [
       >
         <g data-pressure-bars></g>
       </svg>
+      <!-- The bars are hours; without ticks a quiet day reads as a chart with a hole in it. -->
+      <div class="pressure-axis" aria-hidden="true">
+        <span>−24h</span><span>−12h</span><span>0</span>
+      </div>
       <p class="note mt-3">
         {page.pressureNote}
       </p>
@@ -406,12 +413,19 @@ const metrics = [
       </p>
       <p class="mt-3 max-w-2xl text-muted">{page.holderTableIntro}</p>
 
+      <!--
+        On a phone the table fits the card instead of scrolling: the kind tag
+        moves under the address and the Tokens and Share columns, which are the
+        point of the table, stay in view.
+      -->
       <div class="mt-6 overflow-x-auto">
-        <table class="w-full min-w-[32rem] border-collapse text-left font-mono text-sm">
+        <table class="w-full border-collapse text-left font-mono text-sm sm:min-w-[32rem]">
           <thead>
             <tr class="border-b border-line text-[11px] uppercase tracking-[0.14em] text-faint">
               <th scope="col" class="py-3 pr-4 font-normal">{page.holderAddress}</th>
-              <th scope="col" class="py-3 pr-4 font-normal">{page.holderWhat}</th>
+              <th scope="col" class="hidden py-3 pr-4 font-normal sm:table-cell"
+                >{page.holderWhat}</th
+              >
               <th scope="col" class="py-3 pr-4 text-right font-normal">{page.holderTokens}</th>
               <th scope="col" class="py-3 text-right font-normal">{page.holderShare}</th>
             </tr>
@@ -430,8 +444,11 @@ const metrics = [
                       {holder.address.slice(0, 8)}…{holder.address.slice(-6)}
                       <span class="sr-only">{copy.common.externalLink}</span>
                     </a>
+                    <span class="holder-tag mt-1.5 sm:hidden" data-kind={holder.kind}>
+                      {page.holderKinds[holder.kind]}
+                    </span>
                   </th>
-                  <td class="py-3 pr-4">
+                  <td class="hidden py-3 pr-4 sm:table-cell">
                     <span class="holder-tag" data-kind={holder.kind}>
                       {page.holderKinds[holder.kind]}
                     </span>
@@ -651,7 +668,19 @@ const metrics = [
               {/* set:text on a self-closing element, so no source indentation
                   ends up inside the block — a reader copies the command, and
                   sixteen leading spaces would come with it. */}
-              <pre class="reproduce-command mt-2" set:text={recipe.command} />
+              <div class="reproduce-block mt-2">
+                <pre class="reproduce-command" set:text={recipe.command} />
+                {/* A copy button, because a 900px command in a 300px box cannot be selected on a phone. */}
+                <button
+                  type="button"
+                  class="js-copy reproduce-copy tap-box"
+                  data-copy-value={recipe.command}
+                  data-copy-label={copy.numbers.copy}
+                  data-copied-label={copy.numbers.copied}
+                >
+                  {copy.numbers.copy}
+                </button>
+              </div>
               <p class="mt-1.5 font-mono text-[11px] text-faint">
                 {page.reproduceField} <span class="text-ink">{recipe.field}</span>
               </p>
@@ -837,9 +866,29 @@ const metrics = [
     stroke: none;
   }
 
-  .chart-bound {
+  .reproduce-block {
+    position: relative;
+  }
+  .reproduce-copy {
     position: absolute;
-    right: 0.75rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.35rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-lime);
+  }
+
+  /* The hours under the pressure bars. */
+  .pressure-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.35rem;
     font-family: var(--font-mono);
     font-size: 0.625rem;
     letter-spacing: 0.08em;

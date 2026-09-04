@@ -27,7 +27,7 @@ import {
 import { formatCompact, formatCount, formatPercent, formatUsd } from '../lib/format.ts';
 import { setLiveText } from '../lib/live-text.ts';
 import { BURNS, BURNS_SCANNED_TO } from '../config/burns.ts';
-import { CHAIN, TOKEN } from '../config/site.ts';
+import { CHAIN, TOKEN, TOKEN_SNAPSHOT } from '../config/site.ts';
 import { recall, remember } from '../lib/preferences.ts';
 import { attachChartInteraction } from './chart-interaction.ts';
 import {
@@ -110,8 +110,8 @@ export function initDashboard(locale: string): void {
   if (!root) return;
 
   const chart = root.querySelector<SVGSVGElement>('[data-chart]');
-  const chartHigh = root.querySelector<HTMLElement>('[data-chart-high]');
-  const chartLow = root.querySelector<HTMLElement>('[data-chart-low]');
+  /** Says when the candles on screen were last fetched, once they stop being live. */
+  const staleNote = root.querySelector<HTMLElement>('[data-chart-stale]');
   const feed = root.querySelector<HTMLElement>('[data-feed]');
   /** The live dot, and the message that replaces the chart when it has nothing. */
   const feedLive = root.querySelector<HTMLElement>('[data-feed-live]');
@@ -122,6 +122,7 @@ export function initDashboard(locale: string): void {
     sell: root.dataset.labelSell ?? 'Sell',
     view: root.dataset.labelView ?? 'View',
     failed: root.dataset.labelFailed ?? '',
+    asOf: root.dataset.labelAsOf ?? '',
     holdersUpdated: root.dataset.labelHoldersUpdated ?? '',
     burnMark: root.dataset.labelBurnMark ?? '{amount} burned',
     checkPass: root.dataset.labelCheckPass ?? '',
@@ -140,7 +141,8 @@ export function initDashboard(locale: string): void {
         node.textContent = '—';
         continue;
       }
-      node.textContent = `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
+      // Through the locale's formatter, so es reads 4,70 % beside 0,01668 $.
+      node.textContent = `${value > 0 ? '+' : ''}${formatPercent(value, locale)}`;
       node.dataset.direction = value > 0 ? 'up' : value < 0 ? 'down' : 'flat';
     }
   };
@@ -236,7 +238,7 @@ export function initDashboard(locale: string): void {
     }
     const move = document.createElement('span');
     move.dataset.direction = change >= 0 ? 'up' : 'down';
-    move.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+    move.textContent = `${change >= 0 ? '+' : ''}${formatPercent(change, locale)}`;
     ohlcBar.append(move);
   };
 
@@ -301,7 +303,7 @@ export function initDashboard(locale: string): void {
 
     // The furniture that makes it readable: round price levels down the right
     // with a line each, the dates along the bottom, and the last close marked.
-    drawPriceScale(chart, priceScale, bounds.low, bounds.high, scale, locale);
+    drawPriceScale(chart, priceScale, bounds.low, bounds.high, scale, locale, log);
     drawTimeAxis(timeAxis, candles, locale);
     markLastPrice(candles, scale);
     showOhlc(candles[candles.length - 1]);
@@ -310,8 +312,6 @@ export function initDashboard(locale: string): void {
     // Only offer "reset" when there is something to reset to.
     root.dataset.zoomed = String(view.start > 0 || view.end < loaded.length);
 
-    if (chartHigh) chartHigh.textContent = formatUsd(bounds.high, locale);
-    if (chartLow) chartLow.textContent = formatUsd(bounds.low, locale);
     const rising = (candles.at(-1)?.close ?? 0) >= (candles[0]?.open ?? 0);
     chart.dataset.direction = rising ? 'up' : 'down';
   };
@@ -343,6 +343,26 @@ export function initDashboard(locale: string): void {
     if (committed.length >= 2) cache.set(frame, committed);
   }
 
+  /**
+   * The candles on screen came from the build, or from an earlier fetch, and
+   * the live call just failed. Under a live price that is easy to misread as a
+   * live chart — the axis says yesterday if you look, but nobody looks — so the
+   * reading line says exactly when its candles end.
+   */
+  const markStale = (candles: Candle[]) => {
+    if (!staleNote) return;
+    const last = candles.at(-1);
+    if (!last) return;
+    const when = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(last.time * 1000));
+    staleNote.textContent = (staleNote.dataset.template ?? '{time}').replace('{time}', when);
+    staleNote.hidden = false;
+  };
+
   const renderChart = async (timeframe: Timeframe, keepView = false): Promise<TaskResult> => {
     if (!chart) return 'skipped';
 
@@ -369,6 +389,7 @@ export function initDashboard(locale: string): void {
           if (chartEmpty) chartEmpty.hidden = true;
           paint();
         }
+        markStale(fallback);
         return 'fallback';
       }
       if (chartEmpty && loaded.length === 0) chartEmpty.hidden = false;
@@ -392,6 +413,7 @@ export function initDashboard(locale: string): void {
 
     loaded = candles;
     paint();
+    if (staleNote) staleNote.hidden = true;
     return 'ok';
   };
 
@@ -424,9 +446,16 @@ export function initDashboard(locale: string): void {
       kind.className = 'feed-kind';
       kind.textContent = trade.kind === 'buy' ? labels.buy : labels.sell;
 
-      const amount = document.createElement('span');
+      // The amount is the link to the transaction. The wallet link beside it
+      // is hidden below 720px, which left a phone row with nothing to tap.
+      const amount = document.createElement(trade.txHash ? 'a' : 'span');
       amount.className = 'feed-amount';
       amount.textContent = formatTradeUsd(trade.usd, locale);
+      if (amount instanceof HTMLAnchorElement) {
+        amount.href = `${CHAIN.explorerUrl}/tx/${trade.txHash}`;
+        amount.target = '_blank';
+        amount.rel = 'noopener noreferrer';
+      }
 
       const tokens = document.createElement('span');
       tokens.className = 'feed-tokens';
@@ -683,11 +712,26 @@ export function initDashboard(locale: string): void {
       return { time: burn.time, total: running, txHash: burn.txHash };
     });
 
+    // Draw the committed history now. The live top-up below waits on an
+    // `eth_getLogs` that has taken six seconds and been rate-limited; the
+    // panel used to sit empty for all of it.
+    paintBurns(points, running);
+
     const newer = await getRecentBurns(BURNS_SCANNED_TO + 1).catch(() => []);
+    if (newer.length === 0) return;
     for (const burn of newer) {
       running += burn.tokens;
       points.push({ time: Math.floor(Date.now() / 1000), total: running, txHash: '' });
     }
+    paintBurns(points, running);
+  };
+
+  const paintBurns = (
+    points: { time: number; total: number; txHash: string }[],
+    running: number,
+  ) => {
+    const svg = root.querySelector<SVGSVGElement>('[data-burns]');
+    if (!svg || points.length === 0) return;
 
     const width = 1000;
     const height = 200;
@@ -769,14 +813,18 @@ export function initDashboard(locale: string): void {
     const slow = tick % SLOW_EVERY === 0;
     tick += 1;
 
+    // renderExtremes reuses the recent trades renderTrades fetched, so it runs
+    // after that fetch rather than beside it — beside it, `lastTrades` was
+    // still empty and the same request went out twice in the same second.
+    const tradesTask = renderTrades();
     const results = await Promise.allSettled([
       renderSnapshot(),
       // Redrawing under a pointer makes the chart jump while it is being read.
       chartPointer.isEngaged() || !slow
         ? Promise.resolve('skipped' as TaskResult)
         : renderChart((root.dataset.timeframe as Timeframe) ?? 'day', true),
-      renderTrades(),
-      slow ? renderExtremes() : Promise.resolve('skipped' as TaskResult),
+      tradesTask,
+      slow ? tradesTask.then(() => renderExtremes()) : Promise.resolve('skipped' as TaskResult),
       slow ? renderTokenInfo() : Promise.resolve('skipped' as TaskResult),
     ]);
     // A task that was skipped says nothing about whether the data is reachable,
@@ -791,7 +839,10 @@ export function initDashboard(locale: string): void {
 
     if (status) {
       status.hidden = !allFailed;
-      if (allFailed) status.textContent = labels.failed;
+      // With the snapshot's date, so "could not reach" also says how old.
+      if (allFailed) {
+        status.textContent = `${labels.failed} · ${labels.asOf} ${TOKEN_SNAPSHOT.capturedAt}`;
+      }
     }
 
     // Announced once per cycle, after every task has had its turn, so the
@@ -801,6 +852,15 @@ export function initDashboard(locale: string): void {
       document.dispatchEvent(new CustomEvent('if:stats', { detail: { ...visitFigures } }));
     }
   };
+
+  /*
+   * On a touchscreen the secondary controls start folded. Three rows of 44px
+   * chips put the chart itself a full screen below the fold on a phone; the
+   * timeframes stay out, everything else is one tap away. On a mouse the fold
+   * is invisible and always open (see .chart-more in chart.css).
+   */
+  const more = root.querySelector<HTMLDetailsElement>('[data-chart-more]');
+  if (more && window.matchMedia('(pointer: coarse)').matches) more.open = false;
 
   for (const button of root.querySelectorAll<HTMLButtonElement>('[data-chart-type]')) {
     button.addEventListener('click', () => {

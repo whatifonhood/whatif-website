@@ -80,97 +80,106 @@ const page = copy.pages.stats;
           be tapped. The clip is also why nothing looked wrong: the page never
           scrolled sideways, the buttons were simply not there.
         -->
-      <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypeLabel}>
-        {
-          (['candles', 'line'] as const).map((type) => (
-            <button
-              type="button"
-              data-chart-type={type}
-              aria-pressed={type === 'candles' ? 'true' : 'false'}
-              class="tf-chip tf-chip-icon"
-              title={page.chartTypes[type]}
-            >
-              {type === 'candles' ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M7 3v4M7 17v4M17 3v7M17 16v5"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <rect x="4.5" y="7" width="5" height="10" rx="1" fill="currentColor" />
-                  <rect x="14.5" y="10" width="5" height="6" rx="1" fill="currentColor" />
-                </svg>
-              ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M3 16l5-6 4 3 4-7 5 4"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              )}
-              <span class="sr-only">{page.chartTypes[type]}</span>
-            </button>
-          ))
-        }
-        <button
-          type="button"
-          data-chart-zoom="out"
-          class="chart-toggle"
-          aria-label={page.zoomOut}
-          title={page.zoomOut}
-        >
-          −
-        </button>
-        <button
-          type="button"
-          data-chart-zoom="in"
-          class="chart-toggle"
-          aria-label={page.zoomIn}
-          title={page.zoomIn}
-        >
-          +
-        </button>
-        <button
-          type="button"
-          data-chart-reset
-          class="chart-toggle chart-reset"
-          title={page.resetZoom}
-        >
-          {page.resetZoom}
-        </button>
-        <button
-          type="button"
-          data-chart-average
-          aria-pressed="false"
-          class="chart-toggle"
-          title={page.average}
-        >
-          {page.average}
-        </button>
-        <button
-          type="button"
-          data-chart-ema
-          aria-pressed="false"
-          class="chart-toggle"
-          title={page.ema}
-        >
-          {page.ema}
-        </button>
-        <button
-          type="button"
-          data-chart-log
-          aria-pressed="false"
-          class="chart-toggle"
-          title={page.logScale}
-        >
-          {page.logScale}
-        </button>
-      </div>
+      <!--
+          Folded on touchscreens, always open on a mouse (dashboard.ts closes
+          it on coarse pointers; chart.css hides the summary on fine ones).
+          The chart used to sit a full screen below the fold on a phone behind
+          three rows of these.
+        -->
+      <details data-chart-more open class="chart-more">
+        <summary class="tf-chip chart-more-summary">{page.chartOptions}</summary>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypeLabel}>
+          {
+            (['candles', 'line'] as const).map((type) => (
+              <button
+                type="button"
+                data-chart-type={type}
+                aria-pressed={type === 'candles' ? 'true' : 'false'}
+                class="tf-chip tf-chip-icon"
+                title={page.chartTypes[type]}
+              >
+                {type === 'candles' ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M7 3v4M7 17v4M17 3v7M17 16v5"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <rect x="4.5" y="7" width="5" height="10" rx="1" fill="currentColor" />
+                    <rect x="14.5" y="10" width="5" height="6" rx="1" fill="currentColor" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M3 16l5-6 4 3 4-7 5 4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                )}
+                <span class="sr-only">{page.chartTypes[type]}</span>
+              </button>
+            ))
+          }
+          <button
+            type="button"
+            data-chart-zoom="out"
+            class="chart-toggle"
+            aria-label={page.zoomOut}
+            title={page.zoomOut}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            data-chart-zoom="in"
+            class="chart-toggle"
+            aria-label={page.zoomIn}
+            title={page.zoomIn}
+          >
+            +
+          </button>
+          <button
+            type="button"
+            data-chart-reset
+            class="chart-toggle chart-reset"
+            title={page.resetZoom}
+          >
+            {page.resetZoom}
+          </button>
+          <button
+            type="button"
+            data-chart-average
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.average}
+          >
+            {page.average}
+          </button>
+          <button
+            type="button"
+            data-chart-ema
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.ema}
+          >
+            {page.ema}
+          </button>
+          <button
+            type="button"
+            data-chart-log
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.logScale}
+          >
+            {page.logScale}
+          </button>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -181,6 +190,8 @@ const page = copy.pages.stats;
       than decorative.
     -->
   <div id="chart-ohlc" data-ohlc class="ohlc-bar" aria-live="off"></div>
+  <!-- Only when the live candles could not be fetched: says when these ones end. -->
+  <p data-chart-stale data-template={page.candlesAsOf} hidden class="chart-stale" role="status"></p>
 
   <div data-chart-wrap class="chart-wrap relative border-t border-line">
     <!--
@@ -204,6 +215,8 @@ const page = copy.pages.stats;
       class="chart w-full"
       role="img"
       aria-label={`${page.chartTitle} chart`}
+      tabindex="0"
+      aria-describedby="chart-ohlc"
     >
       <!-- Behind everything: the price levels the scale on the right names. -->
       <g data-grid></g>
@@ -229,6 +242,8 @@ const page = copy.pages.stats;
     <div data-time-axis class="time-axis" aria-hidden="true"></div>
     <div data-tip class="chart-tip" hidden></div>
   </div>
+  <!-- How to read it. The copy existed in four languages and was rendered nowhere. -->
+  <p class="chart-hint">{page.chartHint}</p>
 
   <!--
       Drag to resize. A real slider underneath, so it also works with a

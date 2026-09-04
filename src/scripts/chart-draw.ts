@@ -79,6 +79,24 @@ export function niceLevels(min: number, max: number, count = 5): number[] {
  * line always sits exactly where its price is rather than where a linear
  * reading of the label would put it.
  */
+/**
+ * Levels for a log axis: 1, 2 and 5 times each power of ten inside the range.
+ *
+ * Linear levels on a log scale bunch into the top of the plot — three labels
+ * in the top fifth and two thirds of the chart with no line at all.
+ */
+export function logLevels(min: number, max: number): number[] {
+  if (!(max > min) || min <= 0) return [];
+  const levels: number[] = [];
+  for (let e = Math.floor(Math.log10(min)); e <= Math.ceil(Math.log10(max)); e += 1) {
+    for (const m of [1, 2, 5]) {
+      const value = Number((m * 10 ** e).toPrecision(12));
+      if (value >= min && value <= max) levels.push(value);
+    }
+  }
+  return levels;
+}
+
 export function drawPriceScale(
   svg: SVGSVGElement,
   scaleEl: HTMLElement | null,
@@ -86,13 +104,17 @@ export function drawPriceScale(
   max: number,
   y: (value: number) => number,
   locale: string,
+  log = false,
 ): void {
   const grid = svg.querySelector('[data-grid]');
   if (grid) grid.replaceChildren();
   if (scaleEl) scaleEl.replaceChildren();
   if (!(max > min)) return;
 
-  const levels = niceLevels(min, max);
+  // A narrow range on a log axis may hold fewer than three round levels; the
+  // linear set is then the more readable of the two.
+  const logSet = log ? logLevels(min, max) : [];
+  const levels = logSet.length >= 3 ? logSet : niceLevels(min, max);
   const lines: SVGElement[] = [];
 
   for (const level of levels) {
@@ -342,8 +364,10 @@ export function drawAverage(
 /**
  * Burns, marked where they happened.
  *
- * Only the ones inside the visible window, so zooming in reveals individual
- * burns rather than a smear of ticks across the whole axis.
+ * One tick per candle, not per burn: four hundred burns over fifty daily
+ * candles drew as a solid band along the axis. The burns that fall inside a
+ * candle's span are summed and drawn as one tick at that candle, whose title
+ * gives the total and how many it stands for. Zoom in and they separate.
  */
 export function drawBurnMarks(
   svg: SVGSVGElement,
@@ -357,28 +381,35 @@ export function drawBurnMarks(
   if (!layer || candles.length < 2) return;
 
   const first = candles[0]!.time;
-  const last = candles[candles.length - 1]!.time;
-  const span = last - first || 1;
+  const step = (candles[candles.length - 1]!.time - first) / (candles.length - 1) || 1;
+  const last = first + step * candles.length;
 
-  const marks = burns
-    .filter((burn) => burn.time >= first && burn.time <= last)
-    .map((burn) => {
-      const x = ((burn.time - first) / span) * 1000;
-      const mark = document.createElementNS(SVG_NS, 'line');
-      mark.setAttribute('x1', x.toFixed(2));
-      mark.setAttribute('x2', x.toFixed(2));
-      mark.setAttribute('y1', String(PLOT_H - 16));
-      mark.setAttribute('y2', String(PLOT_H));
-      mark.setAttribute('class', 'burn-mark');
+  const perCandle = new Map<number, { tokens: number; count: number }>();
+  for (const burn of burns) {
+    if (burn.time < first || burn.time >= last) continue;
+    const index = Math.min(candles.length - 1, Math.floor((burn.time - first) / step));
+    const slot = perCandle.get(index) ?? { tokens: 0, count: 0 };
+    slot.tokens += burn.tokens;
+    slot.count += 1;
+    perCandle.set(index, slot);
+  }
 
-      const title = document.createElementNS(SVG_NS, 'title');
-      title.textContent = template.replace(
-        '{amount}',
-        Math.round(burn.tokens).toLocaleString(locale),
-      );
-      mark.append(title);
-      return mark;
-    });
+  const marks = [...perCandle.entries()].map(([index, slot]) => {
+    const x = ((index + 0.5) / candles.length) * CHART_W;
+    const mark = document.createElementNS(SVG_NS, 'line');
+    mark.setAttribute('x1', x.toFixed(2));
+    mark.setAttribute('x2', x.toFixed(2));
+    mark.setAttribute('y1', String(PLOT_H - 16));
+    mark.setAttribute('y2', String(PLOT_H));
+    mark.setAttribute('class', 'burn-mark');
+
+    const title = document.createElementNS(SVG_NS, 'title');
+    const amount = Math.round(slot.tokens).toLocaleString(locale);
+    title.textContent =
+      template.replace('{amount}', amount) + (slot.count > 1 ? ` (×${slot.count})` : '');
+    mark.append(title);
+    return mark;
+  });
 
   layer.replaceChildren(...marks);
 }

@@ -59,7 +59,8 @@ export async function initLiveStats(locale: string): Promise<void> {
  * arrive", not "did this throw".
  */
 async function update(locale: string): Promise<void> {
-  const stats = await getLiveStats({ pair: document.querySelector('[data-dashboard]') === null });
+  const onDashboard = document.querySelector('[data-dashboard]') !== null;
+  const stats = await getLiveStats({ pair: !onDashboard, holders: !onDashboard });
 
   const burnedPercent =
     stats.burnedTokens === undefined ? undefined : (stats.burnedTokens / TOKEN.totalSupply) * 100;

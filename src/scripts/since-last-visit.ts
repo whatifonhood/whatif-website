@@ -91,7 +91,14 @@ export function initSinceLastVisit(locale: string): void {
    * *previous* visit, so the new figures are only stored after it has rendered.
    */
   const record = (now: Visit) => {
-    write({ ...now, at: Date.now() });
+    // Keep whatever did not arrive this time. A rate-limited visit used to
+    // store only the price, so the next visit could not report burns or holders.
+    write({
+      at: Date.now(),
+      price: now.price ?? previous?.price,
+      burned: now.burned ?? previous?.burned,
+      holders: now.holders ?? previous?.holders,
+    });
   };
 
   const show = (now: Visit) => {

@@ -14,7 +14,7 @@
  * visible in one interface instead of spread through a closure.
  */
 import type { Candle } from '../lib/market.ts';
-import { formatCompact, formatUsd } from '../lib/format.ts';
+import { formatCompact, formatPercent, formatUsd } from '../lib/format.ts';
 import { CHART_H, PLOT_H } from './chart-draw.ts';
 import { recall, remember, type PrefKey } from '../lib/preferences.ts';
 
@@ -188,7 +188,7 @@ export function attachChartInteraction(ctx: ChartContext): ChartPointer {
     const move = document.createElement('span');
     move.dataset.tipChange = '';
     move.dataset.direction = change >= 0 ? 'up' : 'down';
-    move.textContent = `  ${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+    move.textContent = `  ${change >= 0 ? '+' : ''}${formatPercent(change, locale)}`;
 
     const volume = document.createElement('b');
     volume.textContent = `vol ${formatCompact(candle.volumeUsd, locale)}`;

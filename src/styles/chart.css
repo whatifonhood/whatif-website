@@ -418,7 +418,8 @@
  */
 @media (pointer: coarse) {
   .chart-grip {
-    touch-action: pan-y;
+    /* The grip is dragged vertically; pan-y handed that gesture to the page and the grip did nothing on touch. */
+    touch-action: none;
   }
 }
 
@@ -647,4 +648,53 @@
 }
 [data-change][data-direction='down'] {
   color: var(--color-warn);
+}
+
+/*
+ * The secondary chart controls fold on touchscreens. On a mouse the summary is
+ * hidden and the details stays open (dashboard.ts only closes it for coarse
+ * pointers), so the fold is invisible where it is not needed.
+ */
+.chart-more {
+  display: contents;
+}
+.chart-more-summary {
+  list-style: none;
+  cursor: pointer;
+}
+.chart-more-summary::-webkit-details-marker {
+  display: none;
+}
+@media (pointer: fine) {
+  .chart-more-summary {
+    display: none;
+  }
+}
+.chart-more[open] .chart-more-summary {
+  border-color: var(--color-lime);
+  color: var(--color-lime);
+}
+
+/* Shown only while the candles on screen are not the live ones. */
+.chart-stale {
+  margin: 0;
+  padding: 0.5rem 1.5rem;
+  border-top: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-warn) 10%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-warn);
+}
+
+/* How to read the chart, under it. */
+.chart-hint {
+  margin: 0;
+  padding: 0.6rem 1.5rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
 }
