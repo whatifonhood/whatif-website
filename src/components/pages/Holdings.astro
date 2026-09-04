@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { SITE, type Locale } from '../../config/site.ts';
+import { CHAIN, SITE, TOKEN, type Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import Icons from '../../components/ui/Icons.astro';
 import Button from '../ui/Button.astro';
@@ -29,6 +29,8 @@ const labels = JSON.stringify({
   errorShape: page.errors.shape,
   errorNetwork: page.errors.network,
   shareText: page.shareText,
+  checking: page.checking,
+  shareOfSupply: page.shareOfSupply,
 });
 ---
 
@@ -101,6 +103,12 @@ const labels = JSON.stringify({
           $IF{' · '}<span data-out="usd" class="text-lime"></span>
         </p>
         <p data-out="verdict" class="mt-5 text-lg text-ink"></p>
+        <!-- The card's most honest number, on the page and not only in the picture. -->
+        <p
+          data-out="share"
+          class="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-faint"
+        >
+        </p>
       </div>
 
       <canvas
@@ -126,6 +134,18 @@ const labels = JSON.stringify({
         >
           <Icons name="x" size={14} />
           {page.postOnX}
+        </Button>
+        <!-- The card says "read from the chain"; this is where to go and read it. -->
+        <Button
+          href={`${CHAIN.explorerUrl}/address/${TOKEN.address}`}
+          variant="secondary"
+          size="lg"
+          external
+          externalLabel={copy.common.externalLink}
+          data-holdings-explorer
+        >
+          {page.verify}
+          <Icons name="arrow-up-right" size={14} />
         </Button>
       </div>
     </div>

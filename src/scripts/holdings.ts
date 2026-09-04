@@ -13,8 +13,9 @@
 import { getBalanceOf, getPairSnapshot } from '../lib/market.ts';
 import { formatCompact, formatCount, formatUsd } from '../lib/format.ts';
 import { track } from '../lib/analytics.ts';
-import { TOKEN } from '../config/site.ts';
-import { CARD_COINS, coinArt, drawHoldingsCard } from '../lib/card-designs.ts';
+import { CHAIN, SITE, TOKEN } from '../config/site.ts';
+import { CARD_COINS, coinArt, drawHoldingsCard, readyFonts } from '../lib/card-designs.ts';
+import { canvasBlob, shareOrDownload } from '../lib/share.ts';
 
 const ADDRESS = /^0x[a-fA-F0-9]{40}$/;
 
@@ -28,12 +29,41 @@ const BANDS = [
   { atLeast: 10_000_000, pose: 'victory', key: 'whale' },
   { atLeast: 1_000_000, pose: 'victory', key: 'shark' },
   { atLeast: 100_000, pose: 'arms-crossed', key: 'holder' },
-  { atLeast: 1, pose: 'thinking', key: 'curious' },
+  // Anything above nothing. The floor used to be one whole token, so a wallet
+  // holding 0.9 $IF was told it held nothing.
+  { atLeast: Number.MIN_VALUE, pose: 'thinking', key: 'curious' },
   { atLeast: 0, pose: 'facepalm', key: 'empty' },
 ] as const;
 
-function bandFor(tokens: number) {
-  return BANDS.find((band) => tokens >= band.atLeast) ?? BANDS[BANDS.length - 1]!;
+/**
+ * The two addresses people paste first, because both are on the stats page.
+ * Calling the burn address a whale was wrong in a way that made the whole tool
+ * look unserious, so each gets its own name and verdict.
+ */
+const KNOWN: Record<string, 'burn' | 'pool'> = {
+  [TOKEN.burnAddress.toLowerCase()]: 'burn',
+  [TOKEN.primaryPool.toLowerCase()]: 'pool',
+};
+
+function bandFor(address: string, tokens: number): string {
+  const known = KNOWN[address.toLowerCase()];
+  if (known) return known;
+  return (BANDS.find((band) => tokens >= band.atLeast) ?? BANDS[BANDS.length - 1]!).key;
+}
+
+/** Whole tokens, or the fraction when the fraction is all there is. */
+function formatTokens(tokens: number, locale: string): string {
+  if (tokens > 0 && tokens < 1) {
+    return tokens.toLocaleString(locale, { maximumSignificantDigits: 3 });
+  }
+  return formatCount(tokens, locale);
+}
+
+/** Share of supply, with enough digits for a small wallet to read as more than zero. */
+function formatShare(share: number, locale: string): string {
+  const percent = share * 100;
+  const digits = percent >= 1 ? 2 : percent >= 0.01 ? 3 : 6;
+  return `${percent.toLocaleString(locale, { maximumFractionDigits: digits })}%`;
 }
 
 /**
@@ -68,6 +98,7 @@ async function drawCard(
   },
   locale: string,
 ): Promise<void> {
+  await readyFonts();
   drawHoldingsCard(
     canvas,
     {
@@ -96,6 +127,8 @@ export function initHoldings(locale: string): void {
   const canvas = root.querySelector<HTMLCanvasElement>('[data-holdings-card]');
   const download = root.querySelector<HTMLAnchorElement>('[data-holdings-download]');
   const share = root.querySelector<HTMLAnchorElement>('[data-holdings-share]');
+  const explorer = root.querySelector<HTMLAnchorElement>('[data-holdings-explorer]');
+  const submit = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (!form || !input || !result) return;
 
   const labels: Record<string, string> = JSON.parse(root.dataset.labels ?? '{}');
@@ -105,6 +138,21 @@ export function initHoldings(locale: string): void {
   const setText = (key: string, value: string) => {
     const node = root.querySelector<HTMLElement>(`[data-out="${key}"]`);
     if (node) node.textContent = value;
+  };
+
+  /**
+   * Visible while the chain is being asked. The tap used to change nothing on
+   * screen for up to six seconds, and on a phone the answer then appeared below
+   * the fold — so "Check it" looked like a button that did nothing.
+   */
+  const idleLabel = submit?.textContent ?? '';
+  const setBusy = (on: boolean) => {
+    root.dataset.loading = String(on);
+    result.setAttribute('aria-busy', String(on));
+    if (submit) {
+      submit.disabled = on;
+      submit.textContent = on && labels.checking ? labels.checking : idleLabel;
+    }
   };
 
   const fail = (message: string) => {
@@ -118,9 +166,20 @@ export function initHoldings(locale: string): void {
     }
   };
 
+  // The download goes through the share sheet where the device has one.
+  download?.addEventListener('click', (event) => {
+    if (!canvas || download.hidden) return;
+    event.preventDefault();
+    void canvasBlob(canvas).then((blob) => {
+      if (blob) void shareOrDownload(blob, 'what-if-holdings.png');
+    });
+  });
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const address = input.value.trim().replace(/^0X/, '0x');
+    // Chat apps wrap long strings, so a pasted address can arrive with a space
+    // or a line break inside it. Strip every kind of whitespace, not just the ends.
+    const address = input.value.replace(/\s+/g, '').replace(/^0X/, '0x');
 
     if (!ADDRESS.test(address)) {
       fail(diagnose(address, labels));
@@ -134,7 +193,7 @@ export function initHoldings(locale: string): void {
     // screen while a new address loaded, so for a second or two the page showed
     // one wallet's balance under another wallet's request.
     result.hidden = true;
-    root.dataset.loading = 'true';
+    setBusy(true);
 
     // A slow first lookup must not overwrite a faster second one.
     const request = ++latest;
@@ -143,18 +202,19 @@ export function initHoldings(locale: string): void {
     let priceUsd: number | undefined;
     try {
       [tokens, priceUsd] = await Promise.all([
-        getBalanceOf(address),
+        // A person's own request, not a poll: see the note on `oneShot`.
+        getBalanceOf(address, { oneShot: true }),
         getPairSnapshot()
           .then((snapshot) => snapshot.priceUsd)
           .catch(() => undefined),
       ]);
     } catch {
-      root.dataset.loading = 'false';
+      setBusy(false);
       if (request === latest) fail(labels.errorNetwork ?? '');
       return;
     }
 
-    root.dataset.loading = 'false';
+    setBusy(false);
     if (request !== latest) return; // A newer lookup has already started.
 
     if (tokens === undefined) {
@@ -162,27 +222,37 @@ export function initHoldings(locale: string): void {
       return;
     }
 
-    const band = bandFor(tokens);
+    const band = bandFor(address, tokens);
     const usd = priceUsd === undefined ? undefined : tokens * priceUsd;
+    const supplyShare = tokens / TOKEN.totalSupply;
 
-    setText('tokens', formatCount(tokens, locale));
+    setText('tokens', formatTokens(tokens, locale));
     setText('usd', usd === undefined ? '—' : formatUsd(usd, locale));
-    setText('band', bands[band.key] ?? '');
-    setText('verdict', verdicts[band.key] ?? '');
+    setText('band', bands[band] ?? '');
+    setText('verdict', verdicts[band] ?? '');
+    setText(
+      'share',
+      (labels.shareOfSupply ?? '{share}').replace('{share}', formatShare(supplyShare, locale)),
+    );
+    if (explorer) explorer.href = `${CHAIN.explorerUrl}/address/${address}`;
     result.hidden = false;
+    // On a phone the answer lands below the fold; bring it into view.
+    result.scrollIntoView({
+      block: 'nearest',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
 
     // Records that a lookup happened. The address is deliberately not included.
     track('Wallet Lookup');
 
     if (canvas) {
-      const supplyShare = tokens / TOKEN.totalSupply;
       await drawCard(
         canvas,
         {
           tokens,
           usd,
-          band: bands[band.key] ?? '',
-          verdict: verdicts[band.key] ?? '',
+          band: bands[band] ?? '',
+          verdict: verdicts[band] ?? '',
           supplyShare,
         },
         locale,
@@ -207,7 +277,7 @@ export function initHoldings(locale: string): void {
           .replace('{tokens}', formatCompact(tokens, locale))
           .replace('{symbol}', TOKEN.symbol),
       );
-      url.searchParams.set('url', 'https://whatifonhood.com/holdings/');
+      url.searchParams.set('url', `${SITE.url}/holdings/`);
       share.href = url.toString();
       share.hidden = false;
     }
