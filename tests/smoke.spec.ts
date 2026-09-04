@@ -712,7 +712,7 @@ test('no cache rule puts an HTML route behind a week', () => {
   for (const rule of weekly) {
     // Every long-cached prefix must be an asset directory, not a page route.
     expect(rule, `${rule} would also match an HTML page`).toMatch(
-      /^\/(memes\/(full|thumb|thumb2x|og)|coins\/(full|thumb|og)|posts|art)\/\*$/,
+      /^\/(memes\/(full|thumb|thumb15x|thumb2x|display|og)|coins\/(full|thumb|og)|posts|art)\/\*$/,
     );
   }
 });

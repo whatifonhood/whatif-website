@@ -51,7 +51,9 @@ shareUrl.searchParams.set('url', url);
   <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
     <figure class="overflow-hidden rounded-2xl border border-line bg-surface">
       <img
-        src={`/memes/full/${meme.slug}.webp`}
+        src={`/memes/display/${meme.slug}.webp`}
+        srcset={`/memes/thumb2x/${meme.slug}.webp 800w, /memes/display/${meme.slug}.webp 1200w`}
+        sizes="(min-width: 56rem) 56rem, 100vw"
         alt={meme.title}
         width={meme.width}
         height={meme.height}

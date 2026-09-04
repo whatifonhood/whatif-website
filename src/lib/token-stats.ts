@@ -213,11 +213,16 @@ async function fetchHolders(): Promise<number | undefined> {
   return isRecord(holders) ? asPositiveNumber(holders.count) : undefined;
 }
 
-export async function getLiveStats(): Promise<LiveStats> {
+export async function getLiveStats(options: { pair?: boolean } = {}): Promise<LiveStats> {
   // The holder tile on the landing page was a build constant sitting under a
   // heading that says the figures come from the chain. It is fetched now.
+  //
+  // `pair: false` is for /stats/, where the dashboard already fetches the pair
+  // snapshot every tick — asking DexScreener twice per cycle for the same
+  // numbers was the largest single source of first-second requests on that
+  // page, and the reason it tripped rate limits sooner than it needed to.
   const [pair, burned, holders] = await Promise.allSettled([
-    fetchPairStats(),
+    options.pair === false ? Promise.reject(new Error('skipped')) : fetchPairStats(),
     fetchBurnedTokens(),
     fetchHolders(),
   ]);
