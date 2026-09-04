@@ -312,29 +312,39 @@ export async function getRecentBurns(sinceBlock: number): Promise<{ tokens: numb
  * `0x70a08231` is the four-byte selector for `balanceOf(address)`, with the
  * argument left-padded to a 32-byte word.
  */
-export async function getBalanceOf(address: string): Promise<number | undefined> {
+export async function getBalanceOf(
+  address: string,
+  options: { oneShot?: boolean } = {},
+): Promise<number | undefined> {
   // Checked again here even though the caller checks it: this value goes into a
   // request body, and a boundary is only a boundary if it is enforced at it.
   if (!/^0x[a-fA-F0-9]{40}$/.test(address)) return undefined;
 
   const padded = address.slice(2).toLowerCase().padStart(64, '0');
-  const body = await fetchJson(DATA_APIS.rpc, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'eth_call',
-      params: [{ to: TOKEN.address, data: `0x70a08231${padded}` }, 'latest'],
-    }),
-  });
+  const body = await fetchJson(
+    DATA_APIS.rpc,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_call',
+        params: [{ to: TOKEN.address, data: `0x70a08231${padded}` }, 'latest'],
+      }),
+    },
+    options,
+  );
 
   if (!isRecord(body) || typeof body.result !== 'string') return undefined;
   if (!/^0x[0-9a-fA-F]*$/.test(body.result)) return undefined;
   if (body.result === '0x' || body.result === '0x0') return 0;
 
-  // BigInt keeps full precision; dividing by the decimals gives whole tokens.
-  return Number(BigInt(body.result) / 10n ** BigInt(TOKEN.decimals));
+  // Whole tokens exactly, from BigInt, plus the fraction as a float. Flooring
+  // to whole tokens made a wallet holding 0.9 $IF read as empty.
+  const raw = BigInt(body.result);
+  const unit = 10n ** BigInt(TOKEN.decimals);
+  return Number(raw / unit) + Number(raw % unit) / Number(unit);
 }
 
 /**

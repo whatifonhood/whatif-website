@@ -251,6 +251,7 @@ export const en: SiteCopy = {
       all: 'All',
       searchLabel: 'Search memes',
       empty: 'Nothing matches that. Try another word.',
+      showAll: 'Show everything',
       count: 'memes',
     },
     brand: {
@@ -291,6 +292,10 @@ export const en: SiteCopy = {
       average: 'Avg',
       ema: 'EMA',
       chartHint: 'Scroll to zoom · drag to move · double-click to reset',
+      chartOptions: 'Options',
+      candlesAsOf: 'Candles as of {time} — the live feed could not be reached',
+      concentrationNote:
+        'The top ten includes the burn address and the liquidity pool. Neither is a person.',
       chartTypes: { candles: 'Candles', line: 'Line' },
       logScale: 'Log',
       chartTitle: 'Price',
@@ -403,6 +408,7 @@ export const en: SiteCopy = {
       shareText: (name, tier) => `I pulled ${name} — ${tier}.\n\nWhat $IF this one's you?`,
       odds: 'odds',
       openGenerator: 'Pull your own',
+      inCollection: 'In your collection',
     },
     ask: {
       dailyArchiveTitle: 'Every day so far',
@@ -514,10 +520,13 @@ export const en: SiteCopy = {
         'Paste any address and see what it holds. No wallet connection, no signature, nothing to approve.',
       inputLabel: 'Wallet address',
       check: 'Check it',
+      checking: 'Checking…',
       privacy:
         "The address is typed by you, never requested from a wallet, and is sent only to the chain's public RPC. The price used to value it comes from DexScreener with no address attached. Nothing is stored.",
       download: 'Download card',
       postOnX: 'Post on X',
+      verify: 'Verify on Blockscout',
+      shareOfSupply: '{share} of all $IF',
       shareText: 'I am holding {tokens} {symbol}.\n\nStill asking.',
       bands: {
         whale: 'Whale',
@@ -525,6 +534,8 @@ export const en: SiteCopy = {
         holder: 'Holder',
         curious: 'Curious',
         empty: 'Empty',
+        burn: 'The burn address',
+        pool: 'The liquidity pool',
       },
       verdicts: {
         whale: 'The chart moves when you do.',
@@ -532,6 +543,8 @@ export const en: SiteCopy = {
         holder: 'You are in. Properly in.',
         curious: 'A start is a start.',
         empty: 'Nothing here yet. What $IF that changed?',
+        burn: 'Nobody holds a key to this one. Everything here is gone for good.',
+        pool: 'This is the market itself, not a holder. Every trade passes through here.',
       },
       errors: {
         empty: 'Paste an address first.',
@@ -555,6 +568,7 @@ export const en: SiteCopy = {
         `${title} — a $IF meme from the ${series} series. Full resolution, free to post, no credit needed.`,
       download: 'Download',
       postOnX: 'Post on X',
+      copyLink: 'Copy link',
       more: 'More from',
       backToVault: 'Back to the vault',
       shareText: (title) => `${title}\n\nStill asking.`,

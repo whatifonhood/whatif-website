@@ -266,6 +266,7 @@ export const es: SiteCopy = {
       all: 'Todos',
       searchLabel: 'Buscar memes',
       empty: 'Nada coincide con eso. Prueba con otra palabra.',
+      showAll: 'Mostrar todo',
       count: 'memes',
     },
     brand: {
@@ -305,6 +306,10 @@ export const es: SiteCopy = {
       average: 'Media',
       ema: 'EMA',
       chartHint: 'Rueda para acercar · arrastra para mover · doble clic para restablecer',
+      chartOptions: 'Opciones',
+      candlesAsOf: 'Velas hasta {time}: no se pudo leer el feed en vivo',
+      concentrationNote:
+        'Los diez primeros incluyen la dirección de quema y el pool de liquidez. Ninguno es una persona.',
       chartTypes: { candles: 'Velas', line: 'Línea' },
       logScale: 'Log',
       chartTitle: 'Precio',
@@ -423,6 +428,7 @@ export const es: SiteCopy = {
       shareText: (name, tier) => `Me salió ${name} — ${tier}.\n\n¿Y $IF esta eres tú?`,
       odds: 'de probabilidad',
       openGenerator: 'Saca la tuya',
+      inCollection: 'En tu colección',
     },
     ask: {
       dailyArchiveTitle: 'Todos los días hasta ahora',
@@ -534,10 +540,13 @@ export const es: SiteCopy = {
         'Pega cualquier dirección y mira lo que tiene. Sin conectar wallet, sin firmar, sin nada que aprobar.',
       inputLabel: 'Dirección de wallet',
       check: 'Consultar',
+      checking: 'Comprobando…',
       privacy:
         'La dirección la escribes tú, nunca se pide a una wallet, y solo se envía al RPC público de la cadena. El precio con que se valora viene de DexScreener sin ninguna dirección adjunta. No se guarda nada.',
       download: 'Descargar tarjeta',
       postOnX: 'Publicar en X',
+      verify: 'Verificar en Blockscout',
+      shareOfSupply: '{share} de todo el $IF',
       shareText: 'Tengo {tokens} {symbol}.\n\nSeguimos preguntando.',
       bands: {
         whale: 'Ballena',
@@ -545,6 +554,8 @@ export const es: SiteCopy = {
         holder: 'Holder',
         curious: 'Curioso',
         empty: 'Vacía',
+        burn: 'La dirección de quema',
+        pool: 'El pool de liquidez',
       },
       verdicts: {
         whale: 'El gráfico se mueve cuando tú te mueves.',
@@ -552,6 +563,8 @@ export const es: SiteCopy = {
         holder: 'Estás dentro. Bien dentro.',
         curious: 'Empezar es empezar.',
         empty: 'Aquí todavía no hay nada. ¿Y $IF eso cambiara?',
+        burn: 'Nadie tiene la clave de esta dirección. Todo lo que hay aquí se fue para siempre.',
+        pool: 'Esto es el propio mercado, no un titular. Cada operación pasa por aquí.',
       },
       errors: {
         empty: 'Pega una dirección primero.',
@@ -575,6 +588,7 @@ export const es: SiteCopy = {
         `${title} — un meme de $IF de la serie ${series}. Máxima resolución, libre de publicar, sin dar crédito.`,
       download: 'Descargar',
       postOnX: 'Publicar en X',
+      copyLink: 'Copiar enlace',
       more: 'Más de',
       backToVault: 'Volver a la bóveda',
       shareText: (title) => `${title}\n\nSeguimos preguntando.`,

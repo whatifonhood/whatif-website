@@ -179,10 +179,20 @@ export function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: 
   let line = '';
   for (const word of text.split(/\s+/).filter(Boolean)) {
     const candidate = line ? `${line} ${word}` : word;
-    if (context.measureText(candidate).width <= maxWidth) line = candidate;
-    else {
-      if (line) lines.push(line);
-      line = word;
+    if (context.measureText(candidate).width <= maxWidth) {
+      line = candidate;
+      continue;
+    }
+    if (line) lines.push(line);
+    // A single word wider than the line — a URL, a hashtag — is split by
+    // character rather than run off the edge of the card.
+    line = '';
+    for (const char of word) {
+      if (context.measureText(line + char).width <= maxWidth || line === '') line += char;
+      else {
+        lines.push(line);
+        line = char;
+      }
     }
   }
   if (line) lines.push(line);

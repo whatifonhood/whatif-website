@@ -28,6 +28,28 @@ import {
 const PAD = 72;
 
 /**
+ * The faces a card is set in, so a card is never drawn in the fallback font.
+ *
+ * On a slow first visit the canvas was painted before Archivo had arrived, in
+ * Helvetica, and never repainted — and the download was made from that. Wait
+ * for the faces, with a ceiling so a blocked font host cannot hold the card.
+ */
+const CARD_FACES = [
+  '600 40px Archivo',
+  '400 40px Archivo',
+  '900 italic 40px Archivo',
+  '700 20px "JetBrains Mono"',
+  '400 20px "JetBrains Mono"',
+];
+
+export async function readyFonts(timeoutMs = 3000): Promise<void> {
+  if (!('fonts' in document)) return;
+  const loads = Promise.all(CARD_FACES.map((face) => document.fonts.load(face))).then(() => {});
+  const ceiling = new Promise<void>((resolve) => window.setTimeout(resolve, timeoutMs));
+  await Promise.race([loads.catch(() => {}), ceiling]);
+}
+
+/**
  * The coin each card wears.
  *
  * Drawn FOR the cards and used nowhere else. The pull set is a collection
@@ -91,7 +113,9 @@ export function drawAskCard(
   paintEyebrow(context, 'Still asking.');
 
   const reply = answer.trim();
-  const box = CARD_WIDTH - PAD * 2 - 120;
+  // Stops short of the medallion (its left edge is at x≈772): a long question
+  // plus a long answer used to run underneath it.
+  const box = 690;
   const { lines, size } = fitLines(
     context,
     question,

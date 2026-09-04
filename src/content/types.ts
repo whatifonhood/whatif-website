@@ -24,6 +24,17 @@ export interface SplitHeading {
   accent: string;
 }
 
+/** One line per holding band on the wallet lookup. */
+export interface HoldingBands {
+  whale: string;
+  shark: string;
+  holder: string;
+  curious: string;
+  empty: string;
+  burn: string;
+  pool: string;
+}
+
 export interface SiteCopy {
   /** Used on <html lang> and for the social card locale. */
   htmlLang: string;
@@ -185,6 +196,8 @@ export interface SiteCopy {
       all: string;
       searchLabel: string;
       empty: string;
+      /** The way out of an empty filter. */
+      showAll: string;
       count: string;
     };
     brand: {
@@ -227,6 +240,12 @@ export interface SiteCopy {
       ema: string;
       /** Explains that the chart can be dragged and scrolled. */
       chartHint: string;
+      /** The fold that hides the secondary chart controls on a touchscreen. */
+      chartOptions: string;
+      /** Shown when the candles on screen are not live; `{time}` is when they end. */
+      candlesAsOf: string;
+      /** Under the concentration bar: the top ten includes the burn address and the pool. */
+      concentrationNote: string;
       /** Candles or a line. */
       chartTypes: { candles: string; line: string };
       /** Toggles the price axis between linear and logarithmic. */
@@ -359,6 +378,8 @@ export interface SiteCopy {
       shareText: (name: string, tier: string) => string;
       odds: string;
       openGenerator: string;
+      /** On a coin page, when this browser has already pulled it. */
+      inCollection: string;
     };
     ask: {
       /** The archive of daily questions. */
@@ -449,15 +470,24 @@ export interface SiteCopy {
       intro: string;
       inputLabel: string;
       check: string;
+      /** The button while the chain is being asked. */
+      checking: string;
       /** Stated before anyone types, because it is the first question asked. */
       privacy: string;
       download: string;
       postOnX: string;
+      /** Opens the address on the block explorer. */
+      verify: string;
+      /** `{share}` is the wallet's share of supply as a percentage. */
+      shareOfSupply: string;
       /** `{tokens}` and `{symbol}` are replaced at runtime. */
       shareText: string;
-      /** Holding bands. No rank is claimed — no public endpoint gives one. */
-      bands: { whale: string; shark: string; holder: string; curious: string; empty: string };
-      verdicts: { whale: string; shark: string; holder: string; curious: string; empty: string };
+      /**
+       * Holding bands. No rank is claimed — no public endpoint gives one.
+       * `burn` and `pool` are the two addresses everyone pastes first.
+       */
+      bands: HoldingBands;
+      verdicts: HoldingBands;
       /** Says what is wrong with what was pasted, rather than returning zero. */
       errors: {
         empty: string;
@@ -483,6 +513,8 @@ export interface SiteCopy {
       description: (title: string, series: string) => string;
       download: string;
       postOnX: string;
+      /** Copies the page URL; the X intent cannot attach the picture. */
+      copyLink: string;
       /** Heading above the rest of the series, e.g. "More from". */
       more: string;
       backToVault: string;

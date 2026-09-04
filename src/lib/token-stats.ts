@@ -82,8 +82,20 @@ export function isThrottled(url: string): boolean {
   return Date.now() < (throttledUntil.get(originOf(url)) ?? 0);
 }
 
-export async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
-  if (isThrottled(url)) throw new Error('rate-limited; holding off');
+/**
+ * `oneShot` marks a request a person just asked for — the wallet lookup — as
+ * opposed to the dashboard's polling. It still times out, is still validated,
+ * still backs off on a real 429. What it skips is the per-origin hold that a
+ * *thrown* fetch sets: that hold exists so a poll stops hammering an endpoint
+ * that is refusing it, but for a one-shot it turned a single CORS hiccup into
+ * a minute of "try again in a moment" during which no retry sent anything.
+ */
+export async function fetchJson(
+  url: string,
+  init?: RequestInit,
+  options: { oneShot?: boolean } = {},
+): Promise<unknown> {
+  if (!options.oneShot && isThrottled(url)) throw new Error('rate-limited; holding off');
 
   let response: Response;
   try {
@@ -124,7 +136,7 @@ export async function fetchJson(url: string, init?: RequestInit): Promise<unknow
      * that was already refusing us. Offline and DNS failures land here too, and
      * backing off is the right answer for those as well.
      */
-    throttledUntil.set(originOf(url), Date.now() + BACKOFF_MS);
+    if (!options.oneShot) throttledUntil.set(originOf(url), Date.now() + BACKOFF_MS);
     throw error;
   }
 
@@ -213,7 +225,9 @@ async function fetchHolders(): Promise<number | undefined> {
   return isRecord(holders) ? asPositiveNumber(holders.count) : undefined;
 }
 
-export async function getLiveStats(options: { pair?: boolean } = {}): Promise<LiveStats> {
+export async function getLiveStats(
+  options: { pair?: boolean; holders?: boolean } = {},
+): Promise<LiveStats> {
   // The holder tile on the landing page was a build constant sitting under a
   // heading that says the figures come from the chain. It is fetched now.
   //
@@ -221,10 +235,12 @@ export async function getLiveStats(options: { pair?: boolean } = {}): Promise<Li
   // snapshot every tick — asking DexScreener twice per cycle for the same
   // numbers was the largest single source of first-second requests on that
   // page, and the reason it tripped rate limits sooner than it needed to.
+  // `holders: false` for the same reason: the dashboard already reads the
+  // token-info endpoint (the rate-limited one) for the concentration panel.
   const [pair, burned, holders] = await Promise.allSettled([
     options.pair === false ? Promise.reject(new Error('skipped')) : fetchPairStats(),
     fetchBurnedTokens(),
-    fetchHolders(),
+    options.holders === false ? Promise.reject(new Error('skipped')) : fetchHolders(),
   ]);
 
   return {

@@ -251,6 +251,7 @@ export const tr: SiteCopy = {
       all: 'Hepsi',
       searchLabel: 'Meme ara',
       empty: 'Eşleşen bir şey yok. Başka bir kelime dene.',
+      showAll: 'Hepsini göster',
       count: 'meme',
     },
     brand: {
@@ -290,6 +291,10 @@ export const tr: SiteCopy = {
       average: 'Ort.',
       ema: 'EMA',
       chartHint: 'Yakınlaştırmak için kaydır · taşımak için sürükle · sıfırlamak için çift tıkla',
+      chartOptions: 'Seçenekler',
+      candlesAsOf: 'Mumlar {time} itibarıyla — canlı veri alınamadı',
+      concentrationNote:
+        'İlk on, yakım adresini ve likidite havuzunu içerir. İkisi de bir kişi değil.',
       chartTypes: { candles: 'Mum', line: 'Çizgi' },
       logScale: 'Log',
       chartTitle: 'Fiyat',
@@ -402,6 +407,7 @@ export const tr: SiteCopy = {
       shareText: (name, tier) => `${name} çektim — ${tier}.\n\nYa bu seninkiyse?`,
       odds: 'olasılık',
       openGenerator: 'Kendi paranı çek',
+      inCollection: 'Koleksiyonunda',
     },
     ask: {
       dailyArchiveTitle: 'Bugüne kadarki her gün',
@@ -514,10 +520,13 @@ export const tr: SiteCopy = {
         'Herhangi bir adresi yapıştır, ne tuttuğunu gör. Cüzdan bağlamak yok, imza yok, onaylanacak hiçbir şey yok.',
       inputLabel: 'Cüzdan adresi',
       check: 'Sorgula',
+      checking: 'Bakılıyor…',
       privacy:
         "Adresi sen yazarsın, hiçbir cüzdandan istenmez ve yalnızca zincirin herkese açık RPC'sine gönderilir. Değerlemede kullanılan fiyat, adres eklenmeden DexScreener'dan alınır. Hiçbir şey saklanmaz.",
       download: 'Kartı indir',
       postOnX: "X'te paylaş",
+      verify: "Blockscout'ta doğrula",
+      shareOfSupply: "Tüm $IF'in {share} kadarı",
       shareText: '{tokens} {symbol} tutuyorum.\n\nHâlâ soruyoruz.',
       bands: {
         whale: 'Balina',
@@ -525,6 +534,8 @@ export const tr: SiteCopy = {
         holder: 'Sahip',
         curious: 'Meraklı',
         empty: 'Boş',
+        burn: 'Yakım adresi',
+        pool: 'Likidite havuzu',
       },
       verdicts: {
         whale: 'Sen kımıldayınca grafik kımıldıyor.',
@@ -532,6 +543,8 @@ export const tr: SiteCopy = {
         holder: 'İçindesin. Hem de tam anlamıyla.',
         curious: 'Başlamak da başlamaktır.',
         empty: 'Burada henüz hiçbir şey yok. Ya bu değişseydi?',
+        burn: 'Bu adresin anahtarı kimsede yok. Buradaki her şey sonsuza dek gitti.',
+        pool: 'Bu bir sahip değil, piyasanın kendisi. Her işlem buradan geçer.',
       },
       errors: {
         empty: 'Önce bir adres yapıştır.',
@@ -555,6 +568,7 @@ export const tr: SiteCopy = {
         `${title} — ${series} serisinden bir $IF meme. Tam çözünürlük, serbestçe paylaş, kaynak gerekmez.`,
       download: 'İndir',
       postOnX: "X'te paylaş",
+      copyLink: 'Bağlantıyı kopyala',
       more: 'Serinin devamı:',
       backToVault: 'Kasaya dön',
       shareText: (title) => `${title}\n\nHâlâ soruyoruz.`,
