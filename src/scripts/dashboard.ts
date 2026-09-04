@@ -71,7 +71,16 @@ const SLOW_EVERY = 4;
  * so explicitly is the only version of this that stays correct as tasks are
  * added.
  */
-type TaskResult = 'ok' | 'failed' | 'skipped';
+/**
+ * 'fallback' is a fourth outcome, and the reason it exists is the banner below.
+ * When every API is unreachable the chart still draws — the candles ship with
+ * the site — and for a while that counted as 'ok', which meant `allFailed` could
+ * never be true and the page showed a build-time snapshot price under a live
+ * pulse dot with nothing saying the data was old. Drawing from the cache is a
+ * success for the chart and a failure for the network, and the banner is about
+ * the network.
+ */
+type TaskResult = 'ok' | 'failed' | 'skipped' | 'fallback';
 
 /** Transaction hashes already on screen, so new ones can be highlighted. */
 const seenTrades = new Set<string>();
@@ -360,7 +369,7 @@ export function initDashboard(locale: string): void {
           if (chartEmpty) chartEmpty.hidden = true;
           paint();
         }
-        return 'ok';
+        return 'fallback';
       }
       if (chartEmpty && loaded.length === 0) chartEmpty.hidden = false;
       return 'failed';
@@ -715,6 +724,12 @@ export function initDashboard(locale: string): void {
           anchor.setAttribute('href', `${CHAIN.explorerUrl}/tx/${point.txHash}`);
           anchor.setAttribute('target', '_blank');
           anchor.setAttribute('rel', 'noopener noreferrer');
+          // The dots are a mouse affordance on a chart that is itself role="img".
+          // Thirty focusable 7px links inside an image are thirty silent tab
+          // stops for a keyboard user; the same transactions are reachable as
+          // real links in the burns list under the chart.
+          anchor.setAttribute('tabindex', '-1');
+          anchor.setAttribute('aria-hidden', 'true');
 
           const dot = document.createElementNS(SVG_NS, 'circle');
           dot.setAttribute('cx', x(point.time).toFixed(2));
@@ -757,7 +772,8 @@ export function initDashboard(locale: string): void {
       result.status === 'fulfilled' ? result.value : 'failed',
     );
     const tried = outcomes.filter((outcome) => outcome !== 'skipped');
-    const allFailed = tried.length > 0 && tried.every((outcome) => outcome === 'failed');
+    const allFailed =
+      tried.length > 0 && tried.every((outcome) => outcome === 'failed' || outcome === 'fallback');
 
     if (status) {
       status.hidden = !allFailed;

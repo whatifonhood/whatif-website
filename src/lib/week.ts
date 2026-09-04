@@ -11,7 +11,7 @@
  */
 
 import { BURNS } from '../config/burns.ts';
-import DAILY_PRICES from '../data/if-daily-prices.json';
+import { committedCandles } from './market.ts';
 
 const DAY = 86_400;
 const WEEK = 7 * DAY;
@@ -36,7 +36,14 @@ export interface WeekInSummary {
  * here instead of going with it. Read at build time only — nothing fetches it.
  */
 function ifHistory(): [string, number][] {
-  return DAILY_PRICES as [string, number][];
+  // One close per day, from the same committed candles the chart draws. The
+  // previous source was a JSON file left behind by the removed Machine: nothing
+  // regenerated it, so it froze on 31 August while the panel above it kept
+  // saying "to <today>".
+  return committedCandles('all').map((candle) => [
+    new Date(candle.time * 1000).toISOString().slice(0, 10),
+    candle.close,
+  ]);
 }
 
 export function weekInSummary(): WeekInSummary {

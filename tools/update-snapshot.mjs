@@ -61,11 +61,18 @@ async function fetchBurned() {
   return Number(BigInt(result) / 10n ** 18n);
 }
 
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+
 async function fetchHolders() {
   const url = `${explorerUrl}/api/v2/tokens/${tokenAddress}`;
   const response = await fetch(url, {
     ...timeout,
-    headers: { accept: 'application/json', 'user-agent': 'whatifonhood-build/1.0' },
+    // The explorer answers 403 to anything that does not look like a browser. The
+    // count had been frozen at 6,816 since 31 August because of this one header,
+    // while capturedAt advanced every day and the page said the figure was fresh.
+    headers: { accept: 'application/json', 'user-agent': BROWSER_UA },
   });
   if (!response.ok) throw new Error(`Blockscout HTTP ${response.status}`);
   const body = await response.json();
