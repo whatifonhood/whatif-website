@@ -13,11 +13,11 @@ Tek $IF budur. İkinci bir sözleşme, bir "V2" ve bizim çıkardığımız köp
 
 `LaunchToken` adlı, Solidity 0.8.30 ile derlenmiş standart bir token sözleşmesidir. Bu proje için yazılmadı. NOXA adlı bir launchpad'in yayına aldığı her token için bastığı hazır şablondur; bu konu [Lansman](/tr/docs/the-launch/) sayfasında ele alınıyor.
 
-Blok gezginindeki kaynak kodu bir **kısmi eşleşmedir**; 14 July 2026 tarihinde Sourcify yerine eth-bytecode-db üzerinden doğrulanmıştır. Kısmi eşleşme, yayımlanan kaynağın yayına alınan sözleşmeyle aynı çalışma zamanı bytecode'una derlendiği, ancak bayt bayt aynı çıktıya derlenmediği anlamına gelir. Yani okuyabildiğiniz mantık, çalışan mantıktır. Kanıtlamadığı şey, tam olarak bu kaynak dosyanın — aynı yorumların, aynı ayarların — derlenmiş olan dosya olduğudur; tam eşleşmenin ortaya koyduğu şey budur. NOXA, buna imkân verecek derlemeyi hiçbir zaman yayımlamadı. Bu, token hakkında değil launchpad hakkında bir olgudur ve sonradan bulunmaktansa burada söylenmesi daha iyidir.
+Blok gezginindeki kaynak kodu bir **kısmi eşleşmedir**; 14 Temmuz 2026 tarihinde Sourcify yerine eth-bytecode-db üzerinden doğrulanmıştır. Kısmi eşleşme, yayımlanan kaynağın yayına alınan sözleşmeyle aynı çalışma zamanı bytecode'una derlendiği, ancak bayt bayt aynı çıktıya derlenmediği anlamına gelir. Yani okuyabildiğiniz mantık, çalışan mantıktır. Kanıtlamadığı şey, tam olarak bu kaynak dosyanın — aynı yorumların, aynı ayarların — derlenmiş olan dosya olduğudur; tam eşleşmenin ortaya koyduğu şey budur. NOXA, buna imkân verecek derlemeyi hiçbir zaman yayımlamadı. Bu, token hakkında değil launchpad hakkında bir olgudur ve sonradan bulunmaktansa burada söylenmesi daha iyidir.
 
 Sözleşmenin sahibi, yönetici rolleri, proxy'si ve yükseltme yolu yoktur. Vazgeçecek kimse ve içine yükseltilecek bir şey yoktur. Ayrıca hiçbir türde yakma fonksiyonu da yoktur: bugüne kadar yok edilen her $IF, token'ın dışından ölü adrese gönderildi; bunu [Yakım nasıl işliyor](/tr/docs/how-the-burn-works/) sayfası tam olarak açıklıyor.
 
-Standart dışı yaptığı tek şey, 11 July 2026 tarihindeki yayına alınmasından yaklaşık 73 dakika sonra kalıcı olarak sona eren bir lansman kısıtlama penceresiydi. Bu pencerenin neden Robinhood Chain blokları yerine Ethereum blokları üzerinden sayıldığını [Zincir](/tr/docs/the-chain/) sayfası ele alıyor.
+Standart dışı yaptığı tek şey, 11 Temmuz 2026 tarihindeki yayına alınmasından yaklaşık 73 dakika sonra kalıcı olarak sona eren bir lansman kısıtlama penceresiydi. Bu pencerenin neden Robinhood Chain blokları yerine Ethereum blokları üzerinden sayıldığını [Zincir](/tr/docs/the-chain/) sayfası ele alıyor.
 
 ## Zincir
 

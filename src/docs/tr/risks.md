@@ -49,7 +49,7 @@ $IF sözleşmesinde hiçbir şey bir şey yakmıyor. Yakım, ücret gelirinden i
 
 Ücret birikimi dışında bunun her adımı, birinin bir fonksiyon çağırmasını gerektirir. Launchpad'in keeper'ı çağırmayı bırakırsa, ücretler pozisyonda birikir ve orada, yakılmadan ve tahsil edilmeden, süresiz kalır. Zincir üzerinde bu çağrıyı zorunlu kılan hiçbir şey yok ve durmadan önce size bir duyuru yapılması gerekmiyor.
 
-Bu bağlamda bilinmeye değer: launchpad, $IF'in lansman yaptığı gün yeni lansmanları kabul etmeyi bıraktı ve web sitesi iki gün sonra karardı. Süpürmeler yine de sürdü, en son 1 September 2026 tarihinde. Sürdürmek, sürdürmekle yükümlü olmakla aynı şey değil.
+Bu bağlamda bilinmeye değer: launchpad, $IF'in lansman yaptığı gün yeni lansmanları kabul etmeyi bıraktı ve web sitesi iki gün sonra karardı. Süpürmeler yine de sürdü, en son 1 Eylül 2026 tarihinde. Sürdürmek, sürdürmekle yükümlü olmakla aynı şey değil.
 
 ## Ücretler başka bir yere yönlendirilebilir
 

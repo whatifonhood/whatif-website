@@ -7,11 +7,11 @@ Kopyalamak ve kontrol etmek için her şey tek sayfada.
 
 ## Adresler
 
-| Ne                             | Adres                                        |
-| ------------------------------ | -------------------------------------------- |
-| $IF sözleşmesi                 | `0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1` |
-| IF/WETH havuzu, Uniswap V3, 1% | `0x39A200271525E9641e799127bdAB299DAeF21953` |
-| Yakım adresi                   | `0x000000000000000000000000000000000000dEaD` |
+| Ne                             | Adres                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| $IF sözleşmesi                 | [`0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1`](https://robinhoodchain.blockscout.com/token/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1)   |
+| IF/WETH havuzu, Uniswap V3, 1% | [`0x39A200271525E9641e799127bdAB299DAeF21953`](https://robinhoodchain.blockscout.com/address/0x39A200271525E9641e799127bdAB299DAeF21953) |
+| Yakım adresi                   | [`0x000000000000000000000000000000000000dEaD`](https://robinhoodchain.blockscout.com/address/0x000000000000000000000000000000000000dEaD) |
 
 Önemli olan sözleşme adresidir. Bir şey satın almadan önce son altı karakteri bu sayfayla ya da blok gezginiyle karşılaştırın — bkz. [Nasıl alınır](/tr/docs/how-to-buy/).
 
@@ -19,13 +19,13 @@ IF/WETH 1% havuzu ana havuzdur — lansman işleminde oluşturuldu ve kilitli po
 
 ## Lansman ve kilit
 
-| Ne                          | Değer                                                                         |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| Lansman işlemi              | `0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`          |
-| Lansman bloğu, L2           | `6657668`, 11 July 2026, 04:32:42 UTC                                         |
-| Lansman likidite pozisyonu  | Uniswap V3 NFT `70641`, tick'ler `[-887200, 204200]`                          |
-| `70641` NFT'sini tutan      | NOXA'nın `LaunchLocker`'ı, lansman işleminin 11 ve 12 numaralı loglarına göre |
-| Deployer, lansmanı gönderen | `0x84F8E5a324466Deb7447048C014CF0245ce04afA`                                  |
+| Ne                          | Değer                                                                                                                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lansman işlemi              | [`0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`](https://robinhoodchain.blockscout.com/tx/0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c) |
+| Lansman bloğu, L2           | `6657668`, 11 Temmuz 2026, 04:32:42 UTC                                                                                                                                             |
+| Lansman likidite pozisyonu  | Uniswap V3 NFT `70641`, tick'ler `[-887200, 204200]`                                                                                                                                |
+| `70641` NFT'sini tutan      | NOXA'nın `LaunchLocker`'ı, lansman işleminin 11 ve 12 numaralı loglarına göre                                                                                                       |
+| Deployer, lansmanı gönderen | [`0x84F8E5a324466Deb7447048C014CF0245ce04afA`](https://robinhoodchain.blockscout.com/address/0x84F8E5a324466Deb7447048C014CF0245ce04afA)                                            |
 
 Kalıcı olarak kilitli olan pozisyon `70641`'dir. [Lansman](/tr/docs/the-launch/) işlemi log log okuyor; [Likidite ve kilit](/tr/docs/liquidity-and-the-lock/) kilidin neyi kapsayıp neyi kapsamadığını söylüyor.
 
@@ -33,17 +33,17 @@ Kalıcı olarak kilitli olan pozisyon `70641`'dir. [Lansman](/tr/docs/the-launch
 
 NOXA, token'ı basan ve yakımı hâlâ işleten launchpad'dir. Bu adresleri kimin kontrol ettiği, incelediğimiz hiçbir kaynakta ortaya konmuş değil: kilit sözleşmesinin sahibi sıradan bir cüzdan, ücret sözleşmesi ise onun yayına aldığı doğrulanmamış bytecode.
 
-| Ne                                                                           | Adres                                        |
-| ---------------------------------------------------------------------------- | -------------------------------------------- |
-| Her yakımın geldiği ücret sözleşmesi                                         | `0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417` |
-| Orijinal ücret cüzdanı, 11–12 July 2026 tarihlerinde 20%'lik $IF payını aldı | `0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b` |
-| `LaunchLocker`'ın sahibi                                                     | `0x7E035Fb048a31e0481b88074557415b1C187242B` |
+| Ne                                                                             | Adres                                                                                                                                    |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Her yakımın geldiği ücret sözleşmesi                                           | [`0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417`](https://robinhoodchain.blockscout.com/address/0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417) |
+| Orijinal ücret cüzdanı, 11–12 Temmuz 2026 tarihlerinde 20%'lik $IF payını aldı | [`0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b`](https://robinhoodchain.blockscout.com/address/0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b) |
+| `LaunchLocker`'ın sahibi                                                       | [`0x7E035Fb048a31e0481b88074557415b1C187242B`](https://robinhoodchain.blockscout.com/address/0x7E035Fb048a31e0481b88074557415b1C187242B) |
 
 [Yakım nasıl işliyor](/tr/docs/how-the-burn-works/) bunların her birinin mekanizmadaki işini açıklıyor.
 
 ## Token
 
-|                     |                               |
+| Alan                | Değer                         |
 | ------------------- | ----------------------------- |
 | Ad, zincir üzerinde | `What If`                     |
 | Sembol              | `IF`                          |
@@ -59,7 +59,7 @@ Sözleşmenin kendi `name` ve `symbol` değerleri `What If` ve `IF`. Bu teknik d
 
 ## Zincir
 
-|                  |                                           |
+| Alan             | Değer                                     |
 | ---------------- | ----------------------------------------- |
 | Ağ               | Robinhood Chain                           |
 | Chain ID         | `4663` (`0x1237`)                         |

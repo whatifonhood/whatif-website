@@ -1,6 +1,6 @@
 ---
 title: How the burn actually works
-summary: An automated fee engine run by a third party has burned $IF 423 times, and it can stop whenever that party decides.
+summary: An automated fee engine run by a third party burns $IF on most days, and it can stop whenever that party decides.
 ---
 
 For a long time this paper said there was no fee feeding the burn. That was wrong, and the correction is large enough to need its own page. Every figure below was read from the chain on 2 September 2026, at or around block `52,582,784`.
@@ -49,7 +49,7 @@ The burn tracks trading volume, which means most of it happened when volume was 
 | August               | 6,541,732  | 7.0%                    |
 | September so far     | 83,171     | 0.1%                    |
 
-Burns have happened on 51 of the 53 days since launch, so the engine is running steadily. It is simply running on much less fuel. Volume has fallen by roughly two orders of magnitude from the launch week, and at the current run rate the supply burns by about 0.014% per day.
+Burns had happened on 51 of the 53 days between launch and the 2 September 2026 snapshot, so the engine is running steadily. It is simply running on much less fuel. Volume has fallen by roughly two orders of magnitude from the launch week, and at the current run rate the supply burns by about 0.014% per day.
 
 Accrued in the position and awaiting the next sweep at the snapshot: `65,950` IF and `0.1967` WETH. That is the next burn, and it can be read live rather than taken on trust.
 

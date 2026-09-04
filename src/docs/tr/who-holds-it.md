@@ -13,7 +13,7 @@ En büyük kalemlerden ikisi ilk bakışta göründükleri şey değildir; etike
 
 **Likidite havuzu genellikle üst sıralardadır.** Bir havuz, karşılığında işlem yaptığı token'ları tutar. Hiçbir şey tutmasaydı, satın alamazdınız. Bu bir pozisyon değil, altyapıdır.
 
-Bu ikisini çıkarın, geriye kalan gerçek sahiplik yoğunlaşmasıdır. Son okumada, en büyük gerçek bireysel cüzdan arzın yaklaşık 3% kadarını tutuyordu.
+Bu ikisini çıkarın, geriye kalan gerçek sahiplik yoğunlaşmasıdır. Eylül 2026 okumasında, en büyük gerçek bireysel cüzdan arzın yaklaşık 3% kadarını tutuyordu.
 
 ## Size ne söyleyebiliriz, ne söyleyemeyiz
 

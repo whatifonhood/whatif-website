@@ -75,7 +75,7 @@ curl -s -X POST https://rpc.mainnet.chain.robinhood.com \
        "params":["0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c"]}'
 ```
 
-Ese hash es el lanzamiento. Una transacción, dieciocho logs, y todo lo que hizo a $IF ocurrió dentro de ella. El log que hay que leer es el número 14 de la lista que devuelve el nodo: un `Transfer` en el contrato del token, `from` el pool `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` el deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. Su campo `data` dividido entre 10^18 es 110,436,131.71 $IF, que es el 11.04% del suministro, comprado atómicamente antes de que nadie más pudiera operar.
+Ese hash es el lanzamiento. Una transacción, dieciocho logs, y todo lo que hizo a $IF ocurrió dentro de ella. El log que hay que leer es el número 14 de la lista que devuelve el nodo, contando desde cero como hace el nodo (un explorador que cuenta desde uno muestra el mismo log como el 15): un `Transfer` en el contrato del token, `from` el pool `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` el deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. Su campo `data` dividido entre 10^18 es 110,436,131.71 $IF, que es el 11.04% del suministro, comprado atómicamente antes de que nadie más pudiera operar.
 
 El límite del 2% por wallet vigente en ese momento no se aplicó, porque el contrato eximía al deployer por nombre. [El lanzamiento](/es/docs/the-launch/) recorre el resto de los dieciocho logs.
 
@@ -131,7 +131,7 @@ Amplía la ventana y el nodo te rechazará en vez de responder, así que todo el
 
 `protocolFeeShare` en el locker es el número que fija el reparto. Léelo desde la pestaña de lectura del explorador en el locker, el mismo contrato que en la sección anterior. Devuelve `100`.
 
-Eso significa que todo el $IF que se barre de la posición bloqueada va al lado del protocolo, y la parte on-chain del creador en la pata del token es cero. Lo que el contrato de comisiones hace después con ello — que desde el 12 July 2026 ha sido quemar cada token — es comportamiento de ese contrato, y este número no lo fija. El código fuente del contrato de comisiones nunca se ha publicado, así que ese paso no se puede leer en absoluto. Solo se puede observar.
+Eso significa que todo el $IF que se barre de la posición bloqueada va al lado del protocolo, y la parte on-chain del creador en la pata del token es cero. Lo que el contrato de comisiones hace después con ello — que desde el 12 de julio de 2026 ha sido quemar cada token — es comportamiento de ese contrato, y este número no lo fija. El código fuente del contrato de comisiones nunca se ha publicado, así que ese paso no se puede leer en absoluto. Solo se puede observar.
 
 Léelo como una lectura y no como una promesa. El dueño del locker puede cambiar el número, y puede cambiar la dirección a la que se paga el lado del protocolo, sin preguntarle a nadie. Si cambia cualquiera de las dos cosas, aquí es donde lo verías primero.
 

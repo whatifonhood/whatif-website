@@ -2,8 +2,10 @@ import type { SiteCopy } from './types.ts';
 
 export const zh: SiteCopy = {
   htmlLang: 'zh-CN',
+  ogLocale: 'zh_CN',
 
   nav: {
+    primaryLabel: '主导航',
     links: [
       { label: '核心理念', href: '#thesis' },
       { label: '数据', href: '#numbers' },
@@ -83,7 +85,7 @@ export const zh: SiteCopy = {
     eyebrow: '核心理念',
     heading: { lead: '一个问题。', accent: '不作承诺。' },
     intro:
-      '$IF 不是实用型代币，也不是治理代币。它是每个人凌晨三点都会冒出的那个念头，被铸造在了这条最新的公链上。',
+      '$IF 不是实用型代币，也不是治理代币。它是每个人凌晨三点都会冒出的那个念头，被铸造在一条今年夏天才开放的公链上。',
     pillars: [
       {
         title: '一切始于一个问题',
@@ -91,7 +93,7 @@ export const zh: SiteCopy = {
       },
       {
         title: '构建于 Robinhood Chain',
-        body: '出块快、手续费低，还有那个把一代人拉进市场的名字。这条链很新，$IF 是最早在上面的代币之一——这是它所在的位置，不是对它去向的预测。',
+        body: '出块快、手续费低，还有那个把一代人拉进市场的名字。这条链只有几周历史，$IF 在它的第二周上线——这是它所在的位置，不是对它去向的预测。',
       },
       {
         title: '已经销毁，永不回来',
@@ -125,7 +127,7 @@ export const zh: SiteCopy = {
     },
     burnHeadline: '已销毁且无法找回',
     burnBody:
-      '发送到 0x…dEaD —— 一个没有私钥的地址。没有人能再动这些代币，团队不能，你不能，任何人都不能。',
+      '发送到 0x…dEaD —— 一个没有人知道、也无法推导出私钥的地址。没有人能再动这些代币，团队不能，你不能，任何人都不能。',
     asOf: '截至',
     live: '实时',
   },
@@ -133,7 +135,8 @@ export const zh: SiteCopy = {
   buy: {
     eyebrow: '上车',
     heading: { lead: '三步。', accent: '就这么多。' },
-    intro: '你需要一个钱包、一点在 Robinhood Chain 上的 ETH，以及三十秒。全部流程如下。',
+    intro:
+      '供应量和销毁直接从 Robinhood Chain 读取；价格和流动性来自公开的市场 API，每一次调用都列在下方。',
     steps: [
       {
         title: '准备钱包',
@@ -207,7 +210,7 @@ export const zh: SiteCopy = {
       },
       {
         q: '销毁了多少？',
-        a: '{burned} 枚 $IF（占总供应量 {burnedPercent}）位于 0x…dEaD，一个没有私钥的地址。这些代币永远无法再被转移。这是区块浏览器上的实时余额，不是文件里的一句承诺。',
+        a: '{burned} 枚 $IF（占总供应量 {burnedPercent}）位于 0x…dEaD，一个没有人知道、也无法推导出私钥的地址。这些代币永远无法再被转移。这是区块浏览器上的实时余额，不是文件里的一句承诺。',
       },
       {
         q: '社区在哪里？',
@@ -232,6 +235,7 @@ export const zh: SiteCopy = {
       '$IF 是一枚没有内在价值、也不应期待任何财务回报的迷因币。本站内容不构成投资建议。请自行研究（DYOR）。',
     builtBy: '每个人都是开发者。',
     reduceMotion: '减少动效',
+    navLabel: '页脚导航',
   },
 
   pages: {
@@ -247,6 +251,10 @@ export const zh: SiteCopy = {
       count: '张',
     },
     brand: {
+      eyebrow: '给所有做 $IF 内容的人',
+      fileNote: 'ZIP · 55 MB · 授权条款见套件内',
+      contractLabel: '合约',
+      questions: '有问题，或者想要这里没有的东西？',
       title: '品牌',
       heading: { lead: '三个标识，', accent: '以及用法。' },
       intro: '一个品牌，三个标识：币标识代币，角色标识世界，字标标识名字。需要什么就拿什么。',
@@ -260,6 +268,7 @@ export const zh: SiteCopy = {
       ],
     },
     stats: {
+      chartTypeLabel: '图表控件',
       title: '数据',
       heading: { lead: '每一个数字，', accent: '都是实时的。' },
       intro: '价格、流动性、供应量与销毁——直接读自 Robinhood Chain。',
@@ -489,7 +498,7 @@ export const zh: SiteCopy = {
       inputLabel: '钱包地址',
       check: '查询',
       privacy:
-        '余额是公开账本上的公开数据，所以这只是把它读出来 —— 和区块浏览器做的事情一样。地址由你自己输入，绝不会向钱包索取。不保存任何内容，除了链上查询之外不向任何地方发送数据。',
+        '地址由你自己输入，从不向钱包索取，并且只发送给链的公共 RPC。用于估值的价格来自 DexScreener，不附带任何地址。什么都不会存储。',
       download: '下载卡片',
       postOnX: '发到 X',
       shareText: '我持有 {tokens} {symbol}。\n\n还在问。',
@@ -520,11 +529,11 @@ export const zh: SiteCopy = {
     meme: {
       intro: '最高分辨率，无水印，无需署名。拿走吧。',
       description: (title, series) =>
-        `${title} —— 来自 ${series} 系列的 $IF 梗图。最高分辨率，随意发布，无需署名。`,
+        `${title} —— 来自 ${series} 系列的 $IF 迷因。最高分辨率，随意发布，无需署名。`,
       download: '下载',
       postOnX: '发到 X',
       more: '更多来自',
-      backToVault: '返回梗图库',
+      backToVault: '返回迷因库',
       shareText: (title) => `${title}\n\n还在问。`,
     },
   },

@@ -41,7 +41,7 @@ Doğru cümle daha uzun ve biz uzun olanı yazmayı tercih ederiz. Lansmanı yap
 
 ## "Yakım topluluk tarafından yürütülüyor"
 
-Yok, çünkü yanlış. Bugüne kadarki her yakımı, kilitli pozisyondan işlem ücretini süpürüp bunun $IF tarafını yakan NOXA'nın ücret sözleşmesi gerçekleştirdi — 12 July 2026 tarihinden bu yana tamamını. 423 kez çalıştı. Bu topluluk hiçbir şey yakmadı.
+Yok, çünkü yanlış. Bugüne kadarki her yakımı, kilitli pozisyondan işlem ücretini süpürüp bunun $IF tarafını yakan NOXA'nın ücret sözleşmesi gerçekleştirdi — 12 Temmuz 2026 tarihinden bu yana tamamını. 423 kez çalıştı. Bu topluluk hiçbir şey yakmadı.
 
 Bunu söylemek alçakgönüllülük değil. Kontrol edebileceğiniz bir anlatı ile edemeyeceğiniz bir anlatı arasındaki fark bu; ve aynı zamanda risk de bu: yakım başkasının keeper'ına ait ve o keeper durduğu gün duruyor. [Yakım nasıl işliyor](/tr/docs/how-the-burn-works/) mekanizmayı ve sona ermesinin nasıl görüneceğini anlatıyor.
 

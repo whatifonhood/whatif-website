@@ -2,8 +2,10 @@ import type { SiteCopy } from './types.ts';
 
 export const tr: SiteCopy = {
   htmlLang: 'tr',
+  ogLocale: 'tr_TR',
 
   nav: {
+    primaryLabel: 'Ana menü',
     links: [
       { label: 'Fikir', href: '#thesis' },
       { label: 'Rakamlar', href: '#numbers' },
@@ -85,7 +87,7 @@ export const tr: SiteCopy = {
     eyebrow: 'Fikir',
     heading: { lead: 'Tek bir soru.', accent: 'Hiçbir vaat yok.' },
     intro:
-      '$IF bir fayda tokeni değil, yönetişim tokeni de değil. Herkesin gece 3’te aklına gelen o düşüncenin, oyundaki en yeni zincire kazınmış hâli.',
+      '$IF bir fayda tokeni değil, yönetişim tokeni de değil. Herkesin gece 3’te aklına gelen o düşüncenin, bu yaz açılan bir zincire kazınmış hâli.',
     pillars: [
       {
         title: 'Her şey bir soruyla başlar',
@@ -93,7 +95,7 @@ export const tr: SiteCopy = {
       },
       {
         title: 'Robinhood Chain üzerine kurulu',
-        body: 'Hızlı bloklar, ucuz gas ve bir nesli piyasaya çeken isim. Zincir yeni ve $IF üzerindeki ilk coinlerden biri — bulunduğu yer bu, gideceği yerin tahmini değil.',
+        body: 'Hızlı bloklar, ucuz gas ve bir nesli piyasaya çeken isim. Zincir birkaç haftalık ve $IF ikinci haftasında çıktı — bulunduğu yer bu, gideceği yerin tahmini değil.',
       },
       {
         title: 'Çoktan yakıldı, geri gelmiyor',
@@ -137,7 +139,7 @@ export const tr: SiteCopy = {
     eyebrow: 'Çantanı doldur',
     heading: { lead: 'Üç adım.', accent: 'Hepsi bu.' },
     intro:
-      'Bir cüzdana, Robinhood Chain üzerinde biraz ETH’ye ve otuz saniyeye ihtiyacın var. Tamamı aşağıda.',
+      "Arz ve yakım doğrudan Robinhood Chain'den okunur; fiyat ve likidite herkese açık piyasa API'lerinden gelir, her çağrı aşağıda gösterilir.",
     steps: [
       {
         title: 'Bir cüzdan edin',
@@ -211,7 +213,7 @@ export const tr: SiteCopy = {
       },
       {
         q: 'Ne kadarı yakıldı?',
-        a: '{burned} $IF — toplam arzın {burnedPercent}’i — özel anahtarı olmayan 0x…dEaD adresinde duruyor. Bu tokenler bir daha asla hareket edemez. Bu, bir belgedeki iddia değil, blok gezgininde canlı duran bir bakiye.',
+        a: '{burned} $IF — toplam arzın {burnedPercent}’i — özel anahtarını kimsenin bilmediği ve türetemediği 0x…dEaD adresinde duruyor. Bu tokenler bir daha asla hareket edemez. Bu, bir belgedeki iddia değil, blok gezgininde canlı duran bir bakiye.',
       },
       {
         q: 'Topluluk nerede?',
@@ -236,6 +238,7 @@ export const tr: SiteCopy = {
       '$IF, içsel değeri olmayan ve finansal getiri beklentisi taşımayan bir meme coin’dir. Buradaki hiçbir şey yatırım tavsiyesi değildir. Kendi araştırmanı yap.',
     builtBy: 'Herkes geliştiricidir.',
     reduceMotion: 'Hareketi azalt',
+    navLabel: 'Alt bilgi menüsü',
   },
 
   pages: {
@@ -251,6 +254,10 @@ export const tr: SiteCopy = {
       count: 'meme',
     },
     brand: {
+      eyebrow: '$IF içeriği üreten herkes için',
+      fileNote: 'ZIP · 55 MB · lisans koşulları kitin içinde',
+      contractLabel: 'Kontrat',
+      questions: 'Sorun mu var, ya da burada olmayan bir şey mi lazım?',
       title: 'Marka',
       heading: { lead: 'İşaretler', accent: 've kullanımı.' },
       intro:
@@ -266,6 +273,7 @@ export const tr: SiteCopy = {
       ],
     },
     stats: {
+      chartTypeLabel: 'Grafik kontrolleri',
       title: 'Veriler',
       heading: { lead: 'Her rakam,', accent: 'canlı.' },
       intro: 'Fiyat, likidite, arz ve yakılanlar — doğrudan Robinhood Chain’den.',
@@ -274,7 +282,7 @@ export const tr: SiteCopy = {
       poolLabel: 'Ana havuz',
       openExplorer: 'Kontratı aç',
       openChart: 'Grafiği aç',
-      timeframes: { day: '24S', week: '7G', month: '30G', quarter: '90D', all: 'TÜMÜ' },
+      timeframes: { day: '24S', week: '7G', month: '30G', quarter: '90G', all: 'TÜMÜ' },
       resizeChart: 'Grafiği yeniden boyutlandırmak için sürükle',
       zoomIn: 'Yakınlaştır',
       zoomOut: 'Uzaklaştır',
@@ -310,10 +318,10 @@ export const tr: SiteCopy = {
       burnHistoryNote: 'Zincirden okundu. Her basamak açabileceğin bir işlem.',
       reproduceTitle: 'Her rakamı kendin kontrol et',
       reproduceIntro:
-        'Bu sayfadaki her rakam herkese açık, anahtarsız, salt okunur bir çağrıdan geliyor. Her biri, tam olarak bizim yaptığımız hâliyle aşağıda. Herhangi birini bir terminale yapıştırın.',
+        'Bu sayfadaki her rakam herkese açık, anahtarsız, salt okunur bir çağrıdan geliyor. Her biri, tam olarak bizim yaptığımız hâliyle aşağıda. Herhangi birini bir terminale yapıştır.',
       reproduceField: 'Rakamın yeri',
       reproduceNote:
-        'Bunlar sayfanın kendi kullandığı adres ve uç noktalardan üretilir, dolayısıyla sessizce uyumsuz hâle gelemezler. Biri yukarıda gördüğünüzle çelişiyorsa sayfa yanlıştır ve bunu bilmek isteriz.',
+        'Bunlar sayfanın kendi kullandığı adres ve uç noktalardan üretilir, dolayısıyla sessizce uyumsuz hâle gelemezler. Biri yukarıda gördüğünle çelişiyorsa sayfa yanlıştır ve bunu bilmek isteriz.',
       reproduceLabels: {
         price: 'Fiyat',
         marketCap: 'Piyasa değeri',
@@ -349,7 +357,7 @@ export const tr: SiteCopy = {
       sinceNothing: 'Pek bir şey yok. Hâlâ soruyoruz.',
       trustTitle: 'Herkesin yapabileceği kontroller',
       trustNote:
-        'Bunlardan ikisi bizim değil, üçüncü tarafların beyanıdır; diğer üçü bu sayfa yüklenirken doğrudan sözleşmeden okunur. Her biri kendiniz kontrol edebileceğiniz yere bağlanır ve okunamayan bir kontrol, geçti göstermek yerine bunu söyler.',
+        'Bunlardan ikisi bizim değil, üçüncü tarafların beyanıdır; diğer üçü bu sayfa yüklenirken doğrudan sözleşmeden okunur. Her biri kendin kontrol edebileceğiniz yere bağlanır ve okunamayan bir kontrol, geçti göstermek yerine bunu söyler.',
       checks: {
         verified: 'Listeleme doğrulandı',
         honeypot: 'Honeypot kontrolü',
@@ -504,7 +512,7 @@ export const tr: SiteCopy = {
       inputLabel: 'Cüzdan adresi',
       check: 'Sorgula',
       privacy:
-        'Bakiye, herkese açık bir defterdeki herkese açık veridir; burada yapılan sadece onu okumak — bir blok gezgininin yaptığının aynısı. Adresi sen yazıyorsun, hiçbir cüzdandan istenmiyor. Hiçbir şey saklanmıyor ve zincir dışında hiçbir yere bir şey gönderilmiyor.',
+        "Adresi sen yazarsın, hiçbir cüzdandan istenmez ve yalnızca zincirin herkese açık RPC'sine gönderilir. Değerlemede kullanılan fiyat, adres eklenmeden DexScreener'dan alınır. Hiçbir şey saklanmaz.",
       download: 'Kartı indir',
       postOnX: "X'te paylaş",
       shareText: '{tokens} {symbol} tutuyorum.\n\nHâlâ soruyoruz.',

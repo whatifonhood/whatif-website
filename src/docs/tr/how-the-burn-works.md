@@ -1,9 +1,9 @@
 ---
 title: Yakım gerçekte nasıl işliyor
-summary: Üçüncü bir tarafça işletilen otomatik bir ücret motoru $IF'i 423 kez yaktı ve o taraf ne zaman karar verirse durabilir.
+summary: Üçüncü bir tarafça işletilen otomatik bir ücret motoru $IF'i neredeyse her gün yakıyor ve o taraf ne zaman karar verirse durabilir.
 ---
 
-Bu teknik doküman uzun süre boyunca yakımı besleyen bir ücret olmadığını söyledi. Bu yanlıştı ve düzeltme kendi sayfasına ihtiyaç duyacak kadar büyük. Aşağıdaki her rakam zincirden 2 September 2026 tarihinde, `52,582,784` bloğunda ya da civarında okundu.
+Bu teknik doküman uzun süre boyunca yakımı besleyen bir ücret olmadığını söyledi. Bu yanlıştı ve düzeltme kendi sayfasına ihtiyaç duyacak kadar büyük. Aşağıdaki her rakam zincirden 2 Eylül 2026 tarihinde, `52,582,784` bloğunda ya da civarında okundu.
 
 Sade hâliyle başlayalım. Yakım elle yapılmıyor. Ara sıra olmuyor. Açıklanamaz değil. Ve hiçbir şey yakmamış olan bu topluluk tarafından yapılmıyor. Üçüncü bir tarafça işletilen, hacme dayalı, otomatik bir ücret motoru ve 423 kez çalıştı.
 
@@ -30,26 +30,26 @@ Açık gözle bakılması gereken bir nokta var. O ücret sözleşmesi, kilit s�
 
 ## İkinci gün ne değişti
 
-Bölüşüm her zaman şimdiki gibi değildi. İlk on tahsilde, 11 July 06:46 UTC'den 12 July 09:52 UTC'ye kadar, sözleşme topladığı IF'in 80%'ini yaktı ve diğer 20%'sini NOXA'nın ilk ücret cüzdanına gönderdi:
+Bölüşüm her zaman şimdiki gibi değildi. İlk on tahsilde, 11 Temmuz 06:46 UTC'den 12 Temmuz 09:52 UTC'ye kadar, sözleşme topladığı IF'in 80%'ini yaktı ve diğer 20%'sini NOXA'nın ilk ücret cüzdanına gönderdi:
 
 **`0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b`**
 
 Oraya `14,468,370.53` IF gitti. O cüzdanın [sahip tablosunda](/tr/stats/) hâlâ görünmesinin ve arzın 1.45%'ini elinde tutmasının sebebi budur. Gizemli bir balina değil ve bir ekip tahsisi değil. Bir launchpad'in ilk iki günden aldığı ücret payı.
 
-12 July'den itibaren, sonraki 413 tahsilin tamamında IF tarafının 100%'ü yakıldı.
+12 Temmuz'dan itibaren, sonraki 413 tahsilin tamamında IF tarafının 100%'ü yakıldı.
 
 ## Yakımın zaman içindeki şekli
 
 Yakım işlem hacmini izliyor, bu da çoğunun hacmin en yüksek olduğu dönemde gerçekleştiği anlamına geliyor, bu da çoğunun çoktan geride kaldığı anlamına geliyor.
 
-| Dönem                  | Yakılan IF | Toplam yakımdaki payı |
-| ---------------------- | ---------- | --------------------- |
-| 11 Jul 2026, ilk gün   | 56,873,813 | 60.9%                 |
-| July'nin kalanı        | 29,950,521 | 32.0%                 |
-| August                 | 6,541,732  | 7.0%                  |
-| Şu ana kadar September | 83,171     | 0.1%                  |
+| Dönem                | Yakılan IF | Toplam yakımdaki payı |
+| -------------------- | ---------- | --------------------- |
+| 11 Jul 2026, ilk gün | 56,873,813 | 60.9%                 |
+| Temmuz'un kalanı     | 29,950,521 | 32.0%                 |
+| Ağustos              | 6,541,732  | 7.0%                  |
+| Şu ana kadar Eylül   | 83,171     | 0.1%                  |
 
-Lansmandan bu yana geçen 53 günün 51'inde yakım gerçekleşti, yani motor istikrarlı biçimde çalışıyor. Sadece çok daha az yakıtla çalışıyor. Hacim, lansman haftasına göre kabaca iki büyüklük mertebesi düştü ve mevcut hızda arz günde yaklaşık 0.014% yanıyor.
+Lansmandan 2 Eylül 2026 anlık görüntüsüne kadar geçen 53 günün 51'inde yakım gerçekleşti, yani motor istikrarlı biçimde çalışıyor. Sadece çok daha az yakıtla çalışıyor. Hacim, lansman haftasına göre kabaca iki büyüklük mertebesi düştü ve mevcut hızda arz günde yaklaşık 0.014% yanıyor.
 
 Anlık görüntü sırasında pozisyonda birikmiş ve bir sonraki süpürmeyi bekleyen: `65,950` IF ve `0.1967` WETH. Bir sonraki yakım budur ve güvene dayanmak yerine canlı olarak okunabilir.
 
@@ -57,11 +57,11 @@ Anlık görüntü sırasında pozisyonda birikmiş ve bir sonraki süpürmeyi be
 
 NOXA, token'ı basan launchpad. Tarihler önemli, çünkü ücret yapılandırmasının neden hiç yeniden müzakere edilmediğini açıklıyorlar.
 
-`LaunchLocker`, Robinhood Chain'in halka açık ana ağı açılmadan iki hafta önce, 16 June 2026 tarihinde, protokol payı 65 olarak ayarlanmış hâlde yayına alındı. Ana ağ günü olan 1 July'de pay 65'ten 100'e çıkarıldı ve mevcut ücret sözleşmesi toplayıcı olarak yetkilendirildi. $IF bu yapılandırma altında 11 July'de piyasaya çıktı. Aynı gün NOXA, yeni token lansmanlarını kabul etmeyi bırakacağını duyurdu. İki gün sonra web sitesi karardı ve 14 July'de artık ücret toplamayacağını, gelirin 100%'ünü yaratıcılara yönlendireceğini paylaştı.
+`LaunchLocker`, Robinhood Chain'in halka açık ana ağı açılmadan iki hafta önce, 16 Haziran 2026 tarihinde, protokol payı 65 olarak ayarlanmış hâlde yayına alındı. Ana ağ günü olan 1 Temmuz'da pay 65'ten 100'e çıkarıldı ve mevcut ücret sözleşmesi toplayıcı olarak yetkilendirildi. $IF bu yapılandırma altında 11 Temmuz'da piyasaya çıktı. Aynı gün NOXA, yeni token lansmanlarını kabul etmeyi bırakacağını duyurdu. İki gün sonra web sitesi karardı ve 14 Temmuz'da artık ücret toplamayacağını, gelirin 100%'ünü yaratıcılara yönlendireceğini paylaştı.
 
-O açıklama ile zincir üstündeki durum bağdaşmıyor. 1 September 21:14 UTC'deki en son tahsil itibarıyla `protocolFeeShare` hâlâ `100` okunuyor ve kilit sözleşmesinin `ProtocolFeeUpdated` kaydı 1 July'den bu yana bir değişiklik göstermiyor.
+O açıklama ile zincir üstündeki durum bağdaşmıyor. 1 Eylül 21:14 UTC'deki en son tahsil itibarıyla `protocolFeeShare` hâlâ `100` okunuyor ve kilit sözleşmesinin `ProtocolFeeUpdated` kaydı 1 Temmuz'dan bu yana bir değişiklik göstermiyor.
 
-İki okuma da uyuyor ve zincir üstünde ikisi arasında karar verdirecek hiçbir şey yok. Ya duyuru bu kilit sözleşmesine hiç uygulanmadı ya da ETH bacağına değil token bacağına uygulandı; çünkü 12 July tam olarak IF tarafının kısmen alıkonulmayı bırakıp tamamen yakılmaya başladığı tarih. Bunu gerçek değil, yorum olarak kabul edin.
+İki okuma da uyuyor ve zincir üstünde ikisi arasında karar verdirecek hiçbir şey yok. Ya duyuru bu kilit sözleşmesine hiç uygulanmadı ya da ETH bacağına değil token bacağına uygulandı; çünkü 12 Temmuz tam olarak IF tarafının kısmen alıkonulmayı bırakıp tamamen yakılmaya başladığı tarih. Bunu gerçek değil, yorum olarak kabul edin.
 
 NOXA'nın arkasında kimin olduğunu kimse bilmiyor. İncelenen hiçbir kaynak bunu ortaya koymuyor. Kilit sözleşmesinin sahibi çıplak bir harici sahipli hesap ve ücret sözleşmesi doğrulanmamış bytecode.
 

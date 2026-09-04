@@ -3,7 +3,7 @@ title: Lansman ve lansmanı yapan
 summary: Tek bir işlem; token'ı, havuzu, kilidi ve onu gönderen kişi için 11%'lik bir alımı yarattı.
 ---
 
-$IF, 11 July 2026 tarihli tek bir işlemle başladı. O işlem arzı mint etti, havuzu oluşturdu, lansman likidite pozisyonunu kilitledi ve kendisini gönderen adrese token'ların 11%'inden biraz fazlasını verdi; hepsi atomik olarak. Bu sayfa onu sırayla geri okuyor, çünkü bir şüphecinin ilk kontrol etmesi gereken kayıt parçası budur ve gösterdiklerinin bir kısmı iç açıcı değildir.
+$IF, 11 Temmuz 2026 tarihli tek bir işlemle başladı. O işlem arzı mint etti, havuzu oluşturdu, lansman likidite pozisyonunu kilitledi ve kendisini gönderen adrese token'ların 11%'inden biraz fazlasını verdi; hepsi atomik olarak. Bu sayfa onu sırayla geri okuyor, çünkü bir şüphecinin ilk kontrol etmesi gereken kayıt parçası budur ve gösterdiklerinin bir kısmı iç açıcı değildir.
 
 ## What $IF için kimse sözleşme yazmadı
 
@@ -11,13 +11,13 @@ $IF özel yazılmış bir kod değil. NOXA'nın hazır `LaunchToken`'ı: `_updat
 
 Bunun iki yönü var ve iki yarısı da söylenmeye değer. Bir geliştirme ekibi yoktu ve token'da özel ya da zekice hiçbir şey yok. Aynı zamanda sözleşmenin bu kadar temiz olmasının sebebi de bu. `LaunchToken`'ın sahibi yok, rolleri yok, proxy'si ve yükseltme yolu yok, constructor dışında mint yok, yakma fonksiyonu yok ve hiç vergi mantığı yok. İçine kimse bir şey saklamadı, çünkü onu kimse yazmıyordu.
 
-`0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1` adresindeki kaynak kod **kısmi eşleşme**, 14 July 2026 tarihinde Sourcify üzerinden değil eth-bytecode-db üzerinden doğrulandı. Onu yayına alan fabrika ise hiç doğrulanmamış. NOXA o derlemeyi hiçbir zaman yayımlamadı. Bu, $IF hakkında değil NOXA hakkında bir gerçek ve geçiştirilmek yerine böyle söylenmeli.
+`0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1` adresindeki kaynak kod **kısmi eşleşme**, 14 Temmuz 2026 tarihinde Sourcify üzerinden değil eth-bytecode-db üzerinden doğrulandı. Onu yayına alan fabrika ise hiç doğrulanmamış. NOXA o derlemeyi hiçbir zaman yayımlamadı. Bu, $IF hakkında değil NOXA hakkında bir gerçek ve geçiştirilmek yerine böyle söylenmeli.
 
 ## Tek işlem, on sekiz log
 
 `0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`
 
-11 July 2026, 04:32:42 UTC, L2 bloğu `6,657,668`, 6,994,056 gaz. Çağrıyı yapan, NOXA fabrikasına 0.1705 ETH gönderdi ve tek bir atomik adımda bir token, bir havuz, kilitli bir LP pozisyonu ve arzın 11%'ini geri aldı.
+11 Temmuz 2026, 04:32:42 UTC, L2 bloğu `6,657,668`, 6,994,056 gaz. Çağrıyı yapan, NOXA fabrikasına 0.1705 ETH gönderdi ve tek bir atomik adımda bir token, bir havuz, kilitli bir LP pozisyonu ve arzın 11%'ini geri aldı.
 
 İçinde sırayla olanlar:
 
@@ -44,7 +44,7 @@ Constructor üç sınır belirledi ve bunların hiçbiri bugün ayakta değil.
 - **İşlem başına üst sınır: pratikte yok.** `maxTxBps` 10000 olarak ayarlanmıştı, bu da arzın 100%'ü. Alımlar `tx.origin` başına bunun 110%'una karşı izleniyordu, yani 1.1 milyar token'lık bir tavan. Devreye giremezdi.
 - **Lansman bloğu kapalıydı.** Lansman bloğunun kendisinde, lansman fabrikası ve deployer dışında havuzdan yapılan her alım revert etti.
 
-`restrictionBlocks` 366'ydı ve bunlar zincirin 101 ms'lik L2 blokları değil, yaklaşık on iki saniyelik L1 bloklarıdır. Hepsi 11 July 2026 tarihinde 05:45 UTC civarında kalıcı olarak sona erdi. Bugün token'da hiç kimse için artık bir ayrıcalık yok.
+`restrictionBlocks` 366'ydı ve bunlar zincirin 101 ms'lik L2 blokları değil, yaklaşık on iki saniyelik L1 bloklarıdır. Hepsi 11 Temmuz 2026 tarihinde 05:45 UTC civarında kalıcı olarak sona erdi. Bugün token'da hiç kimse için artık bir ayrıcalık yok.
 
 ## 110.44M'a ne oldu
 
@@ -59,7 +59,7 @@ Constructor üç sınır belirledi ve bunların hiçbiri bugün ayakta değil.
 | 5          | 15,530,081.02      | 14.1%    | 0.056404     |
 | **Toplam** | **110,436,131.71** | **100%** | **0.439381** |
 
-Maliyet 0.17 ETH artı 0.0005 ETH lansman ücretiydi. Gelir 0.439381 WETH'ti. Net olarak bu snipe yaklaşık 0.269 ETH kazandırdı — bu rakamların okunduğu gün, 2 September 2026, ETH fiyatıyla kabaca $640.
+Maliyet 0.17 ETH artı 0.0005 ETH lansman ücretiydi. Gelir 0.439381 WETH'ti. Net olarak bu snipe yaklaşık 0.269 ETH kazandırdı — bu rakamların okunduğu gün, 2 Eylül 2026, ETH fiyatıyla kabaca $640.
 
 Bu sayı, hikâyenin şeklinin ima ettiğinden küçüktür ve doğru olanı da budur. Deployer daha sonraki bir noktada 674 IF geri aldı ve onu başka yere gönderdi. Bakiye o zamandan beri sıfır. Bu adres, NOXA fabrikasında şimdiye dek tam olarak bir token çıkardı.
 
@@ -67,7 +67,7 @@ Bu sayı, hikâyenin şeklinin ima ettiğinden küçüktür ve doğru olanı da 
 
 Dürüst başlık snipe değil. Ücret akışı.
 
-NOXA'nın ücret sözleşmesi, $IF'in işlem ücretleri üzerinden `0x84F8E5a324466Deb7447048C014CF0245ce04afA` adresine yaratıcı kazancı olarak **18.2300 WETH** ödedi; aynı 2 September okumasıyla yaklaşık $43,500. Lansmanı yapan orijinal tarafın bu projeden çıkardığı şey budur ve bu, token üzerinden değil, launchpad'in tesisatı üzerinden geldi. [Yakım nasıl işliyor](/tr/docs/how-the-burn-works/) aynı ücret akışını anlatıyor, çünkü yakılan şey bunun IF tarafı.
+NOXA'nın ücret sözleşmesi, $IF'in işlem ücretleri üzerinden `0x84F8E5a324466Deb7447048C014CF0245ce04afA` adresine yaratıcı kazancı olarak **18.2300 WETH** ödedi; aynı 2 Eylül okumasıyla yaklaşık $43,500. Lansmanı yapan orijinal tarafın bu projeden çıkardığı şey budur ve bu, token üzerinden değil, launchpad'in tesisatı üzerinden geldi. [Yakım nasıl işliyor](/tr/docs/how-the-burn-works/) aynı ücret akışını anlatıyor, çünkü yakılan şey bunun IF tarafı.
 
 ## Hangi cümleler bunu atlatamaz
 

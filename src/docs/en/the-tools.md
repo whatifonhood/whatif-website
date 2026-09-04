@@ -3,7 +3,7 @@ title: The tools
 summary: What each part of the site does, and what it deliberately does not.
 ---
 
-The site is a set of small tools over public data. None of them needs an account, a wallet connection, or a signature. All of them work with JavaScript disabled, to the extent that showing live data allows.
+The site is a set of small tools over public data. None of them needs an account, a wallet connection, or a signature. Every page renders its text, its links and the figures from the last build without JavaScript. The live numbers, the chart, the question generator, the wallet lookup and the card drawing need it.
 
 ## Stats
 

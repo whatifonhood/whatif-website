@@ -7,11 +7,11 @@ Todo en una página, para copiar y para comprobar.
 
 ## Direcciones
 
-| Qué                          | Dirección                                    |
-| ---------------------------- | -------------------------------------------- |
-| Contrato de $IF              | `0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1` |
-| Pool IF/WETH, Uniswap V3, 1% | `0x39A200271525E9641e799127bdAB299DAeF21953` |
-| Dirección de quema           | `0x000000000000000000000000000000000000dEaD` |
+| Qué                          | Dirección                                                                                                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Contrato de $IF              | [`0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1`](https://robinhoodchain.blockscout.com/token/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1)   |
+| Pool IF/WETH, Uniswap V3, 1% | [`0x39A200271525E9641e799127bdAB299DAeF21953`](https://robinhoodchain.blockscout.com/address/0x39A200271525E9641e799127bdAB299DAeF21953) |
+| Dirección de quema           | [`0x000000000000000000000000000000000000dEaD`](https://robinhoodchain.blockscout.com/address/0x000000000000000000000000000000000000dEaD) |
 
 La dirección del contrato es la que importa. Compara los últimos seis caracteres con esta página o con el explorador antes de comprar nada — mira [Cómo comprar](/es/docs/how-to-buy/).
 
@@ -19,13 +19,13 @@ El pool IF/WETH del 1% es el pool principal — creado en la transacción de lan
 
 ## El lanzamiento y el bloqueo
 
-| Qué                                  | Valor                                                                              |
-| ------------------------------------ | ---------------------------------------------------------------------------------- |
-| Transacción de lanzamiento           | `0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`               |
-| Bloque de lanzamiento, L2            | `6657668`, 11 July 2026, 04:32:42 UTC                                              |
-| Posición de liquidez del lanzamiento | NFT de Uniswap V3 `70641`, ticks `[-887200, 204200]`                               |
-| Titular del NFT `70641`              | El `LaunchLocker` de NOXA, según los logs 11 y 12 de la transacción de lanzamiento |
-| Deployer, que envió el lanzamiento   | `0x84F8E5a324466Deb7447048C014CF0245ce04afA`                                       |
+| Qué                                  | Valor                                                                                                                                                                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Transacción de lanzamiento           | [`0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`](https://robinhoodchain.blockscout.com/tx/0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c) |
+| Bloque de lanzamiento, L2            | `6657668`, 11 de julio de 2026, 04:32:42 UTC                                                                                                                                        |
+| Posición de liquidez del lanzamiento | NFT de Uniswap V3 `70641`, ticks `[-887200, 204200]`                                                                                                                                |
+| Titular del NFT `70641`              | El `LaunchLocker` de NOXA, según los logs 11 y 12 de la transacción de lanzamiento                                                                                                  |
+| Deployer, que envió el lanzamiento   | [`0x84F8E5a324466Deb7447048C014CF0245ce04afA`](https://robinhoodchain.blockscout.com/address/0x84F8E5a324466Deb7447048C014CF0245ce04afA)                                            |
 
 La posición `70641` es la que está bloqueada de forma permanente. [El lanzamiento](/es/docs/the-launch/) lee la transacción log por log; [La liquidez y el bloqueo](/es/docs/liquidity-and-the-lock/) dice qué cubre el bloqueo y qué no.
 
@@ -33,17 +33,17 @@ La posición `70641` es la que está bloqueada de forma permanente. [El lanzamie
 
 NOXA es el launchpad que estampó el token y que todavía opera la quema. Ninguna fuente que hayamos revisado establece quién controla estas direcciones: el dueño del locker es una wallet a secas, y el contrato de comisiones es bytecode sin verificar desplegado por ella.
 
-| Qué                                                                                         | Dirección                                    |
-| ------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Contrato de comisiones, del que ha salido cada quema                                        | `0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417` |
-| Wallet de comisiones original, a la que se pagó la tajada del 20% en $IF el 11–12 July 2026 | `0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b` |
-| Dueño del `LaunchLocker`                                                                    | `0x7E035Fb048a31e0481b88074557415b1C187242B` |
+| Qué                                                                                                | Dirección                                                                                                                                |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Contrato de comisiones, del que ha salido cada quema                                               | [`0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417`](https://robinhoodchain.blockscout.com/address/0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417) |
+| Wallet de comisiones original, a la que se pagó la tajada del 20% en $IF el 11–12 de julio de 2026 | [`0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b`](https://robinhoodchain.blockscout.com/address/0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b) |
+| Dueño del `LaunchLocker`                                                                           | [`0x7E035Fb048a31e0481b88074557415b1C187242B`](https://robinhoodchain.blockscout.com/address/0x7E035Fb048a31e0481b88074557415b1C187242B) |
 
 [Cómo funciona la quema](/es/docs/how-the-burn-works/) explica qué hace cada una dentro del mecanismo.
 
 ## El token
 
-|                      |                              |
+| Campo                | Valor                        |
 | -------------------- | ---------------------------- |
 | Nombre, en la cadena | `What If`                    |
 | Símbolo              | `IF`                         |
@@ -59,7 +59,7 @@ El `name` y el `symbol` propios del contrato son `What If` e `IF`. Este libro bl
 
 ## La cadena
 
-|              |                                           |
+| Campo        | Valor                                     |
 | ------------ | ----------------------------------------- |
 | Red          | Robinhood Chain                           |
 | ID de cadena | `4663` (`0x1237`)                         |

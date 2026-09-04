@@ -49,7 +49,7 @@ Nada en el contrato de $IF quema nada. La quema son ingresos por comisiones: las
 
 Cada paso de eso, salvo la acumulación de comisiones, necesita que alguien llame a una función. Si el keeper del launchpad deja de llamarla, las comisiones se acumulan en la posición y se quedan ahí, sin quemar y sin reclamar, indefinidamente. Nada en la cadena obliga a esa llamada, y nadie te debe un anuncio antes de que se detenga.
 
-Conviene saber esto en ese contexto: el launchpad dejó de aceptar nuevos lanzamientos el mismo día en que se lanzó $IF, y su sitio web se apagó dos días después. Los barridos han continuado de todos modos, el más reciente el 1 September 2026. Continuar no es lo mismo que estar obligado a continuar.
+Conviene saber esto en ese contexto: el launchpad dejó de aceptar nuevos lanzamientos el mismo día en que se lanzó $IF, y su sitio web se apagó dos días después. Los barridos han continuado de todos modos, el más reciente el 1 de septiembre de 2026. Continuar no es lo mismo que estar obligado a continuar.
 
 ## Las comisiones se pueden apuntar a otra parte
 

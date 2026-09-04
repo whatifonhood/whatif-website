@@ -13,7 +13,7 @@ Two of the largest entries are not what they look like at a glance, which is exa
 
 **The liquidity pool is usually near the top.** A pool holds the tokens it trades against. If it held nothing, you could not buy. It is infrastructure, not a position.
 
-Strip those two out and what is left is the actual holder concentration. At the last reading, the largest genuine individual wallet held around 3% of supply.
+Strip those two out and what is left is the actual holder concentration. At the September 2026 reading, the largest genuine individual wallet held around 3% of supply.
 
 ## What we can and cannot tell you
 

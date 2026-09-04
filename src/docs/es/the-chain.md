@@ -7,7 +7,7 @@ $IF no eligió su cadena en ningún sentido significativo. Lo estampó un launch
 
 ## Qué es Robinhood Chain
 
-Robinhood Chain es una layer 2 de Ethereum, construida por Robinhood con Offchain Labs sobre la pila de Arbitrum, que liquida en Ethereum. La red principal pública se abrió el 1 July 2026, anunciada en la conferencia "The World is Flat" de Robinhood en Londres, tras una testnet que había procesado más de 200 millones de transacciones.
+Robinhood Chain es una layer 2 de Ethereum, construida por Robinhood con Offchain Labs sobre la pila de Arbitrum, que liquida en Ethereum. La red principal pública se abrió el 1 de julio de 2026, anunciada en la conferencia "The World is Flat" de Robinhood en Londres, tras una testnet que había procesado más de 200 millones de transacciones.
 
 Funciona bajo la licencia del Arbitrum Expansion Program, que destina el 10% de los ingresos netos del protocolo a Arbitrum: 8% a la ArbitrumDAO y 2% al Developer Guild.
 
@@ -15,13 +15,13 @@ Funcionar en una cadena que construyó Robinhood no es una relación con Robinho
 
 ## Los datos que necesitarías para conectarte a ella
 
-| Campo            | Valor                                                                  |
-| ---------------- | ---------------------------------------------------------------------- |
-| Chain ID         | `4663` (`0x1237`)                                                      |
-| Token de gas     | ETH, comisión base `0.366` gwei en la instantánea del 2 September 2026 |
-| Tiempo de bloque | `101.3` ms medidos, sobre `100,000` bloques en `10,134` segundos       |
-| RPC              | `https://rpc.mainnet.chain.robinhood.com`                              |
-| Explorador       | `https://robinhoodchain.blockscout.com`                                |
+| Campo            | Valor                                                                         |
+| ---------------- | ----------------------------------------------------------------------------- |
+| Chain ID         | `4663` (`0x1237`)                                                             |
+| Token de gas     | ETH, comisión base `0.366` gwei en la instantánea del 2 de septiembre de 2026 |
+| Tiempo de bloque | `101.3` ms medidos, sobre `100,000` bloques en `10,134` segundos              |
+| RPC              | `https://rpc.mainnet.chain.robinhood.com`                                     |
+| Explorador       | `https://robinhoodchain.blockscout.com`                                       |
 
 El tiempo de bloque es lo que conviene retener. Los bloques llegan unas diez veces por segundo, y eso es lo que hace que la primera rareza de más abajo sea confusa en lugar de evidente.
 

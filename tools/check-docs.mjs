@@ -45,6 +45,11 @@ const field = (front, name) => new RegExp(`^${name}: (.+)$`, 'm').exec(front)?.[
 const headings = (text) => (text.match(/^## /gm) ?? []).length;
 
 const problems = [];
+
+// Translated pages kept English month names in their sentences for weeks before
+// anyone noticed. The lint is cheap; the embarrassment was not.
+const ENGLISH_MONTH =
+  /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/;
 const english = slugsIn('en');
 
 // 1. The reading order and the English files agree.
@@ -72,6 +77,9 @@ for (const locale of LOCALES) {
     const text = read(locale, slug);
     const front = frontmatter(text);
     const source = read('en', slug);
+    if (locale !== 'en' && ENGLISH_MONTH.test(text)) {
+      problems.push(`${locale}/${slug}: an English month name in a translated page`);
+    }
 
     // 3. Frontmatter: both fields present, and actually translated.
     for (const name of ['title', 'summary']) {

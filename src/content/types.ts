@@ -27,8 +27,12 @@ export interface SplitHeading {
 export interface SiteCopy {
   /** Used on <html lang> and for the social card locale. */
   htmlLang: string;
+  /** Open Graph wants language_TERRITORY (en_US), not the BCP-47 tag html uses. */
+  ogLocale: string;
 
   nav: {
+    /** Accessible name of the header's <nav>; landmarks must be told apart. */
+    primaryLabel: string;
     /** In-page anchors, in header order. */
     links: { label: string; href: string }[];
     /** The header dropdown that holds the tools. */
@@ -167,6 +171,8 @@ export interface SiteCopy {
     builtBy: string;
     /** The button that stops every animation on the site. */
     reduceMotion: string;
+    /** Accessible name of the footer's <nav>. */
+    navLabel: string;
   };
 
   /** Page-level copy for the sub-pages. */
@@ -182,6 +188,11 @@ export interface SiteCopy {
       count: string;
     };
     brand: {
+      eyebrow: string;
+      /** Under the download: format and size. */
+      fileNote: string;
+      contractLabel: string;
+      questions: string;
       title: string;
       heading: SplitHeading;
       intro: string;
@@ -193,6 +204,8 @@ export interface SiteCopy {
       rules: string[];
     };
     stats: {
+      /** Accessible name of the chart toolbar group. */
+      chartTypeLabel: string;
       title: string;
       heading: SplitHeading;
       intro: string;

@@ -13,7 +13,7 @@ Dos de las entradas más grandes no son lo que parecen a primera vista, y por es
 
 **El pool de liquidez suele estar cerca del principio.** Un pool tiene los tokens contra los que opera. Si no tuviera nada, no podrías comprar. Es infraestructura, no una posición.
 
-Quita esas dos y lo que queda es la concentración real de titulares. En la última lectura, la mayor wallet individual genuina tenía alrededor del 3% del suministro.
+Quita esas dos y lo que queda es la concentración real de titulares. En la lectura de septiembre de 2026, la mayor wallet individual genuina tenía alrededor del 3% del suministro.
 
 ## Lo que podemos y lo que no podemos decirte
 

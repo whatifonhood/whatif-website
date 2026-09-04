@@ -5,7 +5,7 @@ summary: Ana havuzdaki bir pozisyon hiç kimse tarafından çekilemez; derinliğ
 
 $IF, token'ı oluşturan işlemin aynısında launchpad tarafından oluşturulmuş bir Uniswap V3 havuzunda işlem görüyor. O havuzdaki bir pozisyon, kimsenin geri alamayacağı biçimde kilitli. Derinliğin geri kalanı değil. Bu sayfa ikisini birbirinden ayırıyor, çünkü birisi "likidite kilitli" dediğinde bu ifadenin genellikle yaptığı işin tamamı o farktan ibarettir.
 
-Aşağıdaki her rakam, 2 September 2026 tarihinde, yaklaşık `52,582,784` numaralı blokta zincirden okundu. Havuz bakiyeleri değişir. Kilit değişmez.
+Aşağıdaki her rakam, 2 Eylül 2026 tarihinde, yaklaşık `52,582,784` numaralı blokta zincirden okundu. Havuz bakiyeleri değişir. Kilit değişmez.
 
 ## Lansman pozisyonu
 
@@ -46,7 +46,7 @@ $IF'in yedi canlı havuzda likiditesi var; hepsi birlikte yaklaşık $446,000 tu
 | Uniswap V4 IF/ETH  | $56      | $42       | 28 Aug 2026 |
 | Uniswap V4 IF/ETH  | $8       | $4        | 27 Aug 2026 |
 
-İlginç olan ikinci satır. Uniswap V3 üzerindeki IF/USDG havuzu 6 August tarihinde launchpad dışında biri tarafından oluşturuldu ve şimdi tüm $IF hacminin yaklaşık üçte birini, Robinhood Chain'in kendi dolar stablecoin'i karşısında taşıyor. Bunun hiçbiri kilitli değil. Kelimenin tam anlamıyla topluluk likiditesi: bir kişi onu oraya koymayı seçti ve çıkarmayı da seçebilir.
+İlginç olan ikinci satır. Uniswap V3 üzerindeki IF/USDG havuzu 6 Ağustos tarihinde launchpad dışında biri tarafından oluşturuldu ve şimdi tüm $IF hacminin yaklaşık üçte birini, Robinhood Chain'in kendi dolar stablecoin'i karşısında taşıyor. Bunun hiçbiri kilitli değil. Kelimenin tam anlamıyla topluluk likiditesi: bir kişi onu oraya koymayı seçti ve çıkarmayı da seçebilir.
 
 Kilit, tek bir havuzdaki tek bir pozisyonu kapsıyor. Diğer altısıyla hiçbir ilgisi yok.
 

@@ -1,9 +1,9 @@
 ---
 title: Cómo funciona la quema en realidad
-summary: Un motor de comisiones automatizado operado por un tercero ha quemado $IF 423 veces, y puede detenerse cuando ese tercero lo decida.
+summary: Un motor de comisiones automatizado operado por un tercero quema $IF casi todos los días, y puede detenerse cuando ese tercero lo decida.
 ---
 
-Durante mucho tiempo este libro blanco dijo que no había ninguna comisión que alimentara la quema. Eso estaba equivocado, y la corrección es lo bastante grande como para necesitar su propia página. Todas las cifras de abajo se leyeron de la cadena el 2 September 2026, en el bloque `52,582,784` o alrededor de él.
+Durante mucho tiempo este libro blanco dijo que no había ninguna comisión que alimentara la quema. Eso estaba equivocado, y la corrección es lo bastante grande como para necesitar su propia página. Todas las cifras de abajo se leyeron de la cadena el 2 de septiembre de 2026, en el bloque `52,582,784` o alrededor de él.
 
 Empieza por la versión llana. La quema no es manual. No es ocasional. No es inexplicada. Y no la hace esta comunidad, que no ha quemado nada en absoluto. Es un motor de comisiones automatizado y dependiente del volumen, operado por un tercero, y se ha disparado 423 veces.
 
@@ -30,26 +30,26 @@ Una cosa que conviene mirar sin ilusiones. Ese contrato de comisiones son 7,725 
 
 ## Qué cambió el segundo día
 
-El reparto no ha sido siempre el que es ahora. En los primeros diez cobros, desde el 11 July 06:46 UTC hasta el 12 July 09:52 UTC, el contrato quemó el 80% del IF que recogió y envió el otro 20% a la wallet de comisiones original de NOXA:
+El reparto no ha sido siempre el que es ahora. En los primeros diez cobros, desde el 11 de julio 06:46 UTC hasta el 12 de julio 09:52 UTC, el contrato quemó el 80% del IF que recogió y envió el otro 20% a la wallet de comisiones original de NOXA:
 
 **`0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b`**
 
 Allí fueron `14,468,370.53` IF. Por eso esa wallet sigue apareciendo en la [tabla de titulares](/es/stats/), con el 1.45% del suministro. No es una ballena misteriosa y no es una asignación del equipo. Es la tajada de comisiones de un launchpad de los dos primeros días.
 
-Desde el 12 July en adelante se ha quemado el 100% del lado IF, en los 413 cobros siguientes.
+Desde el 12 de julio en adelante se ha quemado el 100% del lado IF, en los 413 cobros siguientes.
 
 ## La forma de la quema en el tiempo
 
 La quema sigue el volumen de operaciones, lo que significa que la mayor parte ocurrió cuando el volumen era más alto, lo que significa que la mayor parte ya quedó atrás.
 
-| Periodo               | IF quemado | Parte del total quemado |
-| --------------------- | ---------- | ----------------------- |
-| 11 Jul 2026, día uno  | 56,873,813 | 60.9%                   |
-| Resto de July         | 29,950,521 | 32.0%                   |
-| August                | 6,541,732  | 7.0%                    |
-| September hasta ahora | 83,171     | 0.1%                    |
+| Periodo                | IF quemado | Parte del total quemado |
+| ---------------------- | ---------- | ----------------------- |
+| 11 Jul 2026, día uno   | 56,873,813 | 60.9%                   |
+| Resto de julio         | 29,950,521 | 32.0%                   |
+| Agosto                 | 6,541,732  | 7.0%                    |
+| Septiembre hasta ahora | 83,171     | 0.1%                    |
 
-Ha habido quemas en 51 de los 53 días desde el lanzamiento, así que el motor funciona de forma constante. Simplemente funciona con mucho menos combustible. El volumen ha caído aproximadamente dos órdenes de magnitud respecto a la semana del lanzamiento, y al ritmo actual el suministro se quema alrededor de un 0.014% al día.
+Hubo quemas en 51 de los 53 días entre el lanzamiento y la instantánea del 2 de septiembre de 2026, así que el motor funciona de forma constante. Simplemente funciona con mucho menos combustible. El volumen ha caído aproximadamente dos órdenes de magnitud respecto a la semana del lanzamiento, y al ritmo actual el suministro se quema alrededor de un 0.014% al día.
 
 Acumulado en la posición y a la espera del siguiente barrido en el momento de la instantánea: `65,950` IF y `0.1967` WETH. Esa es la próxima quema, y se puede leer en vivo en lugar de aceptarla por confianza.
 
@@ -57,11 +57,11 @@ Acumulado en la posición y a la espera del siguiente barrido en el momento de l
 
 NOXA es el launchpad que estampó el token. Las fechas importan, porque explican por qué la configuración de comisiones nunca se ha renegociado.
 
-El `LaunchLocker` se desplegó el 16 June 2026, dos semanas antes de que abriera la mainnet pública de Robinhood Chain, con la parte del protocolo fijada en 65. El día de la mainnet, el 1 July, la parte se subió de 65 a 100 y se autorizó como recolector el contrato de comisiones actual. $IF se lanzó el 11 July bajo esa configuración. Ese mismo día, NOXA anunció que dejaría de aceptar nuevos lanzamientos de tokens. Dos días después su web se apagó, y el 14 July publicó que ya no cobraría comisiones y que redirigiría el 100% de los ingresos a los creadores.
+El `LaunchLocker` se desplegó el 16 de junio de 2026, dos semanas antes de que abriera la mainnet pública de Robinhood Chain, con la parte del protocolo fijada en 65. El día de la mainnet, el 1 de julio, la parte se subió de 65 a 100 y se autorizó como recolector el contrato de comisiones actual. $IF se lanzó el 11 de julio bajo esa configuración. Ese mismo día, NOXA anunció que dejaría de aceptar nuevos lanzamientos de tokens. Dos días después su web se apagó, y el 14 de julio publicó que ya no cobraría comisiones y que redirigiría el 100% de los ingresos a los creadores.
 
-Esa declaración y el estado en la cadena no cuadran. Hasta el cobro más reciente, el 1 September 21:14 UTC, `protocolFeeShare` sigue leyendo `100`, y el log `ProtocolFeeUpdated` del locker no muestra ningún cambio desde el 1 July.
+Esa declaración y el estado en la cadena no cuadran. Hasta el cobro más reciente, el 1 de septiembre 21:14 UTC, `protocolFeeShare` sigue leyendo `100`, y el log `ProtocolFeeUpdated` del locker no muestra ningún cambio desde el 1 de julio.
 
-Encajan dos lecturas, y nada en la cadena decide entre ellas. O bien el anuncio nunca se aplicó a este locker, o bien se aplicó al lado token y no al lado ETH, ya que el 12 July es exactamente cuando el lado IF dejó de retenerse en parte y pasó a quemarse por completo. Tómalo como interpretación, no como hecho.
+Encajan dos lecturas, y nada en la cadena decide entre ellas. O bien el anuncio nunca se aplicó a este locker, o bien se aplicó al lado token y no al lado ETH, ya que el 12 de julio es exactamente cuando el lado IF dejó de retenerse en parte y pasó a quemarse por completo. Tómalo como interpretación, no como hecho.
 
 Nadie sabe quién está detrás de NOXA. Ninguna fuente revisada lo establece. El dueño del locker es una cuenta de propiedad externa a secas y el contrato de comisiones es bytecode no verificado.
 

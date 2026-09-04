@@ -3,7 +3,7 @@ title: Araçlar
 summary: Sitenin her parçasının ne yaptığı ve bilerek ne yapmadığı.
 ---
 
-Site, açık veriler üzerine kurulmuş küçük araçlardan oluşur. Hiçbiri hesap, cüzdan bağlantısı ya da imza gerektirmez. Hepsi, canlı veri göstermenin elverdiği ölçüde, JavaScript kapalıyken de çalışır.
+Site, açık veriler üzerine kurulmuş küçük araçlardan oluşur. Hiçbiri hesap, cüzdan bağlantısı ya da imza gerektirmez. Her sayfa metnini, bağlantılarını ve son derlemedeki rakamları JavaScript olmadan gösterir. Canlı rakamlar, grafik, soru üretici, cüzdan sorgusu ve kart çizimi ise ona ihtiyaç duyar.
 
 ## Veriler
 

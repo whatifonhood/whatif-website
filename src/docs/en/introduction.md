@@ -27,7 +27,7 @@ These are the load-bearing claims of the entire project. Each one is checkable o
 
 1. **The supply is fixed at one billion.** `totalSupply()` returns exactly that, and there is no mint function.
 2. **The contract has no owner.** `owner()` does not revert because we renounced it — it reverts because the function was never there. Nobody can pause it, upgrade it, or mint into it.
-3. **Tokens have been burned, permanently.** They sit at an address whose private key does not exist and cannot be constructed.
+3. **Tokens have been burned, permanently.** They sit at an address nobody holds a key to, and finding one is beyond any computer.
 
 Everything else on this site is either one of those three restated, or a tool for looking at them.
 

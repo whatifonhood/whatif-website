@@ -75,7 +75,7 @@ curl -s -X POST https://rpc.mainnet.chain.robinhood.com \
        "params":["0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c"]}'
 ```
 
-That hash is the launch. One transaction, eighteen logs, and everything that made $IF happened inside it. The log to read is number 14 in the list the node returns: a `Transfer` on the token contract, `from` the pool `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` the deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. Its `data` field divided by 10^18 is 110,436,131.71 $IF, which is 11.04% of the supply, bought atomically before anyone else could trade.
+That hash is the launch. One transaction, eighteen logs, and everything that made $IF happened inside it. The log to read is number 14 in the list the node returns, counting from zero as the node does (an explorer that counts from one shows the same log as 15): a `Transfer` on the token contract, `from` the pool `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` the deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. Its `data` field divided by 10^18 is 110,436,131.71 $IF, which is 11.04% of the supply, bought atomically before anyone else could trade.
 
 The 2% wallet cap in force at the time did not apply, because the contract exempted the deployer by name. [The launch](/docs/the-launch/) walks the rest of the eighteen logs.
 

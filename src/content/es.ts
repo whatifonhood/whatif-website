@@ -14,8 +14,10 @@ import type { SiteCopy } from './types.ts';
  */
 export const es: SiteCopy = {
   htmlLang: 'es',
+  ogLocale: 'es_ES',
 
   nav: {
+    primaryLabel: 'Principal',
     links: [
       { label: 'La tesis', href: '#thesis' },
       { label: 'Los números', href: '#numbers' },
@@ -100,7 +102,7 @@ export const es: SiteCopy = {
     eyebrow: 'La tesis',
     heading: { lead: 'Una pregunta.', accent: 'Sin promesas.' },
     intro:
-      '$IF no es un token de utilidad. No es gobernanza. Es ese pensamiento de las 3 de la mañana que todos hemos tenido, acuñado en la cadena más nueva del juego.',
+      '$IF no es un token de utilidad. No es gobernanza. Es ese pensamiento de las 3 de la mañana que todos hemos tenido, acuñado en una cadena que abrió este verano.',
     pillars: [
       {
         title: 'Todo empieza con una pregunta',
@@ -108,7 +110,7 @@ export const es: SiteCopy = {
       },
       {
         title: 'Construido en Robinhood Chain',
-        body: 'Bloques rápidos, gas barato y el nombre que arrastró a una generación al mercado. La cadena es nueva y $IF es una de las primeras monedas en ella: es dónde está, no una predicción de a dónde va.',
+        body: 'Bloques rápidos, gas barato y el nombre que arrastró a una generación al mercado. La cadena tiene semanas y $IF salió en su segunda semana: es dónde está, no una predicción de a dónde va.',
       },
       {
         title: 'Ya quemado, y para siempre',
@@ -138,12 +140,12 @@ export const es: SiteCopy = {
       volume: 'Volumen 24 h',
       supply: 'Suministro total',
       burned: 'Quemado',
-      holders: 'Holders',
+      holders: 'Titulares',
       chain: 'Cadena',
     },
     burnHeadline: 'quemados e irrecuperables',
     burnBody:
-      'Enviados a 0x…dEaD, una dirección sin clave privada. Nadie puede mover esos tokens — ni el equipo, ni tú, ni nadie.',
+      'Enviados a 0x…dEaD, una dirección cuya clave privada nadie conoce ni puede derivar. Nadie puede mover esos tokens — ni el equipo, ni tú, ni nadie.',
     asOf: 'a fecha de',
     live: 'En vivo',
   },
@@ -151,7 +153,8 @@ export const es: SiteCopy = {
   buy: {
     eyebrow: 'Arma tu bolsa',
     heading: { lead: 'Tres pasos.', accent: 'Ya está.' },
-    intro: 'Necesitas una wallet, algo de ETH en Robinhood Chain y treinta segundos. Esto es todo.',
+    intro:
+      'Suministro y quema, leídos directamente de Robinhood Chain; precio y liquidez, de las APIs públicas de mercado, con cada llamada mostrada abajo.',
     steps: [
       {
         title: 'Consigue una wallet',
@@ -225,7 +228,7 @@ export const es: SiteCopy = {
       },
       {
         q: '¿Qué se ha quemado?',
-        a: '{burned} $IF — {burnedPercent} del suministro total — están en 0x…dEaD, una dirección sin clave privada. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
+        a: '{burned} $IF — {burnedPercent} del suministro total — están en 0x…dEaD, una dirección cuya clave privada nadie conoce ni puede derivar. Esos tokens no podrán moverse nunca más. Es un saldo en vivo en el explorador de bloques, no una afirmación en un documento.',
       },
       {
         q: '¿Dónde está la comunidad?',
@@ -250,6 +253,7 @@ export const es: SiteCopy = {
       '$IF es una meme coin sin valor intrínseco y sin ninguna expectativa de retorno financiero. Nada de lo que hay aquí es asesoramiento financiero. Investiga por tu cuenta.',
     builtBy: 'Todos somos el dev.',
     reduceMotion: 'Reducir movimiento',
+    navLabel: 'Pie de página',
   },
 
   pages: {
@@ -265,6 +269,10 @@ export const es: SiteCopy = {
       count: 'memes',
     },
     brand: {
+      eyebrow: 'Para quien haga cosas de $IF',
+      fileNote: 'ZIP · 55 MB · los términos de licencia van en el kit',
+      contractLabel: 'Contrato',
+      questions: '¿Preguntas, o quieres algo que no está aquí?',
       title: 'Marca',
       heading: { lead: 'Las marcas,', accent: 'y cómo usarlas.' },
       intro:
@@ -280,6 +288,7 @@ export const es: SiteCopy = {
       ],
     },
     stats: {
+      chartTypeLabel: 'Controles del gráfico',
       title: 'Datos',
       heading: { lead: 'Cada número,', accent: 'en vivo.' },
       intro: 'Precio, liquidez, suministro y la quema — leídos directamente desde Robinhood Chain.',
@@ -288,7 +297,7 @@ export const es: SiteCopy = {
       poolLabel: 'Pool principal',
       openExplorer: 'Abrir el contrato',
       openChart: 'Abrir el gráfico',
-      timeframes: { day: '24 H', week: '7 D', month: '30 D', quarter: '90D', all: 'TODO' },
+      timeframes: { day: '24 H', week: '7 D', month: '30 D', quarter: '90 D', all: 'TODO' },
       resizeChart: 'Arrastra para redimensionar el gráfico',
       zoomIn: 'Acercar',
       zoomOut: 'Alejar',
@@ -314,7 +323,7 @@ export const es: SiteCopy = {
       feedNote: 'Las operaciones más recientes en el pool IF/WETH.',
       biggestSell: 'Mayor venta',
       windowHours: 'en las últimas {hours} horas',
-      holdersTitle: 'Holders',
+      holdersTitle: 'Titulares',
       concentration: 'Quién lo tiene',
       bands: { top10: 'Top 10', next20: '11–30', next20More: '31–50', rest: 'Todos los demás' },
       holdersUpdated: 'recontado',
@@ -523,7 +532,7 @@ export const es: SiteCopy = {
       inputLabel: 'Dirección de wallet',
       check: 'Consultar',
       privacy:
-        'Un saldo es información pública en un registro público, así que esto solo lo lee — lo mismo que hace un explorador de bloques. La dirección la escribes tú, nunca se le pide a una wallet. No se guarda nada, y no se envía nada a ningún sitio salvo a la cadena.',
+        'La dirección la escribes tú, nunca se pide a una wallet, y solo se envía al RPC público de la cadena. El precio con que se valora viene de DexScreener sin ninguna dirección adjunta. No se guarda nada.',
       download: 'Descargar tarjeta',
       postOnX: 'Publicar en X',
       shareText: 'Tengo {tokens} {symbol}.\n\nSeguimos preguntando.',

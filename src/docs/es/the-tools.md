@@ -3,7 +3,7 @@ title: Las herramientas
 summary: Qué hace cada parte del sitio, y qué deja de hacer a propósito.
 ---
 
-El sitio es un conjunto de herramientas pequeñas sobre datos públicos. Ninguna necesita una cuenta, una conexión de wallet ni una firma. Todas funcionan con JavaScript desactivado, hasta donde lo permite mostrar datos en vivo.
+El sitio es un conjunto de herramientas pequeñas sobre datos públicos. Ninguna necesita una cuenta, una conexión de wallet ni una firma. Cada página muestra su texto, sus enlaces y las cifras de la última compilación sin JavaScript. Los números en vivo, el gráfico, el generador de preguntas, la consulta de wallet y el dibujo de tarjetas sí lo necesitan.
 
 ## Datos
 

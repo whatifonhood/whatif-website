@@ -41,7 +41,7 @@ La frase exacta es más larga, y preferimos escribir la larga. El lanzador se ll
 
 ## "La quema es impulsada por la comunidad"
 
-Ausente, porque es falso. Todas las quemas hasta ahora las ha ejecutado el contrato de comisiones de NOXA, que barre la comisión de trading de la posición bloqueada y quema el lado $IF de ella — todo él, desde el 12 July 2026. Ha funcionado 423 veces. Esta comunidad no ha quemado nada.
+Ausente, porque es falso. Todas las quemas hasta ahora las ha ejecutado el contrato de comisiones de NOXA, que barre la comisión de trading de la posición bloqueada y quema el lado $IF de ella — todo él, desde el 12 de julio de 2026. Ha funcionado 423 veces. Esta comunidad no ha quemado nada.
 
 Decirlo no es modestia. Es la diferencia entre una historia que puedes comprobar y una que no, y también es el riesgo: la quema pertenece al keeper de otra gente y se detiene el día que ese keeper se detenga. [Cómo funciona la quema](/es/docs/how-the-burn-works/) explica el mecanismo y qué aspecto tendría su final.
 

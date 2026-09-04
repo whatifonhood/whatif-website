@@ -2,8 +2,10 @@ import type { SiteCopy } from './types.ts';
 
 export const en: SiteCopy = {
   htmlLang: 'en',
+  ogLocale: 'en_US',
 
   nav: {
+    primaryLabel: 'Primary',
     links: [
       { label: 'The thesis', href: '#thesis' },
       { label: 'The numbers', href: '#numbers' },
@@ -85,7 +87,7 @@ export const en: SiteCopy = {
     eyebrow: 'The thesis',
     heading: { lead: 'One question.', accent: 'No promises.' },
     intro:
-      "$IF isn't a utility token. It's not governance. It's the 3am thought every human has had, minted on the newest chain in the game.",
+      "$IF isn't a utility token. It's not governance. It's the 3am thought every human has had, minted on a chain that opened this summer.",
     pillars: [
       {
         title: 'It starts with a question',
@@ -93,7 +95,7 @@ export const en: SiteCopy = {
       },
       {
         title: 'Built on Robinhood Chain',
-        body: 'Fast blocks, cheap gas, and the name that pulled a generation into the market. The chain is new and $IF is one of the first coins on it — that is where it stands, not a prediction of where it goes.',
+        body: 'Fast blocks, cheap gas, and the name that pulled a generation into the market. The chain is weeks old and $IF launched in its second week — that is where it stands, not a prediction of where it goes.',
       },
       {
         title: 'Already burned, and gone for good',
@@ -128,7 +130,7 @@ export const en: SiteCopy = {
     },
     burnHeadline: 'burned and unrecoverable',
     burnBody:
-      'Sent to 0x…dEaD, an address with no private key. Nobody can move these tokens — not the team, not you, not anyone.',
+      'Sent to 0x…dEaD, an address whose private key nobody knows and nobody can derive. Nobody can move these tokens — not the team, not you, not anyone.',
     asOf: 'as of',
     live: 'Live',
   },
@@ -137,11 +139,11 @@ export const en: SiteCopy = {
     eyebrow: 'Get your bag',
     heading: { lead: 'Three steps.', accent: "That's it." },
     intro:
-      "You need a wallet, some ETH on Robinhood Chain, and thirty seconds. Here's the whole thing.",
+      'Supply and the burn read straight from Robinhood Chain; price and liquidity from the public market APIs, every call shown below.',
     steps: [
       {
         title: 'Get a wallet',
-        body: 'MetaMask, OKX or Trust on a computer. Robinhood Wallet on your phone. Any of them will add Robinhood Chain for you the first time you visit a page that uses it.',
+        body: 'MetaMask, Rabby or Coinbase Wallet on a computer. Robinhood Wallet on your phone. Most will offer to add Robinhood Chain the first time you visit a page that uses it; if yours does not, the network details are one click away.',
         action: 'Get MetaMask',
       },
       {
@@ -211,7 +213,7 @@ export const en: SiteCopy = {
       },
       {
         q: 'What has been burned?',
-        a: '{burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address with no private key. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
+        a: '{burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address whose private key nobody knows and nobody can derive. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
       },
       {
         q: 'Where is the community?',
@@ -236,6 +238,7 @@ export const en: SiteCopy = {
       '$IF is a meme coin with no intrinsic value and no expectation of financial return. Nothing here is financial advice. Do your own research.',
     builtBy: 'Everybody is the dev.',
     reduceMotion: 'Reduce motion',
+    navLabel: 'Footer',
   },
 
   pages: {
@@ -251,6 +254,10 @@ export const en: SiteCopy = {
       count: 'memes',
     },
     brand: {
+      eyebrow: 'For anyone making $IF things',
+      fileNote: 'ZIP · 55 MB · see the licence terms in the kit',
+      contractLabel: 'Contract',
+      questions: 'Questions, or want something that is not in here?',
       title: 'Brand',
       heading: { lead: 'The marks,', accent: 'and how to use them.' },
       intro:
@@ -266,9 +273,11 @@ export const en: SiteCopy = {
       ],
     },
     stats: {
+      chartTypeLabel: 'Chart controls',
       title: 'Stats',
       heading: { lead: 'Every number,', accent: 'live.' },
-      intro: 'Price, liquidity, supply and the burn — read straight from Robinhood Chain.',
+      intro:
+        'Supply and the burn read straight from Robinhood Chain; price and liquidity from the public market APIs, every call shown below.',
       sourceNote:
         'Price, liquidity and volume come from DexScreener; holders and concentration from GeckoTerminal; the burn is read straight from the chain. Everything refreshes on its own while this tab is open.',
       poolLabel: 'Main pool',
@@ -503,7 +512,7 @@ export const en: SiteCopy = {
       inputLabel: 'Wallet address',
       check: 'Check it',
       privacy:
-        'A balance is public data on a public ledger, so this just reads it — the same thing a block explorer does. The address is typed by you, never requested from a wallet. Nothing is stored, and nothing is sent anywhere except the chain.',
+        "The address is typed by you, never requested from a wallet, and is sent only to the chain's public RPC. The price used to value it comes from DexScreener with no address attached. Nothing is stored.",
       download: 'Download card',
       postOnX: 'Post on X',
       shareText: 'I am holding {tokens} {symbol}.\n\nStill asking.',

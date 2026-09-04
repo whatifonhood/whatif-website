@@ -7,7 +7,7 @@ $IF 在任何有意义的层面上都没有选择过自己的公链。它由一�
 
 ## Robinhood Chain 是什么
 
-Robinhood Chain 是一条以太坊 layer 2，由 Robinhood 与 Offchain Labs 基于 Arbitrum 技术栈构建，结算到以太坊。公共主网于 1 July 2026 开放，在 Robinhood 于伦敦举办的 “The World is Flat” 主题演讲上宣布，此前的测试网已处理超过 2 亿笔交易。
+Robinhood Chain 是一条以太坊 layer 2，由 Robinhood 与 Offchain Labs 基于 Arbitrum 技术栈构建，结算到以太坊。公共主网于 2026 年 7 月 1 日开放，在 Robinhood 于伦敦举办的 “The World is Flat” 主题演讲上宣布，此前的测试网已处理超过 2 亿笔交易。
 
 它运行在 Arbitrum Expansion Program 授权之下，该授权将协议净收入的 10% 导向 Arbitrum：8% 给 ArbitrumDAO，2% 给 Developer Guild。
 
@@ -18,7 +18,7 @@ Robinhood Chain 是一条以太坊 layer 2，由 Robinhood 与 Offchain Labs 基
 | 字段       | 取值                                              |
 | ---------- | ------------------------------------------------- |
 | Chain ID   | `4663`（`0x1237`）                                |
-| Gas 代币   | ETH，2 September 2026 快照时基础费为 `0.366` gwei |
+| Gas 代币   | ETH，2026 年 9 月 2 日快照时基础费为 `0.366` gwei |
 | 出块时间   | 实测 `101.3` ms，`100,000` 个区块历时 `10,134` 秒 |
 | RPC        | `https://rpc.mainnet.chain.robinhood.com`         |
 | 区块浏览器 | `https://robinhoodchain.blockscout.com`           |
@@ -29,7 +29,7 @@ Robinhood Chain 是一条以太坊 layer 2，由 Robinhood 与 Offchain Labs 基
 
 设计目标是代币化的现实世界资产：重构为代币化债务证券的 Stock Tokens、一个专用的 Uniswap AMM、用于借贷的 Morpho，以及由 Paxos 发行的 USDG 作为美元一端。
 
-最先来的是迷因币。CoinDesk 在 July 量化过这个落差：当时链上的代币化现实世界资产价值约 $12.66M，而单是迷因币 CASHCAT 的峰值就大约是它的十二倍。
+最先来的是迷因币。CoinDesk 在 7 月量化过这个落差：当时链上的代币化现实世界资产价值约 $12.66M，而单是迷因币 CASHCAT 的峰值就大约是它的十二倍。
 
 $IF 处在这个落差的迷因币一侧。本白皮书不会把它描述成基础设施。
 

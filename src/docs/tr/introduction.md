@@ -27,7 +27,7 @@ Bunlar tüm projenin taşıyıcı iddialarıdır. Her biri bir dakikadan kısa s
 
 1. **Arz bir milyarda sabittir.** `totalSupply()` tam olarak bunu döndürür ve bir mint fonksiyonu yoktur.
 2. **Sözleşmenin sahibi yoktur.** `owner()` çağrısı, biz sahipliği bıraktığımız için revert etmiyor — o fonksiyon hiçbir zaman orada olmadığı için revert ediyor. Kimse onu durduramaz, yükseltemez ya da içine mint edemez.
-3. **Token'lar kalıcı olarak yakıldı.** Özel anahtarı var olmayan ve oluşturulamayacak bir adreste duruyorlar.
+3. **Token'lar kalıcı olarak yakıldı.** Kimsenin özel anahtarını tutmadığı ve hiçbir bilgisayarın bulamayacağı bir adreste duruyorlar.
 
 Bu sitedeki diğer her şey ya bu üç şeyden birinin yeniden ifadesidir ya da onlara bakmak için bir araçtır.
 

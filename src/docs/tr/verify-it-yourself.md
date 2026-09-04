@@ -75,7 +75,7 @@ curl -s -X POST https://rpc.mainnet.chain.robinhood.com \
        "params":["0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c"]}'
 ```
 
-O hash lansmanın kendisi. Tek bir işlem, on sekiz log, ve $IF'i var eden her şey bunun içinde oldu. Okunacak log, düğümün döndürdüğü listedeki 14 numaralı olan: token sözleşmesinde bir `Transfer`, `from` havuz `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. `data` alanı 10^18'e bölündüğünde 110,436,131.71 $IF eder; bu da arzın 11.04%'ü ve başka kimse işlem yapamadan atomik olarak satın alınmıştır.
+O hash lansmanın kendisi. Tek bir işlem, on sekiz log, ve $IF'i var eden her şey bunun içinde oldu. Okunacak log, düğümün döndürdüğü listede 14 numaralı olan (düğüm sıfırdan sayar; birden sayan bir gezgin aynı logu 15 olarak gösterir): token sözleşmesinde bir `Transfer`, `from` havuz `0x39A200271525E9641e799127bdAB299DAeF21953`, `to` deployer `0x84F8E5a324466Deb7447048C014CF0245ce04afA`. `data` alanı 10^18'e bölündüğünde 110,436,131.71 $IF eder; bu da arzın 11.04%'ü ve başka kimse işlem yapamadan atomik olarak satın alınmıştır.
 
 O sırada yürürlükte olan 2% cüzdan üst sınırı geçerli olmadı, çünkü sözleşme deployer'ı ismen muaf tutuyordu. [Lansman](/tr/docs/the-launch/) on sekiz logun geri kalanını tek tek geziyor.
 
@@ -131,7 +131,7 @@ Pencereyi genişletirseniz düğüm yanıt vermek yerine sizi reddeder, bu yüzd
 
 Kilit sözleşmesindeki `protocolFeeShare`, bölüşümü belirleyen sayıdır. Onu, bir üstteki bölümdekiyle aynı sözleşme olan kilit sözleşmesinde gezginin read sekmesinden okuyun. `100` döndürüyor.
 
-Bu, kilitli pozisyondan süpürülen $IF'in tamamının protokol tarafına gittiği ve yaratıcının token bacağındaki zincir üstü payının sıfır olduğu anlamına geliyor. Ücret sözleşmesinin sonrasında bununla ne yaptığı — ki 12 July 2026'dan bu yana bunun her token'ını yakmak olmuştur — o sözleşmenin kendi davranışıdır ve bu sayı onu sabitlemez. Ücret sözleşmesinin kaynak kodu hiç yayımlanmadı, dolayısıyla o adım hiçbir şekilde okunamaz. Yalnızca izlenebilir.
+Bu, kilitli pozisyondan süpürülen $IF'in tamamının protokol tarafına gittiği ve yaratıcının token bacağındaki zincir üstü payının sıfır olduğu anlamına geliyor. Ücret sözleşmesinin sonrasında bununla ne yaptığı — ki 12 Temmuz 2026'dan bu yana bunun her token'ını yakmak olmuştur — o sözleşmenin kendi davranışıdır ve bu sayı onu sabitlemez. Ücret sözleşmesinin kaynak kodu hiç yayımlanmadı, dolayısıyla o adım hiçbir şekilde okunamaz. Yalnızca izlenebilir.
 
 Bunu bir okuma olarak alın, bir söz olarak değil. Kilit sözleşmesinin sahibi bu sayıyı değiştirebilir ve protokol tarafının ödendiği adresi de kimseye sormadan değiştirebilir. İkisinden biri değişirse, bunu ilk burada görürsünüz.
 

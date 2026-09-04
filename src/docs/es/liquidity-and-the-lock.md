@@ -5,7 +5,7 @@ summary: Una posición del pool principal no la puede retirar nadie; la otra mit
 
 $IF cotiza en un pool de Uniswap V3 que creó el launchpad en la misma transacción que creó el token. Una posición de ese pool está bloqueada de una forma que nadie puede deshacer. El resto de la profundidad no lo está. Esta página separa las dos cosas, porque esa diferencia es todo lo que suele estar haciendo la frase "liquidez bloqueada" cuando alguien la dice.
 
-Todas las cifras de abajo se leyeron de la cadena el 2 September 2026, alrededor del bloque `52,582,784`. Los saldos de los pools se mueven. El bloqueo no.
+Todas las cifras de abajo se leyeron de la cadena el 2 de septiembre de 2026, alrededor del bloque `52,582,784`. Los saldos de los pools se mueven. El bloqueo no.
 
 ## La posición de lanzamiento
 
@@ -46,7 +46,7 @@ $IF tiene liquidez en siete pools activos, que suman unos $446,000 entre todos. 
 | Uniswap V4 IF/ETH  | $56      | $42         | 28 Aug 2026 |
 | Uniswap V4 IF/ETH  | $8       | $4          | 27 Aug 2026 |
 
-La segunda fila es la interesante. El pool IF/USDG en Uniswap V3 lo creó el 6 August alguien ajeno al launchpad, y ahora concentra alrededor de un tercio de todo el volumen de $IF, contra la stablecoin en dólares propia de Robinhood Chain. Nada de eso está bloqueado. Es liquidez de la comunidad en sentido literal: una persona eligió ponerla ahí y puede elegir sacarla.
+La segunda fila es la interesante. El pool IF/USDG en Uniswap V3 lo creó el 6 de agosto alguien ajeno al launchpad, y ahora concentra alrededor de un tercio de todo el volumen de $IF, contra la stablecoin en dólares propia de Robinhood Chain. Nada de eso está bloqueado. Es liquidez de la comunidad en sentido literal: una persona eligió ponerla ahí y puede elegir sacarla.
 
 El bloqueo cubre una posición en un pool. No tiene nada que ver con los otros seis.
 

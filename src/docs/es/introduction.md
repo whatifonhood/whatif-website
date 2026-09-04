@@ -27,7 +27,7 @@ Estas son las afirmaciones que sostienen todo el proyecto. Cada una se puede com
 
 1. **El suministro está fijado en mil millones.** `totalSupply()` devuelve exactamente eso, y no hay función de mint.
 2. **El contrato no tiene dueño.** `owner()` no revierte porque hayamos renunciado a la propiedad — revierte porque esa función nunca estuvo ahí. Nadie puede pausarlo, actualizarlo ni acuñar tokens en él.
-3. **Se han quemado tokens, de forma permanente.** Están en una dirección cuya clave privada no existe y no se puede construir.
+3. **Se han quemado tokens, de forma permanente.** Están en una dirección cuya clave privada nadie tiene y ningún ordenador puede encontrar.
 
 Todo lo demás en este sitio es o bien una de esas tres cosas dicha de otra forma, o una herramienta para mirarlas.
 

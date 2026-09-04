@@ -7,11 +7,11 @@ Everything on one page, for copying and for checking.
 
 ## Addresses
 
-| What                         | Address                                      |
-| ---------------------------- | -------------------------------------------- |
-| $IF contract                 | `0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1` |
-| IF/WETH pool, Uniswap V3, 1% | `0x39A200271525E9641e799127bdAB299DAeF21953` |
-| Burn address                 | `0x000000000000000000000000000000000000dEaD` |
+| What                         | Address                                                                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| $IF contract                 | [`0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1`](https://robinhoodchain.blockscout.com/token/0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1)   |
+| IF/WETH pool, Uniswap V3, 1% | [`0x39A200271525E9641e799127bdAB299DAeF21953`](https://robinhoodchain.blockscout.com/address/0x39A200271525E9641e799127bdAB299DAeF21953) |
+| Burn address                 | [`0x000000000000000000000000000000000000dEaD`](https://robinhoodchain.blockscout.com/address/0x000000000000000000000000000000000000dEaD) |
 
 The contract address is the one that matters. Check the last six characters against this page or the explorer before you buy anything — see [How to buy](/docs/how-to-buy/).
 
@@ -19,13 +19,13 @@ The IF/WETH 1% pool is the main pool — created in the launch transaction, and 
 
 ## The launch and the lock
 
-| What                          | Value                                                                |
-| ----------------------------- | -------------------------------------------------------------------- |
-| Launch transaction            | `0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c` |
-| Launch block, L2              | `6657668`, 11 July 2026, 04:32:42 UTC                                |
-| Launch liquidity position     | Uniswap V3 NFT `70641`, ticks `[-887200, 204200]`                    |
-| Holder of NFT `70641`         | NOXA's `LaunchLocker`, per logs 11 and 12 of the launch transaction  |
-| Deployer, who sent the launch | `0x84F8E5a324466Deb7447048C014CF0245ce04afA`                         |
+| What                          | Value                                                                                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Launch transaction            | [`0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c`](https://robinhoodchain.blockscout.com/tx/0x008893650598c52ba959de3f82ad5b661c022a085ffcbf7db9b6234f6c3b287c) |
+| Launch block, L2              | `6657668`, 11 July 2026, 04:32:42 UTC                                                                                                                                               |
+| Launch liquidity position     | Uniswap V3 NFT `70641`, ticks `[-887200, 204200]`                                                                                                                                   |
+| Holder of NFT `70641`         | NOXA's `LaunchLocker`, per logs 11 and 12 of the launch transaction                                                                                                                 |
+| Deployer, who sent the launch | [`0x84F8E5a324466Deb7447048C014CF0245ce04afA`](https://robinhoodchain.blockscout.com/address/0x84F8E5a324466Deb7447048C014CF0245ce04afA)                                            |
 
 Position `70641` is the permanently locked one. [The launch](/docs/the-launch/) reads the transaction log by log; [Liquidity and the lock](/docs/liquidity-and-the-lock/) says what the lock does and does not cover.
 
@@ -33,17 +33,17 @@ Position `70641` is the permanently locked one. [The launch](/docs/the-launch/) 
 
 NOXA is the launchpad that stamped out the token and still operates the burn. Who controls these addresses is not established by any source we have reviewed: the locker's owner is a bare wallet, and the fee contract is unverified bytecode deployed by it.
 
-| What                                                         | Address                                      |
-| ------------------------------------------------------------ | -------------------------------------------- |
-| Fee contract, which every burn has come from                 | `0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417` |
-| Original fee wallet, paid the 20% $IF cut on 11–12 July 2026 | `0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b` |
-| Owner of the `LaunchLocker`                                  | `0x7E035Fb048a31e0481b88074557415b1C187242B` |
+| What                                                         | Address                                                                                                                                  |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Fee contract, which every burn has come from                 | [`0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417`](https://robinhoodchain.blockscout.com/address/0x9eFdC1A8e6E94f16A228e44f3025E1f346EE0417) |
+| Original fee wallet, paid the 20% $IF cut on 11–12 July 2026 | [`0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b`](https://robinhoodchain.blockscout.com/address/0x71f2F1c2dc94cDaBFE29Cb355119f8683AE0969b) |
+| Owner of the `LaunchLocker`                                  | [`0x7E035Fb048a31e0481b88074557415b1C187242B`](https://robinhoodchain.blockscout.com/address/0x7E035Fb048a31e0481b88074557415b1C187242B) |
 
 [How the burn works](/docs/how-the-burn-works/) explains what each of them does in the mechanism.
 
 ## The token
 
-|                |                          |
+| Field          | Value                    |
 | -------------- | ------------------------ |
 | Name, on-chain | `What If`                |
 | Symbol         | `IF`                     |
@@ -59,7 +59,7 @@ The contract's own `name` and `symbol` are `What If` and `IF`. This paper writes
 
 ## The chain
 
-|            |                                           |
+| Field      | Value                                     |
 | ---------- | ----------------------------------------- |
 | Network    | Robinhood Chain                           |
 | Chain ID   | `4663` (`0x1237`)                         |

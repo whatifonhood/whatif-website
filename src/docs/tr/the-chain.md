@@ -7,7 +7,7 @@ $IF, zincirini anlamlı hiçbir biçimde seçmedi. Bir launchpad tarafından, o 
 
 ## Robinhood Chain nedir
 
-Robinhood Chain, Robinhood'un Offchain Labs ile birlikte Arbitrum yığını üzerine kurduğu, Ethereum'a mutabakat veren bir Ethereum layer 2 ağı. Açık ana ağ, 200 milyondan fazla işlem işlemiş bir test ağının ardından, Robinhood'un Londra'daki "The World is Flat" sunumunda duyurularak 1 July 2026 tarihinde açıldı.
+Robinhood Chain, Robinhood'un Offchain Labs ile birlikte Arbitrum yığını üzerine kurduğu, Ethereum'a mutabakat veren bir Ethereum layer 2 ağı. Açık ana ağ, 200 milyondan fazla işlem işlemiş bir test ağının ardından, Robinhood'un Londra'daki "The World is Flat" sunumunda duyurularak 1 Temmuz 2026 tarihinde açıldı.
 
 Arbitrum Expansion Program lisansı altında çalışıyor; bu lisans protokolün net gelirinin 10% kadarını Arbitrum'a yönlendiriyor: 8% ArbitrumDAO'ya, 2% Developer Guild'e.
 
@@ -15,13 +15,13 @@ Robinhood'un kurduğu bir zincir üzerinde çalışmak, Robinhood ile bir ilişk
 
 ## Ona bağlanmak için gereken bilgiler
 
-| Alan         | Değer                                                             |
-| ------------ | ----------------------------------------------------------------- |
-| Chain ID     | `4663` (`0x1237`)                                                 |
-| Gaz token'ı  | ETH, 2 September 2026 anlık görüntüsünde temel ücret `0.366` gwei |
-| Blok süresi  | ölçülen `101.3` ms, `10,134` saniyede `100,000` blok üzerinden    |
-| RPC          | `https://rpc.mainnet.chain.robinhood.com`                         |
-| Blok gezgini | `https://robinhoodchain.blockscout.com`                           |
+| Alan         | Değer                                                          |
+| ------------ | -------------------------------------------------------------- |
+| Chain ID     | `4663` (`0x1237`)                                              |
+| Gaz token'ı  | ETH, 2 Eylül 2026 anlık görüntüsünde temel ücret `0.366` gwei  |
+| Blok süresi  | ölçülen `101.3` ms, `10,134` saniyede `100,000` blok üzerinden |
+| RPC          | `https://rpc.mainnet.chain.robinhood.com`                      |
+| Blok gezgini | `https://robinhoodchain.blockscout.com`                        |
 
 Akılda tutulması gereken şey blok süresi. Bloklar saniyede kabaca on kez geliyor; aşağıdaki ilk tuhaflığı bariz olmaktan çıkarıp kafa karıştırıcı yapan da bu.
 
@@ -29,7 +29,7 @@ Akılda tutulması gereken şey blok süresi. Bloklar saniyede kabaca on kez gel
 
 Tasarım hedefi tokenlaştırılmış gerçek dünya varlıklarıydı: tokenlaştırılmış borçlanma araçları olarak yeniden yapılandırılmış Stock Tokens, kendine ait bir Uniswap AMM'si, borç verme için Morpho ve dolar ayağı olarak Paxos'un ihraç ettiği USDG.
 
-İlk gelen ise meme coin'ler oldu. CoinDesk bu farkı July ayında ölçtü; o sırada zincirdeki tokenlaştırılmış gerçek dünya varlıkları yaklaşık $12.66M değerindeydi ve tek başına CASHCAT meme coin'i bunun kabaca on iki katında zirve yapmıştı.
+İlk gelen ise meme coin'ler oldu. CoinDesk bu farkı Temmuz ayında ölçtü; o sırada zincirdeki tokenlaştırılmış gerçek dünya varlıkları yaklaşık $12.66M değerindeydi ve tek başına CASHCAT meme coin'i bunun kabaca on iki katında zirve yapmıştı.
 
 $IF, bu farkın meme coin tarafında. Bu teknik doküman onu altyapı diye tarif edecek değil.
 
