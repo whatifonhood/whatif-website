@@ -1,6 +1,7 @@
 ---
 title: La cadena en la que funciona
 summary: Qué es Robinhood Chain, para qué se construyó y dos rarezas que hacen que los propios números de $IF parezcan equivocados hasta que las conoces.
+snapshot: '2026-09-02'
 ---
 
 $IF no eligió su cadena en ningún sentido significativo. Lo estampó un launchpad, en la red en la que ese launchpad resultaba funcionar. Pero la cadena decide qué puedes comprobar, qué herramientas te mostrarán tu saldo y cómo hay que leer dos de los números de este libro blanco. Así que vale la pena describirla con precisión.

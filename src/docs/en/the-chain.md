@@ -1,6 +1,7 @@
 ---
 title: The chain it runs on
 summary: What Robinhood Chain is, what it was built for, and two quirks that make $IF's own numbers look wrong until you know about them.
+snapshot: '2026-09-02'
 ---
 
 $IF did not choose its chain in any meaningful sense. It was stamped out by a launchpad, on the network that launchpad happened to run on. But the chain decides what you can check, which tools will show you your balance, and how two of the numbers in this paper have to be read. So it is worth describing precisely.

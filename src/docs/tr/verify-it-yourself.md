@@ -1,6 +1,7 @@
 ---
 title: Kendiniz doğrulayın
 summary: Her sayının arkasındaki tam komutlar; böylece hiçbiri için sözümüze güvenmek zorunda kalmazsınız.
+snapshot: '2026-09-02'
 ---
 
 Ana sayfa şunu söylüyor: _bir web sitesine güvenmeyin — bu site dahil._ Bu, o sözü uygulanabilir kılan sayfa.

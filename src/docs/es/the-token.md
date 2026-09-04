@@ -1,6 +1,7 @@
 ---
 title: El token
 summary: El contrato, la cadena, el pool y lo que cada una de esas cosas significa en realidad.
+snapshot: '2026-09-02'
 ---
 
 $IF es un token ERC-20 desplegado en Robinhood Chain. Todo lo que sigue es público y cualquiera con conexión a internet puede leerlo.

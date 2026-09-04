@@ -1,6 +1,7 @@
 ---
 title: Yakım gerçekte nasıl işliyor
 summary: Üçüncü bir tarafça işletilen otomatik bir ücret motoru $IF'i neredeyse her gün yakıyor ve o taraf ne zaman karar verirse durabilir.
+snapshot: '2026-09-02'
 ---
 
 Bu teknik doküman uzun süre boyunca yakımı besleyen bir ücret olmadığını söyledi. Bu yanlıştı ve düzeltme kendi sayfasına ihtiyaç duyacak kadar büyük. Aşağıdaki her rakam zincirden 2 Eylül 2026 tarihinde, `52,582,784` bloğunda ya da civarında okundu.

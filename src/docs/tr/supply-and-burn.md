@@ -1,6 +1,7 @@
 ---
 title: Arz ve yakım
 summary: Bir milyar, sabit, ölçülebilir bir miktarı kalıcı olarak yok edilmiş.
+snapshot: '2026-09-02'
 ---
 
 $IF'in para politikasının tamamını iki sayı anlatır ve ikisi de burada iddia edilmek yerine zincirden okunur.

@@ -3,6 +3,7 @@ import Docs from '../../layouts/Docs.astro';
 import type { Locale } from '../../config/site.ts';
 import { getCopy } from '../../content/index.ts';
 import { getDocsContent, getDocsPages } from '../../lib/docs.ts';
+import { formatDate } from '../../lib/format.ts';
 
 /**
  * One page of the white paper, in one language.
@@ -35,6 +36,14 @@ const Content = getDocsContent(locale, slug);
   </p>
   <h1 class="display-heading mt-3 text-3xl sm:text-4xl">{page?.title}</h1>
   {page?.summary && <p class="mt-4 text-lg leading-relaxed text-muted">{page.summary}</p>}
+  {
+    /* Any page quoting a percentage says which day it was read. */
+    page?.snapshot && (
+      <p class="docs-snapshot">
+        {labels.figuresAsOf.replace('{date}', formatDate(page.snapshot, locale))}
+      </p>
+    )
+  }
 
   <div class="docs-prose mt-10">
     {Content && <Content />}

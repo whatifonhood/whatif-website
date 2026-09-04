@@ -1,6 +1,7 @@
 ---
 title: Supply and the burn
 summary: One billion, fixed, with a measurable amount permanently destroyed.
+snapshot: '2026-09-02'
 ---
 
 Two numbers describe the whole of $IF's monetary policy, and both are read from the chain rather than asserted here.

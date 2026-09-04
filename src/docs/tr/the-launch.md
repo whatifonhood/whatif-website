@@ -1,6 +1,7 @@
 ---
 title: Lansman ve lansmanı yapan
 summary: Tek bir işlem; token'ı, havuzu, kilidi ve onu gönderen kişi için 11%'lik bir alımı yarattı.
+snapshot: '2026-09-02'
 ---
 
 $IF, 11 Temmuz 2026 tarihli tek bir işlemle başladı. O işlem arzı mint etti, havuzu oluşturdu, lansman likidite pozisyonunu kilitledi ve kendisini gönderen adrese token'ların 11%'inden biraz fazlasını verdi; hepsi atomik olarak. Bu sayfa onu sırayla geri okuyor, çünkü bir şüphecinin ilk kontrol etmesi gereken kayıt parçası budur ve gösterdiklerinin bir kısmı iç açıcı değildir.

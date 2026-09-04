@@ -1,6 +1,7 @@
 ---
 title: Üzerinde çalıştığı zincir
 summary: Robinhood Chain nedir, ne için kuruldu ve $IF'in kendi sayılarını, siz onları öğrenene kadar yanlış gösteren iki tuhaflık.
+snapshot: '2026-09-02'
 ---
 
 $IF, zincirini anlamlı hiçbir biçimde seçmedi. Bir launchpad tarafından, o launchpad'in çalıştığı ağın üzerinde basıldı. Ama neyi kontrol edebileceğinize, hangi araçların size bakiyenizi göstereceğine ve bu teknik dokümandaki iki sayının nasıl okunması gerektiğine zincir karar veriyor. Bu yüzden tam olarak tarif etmeye değer.

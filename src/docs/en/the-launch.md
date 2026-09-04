@@ -1,6 +1,7 @@
 ---
 title: The launch, and the launcher
 summary: One transaction created the token, the pool, the lock and an 11% buy for the person who sent it.
+snapshot: '2026-09-02'
 ---
 
 $IF began as a single transaction on 11 July 2026. That transaction minted the supply, created the pool, locked the launch liquidity position and handed the address that sent it just over 11% of the tokens, all atomically. This page reads it back in order, because it is the part of the record a sceptic should check first, and because some of what it shows is not flattering.

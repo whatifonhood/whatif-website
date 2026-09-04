@@ -1,6 +1,7 @@
 ---
 title: Liquidity, and what is actually locked
 summary: One position in the main pool cannot be withdrawn by anyone; the other half of the depth can leave in a block.
+snapshot: '2026-09-02'
 ---
 
 $IF trades on a Uniswap V3 pool that was created by the launchpad in the same transaction that created the token. One position in that pool is locked in a way nobody can undo. The rest of the depth is not. This page separates the two, because that difference is the whole of what the phrase "liquidity locked" is usually doing when somebody says it.

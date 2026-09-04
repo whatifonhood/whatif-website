@@ -24,6 +24,8 @@ export interface DocsPage {
   locale: Locale;
   title: string;
   summary: string;
+  /** The day the page's figures were read, YYYY-MM-DD. Required where a page quotes a percentage. */
+  snapshot?: string;
   /** Position in the whole paper, 1-based. Shown in the sidebar. */
   number: number;
   /** The group's id; the label for it lives in src/content/<language>.ts. */
@@ -31,7 +33,13 @@ export interface DocsPage {
   headings: { depth: number; slug: string; text: string }[];
 }
 
-type DocModule = MarkdownInstance<{ title?: string; summary?: string }>;
+type DocModule = MarkdownInstance<{ title?: string; summary?: string; snapshot?: string | Date }>;
+
+/** YAML reads an unquoted 2026-09-02 as a Date; the pages quote it, but be sure. */
+function asIsoDate(value: unknown): string | undefined {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
+}
 
 const modules = import.meta.glob<DocModule>('../docs/*/*.md', { eager: true });
 
@@ -62,6 +70,7 @@ export function getDocsPages(locale: Locale): DocsPage[] {
       locale,
       title: module?.frontmatter?.title ?? slug,
       summary: module?.frontmatter?.summary ?? '',
+      snapshot: asIsoDate(module?.frontmatter?.snapshot),
       number: index + 1,
       group,
       // Only H2s: an "on this page" list that also carries H3s stops being a

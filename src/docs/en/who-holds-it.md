@@ -1,6 +1,7 @@
 ---
 title: Who holds it
 summary: The largest wallets, named where they can be identified.
+snapshot: '2026-09-02'
 ---
 
 "Does one wallet hold everything" is the first serious question anyone should ask about a token, and a percentage is not an answer to it. The [stats page](/stats/) publishes the fifteen largest holdings with every row linked to the address.

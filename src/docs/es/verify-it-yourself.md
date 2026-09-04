@@ -1,6 +1,7 @@
 ---
 title: Verifícalo tú mismo
 summary: Los comandos exactos detrás de cada número, para que nunca tengas que creernos ninguno.
+snapshot: '2026-09-02'
 ---
 
 La página de inicio dice _no confíes en una página web — tampoco en esta._ Esta es la página que lo convierte en algo que puedes hacer.

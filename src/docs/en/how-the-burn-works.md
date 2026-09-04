@@ -1,6 +1,7 @@
 ---
 title: How the burn actually works
 summary: An automated fee engine run by a third party burns $IF on most days, and it can stop whenever that party decides.
+snapshot: '2026-09-02'
 ---
 
 For a long time this paper said there was no fee feeding the burn. That was wrong, and the correction is large enough to need its own page. Every figure below was read from the chain on 2 September 2026, at or around block `52,582,784`.

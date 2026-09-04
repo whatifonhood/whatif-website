@@ -1,6 +1,7 @@
 ---
 title: İddia etmediklerimiz
 summary: Burada görmeyi bekleyeceğiniz cümleler ve her birinin neden eksik olduğu.
+snapshot: '2026-09-02'
 ---
 
 Bu teknik dokümanın büyük bölümü $IF'in ne olduğuyla ilgili. Bu sayfa ise onun negatif alanı, çünkü bu piyasada bir projenin yapmaktan kaçındığı iddialar, yaptıklarından daha çok şey anlatır.

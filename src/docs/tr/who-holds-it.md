@@ -1,6 +1,7 @@
 ---
 title: Kimler tutuyor
 summary: En büyük cüzdanlar, kimliği belirlenebildiği yerde adlarıyla.
+snapshot: '2026-09-02'
 ---
 
 "Her şeyi tek bir cüzdan mı tutuyor" sorusu, bir token hakkında herkesin sorması gereken ilk ciddi sorudur ve bir yüzde bunun cevabı değildir. [Veriler sayfası](/tr/stats/) en büyük on beş bakiyeyi, her satır kendi adresine bağlanmış olarak yayımlar.

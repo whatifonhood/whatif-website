@@ -1,6 +1,7 @@
 ---
 title: El lanzamiento, y el lanzador
 summary: Una transacción creó el token, el pool, el bloqueo y una compra del 11% para quien la envió.
+snapshot: '2026-09-02'
 ---
 
 $IF empezó como una sola transacción el 11 de julio de 2026. Esa transacción acuñó el suministro, creó el pool, bloqueó la posición de liquidez del lanzamiento y entregó a la dirección que la envió algo más del 11% de los tokens, todo de forma atómica. Esta página la relee en orden, porque es la parte del registro que un escéptico debería comprobar primero, y porque parte de lo que muestra no es favorecedor.

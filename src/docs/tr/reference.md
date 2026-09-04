@@ -1,6 +1,7 @@
 ---
 title: Referans
 summary: Adresler, bağlantılar ve bu teknik dokümanın kullandığı kelimeler.
+snapshot: '2026-09-02'
 ---
 
 Kopyalamak ve kontrol etmek için her şey tek sayfada.

@@ -1,6 +1,7 @@
 ---
 title: Verify it yourself
 summary: The exact commands behind every number, so you never have to take our word for one.
+snapshot: '2026-09-02'
 ---
 
 The landing page says _don't trust a website — including this one._ This is the page that makes that actionable.

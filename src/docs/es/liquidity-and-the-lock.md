@@ -1,6 +1,7 @@
 ---
 title: La liquidez, y qué está realmente bloqueado
 summary: Una posición del pool principal no la puede retirar nadie; la otra mitad de la profundidad puede irse en un bloque.
+snapshot: '2026-09-02'
 ---
 
 $IF cotiza en un pool de Uniswap V3 que creó el launchpad en la misma transacción que creó el token. Una posición de ese pool está bloqueada de una forma que nadie puede deshacer. El resto de la profundidad no lo está. Esta página separa las dos cosas, porque esa diferencia es todo lo que suele estar haciendo la frase "liquidez bloqueada" cuando alguien la dice.

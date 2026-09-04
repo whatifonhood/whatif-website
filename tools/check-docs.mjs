@@ -77,6 +77,15 @@ for (const locale of LOCALES) {
     const text = read(locale, slug);
     const front = frontmatter(text);
     const source = read('en', slug);
+    // A page quoting a percentage carries the day it was read, so the figure
+    // can never look current when it is not. Rendered under the title.
+    if (/\d%/.test(text.replace(/^---[\s\S]*?---/, ''))) {
+      const snapshot = field(front, 'snapshot')?.replace(/^['"]|['"]$/g, '');
+      if (!snapshot) problems.push(`${locale}/${slug}: quotes a percentage with no snapshot: date`);
+      else if (!/^\d{4}-\d{2}-\d{2}$/.test(snapshot)) {
+        problems.push(`${locale}/${slug}: snapshot "${snapshot}" is not YYYY-MM-DD`);
+      }
+    }
     if (locale !== 'en' && ENGLISH_MONTH.test(text)) {
       problems.push(`${locale}/${slug}: an English month name in a translated page`);
     }

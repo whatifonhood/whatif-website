@@ -62,21 +62,50 @@ const next = index >= 0 ? pages[index + 1] : undefined;
         Contents, twice: a disclosure on a phone and a column from lg up. See
         the note in DocsNav.astro for why this is not one <details>.
       -->
-      <details class="docs-nav-mobile lg:hidden">
-        <summary class="docs-nav-summary">
-          <span>{labels.contents}</span>
-          <Icons name="chevron-down" size={14} />
-        </summary>
-        <div class="pt-5">
-          <DocsNav locale={locale} slug={slug} />
-        </div>
-      </details>
+      {
+        /* Not on the contents page itself, which is the same list. */
+        slug && (
+          <details class="docs-nav-mobile lg:hidden">
+            <summary class="docs-nav-summary">
+              <span>{labels.contents}</span>
+              <Icons name="chevron-down" size={14} />
+            </summary>
+            <div class="pt-5">
+              <DocsNav locale={locale} slug={slug} />
+            </div>
+          </details>
+        )
+      }
+      {
+        /* On this page, for phones: the column version below only exists from xl. */
+        current && current.headings.length > 1 && (
+          <details class="docs-toc-mobile lg:hidden">
+            <summary class="docs-nav-summary docs-toc-summary">
+              <span>{labels.onThisPage}</span>
+              <Icons name="chevron-down" size={14} />
+            </summary>
+            <ul class="space-y-1 pt-4 pb-2">
+              {current.headings.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`} class="docs-toc-link docs-toc-link-mobile">
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
 
       <div class="docs-nav hidden lg:block">
         <DocsNav locale={locale} slug={slug} />
       </div>
 
-      <article class="docs-body min-w-0 flex-1 py-12">
+      <article
+        class="docs-body min-w-0 flex-1 py-12"
+        data-copy-label={copy.numbers.copy}
+        data-copied-label={copy.numbers.copied}
+      >
         <slot />
 
         {
@@ -129,12 +158,18 @@ const next = index >= 0 ? pages[index + 1] : undefined;
   <Footer locale={locale} />
 </BaseLayout>
 
+<script>
+  import { initDocsCopy } from '../scripts/docs-copy.ts';
+  initDocsCopy();
+</script>
+
 <style is:global>
   /* ------------------------------------------------------------------ docs
      A documentation layout: contents on the left, the page in the middle,
      what is on the page to the right. Only the middle column exists on a
      phone; the other two fold away rather than overlaying the reading. */
-  .docs-nav-mobile {
+  .docs-nav-mobile,
+  .docs-toc-mobile {
     border-bottom: 1px solid var(--color-line);
     padding-block: 0.75rem;
   }
@@ -158,7 +193,8 @@ const next = index >= 0 ? pages[index + 1] : undefined;
   .docs-nav-summary::-webkit-details-marker {
     display: none;
   }
-  .docs-nav-mobile[open] .docs-nav-summary svg {
+  .docs-nav-mobile[open] .docs-nav-summary svg,
+  .docs-toc-mobile[open] .docs-toc-summary svg {
     transform: rotate(180deg);
   }
   .docs-nav-summary svg {
@@ -175,18 +211,13 @@ const next = index >= 0 ? pages[index + 1] : undefined;
     }
 
     /*
-   * The contents column scrolls without showing a scrollbar.
-   *
-   * It is a tall sticky list beside the reading column, and a grey native
-   * scrollbar sitting against the text is the loudest thing on the page for
-   * something nobody needs to look at. Hidden, not disabled: the wheel, a
-   * touch drag and the keyboard all still scroll it.
-   */
+     * The contents column scrolls with a thin scrollbar in the site's own
+     * colours. It used to hide the scrollbar entirely, and with sixteen
+     * chapters the last four sat below a 836px box with nothing to say so.
+     */
     .docs-nav {
-      scrollbar-width: none;
-    }
-    .docs-nav::-webkit-scrollbar {
-      display: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-line) transparent;
     }
 
     /* The link back to the front of the paper. */
@@ -223,10 +254,6 @@ const next = index >= 0 ? pages[index + 1] : undefined;
       .docs-home {
         min-height: 44px;
       }
-    }
-
-    .docs-link {
-      min-height: 0;
     }
   }
 
@@ -277,10 +304,36 @@ const next = index >= 0 ? pages[index + 1] : undefined;
   .docs-link[aria-current='page'] .docs-number {
     color: var(--color-lime);
   }
+  /* After the base rule, so it wins: 44px rows are for thumbs, not mice. */
+  @media (pointer: fine) {
+    .docs-link {
+      min-height: 0;
+    }
+  }
 
-  /* The reading column. Measure capped near 70 characters. */
+  /* The reading column: ~75 characters a line at the desktop text size. */
   .docs-body {
-    max-width: 46rem;
+    max-width: 42rem;
+  }
+  @media (min-width: 1024px) {
+    .docs-prose p,
+    .docs-prose li {
+      font-size: 1.0625rem;
+    }
+  }
+  .docs-toc-link-mobile {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  .docs-snapshot {
+    margin-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
   }
 
   .docs-toc {
@@ -414,6 +467,43 @@ const next = index >= 0 ? pages[index + 1] : undefined;
     background: none;
     font-size: inherit;
   }
+  /* A hash in a table cell is plain mono, not a chip: the chip border wrapped
+     into orphan boxes around a lone "c" on a phone. */
+  .docs-prose td code {
+    border: 0;
+    padding: 0;
+    background: none;
+  }
+  @media (max-width: 639px) {
+    .docs-prose pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+  }
+  /* The command block with its copy button; see src/scripts/docs-copy.ts. */
+  .docs-pre {
+    position: relative;
+  }
+  .docs-pre-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    min-height: 32px;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.3rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-lime);
+  }
+  @media (pointer: coarse) {
+    .docs-pre-copy {
+      min-height: 40px;
+    }
+  }
   .docs-prose blockquote {
     border-left: 2px solid var(--color-lime);
     padding-left: 1rem;
@@ -449,5 +539,40 @@ const next = index >= 0 ? pages[index + 1] : undefined;
     border: 0;
     border-top: 1px solid var(--color-line);
     margin-block: 2.5rem;
+  }
+
+  /* The reference page says "print or save any of them". Make that true. */
+  @media print {
+    header,
+    footer,
+    .docs-nav,
+    .docs-nav-mobile,
+    .docs-toc,
+    .docs-pre-copy,
+    .docs-body > nav {
+      display: none !important;
+    }
+    body {
+      background: #fff;
+    }
+    .docs-body {
+      max-width: none;
+      padding: 0;
+    }
+    .docs-body,
+    .docs-prose,
+    .docs-prose * {
+      color: #000 !important;
+      background: none !important;
+      border-color: #999 !important;
+    }
+    .docs-prose a::after {
+      content: ' (' attr(href) ')';
+      font-size: 0.8em;
+    }
+    .docs-prose pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
   }
 </style>

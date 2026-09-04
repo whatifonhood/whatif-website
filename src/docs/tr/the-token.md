@@ -1,6 +1,7 @@
 ---
 title: Token
 summary: Sözleşme, zincir, havuz ve bunların her birinin gerçekte ne anlama geldiği.
+snapshot: '2026-09-02'
 ---
 
 $IF, Robinhood Chain üzerinde yayına alınmış bir ERC-20 token'ıdır. Aşağıdaki her şey herkese açıktır ve internet bağlantısı olan herkes tarafından okunabilir.

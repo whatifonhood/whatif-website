@@ -1,6 +1,7 @@
 ---
 title: What we do not claim
 summary: The sentences you would expect here, and why each one is missing.
+snapshot: '2026-09-02'
 ---
 
 Most of this paper is what $IF is. This page is the negative space, because in this market the claims a project declines to make say more than the ones it makes.

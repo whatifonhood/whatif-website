@@ -1,6 +1,7 @@
 ---
 title: Risks
 summary: The ways you lose money here, stated plainly rather than buried.
+snapshot: '2026-09-02'
 ---
 
 This page is not a disclaimer bolted on for cover. If you read one page before buying, read this one.

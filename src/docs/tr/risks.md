@@ -1,6 +1,7 @@
 ---
 title: Riskler
 summary: Burada para kaybetme yollarınız, gömülmek yerine açıkça yazılmış hâlde.
+snapshot: '2026-09-02'
 ---
 
 Bu sayfa, korunmak için sonradan iliştirilmiş bir sorumluluk reddi değil. Almadan önce tek bir sayfa okuyacaksanız, bunu okuyun.

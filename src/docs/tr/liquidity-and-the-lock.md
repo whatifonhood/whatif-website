@@ -1,6 +1,7 @@
 ---
 title: Likidite ve gerçekte kilitli olan şey
 summary: Ana havuzdaki bir pozisyon hiç kimse tarafından çekilemez; derinliğin diğer yarısı tek bir blokta çıkıp gidebilir.
+snapshot: '2026-09-02'
 ---
 
 $IF, token'ı oluşturan işlemin aynısında launchpad tarafından oluşturulmuş bir Uniswap V3 havuzunda işlem görüyor. O havuzdaki bir pozisyon, kimsenin geri alamayacağı biçimde kilitli. Derinliğin geri kalanı değil. Bu sayfa ikisini birbirinden ayırıyor, çünkü birisi "likidite kilitli" dediğinde bu ifadenin genellikle yaptığı işin tamamı o farktan ibarettir.

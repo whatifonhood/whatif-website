@@ -1,6 +1,7 @@
 ---
 title: Reference
 summary: Addresses, links, and the words this paper uses.
+snapshot: '2026-09-02'
 ---
 
 Everything on one page, for copying and for checking.

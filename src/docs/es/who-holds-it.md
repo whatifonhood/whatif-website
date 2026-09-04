@@ -1,6 +1,7 @@
 ---
 title: Quién lo tiene
 summary: Las wallets más grandes, nombradas cuando se las puede identificar.
+snapshot: '2026-09-02'
 ---
 
 "¿Hay una sola wallet que lo tenga todo?" es la primera pregunta seria que cualquiera debería hacerse sobre un token, y un porcentaje no es una respuesta. La [página de datos](/es/stats/) publica las quince posiciones más grandes, con cada fila enlazada a la dirección.

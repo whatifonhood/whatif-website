@@ -1,6 +1,7 @@
 ---
 title: Riesgos
 summary: Las formas en que aquí pierdes dinero, dichas sin rodeos en lugar de enterradas.
+snapshot: '2026-09-02'
 ---
 
 Esta página no es un descargo de responsabilidad puesto para cubrirnos. Si lees una sola página antes de comprar, lee esta.

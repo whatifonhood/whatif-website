@@ -1,6 +1,7 @@
 ---
 title: Referencia
 summary: Direcciones, enlaces y las palabras que usa este libro blanco.
+snapshot: '2026-09-02'
 ---
 
 Todo en una página, para copiar y para comprobar.

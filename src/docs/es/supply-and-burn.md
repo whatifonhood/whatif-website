@@ -1,6 +1,7 @@
 ---
 title: El suministro y la quema
 summary: Mil millones, fijo, con una cantidad medible destruida de forma permanente.
+snapshot: '2026-09-02'
 ---
 
 Dos números describen toda la política monetaria de $IF, y ambos se leen de la cadena en lugar de afirmarse aquí.

@@ -1,6 +1,7 @@
 ---
 title: Cómo funciona la quema en realidad
 summary: Un motor de comisiones automatizado operado por un tercero quema $IF casi todos los días, y puede detenerse cuando ese tercero lo decida.
+snapshot: '2026-09-02'
 ---
 
 Durante mucho tiempo este libro blanco dijo que no había ninguna comisión que alimentara la quema. Eso estaba equivocado, y la corrección es lo bastante grande como para necesitar su propia página. Todas las cifras de abajo se leyeron de la cadena el 2 de septiembre de 2026, en el bloque `52,582,784` o alrededor de él.

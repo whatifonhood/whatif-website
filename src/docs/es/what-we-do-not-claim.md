@@ -1,6 +1,7 @@
 ---
 title: Lo que no afirmamos
 summary: Las frases que esperarías encontrar aquí, y por qué falta cada una.
+snapshot: '2026-09-02'
 ---
 
 La mayor parte de este libro blanco trata de lo que $IF es. Esta página es el espacio negativo, porque en este mercado las afirmaciones que un proyecto se niega a hacer dicen más que las que hace.
