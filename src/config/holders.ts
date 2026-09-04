@@ -31,7 +31,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x39A200271525E9641e799127bdAB299DAeF21953',
-    tokens: 16212555,
+    tokens: 16323394,
     kind: 'pool',
   },
   {
@@ -70,14 +70,14 @@ export const HOLDERS: Holder[] = [
     kind: 'unknown',
   },
   {
-    address: '0x7Ff8bbf9C8AB106db589e7863fb100525F61CCe5',
-    tokens: 9279686,
-    kind: 'unknown',
-  },
-  {
     address: '0x8EfC646EbE93feeBfDBd36359BeCfC62716d244e',
     tokens: 9274632,
     kind: 'contract',
+  },
+  {
+    address: '0x7Ff8bbf9C8AB106db589e7863fb100525F61CCe5',
+    tokens: 9062233,
+    kind: 'unknown',
   },
   {
     address: '0xA24509fdcCa6CE6dA70A81152c7d075529653D8C',
