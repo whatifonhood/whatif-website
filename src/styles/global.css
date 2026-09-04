@@ -506,3 +506,37 @@ body {
     transform: none;
   }
 }
+
+/*
+ * The same stillness, chosen on the page rather than in the OS.
+ *
+ * WCAG 2.2.2 wants a way to stop anything that moves for more than five
+ * seconds. The prefers-reduced-motion blocks above honour a system setting most
+ * people have never found. The footer's "Reduce motion" button sets this
+ * attribute on <html> and remembers it, and these rules mirror those blocks
+ * exactly — generated from them, so the two cannot drift.
+ */
+html[data-motion='reduced'] {
+  scroll-behavior: auto;
+}
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+html[data-motion='reduced'] .reveal {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='reduced'] .enter,
+html[data-motion='reduced'] .is-visible .stamp,
+html[data-motion='reduced'] .float-slow,
+html[data-motion='reduced'] .ring-anim::before {
+  animation: none;
+}
+html[data-motion='reduced'] .enter {
+  opacity: 1;
+  transform: none;
+}

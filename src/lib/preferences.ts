@@ -19,6 +19,7 @@ export const PREFS = {
   chartEma: 'whatif.chartEma',
   chartHeight: 'whatif.chartHeight',
   chartLog: 'whatif.chartLog',
+  motion: 'whatif.motion',
 } as const;
 
 export type PrefKey = keyof typeof PREFS;

@@ -12,6 +12,8 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getCopy(locale);
+// Doubled so the loop is seamless. The second copy is aria-hidden below: a
+// screen reader should hear the sentence once, not twice.
 const items = [...copy.marquee, ...copy.marquee];
 ---
 
@@ -24,6 +26,7 @@ const items = [...copy.marquee, ...copy.marquee];
     {
       items.map((item, index) => (
         <span
+          aria-hidden={index >= copy.marquee.length ? 'true' : undefined}
           class:list={[
             'mx-6 font-display text-2xl font-black italic uppercase tracking-tight sm:text-3xl',
             index % 2 === 0 ? 'text-ink' : 'text-lime',

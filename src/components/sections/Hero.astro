@@ -118,23 +118,29 @@ const stats = [
         </Button>
       </div>
 
+      <p class="enter enter-2 mt-4 max-w-lg text-xs leading-relaxed text-faint">
+        {copy.hero.riskNote}
+      </p>
+
       <!-- Live figures. Snapshot values are rendered server-side so this strip is
            never empty, then replaced in place when the chain responds. -->
       <dl class="enter enter-3 mt-12 grid max-w-lg grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
         {
           stats.map((stat) => (
-            <div class="min-w-0">
+            <div class="min-w-0 @container">
               {/*
-                Shrinks to fit; never breaks.
-                Sized for the longest locale rather than for English — "US$386,77
-                mil" is half again the width of "$386.77K" — but a price is one
-                token and must stay on one line. Letting it wrap turned $0.00803
-                into "$0.0080" above a lone "3", which is worse than the overflow
-                it was meant to cure.
+                Shrinks to fit its CELL; never breaks.
+                It used to shrink with the viewport (vw), which is the wrong
+                ruler: on a landscape phone or a desktop the viewport is wide but
+                the cell is 110px, so "US$1217.95万" overflowed into its
+                neighbour at every width above 640px. Container-query units size
+                it to the column it is actually in. A price is one token and
+                must stay on one line — wrapping once turned $0.00803 into
+                "$0.0080" above a lone "3".
               */}
               <dd
                 data-stat={stat.key}
-                class="font-display text-[clamp(0.78rem,4.8vw,1.5rem)] font-black italic tabular-nums whitespace-nowrap tracking-tight text-ink"
+                class="font-display text-[clamp(0.8rem,17cqi,1.5rem)] font-black italic tabular-nums whitespace-nowrap tracking-tight text-ink"
               >
                 {stat.value}
               </dd>

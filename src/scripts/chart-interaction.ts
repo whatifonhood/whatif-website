@@ -443,8 +443,14 @@ export function attachChartInteraction(ctx: ChartContext): ChartPointer {
 
   wrap?.addEventListener('pointermove', moveCrosshair);
   wrap?.addEventListener('pointerdown', moveCrosshair);
-  wrap?.addEventListener('pointerleave', hideCrosshair);
-  wrap?.addEventListener('pointercancel', hideCrosshair);
+  // On touch, `pointerleave` fires the instant the finger lifts, which took the
+  // reading away before anyone could read it. A tap leaves its reading in
+  // place until the next gesture; only a mouse actually leaving clears it.
+  const hideUnlessTouch = (event: PointerEvent) => {
+    if (event.pointerType !== 'touch') hideCrosshair();
+  };
+  wrap?.addEventListener('pointerleave', hideUnlessTouch);
+  wrap?.addEventListener('pointercancel', hideUnlessTouch);
 
   /**
    * Resizing the chart by dragging.

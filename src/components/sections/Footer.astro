@@ -125,6 +125,14 @@ const headingTail = ` ${copy.footer.heading.accent}`;
         class="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-start sm:justify-between"
       >
         <p class="max-w-2xl text-xs leading-relaxed text-faint">{copy.footer.disclaimer}</p>
+        <button
+          type="button"
+          data-motion-toggle
+          aria-pressed="false"
+          class="tap shrink-0 self-start rounded-full border border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-faint transition-colors hover:text-ink aria-pressed:border-lime aria-pressed:text-lime"
+        >
+          {copy.footer.reduceMotion}
+        </button>
         <p class="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
           © {year} · {copy.footer.builtBy}
         </p>
@@ -132,3 +140,24 @@ const headingTail = ` ${copy.footer.heading.accent}`;
     </div>
   </div>
 </footer>
+
+<script>
+  import { recall, remember } from '../../lib/preferences.ts';
+
+  // Applied before first paint would be better, but the attribute is read by
+  // CSS alone, so applying it here costs at most one frame of motion on a
+  // return visit — and nothing at all reaches the page until this runs anyway.
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+  const apply = (reduced: boolean) => {
+    if (reduced) root.dataset.motion = 'reduced';
+    else delete root.dataset.motion;
+    button?.setAttribute('aria-pressed', String(reduced));
+  };
+  apply(recall('motion') === 'reduced');
+  button?.addEventListener('click', () => {
+    const next = root.dataset.motion !== 'reduced';
+    remember('motion', next ? 'reduced' : 'full');
+    apply(next);
+  });
+</script>

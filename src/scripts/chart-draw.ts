@@ -136,8 +136,11 @@ export function drawTimeAxis(axis: HTMLElement | null, candles: Candle[], locale
         : { month: 'short', year: '2-digit' }),
   });
 
-  const wanted = 5;
-  const step = Math.max(1, Math.floor(candles.length / wanted));
+  // Budget from the width, not a constant: five labels in a 271px axis on a
+  // small phone overlap into one string, and after a pinch to eight candles a
+  // fixed step labelled every one of them. ~72px is a "02:00 PM" plus a gap.
+  const wanted = Math.max(2, Math.floor((axis.clientWidth || 600) / 72));
+  const step = Math.max(1, Math.ceil(candles.length / wanted));
   for (let i = Math.floor(step / 2); i < candles.length; i += step) {
     const candle = candles[i];
     if (!candle) continue;

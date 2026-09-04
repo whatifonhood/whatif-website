@@ -58,12 +58,12 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
       </span>
     </div>
 
-    <div class="hidden items-center gap-1 md:flex">
+    <div class="hidden items-center gap-1 lg:flex">
       {
         copy.nav.links.map((link) => (
           <a
             href={sectionHref(link.href)}
-            class="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink"
+            class="rounded-lg px-3 py-2 text-sm whitespace-nowrap text-muted transition-colors hover:bg-surface hover:text-ink"
           >
             {link.label}
           </a>
@@ -121,7 +121,7 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
       aria-label={copy.nav.openMenu}
       data-label-open={copy.nav.openMenu}
       data-label-close={copy.nav.closeMenu}
-      class="grid h-11 w-11 place-items-center rounded-lg text-ink transition-colors hover:bg-surface md:hidden"
+      class="grid h-11 w-11 place-items-center rounded-lg text-ink transition-colors hover:bg-surface lg:hidden"
     >
       <Icons name="menu" size={20} />
     </button>
@@ -137,7 +137,7 @@ const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace
     id="mobile-menu"
     data-menu
     hidden
-    class="glass menu-panel overflow-y-auto overscroll-contain border-t border-line md:hidden"
+    class="glass menu-panel overflow-y-auto overscroll-contain border-t border-line lg:hidden"
   >
     <div class="flex flex-col gap-1 px-5 pb-8 pt-4">
       {

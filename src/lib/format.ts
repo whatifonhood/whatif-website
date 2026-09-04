@@ -12,6 +12,7 @@ export function formatUsd(value: number, locale = 'en'): string {
   if (value >= 1000) {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
+      currencyDisplay: 'narrowSymbol',
       currency: 'USD',
       notation: 'compact',
       maximumFractionDigits: 2,
@@ -22,6 +23,7 @@ export function formatUsd(value: number, locale = 'en'): string {
   if (value >= 1) {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
+      currencyDisplay: 'narrowSymbol',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
@@ -34,6 +36,7 @@ export function formatUsd(value: number, locale = 'en'): string {
   if (value < 0.001) {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
+      currencyDisplay: 'narrowSymbol',
       currency: 'USD',
       maximumSignificantDigits: 4,
     }).format(value);
@@ -41,6 +44,7 @@ export function formatUsd(value: number, locale = 'en'): string {
 
   return new Intl.NumberFormat(locale, {
     style: 'currency',
+    currencyDisplay: 'narrowSymbol',
     currency: 'USD',
     minimumFractionDigits: 5,
     maximumFractionDigits: 5,
@@ -84,6 +88,7 @@ export function formatUsdExact(value: number, locale = 'en'): string {
   if (value < 1000) return formatUsd(value, locale);
   return new Intl.NumberFormat(locale, {
     style: 'currency',
+    currencyDisplay: 'narrowSymbol',
     currency: 'USD',
     maximumFractionDigits: 0,
   }).format(value);
