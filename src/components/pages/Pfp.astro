@@ -86,7 +86,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
 
       <!-- Result -->
       <p data-pfp-status role="status" aria-live="polite" class="sr-only"></p>
-      <div data-pfp-result hidden class="mt-8 flex flex-col items-center gap-3">
+      <div data-pfp-result hidden class="mt-5 flex flex-col items-center gap-3">
         <h2 data-pfp-name class="display-heading text-3xl sm:text-4xl"></h2>
         <span
           data-pfp-tier
@@ -96,7 +96,7 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
 
       <Button
         size="xl"
-        class="mt-8 aria-disabled:opacity-60"
+        class="mt-5 aria-disabled:opacity-60"
         data-pfp-generate
         data-label-generate={page.generate}
         data-label-again={page.again}
@@ -126,7 +126,15 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
         </Button>
       </div>
 
-      <canvas data-pfp-canvas width="1200" height="675" class="sr-only" aria-hidden="true"></canvas>
+      <!-- The share card, shown once there is one. It used to be a blind download. -->
+      <canvas
+        data-pfp-canvas
+        width="1200"
+        height="675"
+        hidden
+        role="img"
+        aria-label={page.shareCard}
+        class="mt-6 w-full max-w-xl rounded-xl border border-line bg-surface shadow-2xl"></canvas>
     </div>
 
     <!-- The pool -->
@@ -285,7 +293,9 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
   /* The coin sits in a perspective box so it can spin on its Y axis. */
   .pfp-stage {
     position: relative;
-    width: min(100%, 380px);
+    /* Capped against the viewport height too: at 380px the coin alone filled a
+       phone screen and the result and the button sat below the fold. */
+    width: min(100%, 380px, 42dvh);
     aspect-ratio: 1;
     perspective: 1100px;
     display: grid;
@@ -404,6 +414,20 @@ const byTier = COIN_TIER_ORDER.map((tier) => ({
   }
   .pfp-pool-item[data-found] img {
     opacity: 1;
+  }
+  /* A found coin's name, under it. */
+  .pfp-pool-caption {
+    display: block;
+    margin-top: 0.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
   .pfp-pool-item[data-found] .pfp-pool-lock {
     display: none;

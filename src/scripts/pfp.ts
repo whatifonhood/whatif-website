@@ -12,7 +12,9 @@
 import { decodeCollection, encodeCollection } from '../lib/collection-code.ts';
 import { COINS, COIN_TIERS, type Coin, type CoinTier } from '../config/coins.ts';
 import { SITE } from '../config/site.ts';
-import { drawPfpCard } from '../lib/card-designs.ts';
+import { localePath } from '../config/navigation.ts';
+import { drawPfpCard, readyFonts } from '../lib/card-designs.ts';
+import { canvasBlob, shareOrDownload } from '../lib/share.ts';
 
 /** Force a rare if one has not appeared in this many pulls, and a legendary likewise. */
 const PITY = { rare: 8, legendary: 60 };
@@ -33,6 +35,8 @@ interface State {
   sinceRare: number;
   sinceLegendary: number;
   poolOpen: boolean;
+  /** The last coin pulled, so a reload shows it again instead of demanding a re-roll. */
+  last?: string;
 }
 
 function loadState(): State {
@@ -48,6 +52,7 @@ function loadState(): State {
       sinceRare: Number(value.sinceRare) || 0,
       sinceLegendary: Number(value.sinceLegendary) || 0,
       poolOpen: value.poolOpen === true,
+      last: typeof value.last === 'string' ? value.last : undefined,
     };
   } catch {
     // Private browsing, or storage disabled. The generator still works; it just
@@ -115,6 +120,7 @@ async function drawShareCard(
   if (!image) return;
 
   const tier = COIN_TIERS[coin.tier];
+  await readyFonts();
   drawPfpCard(canvas, image, {
     name: coin.name,
     tier: tierLabel,
@@ -123,7 +129,7 @@ async function drawShareCard(
   });
 }
 
-export function initPfp(): void {
+export function initPfp(locale = document.documentElement.lang || 'en'): void {
   const root = document.querySelector<HTMLElement>('[data-pfp]');
   if (!root) return;
 
@@ -195,7 +201,13 @@ export function initPfp(): void {
       }
 
       const name = item.querySelector<HTMLElement>('[data-pool-name]');
-      if (name && coin) name.textContent = coin.name;
+      if (name && coin) {
+        name.textContent = coin.name;
+        // Visible now, not only to a screen reader: on a phone there is no
+        // hover, and a found coin with no name is an anonymous disc.
+        name.classList.remove('sr-only');
+        name.classList.add('pfp-pool-caption');
+      }
     }
   };
 
@@ -210,8 +222,8 @@ export function initPfp(): void {
     }
   };
 
-  const land = (coin: Coin) => {
-    rolling = false;
+  /** Puts a coin on screen with its name, tier, downloads and card. No counters. */
+  const show = (coin: Coin) => {
     const tierLabel = tierLabels[coin.tier] ?? coin.tier;
 
     image.src = coinImage(coin, 'full');
@@ -224,18 +236,6 @@ export function initPfp(): void {
     if (actions) actions.hidden = false;
     generate.setAttribute('aria-disabled', 'false');
     generate.textContent = labels.again;
-    // Announced, because the result appears in a region nothing points at.
-    if (statusEl)
-      statusEl.textContent = labels.rolled
-        .replace('{name}', coin.name)
-        .replace('{tier}', tierLabel);
-
-    // Record it, and reset the relevant pity counter.
-    if (!state.found[coin.slug]) state.found[coin.slug] = true;
-    state.sinceRare = coin.tier === 'rare' || coin.tier === 'legendary' ? 0 : state.sinceRare + 1;
-    state.sinceLegendary = coin.tier === 'legendary' ? 0 : state.sinceLegendary + 1;
-    saveState(state);
-    paintFound();
 
     if (download) {
       download.href = coinImage(coin, 'png');
@@ -247,11 +247,13 @@ export function initPfp(): void {
         'text',
         labels.shareText.replace('{name}', coin.name).replace('{tier}', tierLabel),
       );
-      url.searchParams.set('url', `${SITE.url}/pfp/${coin.slug}`);
+      // The same URL the coin page and its canonical use, locale included.
+      url.searchParams.set('url', `${SITE.url}${localePath(`/pfp/${coin.slug}/`, locale)}`);
       shareLink.href = url.toString();
     }
     if (canvas && cardLink) {
       void drawShareCard(canvas, coin, tierLabel).then(() => {
+        canvas.hidden = false;
         canvas.toBlob((blob) => {
           if (!blob) return;
           if (cardUrl) URL.revokeObjectURL(cardUrl);
@@ -261,6 +263,25 @@ export function initPfp(): void {
         }, 'image/png');
       });
     }
+  };
+
+  const land = (coin: Coin) => {
+    rolling = false;
+    const tierLabel = tierLabels[coin.tier] ?? coin.tier;
+    show(coin);
+    // Announced, because the result appears in a region nothing points at.
+    if (statusEl)
+      statusEl.textContent = labels.rolled
+        .replace('{name}', coin.name)
+        .replace('{tier}', tierLabel);
+
+    // Record it, and reset the relevant pity counter.
+    if (!state.found[coin.slug]) state.found[coin.slug] = true;
+    state.sinceRare = coin.tier === 'rare' || coin.tier === 'legendary' ? 0 : state.sinceRare + 1;
+    state.sinceLegendary = coin.tier === 'legendary' ? 0 : state.sinceLegendary + 1;
+    state.last = coin.slug;
+    saveState(state);
+    paintFound();
 
     // A short buzz on a good pull, where the device supports it.
     if (!reduceMotion && 'vibrate' in navigator) {
@@ -326,6 +347,31 @@ export function initPfp(): void {
     else spin(target);
   });
 
+  /*
+   * Both downloads go through the share sheet where the device has one, so a
+   * coin can go straight to Photos or a chat. The links keep working as plain
+   * downloads everywhere else, and without this script at all.
+   */
+  if (download) {
+    download.addEventListener('click', (event) => {
+      if (download.getAttribute('href') === '#') return;
+      event.preventDefault();
+      void fetch(download.href, { credentials: 'omit' })
+        .then((response) => (response.ok ? response.blob() : null))
+        .then((file) => {
+          if (file) void shareOrDownload(file, download.download || 'what-if-coin.png');
+          else window.location.href = download.href;
+        });
+    });
+  }
+  cardLink?.addEventListener('click', (event) => {
+    if (!canvas || cardLink.getAttribute('href') === '#') return;
+    event.preventDefault();
+    void canvasBlob(canvas).then((file) => {
+      if (file) void shareOrDownload(file, cardLink.download || 'what-if-card.png');
+    });
+  });
+
   poolToggle?.addEventListener('click', () => {
     setPool(poolToggle.getAttribute('aria-expanded') !== 'true');
   });
@@ -379,4 +425,12 @@ export function initPfp(): void {
 
   paintFound();
   setPool(state.poolOpen);
+
+  // Somebody coming back sees the coin they got, and can still download it.
+  const last = state.last ? COINS.find((coin) => coin.slug === state.last) : undefined;
+  if (last) {
+    show(last);
+    result.hidden = false;
+    if (actions) actions.hidden = false;
+  }
 }

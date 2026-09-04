@@ -58,6 +58,14 @@ shareUrl.searchParams.set('url', `${SITE.url}${localePath(`/pfp/${coin.slug}/`, 
       <p class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
         {tierLabel} · {COIN_TIERS[coin.tier].weight}% {page.odds}
       </p>
+      <!-- Shown by the script below when this browser has pulled the coin. -->
+      <p
+        data-coin-owned={coin.slug}
+        hidden
+        class="mt-3 rounded-full border border-lime/40 bg-lime/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-lime"
+      >
+        {page.inCollection}
+      </p>
 
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <Button href={localePath('/pfp/', locale)} size="lg">
@@ -86,6 +94,25 @@ shareUrl.searchParams.set('url', `${SITE.url}${localePath(`/pfp/${coin.slug}/`, 
     </div>
   </div>
 </PageLayout>
+
+<script>
+  // The collection lives in this browser only, so only this browser can say.
+  const badge = document.querySelector<HTMLElement>('[data-coin-owned]');
+  try {
+    const raw = localStorage.getItem('whatif.pfp.v1');
+    const found: unknown = raw ? (JSON.parse(raw) as { found?: unknown }).found : undefined;
+    if (
+      badge &&
+      found &&
+      typeof found === 'object' &&
+      badge.dataset.coinOwned! in (found as object)
+    ) {
+      badge.hidden = false;
+    }
+  } catch {
+    /* storage unavailable; the badge simply stays hidden */
+  }
+</script>
 
 <style>
   .coin-frame {
