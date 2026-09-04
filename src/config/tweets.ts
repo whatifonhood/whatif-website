@@ -18,6 +18,8 @@
  */
 export const TWEET_URLS: string[] = [
   'https://x.com/WhatIFonHOOD/status/2094772271722434583',
+  'https://x.com/WhatIFonHOOD/status/2094455176971362440',
+  'https://x.com/WhatIFonHOOD/status/2094442732940927202',
   'https://x.com/WhatIFonHOOD/status/2094394783137677653',
   'https://x.com/WhatIFonHOOD/status/2093803407362625946',
   'https://x.com/WhatIFonHOOD/status/2089569584860799369',

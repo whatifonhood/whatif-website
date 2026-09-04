@@ -37,6 +37,36 @@ export const TWEET_CARDS: TweetCard[] = [
     url: 'https://x.com/WhatIFonHOOD/status/2094772271722434583',
   },
   {
+    text: 'Robinhood Chain just did $1.4B in a day.\n\nNew all-time high. +183% in a week.\n\nThey built it for tokenised stocks.\nThe memes moved in.\n\nWhat $IF that was always going to happen?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorHandle: 'WhatIFonHOOD',
+    avatar: '/posts/2094455176971362440-avatar.webp',
+    postedAt: '2026-08-31',
+    photos: [
+      {
+        src: '/posts/2094455176971362440-1.webp',
+        width: 1200,
+        height: 675,
+      },
+    ],
+    url: 'https://x.com/WhatIFonHOOD/status/2094455176971362440',
+  },
+  {
+    text: 'What $IF @RobinhoodCrypto eventually lists the native meme of its own ecosystem?',
+    authorName: 'What $IF on Robinhood Chain',
+    authorHandle: 'WhatIFonHOOD',
+    avatar: '/posts/2094442732940927202-avatar.webp',
+    postedAt: '2026-08-31',
+    photos: [
+      {
+        src: '/posts/2094442732940927202-1.webp',
+        width: 1200,
+        height: 670,
+      },
+    ],
+    url: 'https://x.com/WhatIFonHOOD/status/2094442732940927202',
+  },
+  {
     text: 'Just one. What $IF?',
     authorName: 'What $IF on Robinhood Chain',
     authorHandle: 'WhatIFonHOOD',
