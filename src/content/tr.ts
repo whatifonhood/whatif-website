@@ -256,7 +256,7 @@ export const tr: SiteCopy = {
     },
     brand: {
       eyebrow: '$IF içeriği üreten herkes için',
-      fileNote: 'ZIP · 55 MB · lisans koşulları kitin içinde',
+      fileNote: 'ZIP · {size} · lisans koşulları paketin içinde',
       contractLabel: 'Kontrat',
       questions: 'Sorun mu var, ya da burada olmayan bir şey mi lazım?',
       title: 'Marka',
@@ -264,6 +264,7 @@ export const tr: SiteCopy = {
       intro:
         'Tek marka, üç işaret: para tokeni, karakter dünyayı, kelime işareti ismi tanımlar. Neye ihtiyacın varsa al.',
       download: 'İndir',
+      downloadMarks: 'Yalnızca işaretler · {size}',
       kitNote:
         'Logolar, avatar, vektör kelime işaretleri, bannerlar, karakter referans sayfası ve şeffaf pozlar — palet, tipografi ve kurallar bir readme dosyasında.',
       rulesTitle: 'Önemli üç şey',
@@ -455,6 +456,7 @@ export const tr: SiteCopy = {
       backToContents: 'Teknik doküman',
       contents: 'İçindekiler',
       onThisPage: 'Bu sayfada',
+      figuresAsOf: 'Rakamlar {date} itibarıyla',
       previous: 'Önceki',
       next: 'Sonraki',
       moreOfThePaper: 'Dokümanın devamı',
@@ -465,7 +467,6 @@ export const tr: SiteCopy = {
       heading: { lead: 'Ne yapıldı,', accent: 'sırada ne var.' },
       intro:
         'Yayına alınan her şey bu sayfada kalır. Yalnızca geleceği gösteren bir yol haritası, dilek listesidir.',
-      open: 'Bir bak',
       statuses: {
         building: 'Şu anda yapılıyor',
         next: 'Sırada',
@@ -473,6 +474,7 @@ export const tr: SiteCopy = {
         shipped: 'Yayına alındı',
       },
       shippedCount: 'şey yayına alındı',
+      earlier: 'Daha önce',
       record: { shipped: 'Yayına alındı', inProgress: 'Yapılıyor', latest: 'En yenisi' },
       tracks: {
         proof: {
@@ -498,7 +500,6 @@ export const tr: SiteCopy = {
       needsLabel: 'Bekleniyor',
       signalLabel: 'Bitiş şartı',
       log: {
-        title: 'Kayıt defteri',
         intro:
           'Şimdiye kadar yapılmış her şey, en yenisi en üstte, her biri kendine bağlantı veriyor. Bir yol haritasının gerçekten test edilmiş kısmı burasıdır.',
       },

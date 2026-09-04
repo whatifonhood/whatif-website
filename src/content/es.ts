@@ -271,7 +271,7 @@ export const es: SiteCopy = {
     },
     brand: {
       eyebrow: 'Para quien haga cosas de $IF',
-      fileNote: 'ZIP · 55 MB · los términos de licencia van en el kit',
+      fileNote: 'ZIP · {size} · condiciones de licencia en el paquete',
       contractLabel: 'Contrato',
       questions: '¿Preguntas, o quieres algo que no está aquí?',
       title: 'Marca',
@@ -279,6 +279,7 @@ export const es: SiteCopy = {
       intro:
         'Una marca, tres signos: la moneda identifica al token, el personaje identifica al mundo, el logotipo identifica al nombre. Toma lo que necesites.',
       download: 'Descargar',
+      downloadMarks: 'Solo las marcas · {size}',
       kitNote:
         'Logos, el avatar, logotipos vectoriales, banners, la hoja de referencia del personaje y las poses en transparente — con la paleta, la tipografía y las reglas en un léeme.',
       rulesTitle: 'Tres cosas que importan',
@@ -475,6 +476,7 @@ export const es: SiteCopy = {
       backToContents: 'Libro blanco',
       contents: 'Contenido',
       onThisPage: 'En esta página',
+      figuresAsOf: 'Cifras a {date}',
       previous: 'Anterior',
       next: 'Siguiente',
       moreOfThePaper: 'Más del libro blanco',
@@ -485,7 +487,6 @@ export const es: SiteCopy = {
       heading: { lead: 'Lo que está hecho,', accent: 'y lo que viene.' },
       intro:
         'Todo lo que se ha lanzado se queda en esta página. Una hoja de ruta que solo enseña el futuro es una lista de deseos.',
-      open: 'Échale un vistazo',
       statuses: {
         building: 'En construcción ahora',
         next: 'Lo siguiente',
@@ -493,6 +494,7 @@ export const es: SiteCopy = {
         shipped: 'Ya lanzado',
       },
       shippedCount: 'cosas lanzadas hasta ahora',
+      earlier: 'Anteriores',
       record: { shipped: 'Lanzado', inProgress: 'En construcción', latest: 'Más reciente' },
       tracks: {
         proof: {
@@ -518,7 +520,6 @@ export const es: SiteCopy = {
       needsLabel: 'Depende de',
       signalLabel: 'Listo cuando',
       log: {
-        title: 'El registro',
         intro:
           'Todo lo ya construido, lo más nuevo primero, y cada cosa enlaza a sí misma. Esta es la parte de una hoja de ruta que sí se ha probado.',
       },

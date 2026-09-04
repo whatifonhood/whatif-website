@@ -210,6 +210,8 @@ export interface SiteCopy {
       heading: SplitHeading;
       intro: string;
       download: string;
+      /** The smaller zip of marks only; `{size}` is filled from the build. */
+      downloadMarks: string;
       /** One line describing what the kit holds, without listing it all. */
       kitNote: string;
       /** The short version of the rules, for people using the marks. */
@@ -430,6 +432,8 @@ export interface SiteCopy {
       contents: string;
       /** The column listing this page's own headings. */
       onThisPage: string;
+      /** Under a chapter title; `{date}` is the day its percentages were read. */
+      figuresAsOf: string;
       previous: string;
       next: string;
       /** aria-label for the prev/next pair. */
@@ -440,11 +444,12 @@ export interface SiteCopy {
       eyebrow: string;
       heading: SplitHeading;
       intro: string;
-      open: string;
       /** Column headings, keyed by status. */
       statuses: { shipped: string; building: string; next: string; later: string };
       /** Follows the number of shipped items, e.g. "things shipped". */
       shippedCount: string;
+      /** The fold holding shipped days older than the two most recent. */
+      earlier: string;
       /** The three figures above the list. Each is a label under a number. */
       record: { shipped: string; inProgress: string; latest: string };
       /**
@@ -459,7 +464,7 @@ export interface SiteCopy {
       /** Above the success condition, e.g. "Done when". */
       signalLabel: string;
       /** The dated record of everything already shipped. */
-      log: { title: string; intro: string };
+      log: { intro: string };
       /** What the roadmap refuses to do — the reason to believe the rest of it. */
       terms: { title: string; items: string[] };
     };

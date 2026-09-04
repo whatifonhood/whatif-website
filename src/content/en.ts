@@ -256,7 +256,7 @@ export const en: SiteCopy = {
     },
     brand: {
       eyebrow: 'For anyone making $IF things',
-      fileNote: 'ZIP · 55 MB · see the licence terms in the kit',
+      fileNote: 'ZIP · {size} · licence terms in the kit',
       contractLabel: 'Contract',
       questions: 'Questions, or want something that is not in here?',
       title: 'Brand',
@@ -264,6 +264,7 @@ export const en: SiteCopy = {
       intro:
         'One brand, three marks: the coin identifies the token, the character identifies the world, the wordmark identifies the name. Take what you need.',
       download: 'Download',
+      downloadMarks: 'Marks only · {size}',
       kitNote:
         'Logos, the avatar, vector wordmarks, banners, the character reference sheet and transparent poses — with the palette, the type and the rules in a readme.',
       rulesTitle: 'Three things that matter',
@@ -455,6 +456,7 @@ export const en: SiteCopy = {
       backToContents: 'White paper',
       contents: 'Contents',
       onThisPage: 'On this page',
+      figuresAsOf: 'Figures as of {date}',
       previous: 'Previous',
       next: 'Next',
       moreOfThePaper: 'More of the paper',
@@ -465,7 +467,6 @@ export const en: SiteCopy = {
       heading: { lead: 'What is built,', accent: 'and what is next.' },
       intro:
         'Everything shipped stays on this page. A roadmap that only shows the future is a wish list.',
-      open: 'Take a look',
       statuses: {
         building: 'Being built now',
         next: 'Next up',
@@ -473,6 +474,7 @@ export const en: SiteCopy = {
         shipped: 'Already shipped',
       },
       shippedCount: 'things shipped so far',
+      earlier: 'Earlier',
       record: { shipped: 'Shipped', inProgress: 'Being built', latest: 'Most recent' },
       tracks: {
         proof: {
@@ -498,7 +500,6 @@ export const en: SiteCopy = {
       needsLabel: 'Waiting on',
       signalLabel: 'Done when',
       log: {
-        title: 'The log',
         intro:
           'Everything already built, newest first, each one linking to itself. This is the part of a roadmap that has actually been tested.',
       },

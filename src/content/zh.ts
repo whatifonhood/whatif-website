@@ -253,13 +253,14 @@ export const zh: SiteCopy = {
     },
     brand: {
       eyebrow: '给所有做 $IF 内容的人',
-      fileNote: 'ZIP · 55 MB · 授权条款见套件内',
+      fileNote: 'ZIP · {size} · 许可条款见包内',
       contractLabel: '合约',
       questions: '有问题，或者想要这里没有的东西？',
       title: '品牌',
       heading: { lead: '三个标识，', accent: '以及用法。' },
       intro: '一个品牌，三个标识：币标识代币，角色标识世界，字标标识名字。需要什么就拿什么。',
       download: '下载',
+      downloadMarks: '仅标识 · {size}',
       kitNote: '包含标识、头像、矢量字标、横幅、角色参考图和透明素材——附带调色板、字体与使用说明。',
       rulesTitle: '三条重要规则',
       rules: [
@@ -444,6 +445,7 @@ export const zh: SiteCopy = {
       backToContents: '白皮书',
       contents: '目录',
       onThisPage: '本页内容',
+      figuresAsOf: '数据截至 {date}',
       previous: '上一页',
       next: '下一页',
       moreOfThePaper: '白皮书的其他部分',
@@ -453,7 +455,6 @@ export const zh: SiteCopy = {
       eyebrow: '路线图',
       heading: { lead: '做完了什么，', accent: '接下来做什么。' },
       intro: '所有已上线的内容都留在这个页面上。只展示未来的路线图，那叫愿望清单。',
-      open: '去看看',
       statuses: {
         building: '正在做',
         next: '接下来',
@@ -461,6 +462,7 @@ export const zh: SiteCopy = {
         shipped: '已经上线',
       },
       shippedCount: '项已经上线',
+      earlier: '更早',
       record: { shipped: '已上线', inProgress: '正在做', latest: '最近一次' },
       tracks: {
         proof: {
@@ -484,7 +486,6 @@ export const zh: SiteCopy = {
       needsLabel: '等待',
       signalLabel: '完成条件',
       log: {
-        title: '记录',
         intro:
           '所有已经做完的东西，最新的在前，每一条都链接到它自己。这是一份路线图里真正经过检验的部分。',
       },
