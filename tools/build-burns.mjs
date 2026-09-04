@@ -91,8 +91,12 @@ for (let to = head; to > 0; to -= CHUNK) {
   ]);
 
   for (const log of logs ?? []) {
+    const block = Number(log.blockNumber);
+    if (!Number.isFinite(block) || !/^0x[a-fA-F0-9]{64}$/.test(log.transactionHash ?? '')) {
+      throw new Error(`eth_getLogs returned a malformed entry: ${JSON.stringify(log)}`);
+    }
     events.push({
-      block: Number(log.blockNumber),
+      block,
       tx: log.transactionHash,
       // The amount is the single unindexed argument, so it is the whole data word.
       tokens: Number(BigInt(log.data) / 10n ** BigInt(TOKEN.decimals)),

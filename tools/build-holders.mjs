@@ -62,6 +62,9 @@ const DECIMALS = 10n ** BigInt(TOKEN.decimals ?? 18);
 
 const holders = body.items.slice(0, KEEP).map((item) => {
   const address = String(item?.address?.hash ?? '');
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    throw new Error(`the holder list carried a malformed address: ${address}`);
+  }
   const tokens = Number(BigInt(item?.value ?? 0) / DECIMALS);
   const lower = address.toLowerCase();
 

@@ -127,6 +127,14 @@ async function saveImage(url, name, width, { round = false } = {}) {
 
   const file = join(mediaDir, `${name}.webp`);
   const info = await pipeline.webp({ quality: 82 }).toFile(file);
+  if (!round) {
+    // Phones show a photo 370–393px wide, so the 1200px file alone was roughly
+    // twice the pixels any small screen used. Posts.astro picks by srcset.
+    await sharp(bytes)
+      .resize({ width: 800, withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toFile(file.replace(/\.webp$/, '@800.webp'));
+  }
   return { src: `/posts/${name}.webp`, width: info.width, height: info.height };
 }
 

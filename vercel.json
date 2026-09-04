@@ -23,7 +23,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
@@ -72,15 +72,6 @@
     },
     {
       "source": "/_astro/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/pfp/img/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

@@ -32,15 +32,26 @@ const explorerUrl = readValue('explorerUrl');
 
 const timeout = { signal: AbortSignal.timeout(20_000) };
 
+/**
+ * `Number(undefined)` is NaN and `??` lets NaN through, so one renamed field
+ * in an API response used to write `holders: NaN` straight into site.ts. Every
+ * figure passes through here and a bad one stops the run.
+ */
+const finite = (label, value, { min = 0 } = {}) => {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < min) throw new Error(`${label} is not a usable number: ${value}`);
+  return n;
+};
+
 async function fetchPair() {
   const url = `https://api.dexscreener.com/latest/dex/pairs/robinhood/${poolAddress}`;
   const { pair } = await (await fetch(url, timeout)).json();
   if (!pair) throw new Error('DexScreener returned no pair');
   return {
-    priceUsd: Number(pair.priceUsd),
-    marketCapUsd: Math.round(pair.marketCap ?? pair.fdv ?? 0),
-    liquidityUsd: Math.round(pair.liquidity?.usd ?? 0),
-    volume24hUsd: Math.round(pair.volume?.h24 ?? 0),
+    priceUsd: finite('priceUsd', pair.priceUsd, { min: Number.EPSILON }),
+    marketCapUsd: Math.round(finite('marketCap', pair.marketCap ?? pair.fdv, { min: 1 })),
+    liquidityUsd: Math.round(finite('liquidity', pair.liquidity?.usd)),
+    volume24hUsd: Math.round(finite('volume24h', pair.volume?.h24)),
   };
 }
 
@@ -76,7 +87,7 @@ async function fetchHolders() {
   });
   if (!response.ok) throw new Error(`Blockscout HTTP ${response.status}`);
   const body = await response.json();
-  return Number(body.holders_count ?? body.holders);
+  return finite('holders', body.holders_count ?? body.holders, { min: 1 });
 }
 
 const [pair, burned, holders] = await Promise.all([
