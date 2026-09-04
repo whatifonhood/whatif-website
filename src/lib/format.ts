@@ -83,13 +83,10 @@ export function formatPercent(value: number, locale = 'en'): string {
  * figure but wrong in a column of results: "$16.96K" next to "$652.45" makes
  * two numbers the reader has to convert before they can compare them.
  */
-export function formatUsdExact(value: number, locale = 'en'): string {
-  if (!Number.isFinite(value)) return '—';
-  if (value < 1000) return formatUsd(value, locale);
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currencyDisplay: 'narrowSymbol',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
+
+/** A calendar date in the reader's own format, from an ISO YYYY-MM-DD. */
+export function formatDate(iso: string, locale = 'en'): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(
+    new Date(`${iso}T00:00:00Z`),
+  );
 }

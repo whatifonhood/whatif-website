@@ -16,3 +16,7 @@ playwright-report/
 
 # os
 .DS_Store
+
+# generator scratch
+.vite/
+.brand-kit-build/

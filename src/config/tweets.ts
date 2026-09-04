@@ -2,8 +2,10 @@
  * Posts to show on the site.
  *
  * Paste the URL of any public post here, then run `npm run tweets`. That fetches
- * the text and author through X's oEmbed endpoint at BUILD TIME and writes
- * src/config/tweet-cards.ts, which is what the page actually renders.
+ * the post as structured data from X's syndication endpoint at BUILD TIME (the
+ * same one X's own embed widget calls), re-encodes its pictures into
+ * public/posts/, and writes src/config/tweet-cards.ts, which is what the page
+ * actually renders.
  *
  * Why not X's own embed widget: it is a third-party script that tracks every
  * visitor, loads an iframe per post, renders in X's design rather than ours, and

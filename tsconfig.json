@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*.ts", "**/*.astro"],
-  "exclude": ["dist", "public/pfp"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "strict": true,
     "noUnusedLocals": true,

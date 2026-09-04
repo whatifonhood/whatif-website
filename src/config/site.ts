@@ -17,7 +17,7 @@ export const SITE = {
   /** Canonical origin. Used for sitemap, canonical tags and social card URLs. */
   url: 'https://whatifonhood.com',
   /** Shown in the browser tab and as the social card title. */
-  title: 'What $IF — the meme coin on Robinhood Chain',
+  title: 'What $IF — a meme coin on Robinhood Chain',
   description:
     'The meme coin for the perpetually curious. What if you aped earlier? What if you held? $IF on Robinhood Chain.',
   /** Repeated under holder posts; the one line that never changes. */
@@ -48,7 +48,6 @@ export const TOKEN = {
  * Robinhood Chain network parameters.
  *
  * These are the exact values a wallet needs, and the same object is passed to
- * `wallet_addEthereumChain` by the "Add Robinhood Chain" button. That call is a
  * standard browser wallet API: it adds a network, it does not connect a wallet,
  * and this site never asks anyone to connect one.
  *
@@ -136,7 +135,7 @@ export const TOKEN_SNAPSHOT = {
  * fails for their whole session. `npm run snapshot` is manual, so without a
  * gate nothing forces it to ever run again. Checked by tests/headers.spec.ts.
  */
-export const SNAPSHOT_MAX_AGE_DAYS = 30;
+export const SNAPSHOT_MAX_AGE_DAYS = 7;
 
 /** Percentage of total supply that has been burned. Derived, never typed by hand. */
 export const BURNED_PERCENT = (TOKEN_SNAPSHOT.burnedTokens / TOKEN.totalSupply) * 100;
@@ -148,7 +147,7 @@ export type Locale = (typeof LOCALES)[number];
 /** Shown in the language switcher. */
 export const LOCALE_NAMES: Record<Locale, string> = {
   en: 'EN',
-  zh: '中文',
+  zh: 'ZH',
   tr: 'TR',
   es: 'ES',
 };

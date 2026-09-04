@@ -135,28 +135,7 @@ export async function getPriceHistory(timeframe: Timeframe): Promise<Candle[]> {
   if (!isRecord(body) || !isRecord(body.data) || !isRecord(body.data.attributes)) return [];
 
   const list = body.data.attributes.ohlcv_list;
-  if (!Array.isArray(list)) return [];
-
-  const candles: Candle[] = [];
-  for (const row of list) {
-    // [timestamp, open, high, low, close, volume]
-    if (!Array.isArray(row) || row.length < 6) continue;
-    const [time, open, high, low, close, volumeUsd] = row.map(Number) as (number | undefined)[];
-    if ([time, open, high, low, close].some((value) => value === undefined)) continue;
-    if (![time, open, high, low, close].every((v) => Number.isFinite(v) && (v as number) > 0)) {
-      continue;
-    }
-    candles.push({
-      time: time as number,
-      open: open as number,
-      close: close as number,
-      high: high as number,
-      low: low as number,
-      volumeUsd: volumeUsd ?? 0,
-    });
-  }
-  // GeckoTerminal returns newest first; a chart reads oldest to newest.
-  return candles.reverse();
+  return toCandles(list);
 }
 
 /** The most recent trades on the pool, newest first. */

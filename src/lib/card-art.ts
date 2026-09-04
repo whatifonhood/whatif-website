@@ -20,7 +20,6 @@ export const INK = '#E9F0DD';
 export const LIME = '#8FCE02';
 export const FAINT = '#7D8C6E';
 export const VOID = '#080B07';
-export const WARN = '#E4703A';
 
 /**
  * A small deterministic generator.

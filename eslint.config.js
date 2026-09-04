@@ -9,12 +9,12 @@ import astro from 'eslint-plugin-astro';
  *  - tools/     runs in Node at build time
  *  - tests/     runs in Node under Playwright
  *
- * The generated config files (src/config/memes.ts, coin-history.ts) are written
+ * The generated config files (src/config/memes.ts, coins.ts, holders.ts, burns.ts, tweet-cards.ts) are written
  * by tools and are not hand-edited, so they are formatted but not linted for
  * style.
  */
 export default [
-  { ignores: ['dist/**', 'node_modules/**', '.astro/**', 'public/pfp/**'] },
+  { ignores: ['dist/**', 'node_modules/**', '.astro/**'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,

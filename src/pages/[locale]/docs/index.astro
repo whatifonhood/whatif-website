@@ -1,16 +1,11 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import DocsIndex from '../../../components/pages/DocsIndex.astro';
-import { LOCALES, type Locale } from '../../../config/site.ts';
 
 /** The contents page in every language except English, served from the root. */
-export const getStaticPaths = (() =>
-  LOCALES.filter((locale) => locale !== 'en').map((locale) => ({
-    params: { locale },
-    props: { locale },
-  }))) satisfies GetStaticPaths;
+import type { LocaleProps } from '../../../lib/routes.ts';
+export { localeStaticPaths as getStaticPaths } from '../../../lib/routes.ts';
 
-const { locale } = Astro.props as { locale: Locale };
+const { locale } = Astro.props as LocaleProps;
 ---
 
 <DocsIndex locale={locale} />

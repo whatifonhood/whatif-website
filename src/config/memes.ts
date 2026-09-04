@@ -367,7 +367,7 @@ export const MEMES: Meme[] = [
   },
   {
     slug: 'meme-artefact-weather-forecast',
-    title: 'Weather forecast',
+    title: 'Weather forecast (artefact)',
     series: 'Artefacts',
     width: 2048,
     height: 2048,

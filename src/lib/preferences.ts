@@ -5,7 +5,7 @@
  * private browsing and wherever site data is blocked, and a chart toolbar is
  * not worth a broken page. That wrapper was written out longhand at each of the
  * nine call sites in the dashboard, which is how one of them ended up saving
- * under a neighbour's key — see wireToggle in src/scripts/dashboard.ts.
+ * under a neighbour's key — see wireToggle in src/scripts/chart-interaction.ts.
  *
  * Naming the keys here rather than spelling the strings at each call site means
  * a typo is a compile error, and there is one list of what this site keeps on a

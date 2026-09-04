@@ -78,14 +78,14 @@ export const SECURITY_HEADERS: [string, string][] = [
   ['Referrer-Policy', 'strict-origin-when-cross-origin'],
   [
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()',
   ],
   ['Cross-Origin-Opener-Policy', 'same-origin'],
   ['Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload'],
 ];
 
 /** Fingerprinted or content-addressed: safe to cache forever. */
-export const IMMUTABLE_PATHS = ['/_astro', '/pfp/img'] as const;
+export const IMMUTABLE_PATHS = ['/_astro'] as const;
 
 /**
  * Artwork, replaced by uploading a new file rather than by editing one.
