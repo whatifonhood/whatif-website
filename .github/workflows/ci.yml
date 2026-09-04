@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # GitHub disables scheduled workflows in a public repo after 60 quiet days;
+  # a weekly run keeps the nightly refresh alive and re-checks the data.
+  schedule:
+    - cron: '17 6 * * 1'
 
 # Least privilege: this workflow only ever reads the repository.
 permissions:
