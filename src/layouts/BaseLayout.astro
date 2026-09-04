@@ -82,14 +82,14 @@ const organizationSchema = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
 
     <link rel="preload" as="font" type="font/woff2" href={archivoBody} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={archivoDisplay} crossorigin />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {
-      alternates.length > 1 && (
+      !noindex && alternates.length > 1 && (
         <>
           {alternates.map((alternate) => (
             <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
@@ -106,6 +106,13 @@ const organizationSchema = {
       )
     }
 
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${SITE.name} — updates`}
+      href={new URL('/rss.xml', SITE.url).href}
+    />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
@@ -118,11 +125,18 @@ const organizationSchema = {
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={shareImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:locale" content={copy.htmlLang} />
+    <meta property="og:locale" content={copy.ogLocale} />
+    {
+      alternates
+        .filter((alternate) => alternate.code !== locale)
+        .map((alternate) => (
+          <meta property="og:locale:alternate" content={getCopy(alternate.code).ogLocale} />
+        ))
+    }
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content={LINKS.xHandle} />

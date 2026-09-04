@@ -11,6 +11,8 @@ import Eyebrow from '../components/ui/Eyebrow.astro';
  * a title block, then whatever the page puts in the slot.
  */
 interface Props {
+  /** Forwarded to BaseLayout: the 404 page must not be indexed or given a canonical. */
+  noindex?: boolean;
   locale: Locale;
   title: string;
   description: string;
@@ -21,13 +23,28 @@ interface Props {
   socialImage?: string;
 }
 
-const { locale, title, description, eyebrow, heading, intro, socialImage } = Astro.props;
+const {
+  locale,
+  title,
+  description,
+  eyebrow,
+  heading,
+  intro,
+  socialImage,
+  noindex = false,
+} = Astro.props;
 
 // The space belongs to the string, not to the markup — see Hero.astro.
 const headingLead = `${heading.lead} `;
 ---
 
-<BaseLayout locale={locale} title={title} description={description} socialImage={socialImage}>
+<BaseLayout
+  noindex={noindex}
+  locale={locale}
+  title={title}
+  description={description}
+  socialImage={socialImage}
+>
   <Header locale={locale} />
 
   <main id="main" class="pt-16">
@@ -52,8 +69,3 @@ const headingLead = `${heading.lead} `;
 
   <Footer locale={locale} />
 </BaseLayout>
-
-<script>
-  // Sub-pages do not need the starfield, but they do share the reveal and copy
-  // behaviour, which BaseLayout already starts.
-</script>

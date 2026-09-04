@@ -50,6 +50,7 @@ const FULL_NAME: Record<Locale, string> = {
         <a
           href={target(code)}
           hreflang={code}
+          lang={code}
           aria-current={code === locale ? 'page' : undefined}
           class:list={[
             'rounded-lg px-3 py-2 text-sm transition-colors',
@@ -86,6 +87,7 @@ const FULL_NAME: Record<Locale, string> = {
               <a
                 href={target(code)}
                 hreflang={code}
+                lang={code}
                 aria-current={code === locale ? 'page' : undefined}
                 class:list={[
                   'flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors hover:bg-surface-2',

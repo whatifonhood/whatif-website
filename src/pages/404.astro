@@ -1,4 +1,5 @@
 ---
+import { toolPath } from '../config/navigation.ts';
 import PageLayout from '../layouts/PageLayout.astro';
 import { TOOL_ROUTES } from '../config/navigation.ts';
 import { getCopy } from '../content/index.ts';
@@ -16,6 +17,7 @@ const page = copy.pages.notFound;
 ---
 
 <PageLayout
+  noindex
   locale={locale}
   title={page.title}
   description={page.intro}
@@ -46,7 +48,7 @@ const page = copy.pages.notFound;
           TOOL_ROUTES.map((tool) => (
             <li>
               <a
-                href={tool.href}
+                href={toolPath(tool.href, locale)}
                 class="card flex flex-col gap-1 p-4 transition-colors hover:border-lime/50"
               >
                 <span class="font-semibold text-ink">{copy.nav.tools[tool.id].label}</span>
