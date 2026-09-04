@@ -44,5 +44,5 @@ matter here are:
 
 Documented in the **Security** section of the README, and enforced in CI:
 a strict CSP with no `unsafe-inline`, Trusted Types, SHA-pinned Actions,
-`npm audit` and secret scanning on every push, and no secrets in the repository
-at all — the site needs none.
+OSV-Scanner, gitleaks and CodeQL on every push, and no secrets in the
+repository at all — the site needs none.

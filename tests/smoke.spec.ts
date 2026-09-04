@@ -26,6 +26,10 @@ const PAGES = [
   { name: 'wallet lookup', path: '/holdings/' },
   { name: 'the generator', path: '/ask/' },
   { name: '404', path: '/404' },
+  { name: 'roadmap', path: '/roadmap/' },
+  { name: 'white paper', path: '/docs/' },
+  { name: 'a white-paper page', path: '/docs/introduction/' },
+  { name: 'question of the day', path: '/ask/day/' },
 ];
 
 for (const page of PAGES) {
@@ -97,7 +101,17 @@ for (const page of PAGES) {
         'content',
         /.{40,}/,
       );
-      await expect(browserPage.locator('link[rel="canonical"]')).toHaveCount(1);
+      // A noindex page has no canonical to offer a search engine; it says so instead.
+      const canonical = browserPage.locator('link[rel="canonical"]');
+      if (page.name === '404') {
+        await expect(canonical).toHaveCount(0);
+        await expect(browserPage.locator('meta[name="robots"]')).toHaveAttribute(
+          'content',
+          /noindex/,
+        );
+      } else {
+        await expect(canonical).toHaveCount(1);
+      }
     });
   });
 }
@@ -612,7 +626,7 @@ test.describe('a language keeps you in that language', () => {
   const hasTranslation = (href: string, locale: string) =>
     existsSync(join('dist', locale, href, 'index.html'));
 
-  for (const locale of ['zh', 'tr', 'es']) {
+  for (const locale of LOCALES.filter((one) => one !== 'en')) {
     for (const path of PAGES) {
       test(`/${locale}/${path} links to a translation whenever one exists`, async ({ page }) => {
         await page.goto(`/${locale}/${path}`);
@@ -623,7 +637,7 @@ test.describe('a language keeps you in that language', () => {
         const english = await page.evaluate(() =>
           [...document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]:not([hreflang])')]
             .map((a) => a.getAttribute('href') ?? '')
-            .filter((href) => /^\/(stats|memes|pfp|brand|learn|ask|holdings|roadmap)\//.test(href)),
+            .filter((href) => /^\/(stats|memes|pfp|brand|docs|ask|holdings|roadmap)\//.test(href)),
         );
 
         const leaks = [...new Set(english)].filter((href) => hasTranslation(href, locale));
@@ -653,7 +667,7 @@ test.describe('hreflang names this page in each language', () => {
     test(`${path} points at its own translations`, async ({ page }) => {
       await page.goto(path);
       const links = page.locator('link[rel="alternate"][hreflang]:not([hreflang="x-default"])');
-      await expect(links).toHaveCount(4);
+      await expect(links).toHaveCount(LOCALES.length);
 
       const hrefs = await links.evaluateAll((nodes) =>
         nodes.map((node) => (node as HTMLLinkElement).href),
@@ -1040,7 +1054,7 @@ test.describe('moving a collection between browsers', () => {
  * The community wall.
  *
  * This is the one place on the site where words written by somebody else reach
- * a visitor's browser. They arrive through X's oEmbed endpoint at build time as
+ * a visitor's browser. They arrive from X's syndication endpoint at build time as
  * a block of HTML, and `tools/build-tweets.mjs` reduces them to plain text
  * before anything is committed. The tests that matter are the ones proving that
  * reduction actually happened and that nothing markup-shaped survived.

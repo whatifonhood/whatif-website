@@ -10,6 +10,9 @@ npm install      # Node 22.12 or newer
 npm run dev      # http://localhost:4321
 ```
 
+Astro 7 runs the dev server as a background daemon. If a later start reports
+the port in use, `npx astro dev stop` ends the old one.
+
 ---
 
 ## Where things live
@@ -58,9 +61,9 @@ Two rules keep this navigable:
 
 ### …change some wording?
 
-Open `src/content/en.ts` and edit the string. The same key exists in `zh.ts` and
-`tr.ts`; TypeScript fails the build if one is missing, so translations cannot
-silently drift.
+Open `src/content/en.ts` and edit the string. The same key exists in `zh.ts`,
+`tr.ts` and `es.ts`; TypeScript fails the build if one is missing, so
+translations cannot silently drift.
 
 ### …change a link, the contract address, or a chain parameter?
 
@@ -73,7 +76,16 @@ contract address that disagrees with it.
 2. Add the code to `LOCALES`, `LOCALE_NAMES` and `LOCALE_PATHS` in `src/config/site.ts`.
 3. Register it in `src/content/index.ts`.
 4. Add `src/pages/<code>/index.astro` containing `<Landing locale="<code>" />`.
-5. Add the code to `i18n.locales` in `astro.config.mjs`.
+5. Add the code to `i18n.locales` in `astro.config.mjs` and to the sitemap's
+   `i18n.locales` map in the same file.
+6. Copy `src/docs/en/` to `src/docs/<code>/` and translate all sixteen pages —
+   `npm run docs` fails the build until every page exists.
+7. Add the routes: `src/pages/<code>/` mirrors `src/pages/[locale]/`, which
+   already builds every localised page from `LOCALES`, so there is nothing to
+   write — but check `npm run build` lists the new pages.
+8. Run `npm run check`. The tests read `LOCALES` too, so nothing there needs
+   editing; a failure means a string or a page is missing, and the message says
+   which.
 
 ### …put a post on the community wall?
 
@@ -83,9 +95,10 @@ Paste the post's URL into `TWEET_URLS` in `src/config/tweets.ts`, then run:
 npm run tweets
 ```
 
-That fetches the text and author through X's oEmbed endpoint **at build time**,
-reduces the returned HTML to plain text, and writes `src/config/tweet-cards.ts` —
-which is what the page renders. Commit both files.
+That fetches the post as structured data from X's syndication endpoint **at
+build time**, re-encodes its pictures into `public/posts/`, and writes
+`src/config/tweet-cards.ts` — which is what the page renders. Commit
+`tweets.ts`, `tweet-cards.ts` and the new files under `public/posts/`.
 
 No third-party script runs on the site and no iframe loads, so the
 Content-Security-Policy is untouched. The daily refresh re-runs this; a post
@@ -93,7 +106,8 @@ deleted on X drops off the wall, and a rate limit or an outage changes nothing.
 
 ### …add a meme to the vault?
 
-Drop the PNG into `what-if-meme/brand-pack/meme-pack/memes/`, then:
+Drop the PNG into `../what-if-meme/brand-pack/meme-pack/memes/` (a sibling
+repository that is not published; see the note under Commands), then:
 
 ```bash
 npm run memes
@@ -111,14 +125,16 @@ line here to add one.
 
 ### …add a FAQ entry?
 
-Add an object to `faq.items` in each of the three content files.
+Add an object to `faq.items` in each of the four content files.
 
 ### …change a colour, a font or the spacing?
 
 `src/styles/global.css`. Everything is a token in the `@theme` block, and
 components only use token-derived classes (`bg-void`, `text-lime`,
-`font-display`). There are no raw hex values anywhere else — Tailwind's default
-`lime` palette is deliberately removed so an off-brand green fails loudly.
+`font-display`). The only raw hex values outside this file are in canvas-drawing
+code (`card-art.ts`, `pfp.ts`, `cosmos.ts`), which cannot read CSS variables, and
+the `theme-color` meta tag. Tailwind's default `lime` palette is deliberately
+removed so an off-brand green fails loudly.
 
 ### …update the numbers shown before JavaScript loads?
 
@@ -133,8 +149,8 @@ requests, so the holder count keeps its previous value and says so.)
 ### …add a logo for another tool?
 
 Drop the file in `src/assets/logos`, add one line to `src/components/ui/ToolLogo.astro`,
-and reference it from `src/config/ecosystem.ts`. Logos are always downloaded and
-served from here — never hotlinked.
+and place `<ToolLogo name="…" />` where it belongs (`HowToBuy.astro` shows the
+pattern). Logos are always downloaded and served from here — never hotlinked.
 
 ### …regenerate the social sharing card?
 
@@ -144,18 +160,34 @@ Edit `tools/og-card.html`, then `npm run og`.
 
 ## Commands
 
-| Command            | What it does                                              |
-| ------------------ | --------------------------------------------------------- |
-| `npm run dev`      | Local dev server with hot reload                          |
-| `npm run build`    | Production build into `dist/`                             |
-| `npm run preview`  | Serve the production build locally                        |
-| `npm run check`    | Typecheck, lint, format check and build — run before a PR |
-| `npm test`         | Playwright tests against a real build                     |
-| `npm run memes`    | Rebuild the meme vault (needs ImageMagick 7)              |
-| `npm run snapshot` | Refresh the build-time token figures                      |
-| `npm run og`       | Re-render the social sharing card                         |
-| `npm run headers`  | Regenerate `public/_headers` and `vercel.json`            |
-| `npm run burns`    | Re-read the burn history from the chain                   |
+| Command             | What it does                                              |
+| ------------------- | --------------------------------------------------------- |
+| `npm run dev`       | Local dev server with hot reload                          |
+| `npm run build`     | Production build into `dist/`                             |
+| `npm run preview`   | Serve the production build locally                        |
+| `npm run check`     | Typecheck, lint, format check and build — run before a PR |
+| `npm test`          | Playwright tests against a real build                     |
+| `npm run memes`     | Rebuild the meme vault (needs ImageMagick 7)              |
+| `npm run snapshot`  | Refresh the build-time token figures                      |
+| `npm run og`        | Re-render the social sharing card                         |
+| `npm run headers`   | Regenerate `public/_headers` and `vercel.json`            |
+| `npm run burns`     | Re-read the burn history from the chain                   |
+| `npm run holders`   | Rebuild the largest-holders table from the explorer       |
+| `npm run candles`   | Refresh the committed chart candles                       |
+| `npm run tweets`    | Refresh the community wall from X                         |
+| `npm run cards`     | Re-render the meme and coin sharing cards                 |
+| `npm run serve`     | Serve `dist/` with the production headers, for the tests  |
+| `npm run docs`      | Lint the white paper (part of `check`)                    |
+| `npm run questions` | Lint the question generator (part of `check`)             |
+| `npm run roadmap`   | Lint the roadmap (part of `check`)                        |
+| `npm run coins`     | Maintainers only — copies PFP artwork from `../pfp`       |
+| `npm run brandkit`  | Maintainers only — builds the brand kit zip               |
+| `npm run favicons`  | Maintainers only — regenerates the favicons               |
+
+`memes`, `coins`, `brandkit` and `favicons` read source artwork from sibling
+repositories (`../what-if-meme`, `../pfp`) that are not published, so only
+maintainers can run them. Their outputs are committed; everything else runs from
+a clean clone.
 
 ---
 
@@ -216,7 +248,9 @@ Found a security problem? Please do not open a public issue. Use the private
 
 ## Deploying
 
-Vercel, from `main`. There are no environment variables to set.
+Production is Vercel, from `main`, with no environment variables to set.
+`netlify.toml`, `public/_headers` and `public/_redirects` are kept so the same
+build deploys unchanged on Netlify.
 
 Both hosts are supported and both configs are **generated**, because they
 disagree about conflicts: Netlify applies the _first_ matching rule, Vercel the

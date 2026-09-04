@@ -27,6 +27,9 @@ const EXACT_DIRECTIVES: Record<string, string> = {
   'form-action': "'none'",
   'object-src': "'none'",
   'manifest-src': "'self'",
+  'upgrade-insecure-requests': '',
+  'require-trusted-types-for': "'script'",
+  'trusted-types': "'none'",
 };
 
 /**
@@ -225,6 +228,34 @@ test('the build-time figures are not stale', async () => {
   expect(
     days,
     `the snapshot is ${Math.round(days)} days old — run \`npm run snapshot\``,
+  ).toBeLessThan(SNAPSHOT_MAX_AGE_DAYS);
+});
+
+/**
+ * The same promise for the other generated data. The nightly refresh rewrites
+ * all of it; a week without a commit means the refresh has been failing and
+ * the page is quietly showing last week.
+ */
+test('the generated holder table and chart candles are not stale', async () => {
+  const { SNAPSHOT_MAX_AGE_DAYS } = await import('../src/config/site.ts');
+  const { HOLDERS_CAPTURED } = await import('../src/config/holders.ts');
+  const { readFileSync } = await import('node:fs');
+
+  const holdersAge = (Date.now() - Date.parse(`${HOLDERS_CAPTURED}T00:00:00Z`)) / 86_400_000;
+  expect(
+    holdersAge,
+    `holders.ts is ${Math.round(holdersAge)} days old — run \`npm run holders\``,
+  ).toBeLessThan(SNAPSHOT_MAX_AGE_DAYS);
+
+  const candles = JSON.parse(
+    readFileSync(new URL('../src/data/candles.json', import.meta.url), 'utf8'),
+  );
+  const lastDay = candles.day.at(-1)?.[0];
+  expect(Number.isFinite(lastDay), 'candles.json has no daily candles').toBe(true);
+  const candleAge = (Date.now() / 1000 - lastDay) / 86_400;
+  expect(
+    candleAge,
+    `candles.json ends ${Math.round(candleAge)} days ago — run \`npm run candles\``,
   ).toBeLessThan(SNAPSHOT_MAX_AGE_DAYS);
 });
 
