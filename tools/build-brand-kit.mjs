@@ -9,7 +9,15 @@
  */
 import { execFileSync } from 'node:child_process';
 import sharp from 'sharp';
-import { cpSync, mkdirSync, rmSync, writeFileSync, existsSync, statSync } from 'node:fs';
+import {
+  cpSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+  existsSync,
+  statSync,
+  readFileSync,
+} from 'node:fs';
 import { dirname, join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,6 +33,10 @@ if (!existsSync(pack)) {
 }
 const staging = resolve(root, '.brand-kit-build');
 const outFile = join(root, 'public', 'brand', 'what-if-brand-kit.zip');
+/** The marks alone — folders 01 to 04 — for anyone who does not need 4K sheets. */
+const marksFile = join(root, 'public', 'brand', 'what-if-marks.zip');
+/** Sizes for the page, so the "55 MB" on it can never be a typed guess again. */
+const sizesFile = join(root, 'src', 'data', 'brand-kit.json');
 
 /** [source in the brand pack, destination in the kit] */
 const CONTENTS = [
@@ -81,7 +93,7 @@ const README = `WHAT $IF — BRAND KIT
 
 Everything you need to make $IF community content. Use it for $IF: posts,
 memes, stickers, videos. Not for another token, project or product, and
-nothing here implies endorsement — see NOTICE in the repository.
+nothing here implies endorsement — see NOTICE.txt in this kit.
 
 WHAT IS IN HERE
   01-token-logo        The coin. Use for the token: DEX listings, wallets,
@@ -154,7 +166,16 @@ for (const [from, to] of CONTENTS) {
     // the generator that made them — an `hf-job-id` per image and creation
     // timestamps — and a zip that is downloaded from the public site is not
     // the place for them. sharp writes a fresh PNG with no ancillary chunks.
-    await sharp(source).png().toFile(destination);
+    // Maximum lossless compression: the same pixels at a third of the bytes.
+    // The 4k reference sheet alone went from 16 MB to 6.
+    await sharp(source).png({ compressionLevel: 9, effort: 10 }).toFile(destination);
+  } else if (to.endsWith('IF-MAN-PROMPT-KIT.md')) {
+    // The prompt kit cites two files that are not in the kit: a head-studies
+    // sheet, and the private research document. Those lines go.
+    const kept = readFileSync(source, 'utf8')
+      .split('\n')
+      .filter((line) => !/head-studies|CHARACTER-RESEARCH/.test(line));
+    writeFileSync(destination, kept.join('\n'));
   } else {
     cpSync(source, destination);
   }
@@ -167,16 +188,43 @@ if (copied === 0) {
 }
 
 writeFileSync(join(staging, 'README.txt'), README);
+// The licence terms travel with the files rather than being a pointer at a
+// repository the reader may never open.
+writeFileSync(join(staging, 'NOTICE.txt'), readFileSync(join(root, 'NOTICE'), 'utf8'));
 
 rmSync(outFile, { force: true });
+rmSync(marksFile, { force: true });
 mkdirSync(dirname(outFile), { recursive: true });
 // -X drops the "extra fields" zip records by default: Unix UID/GID and local
 // timestamps of whoever ran the build, which is exactly what a public file
 // should not say.
 execFileSync('zip', ['-r', '-q', '-X', outFile, '.'], { cwd: staging });
+execFileSync(
+  'zip',
+  [
+    '-r',
+    '-q',
+    '-X',
+    marksFile,
+    '01-token-logo',
+    '02-avatar',
+    '03-wordmark',
+    '04-favicon',
+    'README.txt',
+    'NOTICE.txt',
+  ],
+  { cwd: staging },
+);
 rmSync(staging, { recursive: true, force: true });
 
-const size = (statSync(outFile).size / 1024 / 1024).toFixed(1);
-process.stdout.write(`${copied} files -> ${outFile} (${size} MB)\n`);
+const kitBytes = statSync(outFile).size;
+const marksBytes = statSync(marksFile).size;
+writeFileSync(
+  sizesFile,
+  `${JSON.stringify({ kitBytes, marksBytes, files: copied + 2 }, null, 2)}\n`,
+);
+process.stdout.write(
+  `${copied} files -> ${outFile} (${(kitBytes / 1024 / 1024).toFixed(1)} MB), marks ${(marksBytes / 1024 / 1024).toFixed(1)} MB\n`,
+);
 if (missing.length)
   process.stdout.write(`  missing from the brand pack:\n   - ${missing.join('\n   - ')}\n`);
