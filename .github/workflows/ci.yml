@@ -23,9 +23,9 @@ jobs:
     name: Typecheck, lint and build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: npm
@@ -36,24 +36,18 @@ jobs:
       # The job is called "Typecheck, lint and build" and did not typecheck.
       # astro check is what catches a broken content contract or a bad prop
       # before it reaches a page.
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: Build
-        run: npm run build
+      # The same command CONTRIBUTING tells people to run, so CI and a laptop
+      # cannot disagree. It typechecks, lints, checks formatting, validates the
+      # question generator, the white paper and the roadmap, and builds.
+      - name: Check
+        run: npm run check
 
   test:
     name: Browser tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: npm
@@ -71,7 +65,7 @@ jobs:
       # be. Installing all of them costs about a minute and cannot drift.
       - run: npx playwright install --with-deps
       - run: npm test
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: playwright-report
@@ -82,11 +76,11 @@ jobs:
     name: Dependencies and secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: npm
@@ -98,7 +92,14 @@ jobs:
         run: npm audit --audit-level=high
 
       # The site is built to have no secrets; this makes sure it stays that way.
+      #
+      # The CLI, not the marketplace action. The action calls the GitHub API to
+      # list a pull request's commits, and on Dependabot's pull requests the
+      # token cannot — every one of them failed with "Resource not accessible by
+      # integration" and the scan never ran. The binary needs no token: the
+      # checkout above has the whole history (fetch-depth: 0) and it scans that.
       - name: Scan for secrets
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            | tar -xz gitleaks
+          ./gitleaks detect --no-banner --redact --log-opts='--all'

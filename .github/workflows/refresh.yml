@@ -16,8 +16,8 @@ on:
     - cron: '12 5 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: write
+# Nothing at the workflow level; the one job that pushes asks for what it needs.
+permissions: {}
 
 concurrency:
   group: refresh
@@ -27,10 +27,18 @@ jobs:
   refresh:
     name: Refresh on-chain and market data
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      # persist-credentials: false keeps the write token out of .git/config for
+      # the whole run — the npm install and every third-party fetch below happen
+      # without a push-capable credential on disk. The commit step re-attaches
+      # it for the one command that needs it.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: npm
@@ -92,10 +100,20 @@ jobs:
       - name: Verify the site still builds
         run: npm run build
 
+      # A refresh commit pushed with GITHUB_TOKEN never triggers ci.yml, so the
+      # checks that guard the data files have to run here, before the commit —
+      # the header contract, and the wall's posts matching the list.
+      - name: Check the data the way CI would
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test tests/headers.spec.ts --project=desktop
+          npx playwright test tests/smoke.spec.ts --project=desktop -g "wall of posts"
+
       - name: Commit anything that changed
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git add src/config/site.ts src/config/burns.ts src/config/tweet-cards.ts \
                   src/config/holders.ts src/data/candles.json
           if git diff --cached --quiet; then

@@ -55,12 +55,10 @@ export function initAnalytics(): void {
   window.plausible = queue;
   queue.init({ domain: ANALYTICS.domain, endpoint: ANALYTICS.eventPath });
 
-  const script = document.createElement('script');
-  script.src = ANALYTICS.scriptPath;
-  script.defer = true;
-  // A blocked or missing script must not surface as an error.
-  script.addEventListener('error', () => undefined);
-  document.head.append(script);
+  // The <script> tag itself is rendered by BaseLayout.astro when analytics is
+  // enabled. Creating it here — `script.src = …` — is a DOM sink, and the CSP's
+  // `require-trusted-types-for 'script'` makes the browser throw on it, before
+  // the nav and copy buttons had initialised. A tag in the HTML is not a sink.
 }
 
 /**

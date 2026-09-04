@@ -21,7 +21,6 @@ export const CONNECT_SRC = [
   'https://api.dexscreener.com', // price, liquidity, volume
   'https://api.geckoterminal.com', // candles, trades, holders, concentration
   'https://rpc.mainnet.chain.robinhood.com', // the chain: burn, balances, supply
-  'https://api.coingecko.com', // price history for the long-tail coins
 ] as const;
 
 /** The policy every page gets. `img-src` is the only part that ever varies. */
@@ -96,7 +95,9 @@ export const IMMUTABLE_PATHS = ['/_astro', '/pfp/img'] as const;
 export const WEEK_PATHS = [
   '/memes/full',
   '/memes/thumb',
+  '/memes/thumb15x',
   '/memes/thumb2x',
+  '/memes/display',
   '/memes/og',
   '/coins/full',
   '/coins/thumb',

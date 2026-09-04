@@ -9,6 +9,7 @@
  */
 import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
 import { jsonLd } from '../lib/json-ld.ts';
+import { ANALYTICS } from '../config/analytics.ts';
 import { basePath, hasTranslation, localePath } from '../config/navigation.ts';
 
 /*
@@ -88,12 +89,22 @@ const organizationSchema = {
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {
-      alternates.length > 1 &&
-        alternates.map((alternate) => (
-          <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
-        ))
+      alternates.length > 1 && (
+        <>
+          {alternates.map((alternate) => (
+            <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
+          ))}
+          {/* x-default names the fallback for THIS page, not the homepage:
+              pointing every page's x-default at / told search engines that
+              /docs/risks/ in any other language falls back to the landing page. */}
+          <link
+            rel="alternate"
+            hreflang="x-default"
+            href={alternates.find((alternate) => alternate.code === 'en')?.href ?? SITE.url}
+          />
+        </>
+      )
     }
-    <link rel="alternate" hreflang="x-default" href={SITE.url} />
 
     <link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -120,6 +131,17 @@ const organizationSchema = {
     <meta name="twitter:image" content={shareImage} />
 
     <script type="application/ld+json" is:inline set:html={jsonLd(organizationSchema)} />
+    {
+      ANALYTICS.enabled && (
+        <script
+          is:inline
+          defer
+          src={ANALYTICS.scriptPath}
+          data-domain={ANALYTICS.domain}
+          data-api={ANALYTICS.eventPath}
+        />
+      )
+    }
   </head>
 
   <body class="bg-void text-ink antialiased">

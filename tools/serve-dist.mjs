@@ -8,12 +8,64 @@
  *
  *   node tools/serve-dist.mjs [port]
  */
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../dist', import.meta.url)));
+
+/*
+ * The response headers the real hosts send, read from public/_headers.
+ *
+ * Until this existed the suite never saw the CSP: the header test read the
+ * file, and the browser tests ran against a server that sent no policy at all.
+ * A rule that only exists in a file is a rule nobody has watched a browser
+ * enforce — the roadmap's inline styles silently failing in production while
+ * every test passed is what that looks like. Netlify semantics: for a header,
+ * the FIRST matching path block wins.
+ */
+const HEADER_BLOCKS = readFileSync(join(root, '_headers'), 'utf8')
+  .split(/\n(?=\S)/)
+  .map((block) => block.split('\n'))
+  .filter((lines) => lines[0] && !lines[0].startsWith('#'))
+  .map(([path, ...rest]) => ({
+    test: new RegExp(
+      `^${path
+        .trim()
+        .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*/g, '.*')}$`,
+    ),
+    headers: rest
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#'))
+      .map((line) => {
+        const at = line.indexOf(':');
+        return [line.slice(0, at), line.slice(at + 1).trim()];
+      }),
+  }));
+
+function headersFor(url) {
+  const path = url.split('?')[0];
+  const chosen = {};
+  for (const block of HEADER_BLOCKS) {
+    if (!block.test.test(path)) continue;
+    for (const [name, value] of block.headers) {
+      // Everything the hosts send, minus one directive. `upgrade-insecure-requests`
+      // tells the browser to fetch every subresource over https; Chromium and
+      // Firefox exempt localhost, WebKit does not, and against this plain-http
+      // server every script and stylesheet then failed with a TLS error on the
+      // mobile (WebKit) project. Production is https, so the directive is
+      // meaningful there and meaningless here.
+      chosen[name.toLowerCase()] ??=
+        name.toLowerCase() === 'content-security-policy'
+          ? value.replace(/;\s*upgrade-insecure-requests\s*/i, '')
+          : value;
+    }
+  }
+  return chosen;
+}
+
 const port = Number(process.argv[2] ?? 4321);
 
 const CONTENT_TYPES = {
@@ -62,6 +114,7 @@ createServer((request, response) => {
   }
   response.writeHead(200, {
     'content-type': CONTENT_TYPES[extname(file)] ?? 'application/octet-stream',
+    ...headersFor(request.url ?? '/'),
   });
   createReadStream(file).pipe(response);
 }).listen(port, () => {

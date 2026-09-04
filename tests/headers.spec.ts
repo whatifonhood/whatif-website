@@ -92,13 +92,12 @@ test.describe('security headers', () => {
       //   dexscreener   price, liquidity and volume
       //   geckoterminal candles, trades, holders and concentration
       //   rpc           the chain itself, for the burn and wallet balances
-      //   coingecko     price history for the eighteen thousand coins in the
-      //                 Machine that are too many to ship as files
-      // Adding a fifth is a decision, not a detail — this test exists to make
-      // sure one cannot arrive by accident.
+      // CoinGecko was on this list for the What $IF Machine, which is gone; an
+      // origin the site never contacts stayed allowed for three weeks after.
+      // Adding a fourth is a decision, not a detail — this test exists to make
+      // sure one cannot arrive by accident, or outlive its reason.
       expect(allowed, policy).toEqual([
         "'self'",
-        'https://api.coingecko.com',
         'https://api.dexscreener.com',
         'https://api.geckoterminal.com',
         'https://rpc.mainnet.chain.robinhood.com',
