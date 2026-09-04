@@ -12,6 +12,10 @@ permissions: {}
 jobs:
   analyze:
     name: Static analysis
+    # Code scanning is a public-repository feature on this plan. While the repo is
+    # private the upload is refused, so the job is skipped rather than red; the
+    # moment the repo goes public it runs on every push.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
