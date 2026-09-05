@@ -2197,7 +2197,102 @@ export const BURNS: BurnEvent[] = [
     tokens: 10916,
     txHash: '0xea73439404832f1c18b6e639c93f512484979d14e3324a82f76399c2bfa4a208',
   },
+  {
+    time: 1788523158,
+    tokens: 113878,
+    txHash: '0x8973dd227aebe72d250acfcceab4ebc2cec51181e748625d76124e2e84fc611b',
+  },
+  {
+    time: 1788524585,
+    tokens: 4391,
+    txHash: '0xe5385f7ec5e460171343953d9245023b0c59f0e03cbecbbb3156cf39f266b54d',
+  },
+  {
+    time: 1788525522,
+    tokens: 4989,
+    txHash: '0x1a84c0b1b78970030410a7c8fe92fdf323de9d509a697b0dec9f5b81498c44ad',
+  },
+  {
+    time: 1788529156,
+    tokens: 27509,
+    txHash: '0xa41c8c68f16c63ac9d50a370867e04a85edc0c15895b54fc080d50c76f7e319d',
+  },
+  {
+    time: 1788530856,
+    tokens: 5922,
+    txHash: '0xb6716d8cf7b39950e2cc3e37a4e543154514f43376c33e628b661b4fb5315e9f',
+  },
+  {
+    time: 1788530875,
+    tokens: 31,
+    txHash: '0xc94f512f7770b3cdf4bdb8f224294b4983c94dea04b77470b6c7265dd1fb6bc4',
+  },
+  {
+    time: 1788532818,
+    tokens: 2519,
+    txHash: '0x507b11eed278f8a7fb67fc2642396e566b83295f9362f5688b4b26c81625c580',
+  },
+  {
+    time: 1788539123,
+    tokens: 7633,
+    txHash: '0xe9b2a518b26691cc3dec205fee3af6063df57a874eefff0fa3df92a02369ad9c',
+  },
+  {
+    time: 1788547317,
+    tokens: 24438,
+    txHash: '0xd644aab2c4ad5f172e914d78f2b1a2353096c9f6b7a1439eea21eaf6c32a123d',
+  },
+  {
+    time: 1788550602,
+    tokens: 9258,
+    txHash: '0x51f7352a3f159d687ebcf47d43434b857975e600c1fac5121709a008a2380b2e',
+  },
+  {
+    time: 1788551129,
+    tokens: 1130,
+    txHash: '0xeeabc8b12c9ceea82758037366f0c09ad176a2f2009a36424a9f852164638e0c',
+  },
+  {
+    time: 1788552168,
+    tokens: 944,
+    txHash: '0x0c5f8ebefb4be037aa31f5f8d1069f04c59e6b4d012ae371fb62a28b278509cb',
+  },
+  {
+    time: 1788552952,
+    tokens: 1267,
+    txHash: '0x3bbaa09d518593e66dfe3207bd5c9fce746ecd37b34bbd2a08835e0c5c741258',
+  },
+  {
+    time: 1788553846,
+    tokens: 2082,
+    txHash: '0x4d81481a0db04228a652c3ed951908c6a9e36f386c6ba457cda94e8c4528228d',
+  },
+  {
+    time: 1788557370,
+    tokens: 14185,
+    txHash: '0x25adbf3a2feac071337ee5ba051db2f44562ac294fdafa6b9344654347f1f40a',
+  },
+  {
+    time: 1788564625,
+    tokens: 12331,
+    txHash: '0x77f5f3ced8d84d4c25549b4fcd50aab0c44bf021572eed9807d105ff3eed06b7',
+  },
+  {
+    time: 1788568472,
+    tokens: 8844,
+    txHash: '0xcf76d3f732351ffc5564be2fb92d1e2043492801f8d6382c4fdb12c8e885a909',
+  },
+  {
+    time: 1788579698,
+    tokens: 17439,
+    txHash: '0x6c3c61948115b0d454c7765edc23d63f84e224d407a3f3318430514bb3e21539',
+  },
+  {
+    time: 1788589978,
+    tokens: 9738,
+    txHash: '0xdd3cf9137936029f11f8e1eabde943d413882af3144e552b1191f08d820a3366',
+  },
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 54219635;
+export const BURNS_SCANNED_TO = 54997235;
