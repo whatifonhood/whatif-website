@@ -20,3 +20,6 @@ playwright-report/
 # generator scratch
 .vite/
 .brand-kit-build/
+# the Vercel CLI's project link, and the env file it writes
+.vercel
+.env.local
