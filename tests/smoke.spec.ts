@@ -525,6 +525,8 @@ test('the burn is never quoted as hardcoded text', async ({ page }) => {
  * end. These check the drawing, not that the code ran.
  */
 test.describe('the chart can be navigated', () => {
+  test.beforeEach(skipWithoutChart);
+
   /**
    * The chart needs live data before there is anything to navigate.
    *
@@ -925,6 +927,16 @@ test.describe('every day so far', () => {
 });
 
 /** Escapes a sentence so it can be matched literally inside a RegExp. */
+/**
+ * The chart is switched off in Stats.astro for now (GeckoTerminal was
+ * rate-limiting every browser). Its tests wait for it to come back rather than
+ * fail; the price card they share with it is covered by the page tests.
+ */
+async function skipWithoutChart({ page }: { page: Page }): Promise<void> {
+  await page.goto('/stats/');
+  test.skip((await page.locator('[data-chart]').count()) === 0, 'the chart is switched off');
+}
+
 /**
  * The secondary chart controls fold behind an "Options" chip on touchscreens
  * (see .chart-more in chart.css). A test that taps one of them on the mobile
@@ -1665,6 +1677,8 @@ test.describe('the site behaves on a phone', () => {
  * behaviour could ship on any day the API was busy.
  */
 test.describe('the chart reads under a finger', () => {
+  test.beforeEach(skipWithoutChart);
+
   /** Well-formed OHLCV so the chart draws without reaching the network. */
   const candles = (at: number) =>
     Array.from({ length: 240 }, (_, i) => {
@@ -1863,6 +1877,8 @@ test.describe('it works the same in every engine', () => {
  * API is failing, which is exactly when a test that skips itself would skip.
  */
 test.describe('the chart never mislabels what it is showing', () => {
+  test.beforeEach(skipWithoutChart);
+
   const rows = (n: number, step: number) =>
     Array.from({ length: n }, (_, i) => {
       const time = 1_788_000_000 - (n - 1 - i) * step;
@@ -2205,6 +2221,8 @@ test.describe('a line of your own', () => {
  * What changed on the dashboard and the wallet lookup after the tool review.
  */
 test.describe('the chart controls fold on a touchscreen', () => {
+  test.beforeEach(skipWithoutChart);
+
   test('secondary controls are one tap away on a phone, and always open on a mouse', async ({
     page,
   }) => {
@@ -2232,6 +2250,8 @@ test.describe('the chart controls fold on a touchscreen', () => {
 });
 
 test.describe('a stale chart says so', () => {
+  test.beforeEach(skipWithoutChart);
+
   test('when the candle feed is unreachable the reading line dates the candles', async ({
     page,
   }) => {
