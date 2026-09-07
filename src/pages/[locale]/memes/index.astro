@@ -1,0 +1,15 @@
+---
+import Vault from '../../../components/pages/Vault.astro';
+
+/**
+ * Vault in every language except English, which is served from the root.
+ *
+ * The body lives in the component so the two routes cannot drift apart.
+ */
+import type { LocaleProps } from '../../../lib/routes.ts';
+export { localeStaticPaths as getStaticPaths } from '../../../lib/routes.ts';
+
+const { locale } = Astro.props as LocaleProps;
+---
+
+<Vault locale={locale} />

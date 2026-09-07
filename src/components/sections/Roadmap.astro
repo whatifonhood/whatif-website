@@ -1,0 +1,114 @@
+---
+import { ROADMAP } from '../../config/roadmap.ts';
+import { localePath } from '../../config/navigation.ts';
+import type { Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The roadmap, in short.
+ *
+ * This used to be a joke — a blank PDF and four quarters of "still asking".
+ * The joke was good while there was nothing to show. There is now, so the
+ * section shows the real thing and keeps the stamp.
+ *
+ * Only live and next work appears here; the full list — the delivery record,
+ * the four tracks, the dated log and the terms — is on /roadmap/.
+ *
+ * Each item carries its track, so the two pages speak the same language and a
+ * reader arriving at the full roadmap already knows what the chips mean.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.roadmap;
+
+const building = ROADMAP.filter((item) => item.status === 'building');
+const next = ROADMAP.filter((item) => item.status === 'next').slice(0, 3);
+const shipped = ROADMAP.filter((item) => item.status === 'shipped').length;
+---
+
+<Section id="roadmap" divider>
+  <div class="max-w-2xl">
+    <Eyebrow>{page.eyebrow}</Eyebrow>
+    <SectionHeading heading={page.heading} class="mt-4" />
+    <p class="mt-5 text-lg leading-relaxed text-muted">{page.intro}</p>
+  </div>
+
+  <div class="mt-12 grid gap-3 lg:grid-cols-2" data-reveal>
+    {
+      [
+        { key: 'building', items: building },
+        { key: 'next', items: next },
+      ].map((column) => (
+        <div class="card p-6 sm:p-7">
+          <h3 class="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+            <span class="road-dot" data-status={column.key} aria-hidden="true" />
+            {page.statuses[column.key as 'building' | 'next']}
+          </h3>
+          <ul class="mt-5 flex flex-col gap-4">
+            {column.items.map((item) => (
+              <li>
+                <p class="track-chip">{page.tracks[item.track].label}</p>
+                <p class="mt-2 font-semibold text-ink">{item.title}</p>
+                <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="mt-8 flex flex-wrap items-center gap-4">
+    <a
+      href={localePath('/roadmap/', locale)}
+      class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+    >
+      {page.title}
+      <Icons name="arrow-up-right" size={14} />
+    </a>
+    <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+      <span class="text-lime">{shipped}</span>
+      {page.shippedCount}
+    </p>
+  </div>
+
+  <p class="mt-8 max-w-2xl font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+    {copy.roadmap.stamp}
+  </p>
+</Section>
+
+<style>
+  .road-dot {
+    height: 8px;
+    width: 8px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--color-lime);
+  }
+  .road-dot[data-status='building'] {
+    box-shadow: 0 0 0 4px rgb(143 206 2 / 0.18);
+  }
+  .road-dot[data-status='next'] {
+    background: var(--color-lime-mid);
+  }
+
+  .track-chip {
+    display: inline-block;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-lime) 14%, transparent);
+    padding: 0.2rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-lime);
+  }
+</style>

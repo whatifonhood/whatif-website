@@ -1,0 +1,156 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Button from '../ui/Button.astro';
+import Icons from '../ui/Icons.astro';
+import { MEMES, type Meme } from '../../config/memes.ts';
+import { SITE, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import { localePath } from '../../config/navigation.ts';
+
+interface Props {
+  locale: Locale;
+  meme: Meme;
+}
+
+/**
+ * One meme's page, in whichever language the reader is in.
+ *
+ * The body lives here rather than in the route so the English page at
+ * /memes/<slug>/ and the translated ones at /<locale>/memes/<slug>/ cannot
+ * drift apart — the same reason Vault.astro exists.
+ *
+ * The TITLES stay in English on every locale, deliberately. They are jokes and
+ * proper nouns ("Cashcat both pump"), not prose; translating them would remove
+ * the joke and make a shared image unrecognisable between languages. Everything
+ * around them — the buttons, the series heading, the way back — is translated.
+ */
+const { locale, meme } = Astro.props;
+
+const copy = getCopy(locale);
+const page = copy.pages.meme;
+
+/**
+ * Three more from the same series, so the page is a doorway not a dead end.
+ * The three AFTER this one, wrapping round: every page in a series used to
+ * show the same first three, so the doorway led to the same room every time.
+ */
+const inSeries = MEMES.filter((m) => m.series === meme.series);
+const at = Math.max(
+  0,
+  inSeries.findIndex((m) => m.slug === meme.slug),
+);
+const rest = inSeries.filter((m) => m.slug !== meme.slug);
+// In `rest`, the element at `at` is the one that followed this meme.
+const siblings = Array.from(
+  { length: Math.min(3, rest.length) },
+  (_, index) => rest[(at + index) % rest.length]!,
+);
+
+const url = `${SITE.url}${localePath(`/memes/${meme.slug}/`, locale)}`;
+
+const shareUrl = new URL('https://x.com/intent/post');
+shareUrl.searchParams.set('text', page.shareText(meme.title));
+shareUrl.searchParams.set('url', url);
+---
+
+<PageLayout
+  locale={locale}
+  title={meme.title}
+  description={page.description(meme.title, meme.series)}
+  eyebrow={meme.series}
+  heading={{ lead: meme.title, accent: '' }}
+  intro={page.intro}
+  socialImage={`${SITE.url}/memes/og/${meme.slug}.jpg`}
+>
+  <div class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8">
+    <figure class="overflow-hidden rounded-2xl border border-line bg-surface">
+      <img
+        src={`/memes/display/${meme.slug}.webp`}
+        srcset={`/memes/thumb2x/${meme.slug}.webp 800w, /memes/display/${meme.slug}.webp 1200w`}
+        sizes="(min-width: 56rem) 56rem, 100vw"
+        alt={meme.title}
+        width={meme.width}
+        height={meme.height}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="w-full"
+      />
+    </figure>
+
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <Button
+        href={`/memes/full/${meme.slug}.webp`}
+        size="lg"
+        download={`whatif-${meme.slug}.webp`}
+        data-meme-file
+      >
+        {page.download}
+        <Icons name="arrow-up-right" size={16} />
+      </Button>
+      <!-- The X intent cannot attach the picture, so a plain link is the other way to pass it on. -->
+      <button
+        type="button"
+        class="js-copy inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+        data-copy-value={url}
+        data-copy-label={page.copyLink}
+        data-copied-label={copy.numbers.copied}
+      >
+        {page.copyLink}
+      </button>
+      <a
+        href={shareUrl.toString()}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+      >
+        <Icons name="x" size={14} />
+        {page.postOnX}
+      </a>
+    </div>
+
+    {
+      siblings.length > 0 && (
+        <section class="mt-16 border-t border-line pt-10">
+          <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+            {page.more} {meme.series}
+          </h2>
+          <ul class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {siblings.map((sibling) => (
+              <li class="card group overflow-hidden">
+                <a href={localePath(`/memes/${sibling.slug}/`, locale)}>
+                  <img
+                    src={`/memes/thumb/${sibling.slug}.webp`}
+                    alt=""
+                    width={sibling.width}
+                    height={sibling.height}
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-square w-full bg-surface-2 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                  <p class="line-clamp-2 p-3 text-sm font-semibold text-ink [overflow-wrap:anywhere]">
+                    {sibling.title}
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <p class="mt-12 text-center">
+      <a
+        href={localePath('/memes/', locale)}
+        class="tap text-sm text-muted underline-offset-4 hover:text-lime hover:underline"
+      >
+        {page.backToVault}
+      </a>
+    </p>
+  </div>
+</PageLayout>
+
+<script>
+  import { initMemeShare } from '../../scripts/meme-share.ts';
+  initMemeShare();
+</script>

@@ -1,0 +1,71 @@
+---
+import type { Locale } from '../config/site.ts';
+import type { SplitHeading } from '../content/types.ts';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/sections/Header.astro';
+import Footer from '../components/sections/Footer.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+
+/**
+ * The shell for every page that is not the landing page: same header and footer,
+ * a title block, then whatever the page puts in the slot.
+ */
+interface Props {
+  /** Forwarded to BaseLayout: the 404 page must not be indexed or given a canonical. */
+  noindex?: boolean;
+  locale: Locale;
+  title: string;
+  description: string;
+  eyebrow: string;
+  heading: SplitHeading;
+  intro: string;
+  /** Absolute URL of the sharing image, when the page has its own. */
+  socialImage?: string;
+}
+
+const {
+  locale,
+  title,
+  description,
+  eyebrow,
+  heading,
+  intro,
+  socialImage,
+  noindex = false,
+} = Astro.props;
+
+// The space belongs to the string, not to the markup — see Hero.astro.
+const headingLead = `${heading.lead} `;
+---
+
+<BaseLayout
+  noindex={noindex}
+  locale={locale}
+  title={title}
+  description={description}
+  socialImage={socialImage}
+>
+  <Header locale={locale} />
+
+  <main id="main" class="pt-16">
+    <div class="relative overflow-hidden border-b border-line">
+      <div
+        class="pointer-events-none absolute -top-32 left-1/2 h-64 w-[70vw] max-w-3xl -translate-x-1/2 rounded-full bg-lime/10 blur-[110px]"
+        aria-hidden="true"
+      >
+      </div>
+      <div class="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-20">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h1 class="display-heading mt-4 max-w-3xl text-4xl sm:text-6xl">
+          {headingLead}<span class="text-lime">{heading.accent}</span>
+        </h1>
+        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted">{intro}</p>
+        <slot name="header-extra" />
+      </div>
+    </div>
+
+    <slot />
+  </main>
+
+  <Footer locale={locale} />
+</BaseLayout>

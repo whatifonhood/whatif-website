@@ -1,0 +1,147 @@
+---
+import { TWEET_CARDS } from '../../config/tweet-cards.ts';
+import { LINKS, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The wall of posts.
+ *
+ * The whole post — words, author, avatar and pictures — fetched once at build
+ * time by `npm run tweets` and rendered here in our own type and colours. The
+ * images are downloaded and re-encoded into public/posts/, so they load from
+ * this origin: a visitor sees the full post, and X never learns they were here.
+ *
+ * That is the reason this is not X's embed widget. The widget shows the same
+ * thing while running a third-party script, loading an iframe per post, and
+ * requiring holes in the Content-Security-Policy for both — on a page about a
+ * coin, watched by people who were told not to trust websites.
+ *
+ * The whole section disappears when there is nothing to show, so an empty list
+ * never leaves a hole on the landing page.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const section = copy.posts;
+
+const cards = TWEET_CARDS.slice(0, 6);
+
+/** "2026-08-31" in the reader's language, for the dateline on each card. */
+const showDate = (iso: string) => {
+  const parsed = Date.parse(`${iso}T00:00:00Z`);
+  if (!Number.isFinite(parsed)) return '';
+  return new Date(parsed).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+};
+---
+
+{
+  cards.length > 0 && (
+    <Section id="posts" divider>
+      <div class="max-w-2xl">
+        <Eyebrow>{section.eyebrow}</Eyebrow>
+        <SectionHeading heading={section.heading} class="mt-4" />
+        <p class="mt-5 text-lg leading-relaxed text-muted">{section.intro}</p>
+      </div>
+
+      <ul class="mt-10 grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card, index) => (
+          <li class="card flex flex-col overflow-hidden">
+            <div class="flex items-center gap-3 p-5 pb-3">
+              {card.avatar && (
+                <img
+                  src={card.avatar}
+                  alt=""
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-10 w-10 shrink-0 rounded-full bg-surface-2"
+                />
+              )}
+              <div class="min-w-0">
+                <p id={`post-${index}-author`} class="truncate text-sm font-semibold text-ink">
+                  {card.authorName}
+                </p>
+                <p class="truncate font-mono text-[11px] text-faint">@{card.authorHandle}</p>
+              </div>
+              <Icons name="x" size={14} class="ml-auto shrink-0 text-faint" />
+            </div>
+
+            {/*
+              lang: the posts stay in the language they were written in while
+              the page around them is translated, and a screen reader set to
+              Chinese will otherwise try to pronounce English with Chinese
+              phonetics. WCAG 3.1.2.
+            */}
+            {card.text && (
+              <p
+                id={`post-${index}-text`}
+                lang={locale === 'en' ? undefined : 'en'}
+                class="whitespace-pre-line px-5 pb-4 leading-relaxed text-ink"
+              >
+                {card.text}
+              </p>
+            )}
+
+            {card.photos.map((photo) => (
+              <img
+                src={photo.src}
+                srcset={`${photo.src.replace(/\.webp$/, '@800.webp')} 800w, ${photo.src} 1200w`}
+                sizes="(min-width: 1024px) 393px, calc(100vw - 2.5rem)"
+                alt=""
+                width={photo.width}
+                height={photo.height}
+                loading="lazy"
+                decoding="async"
+                class="w-full border-y border-line bg-surface-2 object-cover"
+              />
+            ))}
+
+            {/*
+              aria-labelledby: every one of these links used to announce the
+              same thing — the account name — while going somewhere different.
+              Listing the links on the page gave three identical entries. Naming
+              each one by the post it opens makes them tell apart.
+            */}
+            <a
+              href={card.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-labelledby={`post-${index}-author post-${index}-text`}
+              class="mt-auto flex items-center gap-2 px-5 py-4 font-mono text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-lime"
+            >
+              <time datetime={card.postedAt}>{showDate(card.postedAt)}</time>
+              <span aria-hidden="true">·</span>
+              {section.readOnX}
+              <Icons name="arrow-up-right" size={12} class="ml-auto" />
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8 text-center">
+        <a
+          href={LINKS.x}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-6 py-3.5 font-semibold text-ink transition-colors hover:border-lime/50"
+        >
+          <Icons name="x" size={14} />
+          {section.follow}
+        </a>
+      </div>
+    </Section>
+  )
+}

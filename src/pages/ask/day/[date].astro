@@ -1,0 +1,111 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PageLayout from '../../../layouts/PageLayout.astro';
+import Button from '../../../components/ui/Button.astro';
+import Icons from '../../../components/ui/Icons.astro';
+import { SITE } from '../../../config/site.ts';
+import { getCopy } from '../../../content/index.ts';
+import { DAILY_FIRST, dailyHorizon, everyDayTo, questionForDate } from '../../../config/what-if.ts';
+
+/**
+ * A page for each day's question.
+ *
+ * The generator can produce a couple of thousand sentences, and a page for
+ * every one of them would be two thousand near-identical documents with a line
+ * of text on each — which is what a search engine calls a doorway page, and
+ * would drag down the coin pages that do have something to say.
+ *
+ * The daily question is different: it is one per day, everybody gets the same
+ * one, and it is the one people answer together. That makes an archive worth
+ * having and worth crawling. Any other question still gets a shareable link
+ * through `/ask/?q=<id>`, which restores it exactly.
+ */
+// Built to tomorrow, not today — see dailyHorizon().
+export const getStaticPaths = (() =>
+  everyDayTo(dailyHorizon()).map((date) => ({
+    params: { date },
+    props: { date, question: questionForDate(date) },
+  }))) satisfies GetStaticPaths;
+
+type Props = { date: string; question: { text: string; id: string } };
+const { date, question } = Astro.props as Props;
+
+const locale = 'en' as const;
+const copy = getCopy(locale);
+const page = copy.pages.ask;
+
+const readable = new Date(`${date}T00:00:00Z`).toLocaleDateString(locale, {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+const previous = date > DAILY_FIRST ? shift(date, -1) : undefined;
+const lastBuilt = dailyHorizon();
+const next = date < lastBuilt ? shift(date, 1) : undefined;
+
+/** The neighbouring day, as YYYY-MM-DD. */
+function shift(from: string, days: number): string {
+  const moved = new Date(`${from}T00:00:00Z`);
+  moved.setUTCDate(moved.getUTCDate() + days);
+  return moved.toISOString().slice(0, 10);
+}
+
+const shareUrl = new URL('https://x.com/intent/post');
+shareUrl.searchParams.set('text', question.text);
+shareUrl.searchParams.set('url', `${SITE.url}/ask/day/${date}/`);
+---
+
+<PageLayout
+  locale={locale}
+  title={question.text}
+  description={`The What $IF question for ${readable}. ${page.intro}`}
+  eyebrow={readable}
+  heading={{ lead: question.text, accent: '' }}
+  intro={page.dailyArchiveIntro}
+  socialImage={`${SITE.url}/og-ask.jpg`}
+>
+  <div class="mx-auto w-full max-w-3xl px-5 py-12 sm:px-8">
+    <div class="flex flex-wrap gap-3">
+      <Button href={`/ask/?q=${question.id}`} variant="primary">
+        {page.dailyAnswerCta}
+        <Icons name="arrow-up-right" size={16} />
+      </Button>
+      <Button href={shareUrl.toString()} variant="ghost" external>
+        {page.postOnX}
+      </Button>
+    </div>
+
+    <nav
+      aria-label={page.dailyArchiveTitle}
+      class="mt-12 flex items-center justify-between gap-4 border-t border-line pt-6 font-mono text-[11px] uppercase tracking-[0.16em]"
+    >
+      {
+        previous ? (
+          <a
+            href={`/ask/day/${previous}/`}
+            class="tap text-faint transition-colors hover:text-lime"
+          >
+            ← {previous}
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      <a href="/ask/day/" class="tap text-faint transition-colors hover:text-lime">
+        {page.dailyArchiveTitle}
+      </a>
+      {
+        next ? (
+          <a href={`/ask/day/${next}/`} class="tap text-faint transition-colors hover:text-lime">
+            {next} →
+          </a>
+        ) : (
+          <span />
+        )
+      }
+    </nav>
+  </div>
+</PageLayout>

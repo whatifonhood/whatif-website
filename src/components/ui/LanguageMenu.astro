@@ -1,0 +1,138 @@
+---
+import { LOCALES, LOCALE_NAMES, type Locale } from '../../config/site.ts';
+import { translatedPath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from './Icons.astro';
+
+/**
+ * The language picker.
+ *
+ * Four languages laid out as four inline buttons was a row of cryptic codes
+ * taking up header space and getting more crowded with each language added. A
+ * dropdown shows the current language and gets out of the way, and it does not
+ * grow when the fifth one arrives.
+ *
+ * It reuses the `.tools-menu` behaviour so there is one dropdown implementation
+ * on the site rather than two that drift apart.
+ */
+interface Props {
+  locale: Locale;
+  /** Rendered inline instead of as a dropdown, for the mobile menu. */
+  inline?: boolean;
+}
+
+const { locale, inline = false } = Astro.props;
+const copy = getCopy(locale);
+
+/**
+ * Where each language takes you: this page, in that language.
+ *
+ * It used to be that language's home page, from wherever you were — so a reader
+ * halfway through a meme page who switched language lost their place. Pages
+ * built in English only (the white paper, a coin's own page) have nothing to
+ * switch to, and fall back to the home page.
+ */
+const target = (code: Locale) => translatedPath(Astro.url.pathname, code);
+
+/** Full names read better in a menu than two-letter codes. */
+const FULL_NAME: Record<Locale, string> = {
+  en: 'English',
+  zh: '中文',
+  tr: 'Türkçe',
+  es: 'Español',
+};
+---
+
+{
+  inline ? (
+    <div class="flex flex-wrap gap-2">
+      {LOCALES.map((code) => (
+        <a
+          href={target(code)}
+          hreflang={code}
+          lang={code}
+          aria-current={code === locale ? 'page' : undefined}
+          class:list={[
+            'rounded-lg px-3 py-2 text-sm transition-colors',
+            code === locale ? 'bg-surface-2 text-lime' : 'text-faint hover:text-ink',
+          ]}
+        >
+          {FULL_NAME[code]}
+        </a>
+      ))}
+    </div>
+  ) : (
+    <div class="tools-menu relative">
+      <button
+        type="button"
+        data-tools-toggle
+        aria-expanded="false"
+        aria-controls="language-menu"
+        aria-label={copy.nav.languageMenu}
+        class="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink aria-expanded:bg-surface aria-expanded:text-ink"
+      >
+        <Icons name="globe" size={14} />
+        <span class="font-mono text-xs">{LOCALE_NAMES[locale]}</span>
+        <Icons name="chevron-down" size={12} class="transition-transform duration-200" />
+      </button>
+
+      <div
+        id="language-menu"
+        data-tools-panel
+        class="tools-panel absolute right-0 top-full z-50 w-44 pt-2"
+      >
+        <ul class="card overflow-hidden p-1.5 shadow-2xl shadow-black/60">
+          {LOCALES.map((code) => (
+            <li>
+              <a
+                href={target(code)}
+                hreflang={code}
+                lang={code}
+                aria-current={code === locale ? 'page' : undefined}
+                class:list={[
+                  'flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors hover:bg-surface-2',
+                  code === locale ? 'text-lime' : 'text-ink',
+                ]}
+              >
+                {FULL_NAME[code]}
+                <span class="font-mono text-[10px] uppercase tracking-wider text-faint">
+                  {LOCALE_NAMES[code]}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .tools-panel {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s var(--ease-out-expo),
+      visibility 0.18s;
+  }
+  .tools-menu[data-open] .tools-panel,
+  .tools-menu:has([aria-expanded='true']) .tools-panel {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tools-menu[data-open] [data-tools-toggle] svg:last-child,
+  .tools-menu:has([aria-expanded='true']) [data-tools-toggle] svg:last-child {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tools-menu:hover .tools-panel {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

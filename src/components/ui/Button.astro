@@ -1,0 +1,86 @@
+---
+/**
+ * The only button on the site. Renders an <a> when given an href, a <button>
+ * otherwise, so a link is always a link and a control is always a control.
+ *
+ * External links get target and rel automatically — no page can ever be opened
+ * with access to ours.
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'md' | 'lg' | 'xl';
+  /** Set for links that leave the site. Adds target, rel and a screen-reader hint. */
+  external?: boolean;
+  externalLabel?: string;
+  type?: 'button' | 'submit';
+  /** Turns a link into a file download, with this as the saved file name. */
+  download?: string;
+  id?: string;
+  class?: string;
+  'aria-label'?: string;
+  title?: string;
+  /** Rendered but not shown, for a control a script reveals later. */
+  hidden?: boolean;
+  /** Hooks for the page's own script, spread onto the element unchanged. */
+  [key: `data-${string}`]: string | boolean | undefined;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  external = false,
+  externalLabel,
+  type = 'button',
+  id,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+/*
+ * `max-w-full` and a wrapping label, because the page cannot scroll sideways:
+ * a button that will not fit is a button with its label cut off rather than one
+ * that overflows visibly. It shows up at 200% zoom, which is an ordinary
+ * low-vision setting rather than an edge case.
+ */
+const base =
+  'inline-flex max-w-full flex-wrap items-center justify-center gap-2.5 rounded-full text-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5';
+
+const variants = {
+  primary:
+    'bg-lime text-void shadow-[0_0_0_0_rgba(143,206,2,0)] hover:bg-lime-pale hover:shadow-[0_10px_30px_-10px_rgba(143,206,2,0.55)]',
+  secondary: 'border border-line bg-surface text-ink hover:border-lime/50 hover:bg-surface-2',
+  ghost: 'text-muted hover:text-ink',
+} as const;
+
+/*
+ * Weight belongs to the size, not to `base`.
+ *
+ * `xl` sets font-bold and the display face; if `base` also set font-semibold the
+ * winner would be whichever utility Tailwind happened to emit last, which is not
+ * something a component should depend on.
+ */
+const sizes = {
+  md: 'px-5 py-3 text-sm font-semibold',
+  lg: 'px-6 py-3.5 text-base font-semibold',
+  /** The one big call to action a page is allowed: the brand kit, the coin pull. */
+  xl: 'px-8 py-4 font-display text-base font-bold',
+} as const;
+
+const classes = [base, variants[variant], sizes[size], className];
+const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...externalAttrs} {...rest}>
+      <slot />
+      {external && externalLabel && <span class="sr-only">({externalLabel})</span>}
+    </a>
+  ) : (
+    <button type={type} id={id} class:list={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}

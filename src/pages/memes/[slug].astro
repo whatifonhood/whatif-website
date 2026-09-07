@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from 'astro';
+import MemePage from '../../components/pages/MemePage.astro';
+import { MEMES } from '../../config/memes.ts';
+
+/**
+ * A page for every meme.
+ *
+ * The vault used to link straight at the image file, which meant a shared meme
+ * carried nothing back to the site. These pages give each one a real URL, its
+ * own social card, and somewhere to go next — the rest of its series, and the
+ * generator.
+ *
+ * Cards are built by `npm run cards` into public/memes/og/.
+ */
+export const getStaticPaths = (() =>
+  MEMES.map((meme) => ({
+    params: { slug: meme.slug },
+    props: { meme },
+  }))) satisfies GetStaticPaths;
+
+const { meme } = Astro.props;
+---
+
+<MemePage locale="en" meme={meme} />

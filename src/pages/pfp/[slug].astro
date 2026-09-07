@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CoinPage from '../../components/pages/CoinPage.astro';
+import { COINS } from '../../config/coins.ts';
+
+/** Every coin's own page, in English, served from the root. */
+export const getStaticPaths = (() =>
+  COINS.map((coin) => ({ params: { slug: coin.slug }, props: { coin } }))) satisfies GetStaticPaths;
+
+const { coin } = Astro.props;
+---
+
+<CoinPage locale="en" coin={coin} />

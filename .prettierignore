@@ -1,0 +1,13 @@
+dist
+node_modules
+package-lock.json
+
+# The PFP module's own artwork and manifest, generated elsewhere.
+
+# Generated data. These are machine-written JSON blobs — 781 price-history
+# files and two indexes — and formatting them would add megabytes of
+# whitespace to the repo for no reader's benefit. Leaving them in was why
+# `format:check` failed on 790 files and CI was red on every push, which is
+# how the check stopped meaning anything.
+public/coins
+public/memes

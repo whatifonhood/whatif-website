@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from 'astro';
+import MemePage from '../../../components/pages/MemePage.astro';
+import { MEMES } from '../../../config/memes.ts';
+import { LOCALES, type Locale } from '../../../config/site.ts';
+
+/**
+ * Every meme, in every language except English, which is served from the root.
+ *
+ * 195 pages. The titles stay English — see the note in MemePage.astro.
+ */
+export const getStaticPaths = (() =>
+  LOCALES.filter((locale) => locale !== 'en').flatMap((locale) =>
+    MEMES.map((meme) => ({
+      params: { locale, slug: meme.slug },
+      props: { locale, meme },
+    })),
+  )) satisfies GetStaticPaths;
+
+const { locale, meme } = Astro.props as { locale: Locale; meme: (typeof MEMES)[number] };
+---
+
+<MemePage locale={locale} meme={meme} />

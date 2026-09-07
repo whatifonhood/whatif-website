@@ -1,0 +1,69 @@
+{
+  "name": "whatif-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Official website for What $IF ($IF) on Robinhood Chain.",
+  "license": "MIT",
+  "homepage": "https://whatifonhood.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whatifonhood/whatif-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/whatifonhood/whatif-website/issues"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run questions && npm run docs && npm run roadmap && npm run build",
+    "typecheck": "astro check",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "playwright test",
+    "test:install": "playwright install chromium",
+    "og": "node tools/render-og.mjs",
+    "cards": "node tools/render-og.mjs --memes --coins",
+    "coincards": "node tools/render-og.mjs --coins",
+    "burns": "node tools/build-burns.mjs",
+    "headers": "node tools/build-headers.mjs",
+    "tweets": "node tools/build-tweets.mjs",
+    "memes": "node tools/build-memes.mjs",
+    "snapshot": "node tools/update-snapshot.mjs",
+    "serve": "node tools/serve-dist.mjs",
+    "favicons": "node tools/build-favicons.mjs",
+    "coins": "node tools/build-coins.mjs",
+    "brandkit": "node tools/build-brand-kit.mjs",
+    "questions": "node tools/check-questions.mjs",
+    "holders": "node tools/build-holders.mjs",
+    "docs": "node tools/check-docs.mjs",
+    "roadmap": "node tools/check-roadmap.mjs",
+    "candles": "node tools/build-candles.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource/archivo": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.9",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "sharp": "^0.35.4",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.46.0"
+  }
+}

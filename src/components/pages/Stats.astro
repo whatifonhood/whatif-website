@@ -1,0 +1,959 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import ChartPanel from '../stats/ChartPanel.astro';
+import '../../styles/chart.css';
+import { CHAIN, SITE, type Locale } from '../../config/site.ts';
+import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
+import { BURNS } from '../../config/burns.ts';
+import { HOLDERS, HOLDERS_CAPTURED } from '../../config/holders.ts';
+import { RECIPES } from '../../lib/reproduce.ts';
+import { weekInSummary } from '../../lib/week.ts';
+import { getCopy } from '../../content/index.ts';
+import { formatCompact, formatCount, formatPercent, formatUsd } from '../../lib/format.ts';
+import Button from '../../components/ui/Button.astro';
+import CopyField from '../../components/ui/CopyField.astro';
+import Icons from '../../components/ui/Icons.astro';
+
+/**
+ * The dashboard.
+ *
+ * Every figure renders server-side from the build-time snapshot, then updates
+ * in place once the market APIs answer — so the page is complete before any
+ * JavaScript runs and stays readable if a request fails. See
+ * src/scripts/dashboard.ts and src/lib/market.ts.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+
+/**
+ * The ten most recent burns.
+ *
+ * This was the ten LARGEST, and as a list it had stopped moving. The biggest
+ * burns all happened in the launch window, when the pool was turning over many
+ * times what it does now, so the top ten was fixed the week it was written and
+ * nothing that has burned since could ever enter it. A list that cannot change
+ * tells a reader nothing about whether the burn is still running — which is the
+ * one thing this section exists to show.
+ *
+ * Sorted from the committed event log rather than fetched: the daily refresh
+ * appends new burns, so this moves on its own.
+ */
+const LATEST_BURNS = [...BURNS].sort((a, b) => b.time - a.time).slice(0, 10);
+
+const burnDate = (seconds: number) =>
+  new Date(seconds * 1000).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+const page = copy.pages.stats;
+
+const WEEK = weekInSummary();
+
+/**
+ * Where each of these can be checked, by somebody who does not trust us.
+ *
+ * A trust panel whose rows lead nowhere is a list of assertions. Anything with
+ * no independent page to point at is left without a link rather than given one
+ * that does not prove it.
+ */
+const CHECK_PROOF: Record<string, string | undefined> = {
+  verified: `${CHAIN.explorerUrl}/address/${TOKEN.address}?tab=contract`,
+  honeypot: `https://www.geckoterminal.com/robinhood/pools/${TOKEN.primaryPool}`,
+  supply: `${CHAIN.explorerUrl}/token/${TOKEN.address}`,
+  burn: `${CHAIN.explorerUrl}/address/${TOKEN.burnAddress}`,
+  owner: `${CHAIN.explorerUrl}/address/${TOKEN.address}?tab=read_contract`,
+};
+
+const metrics = [
+  {
+    key: 'marketCap',
+    label: copy.numbers.stats.marketCap,
+    value: formatUsd(TOKEN_SNAPSHOT.marketCapUsd, locale),
+  },
+  {
+    key: 'liquidity',
+    label: copy.numbers.stats.liquidity,
+    value: formatUsd(TOKEN_SNAPSHOT.liquidityUsd, locale),
+  },
+  {
+    key: 'volume',
+    label: copy.numbers.stats.volume,
+    value: formatUsd(TOKEN_SNAPSHOT.volume24hUsd, locale),
+  },
+  {
+    key: 'holders',
+    label: copy.numbers.stats.holders,
+    value: formatCompact(TOKEN_SNAPSHOT.holders, locale),
+  },
+];
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow="On-chain"
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-stats.jpg`}
+>
+  <div
+    data-dashboard
+    data-timeframe="day"
+    data-chart-type="candles"
+    data-label-holders-updated={page.holdersUpdated}
+    data-label-burn-mark={page.burnMark}
+    data-label-check-pass={page.checkPass}
+    data-label-owner-none={page.ownerNone}
+    data-label-owner-some={page.ownerSome}
+    data-label-window={page.windowHours}
+    data-label-buy={page.buyLabel}
+    data-label-sell={page.sellLabel}
+    data-label-view={page.viewTx}
+    data-label-failed={page.failed}
+    data-label-as-of={copy.numbers.asOf}
+    class="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8"
+  >
+    <p
+      data-dash-status
+      hidden
+      class="mb-6 rounded-xl border-l-2 border-warn bg-warn/10 px-5 py-3 text-sm text-muted"
+      role="status"
+    >
+    </p>
+
+    <!-- Price and the chart. The ids are what the roadmap's shipped items open. -->
+    <div id="chart" class="scroll-mt-20">
+      <ChartPanel locale={locale} />
+    </div>
+    <!-- Headline metrics -->
+    <dl class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {
+        metrics.map((metric) => (
+          <div class="card card-hover p-5 sm:p-6 flex flex-col-reverse">
+            <dt class="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+              {metric.label}
+            </dt>
+            <dd
+              data-metric={metric.key}
+              class="min-w-0 [overflow-wrap:anywhere] font-display text-2xl font-black italic tabular-nums tracking-tight text-lime sm:text-3xl"
+            >
+              {metric.value}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <!--
+      Biggest trade both ways, side by side.
+
+      These were split across two rows, which left one of them sitting alone
+      beside an empty half — the most obvious hole on the page.
+    -->
+    <div class="mt-3 grid gap-3 lg:grid-cols-2">
+      <!--
+        Biggest trade both ways.
+
+        These come from a size-filtered query, which reaches much further back
+        than the recent-trades list — but a size filter is not a time window, so
+        the span actually covered is printed rather than assumed.
+      -->
+      {
+        (['buy', 'sell'] as const).map((side) => (
+          <div
+            data-biggest={side}
+            hidden
+            class:list={['card p-6 sm:p-8', side === 'buy' ? 'border-lime/30' : 'border-warn/30']}
+          >
+            <p
+              class:list={[
+                'font-mono text-[11px] uppercase tracking-[0.16em]',
+                side === 'buy' ? 'text-lime' : 'text-warn',
+              ]}
+            >
+              {side === 'buy' ? page.biggestBuy : page.biggestSell}
+            </p>
+            <p
+              data-biggest-tokens
+              class="mt-3 font-display text-3xl font-black italic tabular-nums tracking-tight text-ink sm:text-4xl"
+            />
+            <p class="mt-2 font-mono text-sm text-muted">
+              <span data-biggest-usd class:list={[side === 'buy' ? 'text-lime' : 'text-warn']} />
+              {' · '}
+              <span data-biggest-wallet />
+              {' · '}
+              <span data-biggest-time />
+            </p>
+            <p
+              data-biggest-window
+              class="mt-1 font-mono text-[10px] uppercase tracking-wider text-faint"
+            />
+            <a
+              data-biggest-link
+              href={MARKETS.contract}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="tap mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-lime hover:underline"
+            >
+              {page.viewTx}
+              <Icons name="arrow-up-right" size={11} />
+            </a>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Flow and concentration -->
+    <div class="mt-3 grid gap-3 lg:grid-cols-2">
+      <!-- Buy / sell flow -->
+      <div class="card p-6 sm:p-8">
+        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          {page.buys} / {page.sells} · 24H
+        </p>
+        <!--
+          Wraps rather than holding its three columns. At 200% zoom on a phone
+          the row needed 210px of a 147px card, and since the page cannot scroll
+          sideways the sell count was simply gone.
+        -->
+        <div class="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          <div>
+            <p
+              data-metric="buys"
+              class="font-display text-3xl font-black italic tabular-nums text-lime"
+            >
+              —
+            </p>
+            <p class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+              {page.buys}
+            </p>
+          </div>
+          <p class="font-mono text-sm text-muted">
+            <span data-metric="ratio" class="text-ink">—</span>×
+          </p>
+          <div class="text-right">
+            <p
+              data-metric="sells"
+              class="font-display text-3xl font-black italic tabular-nums text-warn"
+            >
+              —
+            </p>
+            <p class="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+              {page.sells}
+            </p>
+          </div>
+        </div>
+        <div data-flow-bar class="flow-bar mt-5" aria-hidden="true"></div>
+      </div>
+
+      <!--
+        Concentration. The most useful safety number a holder can read, and one
+        we could not show at all until the count stopped coming from a snapshot.
+      -->
+      <div data-concentration hidden class="card p-6 sm:p-8">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+            {page.concentration}
+          </p>
+          <!-- Showing when it was last recounted makes a stale figure look stale. -->
+          <p data-holders-updated class="font-mono text-[10px] uppercase tracking-wider text-faint">
+          </p>
+        </div>
+        <div class="conc-bar mt-4" aria-hidden="true">
+          <span data-band="top10"></span>
+          <span data-band="next20"></span>
+          <span data-band="next20More"></span>
+          <span data-band="rest"></span>
+        </div>
+        <!-- The top ten includes the burn address and the pool; say so. -->
+        <p class="note mt-3">{page.concentrationNote}</p>
+        <ul class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+          {
+            (['top10', 'next20', 'next20More', 'rest'] as const).map((band) => (
+              <li class="flex items-center justify-between gap-2 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 text-muted">
+                  <i class="conc-key" data-key={band} />
+                  {page.bands[band]}
+                </span>
+                <span data-band-value={band} class="tabular-nums text-ink" />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Hourly pressure -->
+    <div data-pressure hidden class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.pressureTitle}
+      </p>
+      <svg
+        data-pressure-chart
+        viewBox="0 0 1000 160"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={page.pressureTitle}
+        class="mt-5 h-32 w-full"
+      >
+        <g data-pressure-bars></g>
+      </svg>
+      <!-- The bars are hours; without ticks a quiet day reads as a chart with a hole in it. -->
+      <div class="pressure-axis" aria-hidden="true">
+        <span>−24h</span><span>−12h</span><span>0</span>
+      </div>
+      <p class="note mt-3">
+        {page.pressureNote}
+      </p>
+    </div>
+
+    <!--
+      Shown only to somebody who has been here before, and only after an hour.
+      Everything it compares against is in their own browser — see
+      src/scripts/since-last-visit.ts.
+    -->
+    <aside
+      id="since"
+      data-since
+      hidden
+      class:list={['scroll-mt-20']}
+      data-label-lead={page.sinceLead}
+      data-label-price={page.sincePrice}
+      data-label-burned={page.sinceBurned}
+      data-label-holders={page.sinceHolders}
+      data-label-nothing={page.sinceNothing}
+      class="card mt-3 border-lime/25 p-6 sm:p-8"
+    >
+      <p data-since-lead class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime"></p>
+      <ul data-since-list class="mt-4 space-y-2 text-lg leading-relaxed text-ink"></ul>
+    </aside>
+
+    <!--
+      The week, from committed data.
+      Rendered here rather than fetched: it moves when the daily refresh runs,
+      not by the second, so the panel names the day it covers instead of
+      pretending to be live.
+    -->
+    <div class="card mt-3 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.weekTitle}
+      </p>
+      <dl class="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-3">
+        {
+          WEEK.priceThen !== undefined && WEEK.priceNow !== undefined && (
+            <div>
+              <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+                {page.weekPrice}
+              </dt>
+              <dd
+                class="mt-1.5 font-display text-2xl font-semibold tabular-nums"
+                class:list={[WEEK.priceNow >= WEEK.priceThen ? 'text-lime' : 'text-warn']}
+              >
+                {WEEK.priceNow >= WEEK.priceThen ? '+' : ''}
+                {formatPercent(((WEEK.priceNow - WEEK.priceThen) / WEEK.priceThen) * 100, locale)}
+                <span class="mt-1 block font-mono text-[11px] text-faint">
+                  {formatUsd(WEEK.priceThen, locale)} → {formatUsd(WEEK.priceNow, locale)}
+                </span>
+              </dd>
+            </div>
+          )
+        }
+
+        <div>
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+            {page.weekBurned}
+          </dt>
+          <dd class="mt-1.5 font-display text-2xl font-semibold tabular-nums text-ink">
+            {formatCompact(WEEK.burnedTokens, locale)}
+            <span class="mt-1 block font-mono text-[11px] text-faint">
+              {page.weekBurnCount.replace('{count}', String(WEEK.burnCount))}
+            </span>
+          </dd>
+        </div>
+
+        {
+          WEEK.largestBurn && (
+            <div>
+              <dt class="font-mono text-[11px] uppercase tracking-wider text-faint">
+                {page.weekLargest}
+              </dt>
+              <dd class="mt-1.5 font-display text-2xl font-semibold tabular-nums text-ink">
+                {formatCompact(WEEK.largestBurn.tokens, locale)}
+              </dd>
+              <a
+                href={`${CHAIN.explorerUrl}/tx/${WEEK.largestBurn.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tap mt-1 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+              >
+                {page.viewTx}
+                <span class="sr-only">{copy.common.externalLink}</span>
+              </a>
+            </div>
+          )
+        }
+      </dl>
+      <p class="note mt-5">
+        {page.weekNote.replace('{date}', WEEK.to.replace(/-/g, '\u2011'))}
+      </p>
+    </div>
+
+    <!--
+      Who holds it.
+      The most common question about any token is whether one wallet holds all
+      of it, and the honest answer needs the list rather than a percentage. The
+      top row here is the burn address and the third is the pool everybody
+      trades against — unlabelled, both read as whales.
+    -->
+    <div id="holders" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.holderTableTitle}
+      </p>
+      <p class="mt-3 max-w-2xl text-muted">{page.holderTableIntro}</p>
+
+      <!--
+        On a phone the table fits the card instead of scrolling: the kind tag
+        moves under the address and the Tokens and Share columns, which are the
+        point of the table, stay in view.
+      -->
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full border-collapse text-left font-mono text-sm sm:min-w-[32rem]">
+          <thead>
+            <tr class="border-b border-line text-[11px] uppercase tracking-[0.14em] text-faint">
+              <th scope="col" class="py-3 pr-4 font-normal">{page.holderAddress}</th>
+              <th scope="col" class="hidden py-3 pr-4 font-normal sm:table-cell"
+                >{page.holderWhat}</th
+              >
+              <th scope="col" class="py-3 pr-4 text-right font-normal">{page.holderTokens}</th>
+              <th scope="col" class="py-3 text-right font-normal">{page.holderShare}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              HOLDERS.map((holder) => (
+                <tr class="border-b border-line/60">
+                  <th scope="row" class="py-3 pr-4 font-normal">
+                    <a
+                      href={`${CHAIN.explorerUrl}/address/${holder.address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="-my-3 block py-3 text-ink transition-colors hover:text-lime"
+                    >
+                      {holder.address.slice(0, 8)}…{holder.address.slice(-6)}
+                      <span class="sr-only">{copy.common.externalLink}</span>
+                    </a>
+                    <span class="holder-tag mt-1.5 sm:hidden" data-kind={holder.kind}>
+                      {page.holderKinds[holder.kind]}
+                    </span>
+                  </th>
+                  <td class="hidden py-3 pr-4 sm:table-cell">
+                    <span class="holder-tag" data-kind={holder.kind}>
+                      {page.holderKinds[holder.kind]}
+                    </span>
+                  </td>
+                  <td class="py-3 pr-4 text-right tabular-nums text-muted">
+                    {formatCompact(holder.tokens, locale)}
+                  </td>
+                  <td class="py-3 text-right tabular-nums text-muted">
+                    {formatPercent((holder.tokens / TOKEN.totalSupply) * 100, locale)}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="note mt-4">
+        {page.holderTableNote.replace('{date}', HOLDERS_CAPTURED.replace(/-/g, '\u2011'))}
+      </p>
+    </div>
+
+    <!-- Burn history -->
+    <div id="burns" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.burnHistoryTitle}
+      </p>
+      <svg
+        data-burns
+        viewBox="0 0 1000 200"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={page.burnHistoryTitle}
+        class="mt-5 h-40 w-full"
+      >
+        <path data-burns-area class="burn-area"></path>
+        <path data-burns-line class="burn-line"></path>
+        <g data-burns-dots></g>
+      </svg>
+      <p class="note mt-3">
+        {page.burnHistoryNote}
+      </p>
+
+      <!--
+        The most recent burns, each one linked to the transaction that made it.
+        The curve above shows the shape; this names the events behind it, and
+        every row can be checked on the explorer by anyone who doubts it.
+      -->
+      <h2 class="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.latestBurnsTitle}
+      </h2>
+      <ol class="mt-4 divide-y divide-line/60">
+        {
+          LATEST_BURNS.map((burn) => (
+            <li class="flex items-baseline gap-4 py-2.5">
+              <span class="font-mono text-sm tabular-nums text-ink">
+                {formatCount(burn.tokens, locale)}
+                <span class="text-faint">{TOKEN.symbol}</span>
+              </span>
+              <span class="ml-auto font-mono text-[11px] text-faint">
+                <time datetime={new Date(burn.time * 1000).toISOString()}>
+                  {burnDate(burn.time)}
+                </time>
+              </span>
+              <a
+                href={`${CHAIN.explorerUrl}/tx/${burn.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tap -my-2.5 shrink-0 px-2 py-2.5 font-mono text-[11px] text-lime transition-opacity hover:opacity-70"
+              >
+                {page.viewTx}
+                <span class="sr-only">{copy.common.externalLink}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <!-- Live trades -->
+    <div id="trades" class="card mt-3 scroll-mt-20 overflow-hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4">
+        <p
+          class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-faint"
+        >
+          <!--
+            Hidden until a trade actually lands. It used to show from first
+            paint, so a page that never reached the API sat on "Reading the
+            chain…" under a live indicator — the one thing this site must not
+            do, on the page whose whole argument is that the numbers are real.
+          -->
+          <span data-feed-live class="live-dot" hidden aria-hidden="true"></span>
+          {page.feedTitle}
+        </p>
+        <p class="note">
+          {page.feedNote}
+          <span data-feed-updated class="ml-2 text-lime"></span>
+          <!--
+            A heartbeat, so "live" is something you can see rather than something
+            the page asks you to take on trust.
+          -->
+          <span data-live-pulse class="live-pulse" aria-hidden="true"></span>
+        </p>
+      </div>
+
+      <ul data-feed class="divide-y divide-line">
+        <li
+          data-feed-status
+          data-label-loading={page.loading}
+          data-label-unavailable={page.feedUnavailable}
+          class="px-6 py-8 text-center font-mono text-[11px] uppercase tracking-wider text-faint"
+        >
+          {page.loading}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Supply and burn -->
+    <div class="mt-3 grid gap-3 lg:grid-cols-[2fr_1fr]">
+      <div class="card border-lime/25 p-6 sm:p-8">
+        <p
+          data-stat="burnedExact"
+          class="font-display text-4xl font-black italic tabular-nums leading-none tracking-tight text-lime sm:text-6xl"
+        >
+          {formatCount(TOKEN_SNAPSHOT.burnedTokens, locale)}
+        </p>
+        <p class="mt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          <span data-stat="burnedPercent">{formatPercent(BURNED_PERCENT, locale)}</span>
+          {' · '}{copy.numbers.burnHeadline}
+        </p>
+        <p class="mt-4 max-w-2xl leading-relaxed text-muted">{copy.numbers.burnBody}</p>
+      </div>
+      <div class="card p-6 sm:p-8">
+        <p class="font-display text-2xl font-black italic tabular-nums text-ink">
+          {formatCompact(TOKEN.totalSupply, locale)}
+        </p>
+        <p class="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          {copy.numbers.stats.supply}
+        </p>
+        <p
+          data-metric="poolTokens"
+          class="mt-6 font-display text-2xl font-black italic tabular-nums text-ink"
+        >
+          —
+        </p>
+        <p class="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          {page.poolLabel}
+        </p>
+      </div>
+    </div>
+
+    <!--
+      Attested checks.
+
+      Everything here is asserted by somebody who is not us and links to where it
+      can be re-run. The broad "LP locked" and "ownership renounced" claims stay
+      off this panel: the first is only half true, since about half the tradeable
+      depth is ordinary withdrawable liquidity, and the second describes an event
+      that never happened, because the contract never had an owner to give up.
+      Both are set out in full in the white paper.
+    -->
+    <div id="checks" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.trustTitle}</p>
+      <ul data-trust class="mt-5 grid gap-2.5 sm:grid-cols-2">
+        {
+          (['verified', 'honeypot', 'supply', 'burn', 'owner'] as const).map((check) => (
+            <li data-check={check} class="trust-row">
+              <span class="trust-mark" data-state="unknown" aria-hidden="true" />
+              <span class="min-w-0 flex-1 text-sm text-ink">
+                {CHECK_PROOF[check] ? (
+                  <a
+                    href={CHECK_PROOF[check]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="tap underline decoration-line underline-offset-4 transition-colors hover:text-lime hover:decoration-lime"
+                  >
+                    {page.checks[check]}
+                    <span class="sr-only">{copy.common.externalLink}</span>
+                  </a>
+                ) : (
+                  page.checks[check]
+                )}
+              </span>
+              <span
+                data-check-state
+                class="font-mono text-[10px] uppercase tracking-wider text-faint"
+              />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-5 text-xs leading-relaxed text-faint">{page.trustNote}</p>
+    </div>
+
+    <!--
+      Reproduce every number.
+      The landing page says "don't trust a website — including this one", and
+      this is the means to act on it. Every command is built from the same
+      constants the running code uses, so it cannot drift into being wrong
+      without the site being wrong the same way.
+    -->
+    <details id="reproduce" class="card mt-3 scroll-mt-20 p-6 sm:p-8">
+      <summary class="cursor-pointer list-none">
+        <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+          {page.reproduceTitle}
+        </span>
+        <p class="mt-3 max-w-2xl text-muted">{page.reproduceIntro}</p>
+      </summary>
+
+      <ol class="mt-6 space-y-6">
+        {
+          RECIPES.map((recipe) => (
+            <li>
+              <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+                {page.reproduceLabels[recipe.key] ?? recipe.key}
+              </p>
+              {/* set:text on a self-closing element, so no source indentation
+                  ends up inside the block — a reader copies the command, and
+                  sixteen leading spaces would come with it. */}
+              <div class="reproduce-block mt-2">
+                <pre class="reproduce-command" set:text={recipe.command} />
+                {/* A copy button, because a 900px command in a 300px box cannot be selected on a phone. */}
+                <button
+                  type="button"
+                  class="js-copy reproduce-copy tap-box"
+                  data-copy-value={recipe.command}
+                  data-copy-label={copy.numbers.copy}
+                  data-copied-label={copy.numbers.copied}
+                >
+                  {copy.numbers.copy}
+                </button>
+              </div>
+              <p class="mt-1.5 font-mono text-[11px] text-faint">
+                {page.reproduceField} <span class="text-ink">{recipe.field}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="mt-8 max-w-2xl text-xs leading-relaxed text-faint">{page.reproduceNote}</p>
+    </details>
+
+    <!-- Verify it yourself -->
+    <div class="mt-10 grid gap-3 lg:grid-cols-2">
+      <CopyField
+        label={copy.numbers.contractLabel}
+        value={TOKEN.address}
+        copyLabel={copy.numbers.copy}
+        copiedLabel={copy.numbers.copied}
+        emphasis
+      />
+      <CopyField
+        label={page.poolLabel}
+        value={TOKEN.primaryPool}
+        copyLabel={copy.numbers.copy}
+        copiedLabel={copy.numbers.copied}
+        emphasis
+      />
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <Button
+        href={MARKETS.contract}
+        variant="secondary"
+        external
+        externalLabel={copy.common.externalLink}
+      >
+        {page.openExplorer}
+        <Icons name="arrow-up-right" size={14} />
+      </Button>
+      <Button
+        href={MARKETS.dexscreener}
+        variant="secondary"
+        external
+        externalLabel={copy.common.externalLink}
+      >
+        {page.openChart}
+        <Icons name="arrow-up-right" size={14} />
+      </Button>
+    </div>
+
+    <p data-stat-freshness class="mt-8 max-w-2xl font-mono text-[11px] leading-relaxed text-faint">
+      <span
+        data-freshness-live
+        hidden
+        class="mr-2 inline-flex items-center gap-1.5 uppercase tracking-wider text-lime"
+      >
+        <span class="h-1.5 w-1.5 rounded-full bg-lime"></span>{copy.numbers.live}
+      </span>
+      {page.sourceNote}
+    </p>
+  </div>
+</PageLayout>
+
+<style>
+  .live-pulse {
+    display: inline-block;
+    height: 6px;
+    width: 6px;
+    border-radius: 999px;
+    background: var(--color-lime);
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .live-pulse.is-beating {
+    animation: live-beat 1.1s var(--ease-out-expo, ease-out);
+  }
+  @keyframes live-beat {
+    0% {
+      box-shadow: 0 0 0 0 rgb(143 206 2 / 0.55);
+    }
+    100% {
+      box-shadow: 0 0 0 9px rgb(143 206 2 / 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .live-pulse.is-beating {
+      animation: none;
+    }
+  }
+
+  /* Concentration bar */
+  .conc-bar {
+    display: flex;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+  }
+  .conc-bar span {
+    width: var(--share, 0%);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .conc-bar [data-band='top10'] {
+    background: var(--color-lime);
+  }
+  .conc-bar [data-band='next20'] {
+    background: var(--color-lime-mid);
+  }
+  .conc-bar [data-band='next20More'] {
+    background: var(--color-lime-deep);
+  }
+  .conc-bar [data-band='rest'] {
+    background: var(--color-line);
+  }
+
+  .conc-key {
+    height: 8px;
+    width: 8px;
+    flex: none;
+    border-radius: 2px;
+  }
+  .conc-key[data-key='top10'] {
+    background: var(--color-lime);
+  }
+  .conc-key[data-key='next20'] {
+    background: var(--color-lime-mid);
+  }
+  .conc-key[data-key='next20More'] {
+    background: var(--color-lime-deep);
+  }
+  .conc-key[data-key='rest'] {
+    background: var(--color-line);
+  }
+
+  /* Attested checks */
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.7rem 0.9rem;
+  }
+  .trust-mark {
+    height: 9px;
+    width: 9px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--color-line);
+  }
+  .trust-mark[data-state='pass'] {
+    background: var(--color-lime);
+    box-shadow: 0 0 0 3px rgb(143 206 2 / 0.16);
+  }
+  .trust-mark[data-state='fail'] {
+    background: var(--color-warn);
+  }
+
+  /*
+   * The burn curve's dots are not touch targets.
+   *
+   * Thirty of them sit 2.19px apart in a 285px strip, so each anchor measured
+   * 1.71 x 4.8px. There is no size that makes thirty targets in 285px tappable
+   * — the honest answer is that they are a picture on a phone, and the ten
+   * largest burns below are the same transactions as real, labelled links.
+   */
+  @media (pointer: coarse) {
+    [data-burns-dots] a {
+      pointer-events: none;
+    }
+  }
+
+  /* Burn curve */
+  .burn-line {
+    fill: none;
+    stroke: var(--color-lime);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  .burn-area {
+    fill: rgb(143 206 2 / 0.12);
+    stroke: none;
+  }
+
+  .reproduce-block {
+    position: relative;
+  }
+  .reproduce-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.35rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-lime);
+  }
+
+  /* The hours under the pressure bars. */
+  .pressure-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--color-faint);
+  }
+
+  /* Buy/sell split */
+  .flow-bar {
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      var(--color-lime) 0 var(--buy-share, 50%),
+      var(--color-warn) var(--buy-share, 50%) 100%
+    );
+  }
+
+  /* A quiet pulse, so the feed reads as live rather than a static list. */
+  .live-dot {
+    position: relative;
+    display: inline-block;
+    height: 0.4rem;
+    width: 0.4rem;
+    border-radius: 999px;
+    background: var(--color-lime);
+  }
+  .live-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--color-lime);
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes ping {
+    75%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot::after {
+      animation: none;
+    }
+  }
+</style>
+
+<!-- These elements are created by JavaScript at runtime, so Astro's scoped
+     styles never reach them (scoping is applied to markup in the template).
+     They have to be global. -->
+
+<script>
+  import { initLiveStats } from '../../scripts/live-stats.ts';
+  import { initDashboard } from '../../scripts/dashboard.ts';
+  import { initSinceLastVisit } from '../../scripts/since-last-visit.ts';
+
+  const locale = document.documentElement.lang || 'en';
+  // Listening before the dashboard runs, or the figures are announced to
+  // nobody on a fast connection.
+  initSinceLastVisit(locale);
+  void initLiveStats(locale);
+  initDashboard(locale);
+</script>

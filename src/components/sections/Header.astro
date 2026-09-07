@@ -1,0 +1,213 @@
+---
+import { LINKS, LOCALE_PATHS, MARKETS, type Locale } from '../../config/site.ts';
+import { TOOL_ROUTES, toolPath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import Button from '../ui/Button.astro';
+import ToolsMenu from '../ui/ToolsMenu.astro';
+import LanguageMenu from '../ui/LanguageMenu.astro';
+import Icons from '../ui/Icons.astro';
+import Wordmark from '../../assets/wordmark.svg';
+
+/**
+ * The fixed header. Two persistent calls to action — one to the generator, one
+ * to buying — plus in-page links and the language switcher.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const home = LOCALE_PATHS[locale];
+
+/**
+ * The header's section links are in-page anchors, which point at nothing from a
+ * sub-page — pressing "The thesis" on /stats/ used to do nothing at all. Off the
+ * landing page they need the landing page in front of them, in this language.
+ */
+const onLanding = Astro.url.pathname.replace(/\/$/, '') === home.replace(/\/$/, '');
+const sectionHref = (hash: string) => (onLanding ? hash : `${home}${hash.replace(/^\//, '')}`);
+---
+
+<header
+  data-header
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300"
+>
+  <nav
+    aria-label={copy.nav.primaryLabel}
+    class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5 sm:gap-4 sm:px-8"
+  >
+    <div class="flex min-w-0 items-center gap-4">
+      <a href={home} class="flex shrink-0 items-center" aria-label={copy.nav.home}>
+        <Wordmark width={116} height={26} role="img" aria-label="What $IF" />
+      </a>
+      <!--
+        From lg, not sm. This is decoration sharing a row with the navigation,
+        and from 640px up it was taking about 150px that the links needed: at
+        exactly 768px — iPad portrait — the Spanish nav ran 5px past the edge of
+        the screen, where nothing can scroll to reach it. The links are the
+        function; the pill waits until there is room for both.
+      -->
+      <span
+        class="hidden items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-lime lg:inline-flex"
+      >
+        <span class="relative flex h-1.5 w-1.5">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime opacity-75"
+          ></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-lime"></span>
+        </span>
+        {copy.hero.liveOn}
+      </span>
+    </div>
+
+    <div class="hidden items-center gap-1 lg:flex">
+      {
+        copy.nav.links.map((link) => (
+          <a
+            href={sectionHref(link.href)}
+            class="rounded-lg px-3 py-2 text-sm whitespace-nowrap text-muted transition-colors hover:bg-surface hover:text-ink"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+
+      <ToolsMenu locale={locale} />
+
+      <div class="mx-1 flex items-center gap-0.5" role="group" aria-label={copy.nav.languageLabel}>
+        <LanguageMenu locale={locale} />
+      </div>
+
+      <!--
+        The two social links appear from lg, not sm.
+        Everything in this row competes for the same 704px, and the labels are
+        not the same length in four languages: at iPad-portrait width the
+        Spanish nav ran past the edge of the screen, where nothing can scroll to
+        reach it. Both links are in the mobile menu and in the footer of every
+        page, so nothing here is the only way to reach them.
+      -->
+      <a
+        href={LINKS.x}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={copy.footer.follow}
+        class="hidden h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-ink lg:grid"
+      >
+        <Icons name="x" size={14} />
+      </a>
+      <a
+        href={LINKS.telegram}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={copy.footer.telegram}
+        class="hidden h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-ink lg:grid"
+      >
+        <Icons name="telegram" size={15} />
+      </a>
+
+      <Button
+        href={MARKETS.uniswap}
+        external
+        externalLabel={copy.common.externalLink}
+        class="ml-1 min-w-0 shrink whitespace-nowrap"
+      >
+        {copy.nav.buy}
+      </Button>
+    </div>
+
+    <button
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label={copy.nav.openMenu}
+      data-label-open={copy.nav.openMenu}
+      data-label-close={copy.nav.closeMenu}
+      class="grid h-11 w-11 place-items-center rounded-lg text-ink transition-colors hover:bg-surface lg:hidden"
+    >
+      <Icons name="menu" size={20} />
+    </button>
+  </nav>
+
+  <!--
+    The menu is taller than a phone screen once the tools are listed, and the
+    header is fixed — so the bottom of it, including the language switcher, was
+    simply unreachable. Cap it to what is left below the header and let it
+    scroll. the page behind it is locked by the `menu-open` class nav.ts sets on <html>.
+  -->
+  <div
+    id="mobile-menu"
+    data-menu
+    hidden
+    class="bg-void/95 menu-panel overflow-y-auto overscroll-contain border-t border-line lg:hidden"
+  >
+    <div class="flex flex-col gap-1 px-5 pb-8 pt-4">
+      {
+        copy.nav.links.map((link) => (
+          <a href={sectionHref(link.href)} class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface">
+            {link.label}
+          </a>
+        ))
+      }
+      <p class="mt-3 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+        {copy.nav.toolsLabel}
+      </p>
+      {
+        TOOL_ROUTES.map((tool) => (
+          <a
+            href={toolPath(tool.href, locale)}
+            class="rounded-lg px-3 py-2.5 text-ink hover:bg-surface"
+          >
+            {copy.nav.tools[tool.id].label}
+          </a>
+        ))
+      }
+
+      <div
+        class="mt-2 flex items-center gap-2 px-3"
+        role="group"
+        aria-label={copy.nav.languageLabel}
+      >
+        <LanguageMenu locale={locale} inline />
+      </div>
+
+      <Button
+        href={MARKETS.uniswap}
+        external
+        externalLabel={copy.common.externalLink}
+        class="mt-3 w-full"
+        size="lg"
+      >
+        {copy.nav.buy}
+      </Button>
+    </div>
+  </div>
+</header>
+
+<style>
+  /*
+   * The menu's own height, with a `vh` fallback under the `svh`.
+   *
+   * A browser that does not know `svh` drops the declaration, and a menu with
+   * no maximum height does not scroll — on a short screen the Buy button at the
+   * bottom of it simply cannot be reached. That is a worse failure than being
+   * wrong by the height of the URL bar, so the older unit goes first.
+   */
+  /*
+   * The fallback is a separate rule on purpose.
+   *
+   * Two declarations of the same property in one block get deduplicated by the
+   * minifier — it keeps the last and drops the `vh` line, which is exactly the
+   * line that matters on an engine that does not know `svh`. An `@supports`
+   * block cannot be merged away, so the fallback survives the build.
+   */
+  .menu-panel {
+    max-height: calc(100vh - 4rem);
+  }
+  @supports (height: 100svh) {
+    .menu-panel {
+      max-height: calc(100svh - 4rem);
+    }
+  }
+</style>

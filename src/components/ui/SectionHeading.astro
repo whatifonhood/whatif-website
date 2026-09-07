@@ -1,0 +1,29 @@
+---
+import type { SplitHeading } from '../../content/types.ts';
+
+/**
+ * A section heading in two halves: the lead in body colour, the accent in lime.
+ * Headings are always sentence-shaped ("One question. No promises.").
+ */
+interface Props {
+  heading: SplitHeading;
+  /** `h1` on the hero, `h2` everywhere else. */
+  as?: 'h1' | 'h2';
+  class?: string;
+}
+
+const { heading, as: Tag = 'h2', class: className = '' }: Props = Astro.props;
+
+// The space belongs to the string, not to the markup — see Hero.astro.
+const lead = `${heading.lead} `;
+---
+
+<Tag
+  class:list={[
+    'display-heading',
+    Tag === 'h1' ? 'text-5xl sm:text-7xl' : 'text-4xl sm:text-5xl',
+    className,
+  ]}
+>
+  {lead}<span class="text-lime">{heading.accent}</span>
+</Tag>

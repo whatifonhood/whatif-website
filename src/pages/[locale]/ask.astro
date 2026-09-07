@@ -1,0 +1,17 @@
+---
+import Ask from '../../components/pages/Ask.astro';
+
+/**
+ * The generator in every language except English, which is served from the root.
+ *
+ * The interface is translated; the questions themselves are English, because
+ * generating grammatical sentences by combination in a language nobody here can
+ * check would produce confident nonsense.
+ */
+import type { LocaleProps } from '../../lib/routes.ts';
+export { localeStaticPaths as getStaticPaths } from '../../lib/routes.ts';
+
+const { locale } = Astro.props as LocaleProps;
+---
+
+<Ask locale={locale} />

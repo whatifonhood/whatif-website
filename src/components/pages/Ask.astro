@@ -1,0 +1,328 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The question generator.
+ *
+ * The coin is a question, so this is the most on-brand thing the site can do:
+ * hand you another one, forever. Everything runs on the device — no request, so
+ * it is instant and works offline.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.ask;
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-ask.jpg`}
+>
+  <div
+    data-ask
+    data-share-text={page.shareText}
+    data-label-copied={page.copied}
+    data-label-link-copied={page.linkCopied}
+    class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
+  >
+    <!-- The question -->
+    <!--
+      One question a day, the same one for everybody, so there is something to
+      answer together rather than everyone holding a different card.
+    -->
+    <section class="mb-10 rounded-2xl border border-lime/30 bg-surface p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">{page.today}</p>
+      <p data-ask-daily class="ask-daily mt-3"></p>
+      <!-- The way into the archive, which is otherwise unreachable. -->
+      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+        <!-- Set by the script to today's id; without it, the archive still works. -->
+        <a
+          data-ask-daily-answer
+          href="/ask/day/"
+          class="tap inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-lime transition-opacity hover:opacity-70"
+        >
+          {page.dailyAnswerCta} →
+        </a>
+        <a
+          href="/ask/day/"
+          class="tap inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors hover:text-lime"
+        >
+          {page.dailyArchiveTitle} →
+        </a>
+      </div>
+    </section>
+
+    <div class="rounded-2xl border border-line bg-surface p-8 sm:p-12">
+      <p data-ask-question tabindex="0" aria-live="polite" class="ask-question"></p>
+    </div>
+
+    <!--
+      Your own line. The brand is the question, so "What if" is fixed and you
+      finish it. What is typed is drawn on the canvas and set with textContent —
+      never inserted as HTML, and never written into the address bar, so a link
+      to this site can never be made to show words we did not write.
+    -->
+    <form data-ask-own class="mt-4 rounded-2xl border border-line bg-surface p-4 sm:p-5">
+      <label for="ask-own" class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.ownLabel}
+      </label>
+      <div class="mt-2.5 flex flex-col gap-2.5 sm:flex-row">
+        <div class="ask-own-field">
+          <span id="ask-own-prefix" class="ask-own-prefix">What if</span>
+          <input
+            id="ask-own"
+            data-ask-own-input
+            aria-describedby="ask-own-prefix"
+            type="text"
+            maxlength="120"
+            autocomplete="off"
+            enterkeyhint="go"
+            placeholder={page.ownPlaceholder}
+          />
+        </div>
+        <button type="submit" class="ask-secondary justify-center">{page.ownButton}</button>
+      </div>
+    </form>
+
+    <!--
+      Answering turns this from a fortune cookie into a post. The text is drawn
+      onto the canvas and never inserted into the page, so there is nothing to
+      escape and nothing to store.
+    -->
+    <label class="mt-5 block">
+      <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+        {page.answerLabel}
+      </span>
+      <textarea
+        data-ask-answer
+        rows="2"
+        maxlength="140"
+        placeholder={page.answerPlaceholder}
+        class="ask-answer mt-2"></textarea>
+    </label>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button type="button" data-ask-again class="ask-primary">
+        {page.again}
+      </button>
+      <button type="button" data-ask-copy class="ask-secondary">
+        {page.copyLink}
+      </button>
+      <a data-ask-share href="#" target="_blank" rel="noopener noreferrer" class="ask-secondary">
+        <Icons name="x" size={14} />
+        {page.postOnX}
+      </a>
+      <a data-ask-download href="#" download="what-if.png" class="ask-secondary">
+        {page.download}
+      </a>
+      <p data-ask-status role="status" aria-live="polite" class="text-xs text-lime"></p>
+    </div>
+
+    <p class="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+      <span data-ask-total class="text-lime">—</span>
+      {' '}{page.possibilities}
+      {
+        /*
+        "Press space for another" is advice a phone cannot take, and the button
+        that does the same thing is directly above it. Shown to pointers that
+        have a keyboard beside them, hidden from the ones that do not.
+      */
+      }
+      <span class="hidden [@media(pointer:fine)]:inline"> · {page.hint}</span>
+    </p>
+
+    <!-- The card, shown as soon as there is a question rather than only on download. -->
+    <canvas
+      data-ask-card
+      width="1200"
+      height="675"
+      role="img"
+      aria-label={page.title}
+      class="mt-10 w-full rounded-xl border border-line bg-surface shadow-2xl"></canvas>
+  </div>
+</PageLayout>
+
+<script>
+  import { initWhatIf } from '../../scripts/what-if.ts';
+
+  initWhatIf(document.documentElement.lang || 'en');
+</script>
+
+<style>
+  .ask-daily {
+    font-family: var(--font-sans);
+    font-size: clamp(1.125rem, 0.9rem + 1vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-ink);
+    text-wrap: pretty;
+  }
+
+  .ask-answer {
+    width: 100%;
+    resize: none;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.75rem 0.9rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    transition: border-color 0.15s ease;
+  }
+  .ask-answer::placeholder {
+    color: var(--color-faint);
+  }
+  .ask-answer:focus {
+    border-color: var(--color-lime);
+    outline: 2px solid color-mix(in srgb, var(--color-lime) 35%, transparent);
+    outline-offset: 1px;
+  }
+
+  /* ---- writing your own: a fixed "What if" and a field that finishes it */
+  .ask-own-field {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--color-field);
+    background: var(--color-surface-2);
+    padding-left: 1rem;
+    transition: border-color 0.15s ease;
+  }
+  .ask-own-field:focus-within {
+    border-color: var(--color-lime);
+    outline: 2px solid color-mix(in srgb, var(--color-lime) 35%, transparent);
+    outline-offset: 1px;
+  }
+  .ask-own-prefix {
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--color-lime);
+  }
+  .ask-own-field input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 3rem;
+    background: transparent;
+    padding: 0.6rem 1rem 0.6rem 0.5rem;
+    font-family: var(--font-sans);
+    /* 16px on a phone, or iOS zooms in on focus and never zooms back out. */
+    font-size: 1rem;
+    color: var(--color-ink);
+    outline: none;
+  }
+  .ask-own-field input::placeholder {
+    color: var(--color-faint);
+  }
+
+  /*
+   * Set as prose, not as a headline: sentence case, normal weight, room to
+   * breathe. The size follows the viewport but stops well short of the display
+   * scale — the words are doing the work, they do not need shouting.
+   */
+  .ask-question {
+    font-family: var(--font-sans);
+    font-size: clamp(1.375rem, 1rem + 1.9vw, 2.125rem);
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: -0.014em;
+    color: var(--color-ink);
+    text-wrap: pretty;
+    /* Holds the height between a short question and a long one so the buttons
+       underneath do not jump around as you press for another. */
+    min-height: 5.6em;
+    display: flex;
+    align-items: center;
+  }
+  @media (min-width: 640px) {
+    .ask-question {
+      min-height: 4.2em;
+    }
+  }
+  .ask-question.is-new {
+    animation: ask-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes ask-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ask-question.is-new {
+      animation: none;
+    }
+  }
+
+  .ask-chip {
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .ask-chip:hover {
+    border-color: color-mix(in srgb, var(--color-lime) 50%, transparent);
+    color: var(--color-ink);
+  }
+  .ask-chip[aria-pressed='true'] {
+    border-color: var(--color-lime);
+    background: color-mix(in srgb, var(--color-lime) 12%, transparent);
+    color: var(--color-lime);
+  }
+
+  .ask-primary {
+    border-radius: 999px;
+    background: var(--color-lime);
+    padding: 0.85rem 1.8rem;
+    font-weight: 600;
+    color: var(--color-void);
+    transition: filter 0.15s ease;
+  }
+  .ask-primary:hover {
+    filter: brightness(1.08);
+  }
+
+  .ask-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.85rem 1.4rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    transition: border-color 0.15s ease;
+  }
+  .ask-secondary:hover {
+    border-color: color-mix(in srgb, var(--color-lime) 50%, transparent);
+  }
+</style>

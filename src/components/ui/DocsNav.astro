@@ -1,0 +1,75 @@
+---
+import { DOCS_GROUPS } from '../../config/docs.ts';
+import type { Locale } from '../../config/site.ts';
+import { localePath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import { getDocsPages } from '../../lib/docs.ts';
+
+interface Props {
+  locale: Locale;
+  /** The page being read, so its entry can be marked current. */
+  slug?: string;
+}
+
+/**
+ * The white paper's contents list.
+ *
+ * Rendered twice by the layout — once inside a <details> for phones, once as a
+ * plain column from lg up. It lives in one component so the two can never drift
+ * apart, which is the only real cost of rendering it twice.
+ *
+ * Two renders rather than one <details> styled by breakpoint: a closed
+ * <details> hides its content through `::details-content`, which
+ * `content-visibility` governs rather than `display`, so CSS cannot reopen it
+ * at a breakpoint. Duplicating twelve links is cheaper than shipping a script
+ * to work around that.
+ */
+const { locale, slug } = Astro.props;
+const labels = getCopy(locale).pages.docs;
+const pages = getDocsPages(locale);
+---
+
+<nav aria-label={labels.title}>
+  <!--
+    The way back to the front of the paper.
+    Every page linked deeper into the paper and none of them linked to its
+    contents, so once you were inside there was no way back to the beginning
+    short of the browser button.
+  -->
+  <a
+    href={localePath('/docs/', locale)}
+    class="docs-home"
+    aria-current={slug === undefined ? 'page' : undefined}
+  >
+    <span class="docs-home-mark" aria-hidden="true">←</span>
+    {labels.backToContents}
+  </a>
+
+  {
+    DOCS_GROUPS.map((group) => (
+      <section class="mb-7">
+        <p class="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+          {labels.groups[group.id]}
+        </p>
+        <ul class="space-y-0.5">
+          {group.slugs.map((entry) => {
+            const page = pages.find((item) => item.slug === entry);
+            if (!page) return null;
+            return (
+              <li>
+                <a
+                  href={localePath(`/docs/${entry}/`, locale)}
+                  class="docs-link"
+                  aria-current={entry === slug ? 'page' : undefined}
+                >
+                  <span class="docs-number">{String(page.number).padStart(2, '0')}</span>
+                  {page.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+</nav>

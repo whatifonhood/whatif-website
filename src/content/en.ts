@@ -1,0 +1,583 @@
+import type { SiteCopy } from './types.ts';
+
+export const en: SiteCopy = {
+  htmlLang: 'en',
+  ogLocale: 'en_US',
+
+  nav: {
+    primaryLabel: 'Primary',
+    links: [
+      { label: 'The thesis', href: '#thesis' },
+      { label: 'The numbers', href: '#numbers' },
+      { label: 'How to buy', href: '#buy' },
+      { label: 'FAQ', href: '#faq' },
+    ],
+    toolsLabel: 'Tools',
+    tools: {
+      ask: { label: 'Ask a better question', blurb: 'Every question is a variation on two words' },
+      pfp: { label: 'Find your coin', blurb: 'Four rarities, one is yours' },
+      memes: { label: 'The vault', blurb: 'Free to steal' },
+      stats: { label: 'Stats', blurb: 'Every number, live' },
+      holdings: { label: 'Wallet lookup', blurb: 'No connection needed' },
+      docs: { label: 'White paper', blurb: 'The whole thing, written down' },
+      roadmap: { label: 'Roadmap', blurb: 'What is built, and what is next' },
+      brand: { label: 'Brand', blurb: 'Logos and artwork' },
+    },
+    toolGroups: { data: 'The numbers', play: 'Play', assets: 'Assets', read: 'Read' },
+    languageMenu: 'Language',
+    buy: 'Buy $IF',
+    home: 'What $IF — home',
+    pfp: 'Find your coin',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    languageLabel: 'Language',
+  },
+
+  hero: {
+    liveOn: 'Live on Robinhood Chain',
+    titleLead: 'What',
+    titleTail: 'this is the one?',
+    description:
+      'The meme coin for the perpetually curious. What if you aped earlier? What if you held? What if this is the one?',
+    buy: 'Buy $IF',
+    chart: 'Chart',
+    riskNote:
+      'A meme coin with no intrinsic value and no expectation of return. You can lose everything you put in.',
+  },
+
+  posts: {
+    eyebrow: 'From the timeline',
+    readOnX: 'Read on X',
+    heading: { lead: 'People are', accent: 'still asking.' },
+    intro:
+      'What we and the community are posting. Rendered here, not embedded — no tracker, no iframe.',
+    follow: 'Follow on X',
+  },
+
+  marquee: [
+    'What $IF',
+    'you aped earlier?',
+    'What if',
+    'you held?',
+    'What if',
+    'this is the one?',
+    'What if',
+    'we never sold?',
+  ],
+
+  cosmic: {
+    kicker: 'What if',
+    statements: [
+      'What if I could save a life?',
+      'What if I could cure cancer with one wish?',
+      'What if love outlived us all?',
+      'What if one voice could end a war?',
+      'What if the broken became the builders?',
+      'What if hope was never the lie?',
+      "What if a child's dream rewrote tomorrow?",
+      'What if mercy was stronger than power?',
+      'What if we remembered every name?',
+      'What if the darkest night held the dawn?',
+      'What if forgiveness was the cure?',
+      'What if no one grieved alone?',
+    ],
+  },
+
+  thesis: {
+    eyebrow: 'The thesis',
+    heading: { lead: 'One question.', accent: 'No promises.' },
+    intro:
+      "$IF isn't a utility token. It's not governance. It's the 3am thought every human has had, minted on a chain that opened this summer.",
+    pillars: [
+      {
+        title: 'It starts with a question',
+        body: 'Every trade you regret began with "what if?". $IF is that thought, minted — a coin about the feeling, not a forecast of what comes next.',
+      },
+      {
+        title: 'Built on Robinhood Chain',
+        body: 'Fast blocks, cheap gas, and the name that pulled a generation into the market. The chain is weeks old and $IF launched in its second week — that is where it stands, not a prediction of where it goes.',
+      },
+      {
+        title: 'Already burned, and gone for good',
+        body: '{burned} $IF — {burnedPercent} of the supply — sits in an address nobody holds the keys to. Not a plan and not a schedule: a balance you can read right now.',
+      },
+      {
+        title: "Don't trust this page",
+        body: 'The contract, the pool, the burn and the holder count are all public, and every figure here links to the one it came from. Check them, then decide.',
+      },
+    ],
+  },
+
+  numbers: {
+    eyebrow: 'The numbers',
+    heading: { lead: 'No tricks.', accent: 'Just the math.' },
+    intro:
+      'A billion tokens, a public contract, and a burn address anyone can audit. The kind of token where this section is short.',
+    contractLabel: 'Contract address',
+    verifyNote: 'Check every character against our X and Telegram before you buy.',
+    copy: 'Copy',
+    copied: 'Copied',
+    viewOnExplorer: 'View on Blockscout',
+    stats: {
+      price: 'Price',
+      marketCap: 'Market cap',
+      liquidity: 'Liquidity',
+      volume: '24h volume',
+      supply: 'Total supply',
+      burned: 'Burned',
+      holders: 'Holders',
+      chain: 'Chain',
+    },
+    burnHeadline: 'burned and unrecoverable',
+    burnBody:
+      'Sent to 0x…dEaD, an address whose private key nobody knows and nobody can derive. Nobody can move these tokens — not the team, not you, not anyone.',
+    asOf: 'as of',
+    live: 'Live',
+  },
+
+  buy: {
+    eyebrow: 'Get your bag',
+    heading: { lead: 'Three steps.', accent: "That's it." },
+    intro:
+      'Supply and the burn read straight from Robinhood Chain; price and liquidity from the public market APIs, every call shown below.',
+    steps: [
+      {
+        title: 'Get a wallet',
+        body: 'MetaMask, Rabby or Coinbase Wallet on a computer. Robinhood Wallet on your phone. Most will offer to add Robinhood Chain the first time you visit a page that uses it; if yours does not, the network details are one click away.',
+        action: 'Get MetaMask',
+      },
+      {
+        title: 'Get ETH onto Robinhood Chain',
+        body: 'Withdraw ETH from the Robinhood app and pick the Robinhood Chain network. Holding ETH on another chain? Robinhood publishes the bridging routes.',
+        action: 'Bridging guide',
+      },
+      {
+        title: 'Swap on Uniswap',
+        body: 'Opens with $IF already selected on Robinhood Chain. Compare the address on that page against the one above before you confirm.',
+        action: 'Swap on Uniswap',
+      },
+    ],
+    venuesTitle: 'Track it, chart it, verify it',
+    venues: [
+      { label: 'Uniswap', blurb: 'The main IF/WETH pool.' },
+      { label: 'DexScreener', blurb: 'Live price and liquidity.' },
+      { label: 'CoinGecko', blurb: 'Market data and history.' },
+      { label: 'CoinMarketCap', blurb: 'Rankings and supply.' },
+      { label: 'Blockscout', blurb: 'The contract itself.' },
+    ],
+    safetyNote:
+      'This site will never ask you to connect a wallet, sign a message or enter a seed phrase. If any page claiming to be $IF does, it is not us.',
+  },
+
+  pfpTeaser: {
+    eyebrow: 'The pool',
+    heading: { lead: 'Find the coin', accent: "that's you." },
+    body: 'Hand-made $IF coins across four rarities. Tap once, get yours, set it as your profile picture. No wallet, no sign-up, nothing to connect.',
+    cta: 'Open the generator',
+  },
+
+  vaultTeaser: {
+    eyebrow: 'The vault',
+    heading: { lead: 'Every meme.', accent: 'Free to steal.' },
+    body: "Every meme we've made, in full resolution, ready to post. That is the point of them. Right-click responsibly.",
+    cta: 'Open the vault',
+  },
+
+  roadmap: {
+    stamp: 'Still asking.',
+  },
+
+  faq: {
+    eyebrow: 'No dumb questions',
+    heading: { lead: 'Questions,', accent: 'answered.' },
+    items: [
+      {
+        q: 'What is $IF?',
+        a: '$IF is a meme coin on Robinhood Chain built around the one question every trader asks themselves at 3am: what if? There is no product roadmap and no utility. There is a question, a community, and a chart.',
+      },
+      {
+        q: 'How do I get ETH onto Robinhood Chain?',
+        a: 'This trips up most first-time buyers. The simplest route is to withdraw ETH from the Robinhood app and select the Robinhood Chain network. If your ETH is on another chain, Robinhood documents the bridges that reach it. Either way, leave a little ETH behind for gas.',
+      },
+      {
+        q: 'Where do I buy it?',
+        a: 'Uniswap on Robinhood Chain, using the contract address on this page. The deepest market is the IF/WETH pool. Always compare the address character by character — meme coins attract copycats, and one wrong character sends your money to a stranger.',
+      },
+      {
+        q: 'How do I know I have the right token?',
+        a: 'The only address we will ever publish is 0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1, and it appears in full on this page, on our X profile and in our Telegram. If a site shows you a shortened version, or a different one, close it.',
+      },
+      {
+        q: 'Is there a tax?',
+        a: "Nothing is added by the $IF contract on top of your trade — it has no fee logic in it at all. The 1% quoted on the main pool is Uniswap's own fee tier, earned by the liquidity positions. The largest of those is the permanently locked launch position, and its share is swept by the launchpad that created the token: the $IF side is burned, the ETH side is not. None of it reaches this community. The white paper has the whole flow.",
+      },
+      {
+        q: 'What has been burned?',
+        a: '{burned} $IF — {burnedPercent} of the total supply — sits at 0x…dEaD, an address whose private key nobody knows and nobody can derive. Those tokens can never move again. It is a live balance on the block explorer, not a claim in a document.',
+      },
+      {
+        q: 'Where is the community?',
+        a: 'X is @WhatIFonHOOD and Telegram is t.me/WhatIFonHoodChain. Both are live and both are run by people who hold the coin. Everybody is the dev.',
+      },
+      {
+        q: 'Is $IF an investment?',
+        a: 'No. It is a meme coin with no intrinsic value, no team promises and no roadmap. Prices go down as easily as up, and most meme coins end at zero. Never spend more than you would be relaxed about losing entirely.',
+      },
+    ],
+  },
+
+  footer: {
+    heading: { lead: 'What', accent: 'you joined?' },
+    subtitle: 'The chart is right there. The question is right here.',
+    buy: 'Buy $IF',
+    telegram: 'Join Telegram',
+    follow: 'Follow on X',
+    chart: 'Chart',
+    canonical: 'The only official site is whatifonhood.com. Everything else is someone else.',
+    disclaimer:
+      '$IF is a meme coin with no intrinsic value and no expectation of financial return. Nothing here is financial advice. Do your own research.',
+    builtBy: 'Everybody is the dev.',
+    reduceMotion: 'Reduce motion',
+    navLabel: 'Footer',
+  },
+
+  pages: {
+    memes: {
+      title: 'The Vault',
+      heading: { lead: 'Every meme.', accent: 'Free to steal.' },
+      intro:
+        'Every $IF meme, full resolution, no watermark, no credit needed. Post them, print them, remix them. That is what they are for.',
+      download: 'Download',
+      all: 'All',
+      searchLabel: 'Search memes',
+      empty: 'Nothing matches that. Try another word.',
+      showAll: 'Show everything',
+      count: 'memes',
+    },
+    brand: {
+      eyebrow: 'For anyone making $IF things',
+      fileNote: 'ZIP · {size} · licence terms in the kit',
+      contractLabel: 'Contract',
+      questions: 'Questions, or want something that is not in here?',
+      title: 'Brand',
+      heading: { lead: 'The marks,', accent: 'and how to use them.' },
+      intro:
+        'One brand, three marks: the coin identifies the token, the character identifies the world, the wordmark identifies the name. Take what you need.',
+      download: 'Download',
+      downloadMarks: 'Marks only · {size}',
+      kitNote:
+        'Logos, the avatar, vector wordmarks, banners, the character reference sheet and transparent poses — with the palette, the type and the rules in a readme.',
+      rulesTitle: 'Three things that matter',
+      rules: [
+        'The coin always keeps its rim. That is what makes it read as currency.',
+        'Never set the contract address in a display face, and never truncate it.',
+        'No Robinhood feather. Write “on Robinhood Chain” instead.',
+      ],
+    },
+    stats: {
+      chartTypeLabel: 'Chart controls',
+      title: 'Stats',
+      heading: { lead: 'Every number,', accent: 'live.' },
+      intro:
+        'Supply and the burn read straight from Robinhood Chain; price and liquidity from the public market APIs, every call shown below.',
+      sourceNote:
+        'Price, liquidity and volume come from DexScreener; holders and concentration from GeckoTerminal; the burn is read straight from the chain. Everything refreshes on its own while this tab is open.',
+      poolLabel: 'Main pool',
+      openExplorer: 'Open the contract',
+      openChart: 'Open the chart',
+      timeframes: { day: '24H', week: '7D', month: '30D', quarter: '90D', all: 'ALL' },
+      resizeChart: 'Drag to resize the chart',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
+      resetZoom: 'Reset',
+      average: 'Avg',
+      ema: 'EMA',
+      chartHint: 'Scroll to zoom · drag to move · double-click to reset',
+      chartOptions: 'Options',
+      candlesAsOf: 'Candles as of {time} — the live feed could not be reached',
+      concentrationNote:
+        'The top ten includes the burn address and the liquidity pool. Neither is a person.',
+      chartTypes: { candles: 'Candles', line: 'Line' },
+      logScale: 'Log',
+      chartTitle: 'Price',
+      feedTitle: 'Latest trades',
+      biggestBuy: 'Biggest buy',
+      buys: 'Buys',
+      sells: 'Sells',
+      buyLabel: 'Buy',
+      sellLabel: 'Sell',
+      viewTx: 'View',
+      loading: 'Reading the chain…',
+      feedUnavailable: 'Could not read recent trades. Trying again.',
+      chartUnavailable: 'Price history is not available right now.',
+      failed:
+        'Could not reach the market data just now. The figures above are from the last build.',
+      feedNote: 'The most recent trades on the IF/WETH pool.',
+      biggestSell: 'Biggest sell',
+      windowHours: 'in the last {hours} hours',
+      holdersTitle: 'Holders',
+      concentration: 'Who holds it',
+      bands: { top10: 'Top 10', next20: '11–30', next20More: '31–50', rest: 'Everyone else' },
+      holdersUpdated: 'recounted',
+      pressureTitle: 'Buy and sell pressure',
+      pressureNote: 'Hourly volume over the last day, trades of $500 and up. Buys up, sells down.',
+      burnHistoryTitle: 'Every burn',
+      burnHistoryNote: 'Read from the chain. Each step is a transaction you can open.',
+      reproduceTitle: 'Check every number yourself',
+      reproduceIntro:
+        'Every figure on this page comes from a public, keyless, read-only call. Here is each one, exactly as we make it. Paste any of them into a terminal.',
+      reproduceField: 'The number is at',
+      reproduceNote:
+        'These are built from the same addresses and endpoints the page itself uses, so they cannot quietly stop matching. If one of them disagrees with what you see above, the page is wrong and we would like to know.',
+      reproduceLabels: {
+        price: 'Price',
+        marketCap: 'Market cap',
+        liquidity: 'Liquidity',
+        volume: '24-hour volume',
+        holders: 'Holder count',
+        burned: 'Tokens burned',
+        supply: 'Total supply',
+        owner: 'Who can change the contract',
+        trades: 'Recent trades',
+        holderList: 'The largest holders',
+      },
+      weekTitle: 'The last seven days',
+      weekPrice: 'Price',
+      weekBurned: 'Burned',
+      weekBurnCount: 'across {count} burns',
+      weekLargest: 'Largest single burn',
+      weekNote: 'Up to {date}. Refreshed daily, not live — the figures above it are.',
+      holderTableTitle: 'Who holds it',
+      holderTableIntro:
+        'The fifteen largest holdings, with everything we can identify named. The biggest is the burn address — those tokens are gone, not held.',
+      holderTableNote: 'Read from the block explorer on {date}. Every row links to the address.',
+      holderAddress: 'Address',
+      holderWhat: 'What it is',
+      holderTokens: 'Tokens',
+      holderShare: 'Share of supply',
+      holderKinds: { burn: 'Burned', pool: 'Liquidity pool', contract: 'Contract', unknown: '—' },
+      latestBurnsTitle: 'The latest burns',
+      sinceLead: 'Since you were last here, {ago}',
+      sincePrice: 'The price moved {change}, to {price}.',
+      sinceBurned: '{amount} $IF was burned.',
+      sinceHolders: 'Holders went {change}, to {total}.',
+      sinceNothing: 'Not much. Still asking.',
+      trustTitle: 'Checks anyone can run',
+      trustNote:
+        'Two of these are attested by third parties, not by us; three are read from the contract by this page as it loads. Each links to where you can check it yourself, and a check that could not be read says so rather than showing a pass.',
+      checks: {
+        verified: 'Listing verified',
+        honeypot: 'Honeypot check',
+        supply: 'Fixed supply, no mint function',
+        burn: 'Burn address has no private key',
+        owner: 'Who can change the contract',
+      },
+      checkPass: 'Passed',
+      burnMark: '{amount} burned',
+      ownerNone: 'No owner function',
+      ownerSome: 'Owned by',
+    },
+    pfp: {
+      title: 'PFP Generator',
+      heading: { lead: 'Find the coin', accent: "that's you." },
+      intro:
+        'Tap generate, get a $IF coin, set it as your profile picture. No wallet, no sign-up, nothing to connect.',
+      subline: 'Four rarities. Every pull is free.',
+      generate: 'Generate my $IF',
+      again: 'Again',
+      hint: 'One tap. Nothing is stored anywhere but your own browser.',
+      tiers: { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', legendary: 'Legendary' },
+      found: (found, total) => `Found ${found} of ${total}`,
+      showPool: 'Show all coins',
+      hidePool: 'Hide coins',
+      rolled: 'You pulled {name} — {tier}.',
+      backupTitle: 'Move your collection to another browser',
+      backupIntro:
+        'What you have pulled is kept in this browser and nowhere else, so clearing it or changing phone loses it. Copy the code below, keep it somewhere, and paste it back in here on the other device.',
+      backupCopy: 'Copy my code',
+      backupRestore: 'Restore from a code',
+      backupFieldLabel: 'Your collection code',
+      backupPlaceholder: 'Paste a code here to restore it',
+      backupCopied: 'Copied. Keep it somewhere safe.',
+      backupSelected: 'Selected — copy it yourself.',
+      backupBad: 'That is not a collection code.',
+      backupRestored: 'Restored. You have {count} coins.',
+      locked: 'Not found yet',
+      download: 'Download PNG',
+      shareCard: 'Share card',
+      postOnX: 'Post on X',
+      shareText: (name, tier) => `I pulled ${name} — ${tier}.\n\nWhat $IF this one's you?`,
+      odds: 'odds',
+      openGenerator: 'Pull your own',
+      inCollection: 'In your collection',
+    },
+    ask: {
+      dailyArchiveTitle: 'Every day so far',
+      dailyArchiveIntro: 'One question a day, the same one for everybody. Here is all of them.',
+      dailyAnswerCta: 'Answer this one',
+      title: 'Ask a better question',
+      eyebrow: 'The generator',
+      heading: { lead: 'What $IF', accent: 'anything?' },
+      intro:
+        'The whole coin is one question. Here it is, over and over, and never quite the same one twice.',
+      again: 'Ask another',
+      copyLink: 'Copy link',
+      copied: 'Copied.',
+      linkCopied: 'Link copied.',
+      today: 'Today’s question',
+      answerLabel: 'Your answer',
+      answerPlaceholder: 'Say what you think. It goes on the card.',
+      postOnX: 'Post on X',
+      download: 'Download card',
+      possibilities: 'possible questions',
+      hint: 'press space for another',
+      ownLabel: 'Or write your own',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: 'Draw the card',
+      shareText: '{question}\n\nStill asking.',
+    },
+    docs: {
+      title: 'The $IF white paper',
+      description:
+        'What $IF is, what it is not, how to buy it, and how to check every number for yourself.',
+      eyebrow: 'White paper',
+      heading: { lead: 'Everything about $IF,', accent: 'written down' },
+      intro:
+        'What the coin is, what it is not, how to buy it, and the exact commands to check every number here without taking our word for any of it.',
+      contractLabel: 'The contract',
+      contractNote: 'One address, on Robinhood Chain. Anything else is not this coin.',
+      groups: {
+        coin: 'The coin',
+        proof: 'Proof',
+        underTheHood: 'Under the hood',
+        using: 'Using it',
+        straight: 'Straight answers',
+      },
+      backToContents: 'White paper',
+      contents: 'Contents',
+      onThisPage: 'On this page',
+      figuresAsOf: 'Figures as of {date}',
+      previous: 'Previous',
+      next: 'Next',
+      moreOfThePaper: 'More of the paper',
+    },
+    roadmap: {
+      title: 'Roadmap',
+      eyebrow: 'Roadmap',
+      heading: { lead: 'What is built,', accent: 'and what is next.' },
+      intro:
+        'Everything shipped stays on this page. A roadmap that only shows the future is a wish list.',
+      statuses: {
+        building: 'Being built now',
+        next: 'Next up',
+        later: 'Later',
+        shipped: 'Already shipped',
+      },
+      shippedCount: 'things shipped so far',
+      earlier: 'Earlier',
+      record: { shipped: 'Shipped', inProgress: 'Being built', latest: 'Most recent' },
+      tracks: {
+        proof: {
+          label: 'Proof',
+          objective:
+            'Every number on this site can be reproduced from the chain by somebody who does not trust us.',
+        },
+        tools: {
+          label: 'Tools',
+          objective:
+            'Things worth opening. None of them ask you to connect a wallet or sign anything.',
+        },
+        words: {
+          label: 'Words',
+          objective:
+            'Readable in the language you think in — the pages about staying safe before the pages about us.',
+        },
+        craft: {
+          label: 'Craft',
+          objective: 'It has to work on an old phone, on a bad connection, on the first try.',
+        },
+      },
+      needsLabel: 'Waiting on',
+      signalLabel: 'Done when',
+      log: {
+        intro:
+          'Everything already built, newest first, each one linking to itself. This is the part of a roadmap that has actually been tested.',
+      },
+      terms: {
+        title: 'What this roadmap will not do',
+        items: [
+          'Put a date on anything that has not happened. Shipped items carry a date because those already happened; a date on the rest is the easiest promise in crypto to break.',
+          'Mention a price, a market cap or a target. Nothing on this page is a reason to buy anything.',
+          'List a partnership, a listing or an integration before it exists and can be opened.',
+          'Ship anything that asks you to connect a wallet or sign a message. If that ever changes, it will appear on this page as a line before it appears as a feature.',
+        ],
+      },
+    },
+    holdings: {
+      title: 'Wallet lookup',
+      eyebrow: 'Your bag',
+      heading: { lead: 'What $IF', accent: 'you checked?' },
+      intro:
+        'Paste any address and see what it holds. No wallet connection, no signature, nothing to approve.',
+      inputLabel: 'Wallet address',
+      check: 'Check it',
+      checking: 'Checking…',
+      privacy:
+        "The address is typed by you, never requested from a wallet, and is sent only to the chain's public RPC. The price used to value it comes from DexScreener with no address attached. Nothing is stored.",
+      download: 'Download card',
+      postOnX: 'Post on X',
+      verify: 'Verify on Blockscout',
+      shareOfSupply: '{share} of all $IF',
+      shareText: 'I am holding {tokens} {symbol}.\n\nStill asking.',
+      bands: {
+        whale: 'Whale',
+        shark: 'Shark',
+        holder: 'Holder',
+        curious: 'Curious',
+        empty: 'Empty',
+        burn: 'The burn address',
+        pool: 'The liquidity pool',
+      },
+      verdicts: {
+        whale: 'The chart moves when you do.',
+        shark: 'That is a real position.',
+        holder: 'You are in. Properly in.',
+        curious: 'A start is a start.',
+        empty: 'Nothing here yet. What $IF that changed?',
+        burn: 'Nobody holds a key to this one. Everything here is gone for good.',
+        pool: 'This is the market itself, not a holder. Every trade passes through here.',
+      },
+      errors: {
+        empty: 'Paste an address first.',
+        ens: 'Names like that do not resolve on Robinhood Chain. Use the 0x address.',
+        txHash: 'That looks like a transaction hash, not an address — it is too long by half.',
+        prefix: 'An address starts with 0x.',
+        shape: 'That is not a valid address. They are 42 characters, starting 0x.',
+        network: 'Could not reach the chain just now. Try again in a moment.',
+      },
+    },
+    notFound: {
+      title: 'Page not found',
+      eyebrow: '404',
+      heading: { lead: 'What $IF this page', accent: 'never existed?' },
+      intro: 'It did not. Nothing here has moved — this address was never one of ours.',
+      tryThese: 'These do exist',
+    },
+    meme: {
+      intro: 'Full resolution, no watermark, no credit needed. Take it.',
+      description: (title, series) =>
+        `${title} — a $IF meme from the ${series} series. Full resolution, free to post, no credit needed.`,
+      download: 'Download',
+      postOnX: 'Post on X',
+      copyLink: 'Copy link',
+      more: 'More from',
+      backToVault: 'Back to the vault',
+      shareText: (title) => `${title}\n\nStill asking.`,
+    },
+  },
+
+  common: {
+    skipToContent: 'Skip to content',
+    externalLink: 'opens in a new tab',
+  },
+};

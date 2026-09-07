@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from 'astro';
+import DocsPage from '../../components/pages/DocsPage.astro';
+import { DOCS_ORDER } from '../../config/docs.ts';
+
+/** The English white paper, served from the root. */
+export const getStaticPaths = (() =>
+  DOCS_ORDER.map((slug) => ({ params: { slug }, props: { slug } }))) satisfies GetStaticPaths;
+
+const { slug } = Astro.props as { slug: string };
+---
+
+<DocsPage locale="en" slug={slug} />

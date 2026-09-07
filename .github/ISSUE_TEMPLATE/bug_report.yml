@@ -1,0 +1,43 @@
+name: Something is broken
+description: A page, a control or a number that is not doing what it should
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Found a security problem? Please do not file it here — see
+        [SECURITY.md](../blob/main/SECURITY.md) and report it privately.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: And what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to see it
+      placeholder: |
+        1. Open /stats/
+        2. Tap the 7D chip
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Browser and device
+      placeholder: Safari on iPhone 13, iOS 18
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Which page
+      placeholder: /stats/ or /zh/docs/the-token/
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshot or console output
+      description: Optional, but a screenshot usually settles it in one go.

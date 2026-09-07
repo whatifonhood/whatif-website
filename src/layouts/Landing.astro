@@ -1,0 +1,103 @@
+---
+import type { Locale } from '../config/site.ts';
+import { localePath } from '../config/navigation.ts';
+import { getCopy } from '../content/index.ts';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/sections/Header.astro';
+import Hero from '../components/sections/Hero.astro';
+import Marquee from '../components/sections/Marquee.astro';
+import Thesis from '../components/sections/Thesis.astro';
+import Numbers from '../components/sections/Numbers.astro';
+import HowToBuy from '../components/sections/HowToBuy.astro';
+import Teaser from '../components/sections/Teaser.astro';
+import Roadmap from '../components/sections/Roadmap.astro';
+import Faq from '../components/sections/Faq.astro';
+import Posts from '../components/sections/Posts.astro';
+import Footer from '../components/sections/Footer.astro';
+
+import coinGodface from '../assets/teaser/coin-godface.webp';
+import coinDarkHodl from '../assets/teaser/coin-dark-hodl.webp';
+import coinBurner from '../assets/teaser/coin-coin-burner.webp';
+import coinCometRim from '../assets/teaser/coin-comet-rim.webp';
+import coinGigachad from '../assets/teaser/coin-gigachad.webp';
+import coinGoldThrone from '../assets/teaser/coin-gold-throne.webp';
+
+import memeTimeline from '../assets/teaser/meme-timeline-sold-vs-held.webp';
+import memeTarot from '../assets/teaser/meme-tarot-the-holder.webp';
+import memeTwoButtons from '../assets/teaser/meme-two-buttons-sell-or-hold.webp';
+import memeNews from '../assets/teaser/meme-breaking-news-400th-time.webp';
+import memeCreation from '../assets/teaser/meme-creation-of-if.webp';
+import memeArcade from '../assets/teaser/meme-arcade-round-1-hold.webp';
+
+/**
+ * The landing page, in one language.
+ *
+ * Sections appear here in the order a visitor meets them. To reorder the page,
+ * move a line. To change any of the words, edit src/content/<language>.ts.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+
+const coins = [coinGodface, coinDarkHodl, coinBurner, coinCometRim, coinGigachad, coinGoldThrone];
+const memes = [memeTimeline, memeTarot, memeTwoButtons, memeNews, memeCreation, memeArcade];
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${copy.hero.titleLead} $IF ${copy.hero.titleTail}`}
+  description={copy.hero.description}
+  isHome
+>
+  <Header locale={locale} />
+
+  <main id="main">
+    <Hero locale={locale} />
+    <Marquee locale={locale} />
+    <Thesis locale={locale} />
+    <Numbers locale={locale} />
+    <HowToBuy locale={locale} />
+
+    <Teaser
+      id="pfp"
+      eyebrow={copy.pfpTeaser.eyebrow}
+      heading={copy.pfpTeaser.heading}
+      body={copy.pfpTeaser.body}
+      cta={copy.pfpTeaser.cta}
+      href={localePath('/pfp/', locale)}
+      images={coins}
+      imageAlt={copy.pfpTeaser.eyebrow}
+    />
+
+    <Teaser
+      id="vault"
+      eyebrow={copy.vaultTeaser.eyebrow}
+      heading={copy.vaultTeaser.heading}
+      body={copy.vaultTeaser.body}
+      cta={copy.vaultTeaser.cta}
+      href={localePath('/memes/', locale)}
+      images={memes}
+      imageAlt={copy.vaultTeaser.eyebrow}
+      reverse
+    />
+
+    <Roadmap locale={locale} />
+    <Posts locale={locale} />
+    <Faq locale={locale} />
+  </main>
+
+  <Footer locale={locale} />
+</BaseLayout>
+
+<script>
+  import { initCosmosWhenIdle } from '../scripts/cosmos.ts';
+  import { initCosmicStatements } from '../scripts/cosmic-statements.ts';
+  import { initLiveStats } from '../scripts/live-stats.ts';
+
+  initCosmosWhenIdle();
+  initCosmicStatements();
+  void initLiveStats(document.documentElement.lang || 'en');
+</script>

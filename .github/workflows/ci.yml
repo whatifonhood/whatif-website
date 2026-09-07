@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # GitHub disables scheduled workflows in a public repo after 60 quiet days;
+  # a weekly run keeps the nightly refresh alive and re-checks the data.
+  schedule:
+    - cron: '17 6 * * 1'
+
+# Least privilege: this workflow only ever reads the repository.
+permissions:
+  contents: read
+
+# Third-party actions are pinned by commit SHA, not by tag.
+#
+# A tag is a mutable pointer. Whoever controls the action's repository can move
+# `v4` to any commit they like, and every workflow that trusts the tag runs the
+# new code on its next build — which is precisely how the tj-actions compromise
+# reached thousands of repositories in 2025. A SHA cannot be moved. The comment
+# after each one records which release it was, so upgrading stays a deliberate
+# edit rather than something that happens to us.
+
+jobs:
+  check:
+    name: Typecheck, lint and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` installs exactly what the lockfile says, and nothing else.
+      - run: npm ci
+
+      # The job is called "Typecheck, lint and build" and did not typecheck.
+      # astro check is what catches a broken content contract or a bad prop
+      # before it reaches a page.
+      # The same command CONTRIBUTING tells people to run, so CI and a laptop
+      # cannot disagree. It typechecks, lints, checks formatting, validates the
+      # question generator, the white paper and the roadmap, and builds.
+      - name: Check
+        run: npm run check
+
+  test:
+    name: Browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Every browser, with no list to keep in step.
+      #
+      # This used to name the browsers it wanted. It said chromium, then
+      # chromium and webkit, and each time a project was added to
+      # playwright.config.ts somebody had to remember to come back here. The
+      # third one — firefox — was added and nobody did, so every run since has
+      # failed on `Executable doesn't exist`, and the whole suite has been red
+      # while the code it was meant to be guarding went out anyway.
+      #
+      # A list that has to be kept in step with another file will eventually not
+      # be. Installing all of them costs about a minute and cannot drift.
+      - run: npx playwright install --with-deps
+      - run: npm test
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  audit:
+    name: Dependencies and secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # OSV-Scanner over the lockfile, pinned by version and checksum.
+      #
+      # This was `npm audit --audit-level=high`. On 4 September 2026 it started
+      # failing on every run with "400 Bad Request … this endpoint is being
+      # retired": the runner's bundled npm still calls the registry's quick-audit
+      # endpoint, which is going away, while the same lockfile audits clean on a
+      # current npm. A gate that fails for reasons unrelated to the code trains
+      # everyone to ignore it. OSV covers the npm advisory database and more,
+      # does not depend on the registry's endpoint churn, and exits non-zero on
+      # any finding. (`npm ci` above still prints its own audit summary.)
+      - name: Audit dependencies
+        run: |
+          curl -sSfL -o osv-scanner https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64
+          echo "f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+          ./osv-scanner scan source -L package-lock.json
+
+      # The site is built to have no secrets; this makes sure it stays that way.
+      #
+      # The CLI, not the marketplace action. The action calls the GitHub API to
+      # list a pull request's commits, and on Dependabot's pull requests the
+      # token cannot — every one of them failed with "Resource not accessible by
+      # integration" and the scan never ran. The binary needs no token: the
+      # checkout above has the whole history (fetch-depth: 0) and it scans that.
+      - name: Scan for secrets
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            | tar -xz gitleaks
+          ./gitleaks detect --no-banner --redact --log-opts='--all'

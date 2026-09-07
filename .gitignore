@@ -1,0 +1,25 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# test output
+test-results/
+playwright-report/
+
+# secrets — the site needs none, this is belt and braces
+.env
+.env.*
+!.env.example
+
+# os
+.DS_Store
+
+# generator scratch
+.vite/
+.brand-kit-build/
+# the Vercel CLI's project link, and the env file it writes
+.vercel
+.env.local

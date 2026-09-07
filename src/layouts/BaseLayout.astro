@@ -1,0 +1,185 @@
+---
+/**
+ * The shell every page uses: metadata, social cards, fonts, and the scripts that
+ * make the page interactive.
+ *
+ * There is no analytics script, no tag manager and no third-party embed. Fonts
+ * and images are served from this origin, which is why the Content-Security-
+ * Policy in public/_headers can be as tight as it is.
+ */
+import { LOCALES, LINKS, SITE, type Locale } from '../config/site.ts';
+import { jsonLd } from '../lib/json-ld.ts';
+import { ANALYTICS } from '../config/analytics.ts';
+import { basePath, hasTranslation, localePath } from '../config/navigation.ts';
+
+/*
+ * The two faces the first screen is set in, fetched as early as the HTML is.
+ *
+ * They are discovered inside a stylesheet otherwise, which is one round trip
+ * later, and the swap when they land was moving the page enough to put CLS at
+ * 0.109 on the longer content pages — over Google's 0.1 threshold, and visible
+ * as a jolt while reading. Imported with ?url so Vite hashes and fingerprints
+ * them like any other asset rather than us hardcoding a build path.
+ */
+import archivoBody from '@fontsource/archivo/files/archivo-latin-400-normal.woff2?url';
+import archivoDisplay from '@fontsource/archivo/files/archivo-latin-900-italic.woff2?url';
+import { getCopy } from '../content/index.ts';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  /** Page title. The site name is appended automatically. */
+  title: string;
+  description: string;
+  /** Set on the landing page so the title is not doubled up. */
+  isHome?: boolean;
+  /** Absolute URL of the sharing image. Defaults to the site-wide card. */
+  socialImage?: string;
+  /** Keeps a page out of search and out of the sitemap. Review pages only. */
+  noindex?: boolean;
+}
+
+const { locale, title, description, isHome = false, socialImage, noindex = false } = Astro.props;
+const copy = getCopy(locale);
+
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const shareImage = socialImage ?? new URL('/og-default.jpg', SITE.url).href;
+const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
+
+/**
+ * Every language of *this* page, for search engines.
+ *
+ * These used to point at the four locale homepages regardless of the page they
+ * were on, which claims /es/ is the Spanish translation of /machine/. Then they
+ * pointed at the right path in every language — including the languages a page
+ * was never built in, so the twelve white paper pages advertised 36 translations
+ * that answer 404. A page with no translation names none: a single self-
+ * referencing alternate says nothing, so the block is skipped entirely.
+ */
+const alternates = LOCALES.filter((code) => hasTranslation(Astro.url.pathname, code)).map(
+  (code) => ({
+    code,
+    href: new URL(localePath(basePath(Astro.url.pathname), code), SITE.url).href,
+  }),
+);
+
+/** Tells search engines who publishes this site and which accounts are ours. */
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: new URL('/favicon-512.png', SITE.url).href,
+  description: SITE.description,
+  sameAs: [LINKS.x, LINKS.telegram],
+};
+---
+
+<!doctype html>
+<html lang={copy.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+
+    <link rel="preload" as="font" type="font/woff2" href={archivoBody} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={archivoDisplay} crossorigin />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {
+      !noindex && alternates.length > 1 && (
+        <>
+          {alternates.map((alternate) => (
+            <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
+          ))}
+          {/* x-default names the fallback for THIS page, not the homepage:
+              pointing every page's x-default at / told search engines that
+              /docs/risks/ in any other language falls back to the landing page. */}
+          <link
+            rel="alternate"
+            hreflang="x-default"
+            href={alternates.find((alternate) => alternate.code === 'en')?.href ?? SITE.url}
+          />
+        </>
+      )
+    }
+
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${SITE.name} — updates`}
+      href={new URL('/rss.xml', SITE.url).href}
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#080B07" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={copy.ogLocale} />
+    {
+      alternates
+        .filter((alternate) => alternate.code !== locale)
+        .map((alternate) => (
+          <meta property="og:locale:alternate" content={getCopy(alternate.code).ogLocale} />
+        ))
+    }
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={LINKS.xHandle} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+
+    <script type="application/ld+json" is:inline set:html={jsonLd(organizationSchema)} />
+    {
+      ANALYTICS.enabled && (
+        <script
+          is:inline
+          defer
+          src={ANALYTICS.scriptPath}
+          data-domain={ANALYTICS.domain}
+          data-api={ANALYTICS.eventPath}
+        />
+      )
+    }
+  </head>
+
+  <body class="bg-void text-ink antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-lime focus:px-5 focus:py-3 focus:font-semibold focus:text-void"
+    >
+      {copy.common.skipToContent}
+    </a>
+
+    <slot />
+
+    <script>
+      import { initNav } from '../scripts/nav.ts';
+      import { initCopyButtons } from '../scripts/copy.ts';
+      import { initReveal } from '../scripts/reveal.ts';
+      import { initToolsMenu } from '../scripts/tools-menu.ts';
+      import { initAnalytics } from '../lib/analytics.ts';
+
+      initAnalytics();
+      initNav();
+      initCopyButtons();
+      initReveal();
+      initToolsMenu();
+    </script>
+  </body>
+</html>

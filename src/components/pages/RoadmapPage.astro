@@ -1,0 +1,645 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { ROADMAP, ROADMAP_STATUSES, ROADMAP_TRACKS } from '../../config/roadmap.ts';
+import { SITE, type Locale } from '../../config/site.ts';
+import { toolPath } from '../../config/navigation.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from '../ui/Icons.astro';
+
+/**
+ * The roadmap, as one timeline.
+ *
+ * It used to be four differently shaped blocks — a figures row, a grid of
+ * tracks, a three-column board, then a log — and read as four pages stacked.
+ * Now everything that is work hangs off one spine, top to bottom: what is being
+ * built, what is next, what comes later, then every shipped item under the day
+ * it landed. One shape, one reading order, and the spine itself says "roadmap"
+ * before a word is read.
+ *
+ * Around the spine: the record (four figures derived from the list, so they
+ * cannot disagree with it), the four tracks the work is sorted into, and the
+ * terms — the things this roadmap refuses to do, kept last because they only
+ * mean something once the record has been seen.
+ *
+ * No dates are promised for unshipped work, deliberately. `npm run roadmap`
+ * fails the build if one appears.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.roadmap;
+
+const formatDate = (iso: string) =>
+  new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(
+    new Date(`${iso}T12:00:00Z`),
+  );
+
+const shipped = ROADMAP.filter((item) => item.status === 'shipped');
+const building = ROADMAP.filter((item) => item.status === 'building');
+const later = ROADMAP.filter((item) => item.status === 'later');
+
+/*
+ * The record. Four tiles of the same size, so the eye reads them as one row.
+ * Nothing here is measured against "now" — a static page that says "3 days
+ * ago" is wrong by the following morning — and the latest date is set smaller
+ * than the counts because a long-form date is a different length in every
+ * language and never fits at display size.
+ */
+const latest =
+  shipped
+    .map((item) => item.date ?? '')
+    .sort()
+    .at(-1) ?? '';
+const record = [
+  { value: String(shipped.length), label: page.record.shipped },
+  { value: String(building.length), label: page.record.inProgress },
+  { value: String(later.length), label: page.statuses.later },
+];
+
+/** Shipped per track, for the rails. */
+const tracks = ROADMAP_TRACKS.map((track) => {
+  const items = ROADMAP.filter((item) => item.track === track);
+  const done = items.filter((item) => item.status === 'shipped').length;
+  return { track, done, total: items.length, percent: (done / items.length) * 100 };
+});
+
+/** Building, next and later, in pipeline order. Empty stages are not drawn. */
+const openWork = ROADMAP_STATUSES.filter((status) => status !== 'shipped')
+  .map((status) => ({ status, items: ROADMAP.filter((item) => item.status === status) }))
+  .filter((stage) => stage.items.length > 0);
+
+/** Shipped work grouped by the day it landed, newest first. */
+const days = [...new Set(shipped.map((item) => item.date ?? ''))]
+  .filter(Boolean)
+  .sort()
+  .reverse()
+  .map((date) => ({ date, items: shipped.filter((item) => item.date === date) }));
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={page.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-roadmap.jpg`}
+>
+  <div class="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8">
+    <!-- 1. The record -->
+    <dl class="record">
+      {
+        record.map((figure) => (
+          <div class="record-tile">
+            <dt>{figure.label}</dt>
+            <dd class="record-count">{figure.value}</dd>
+          </div>
+        ))
+      }
+      {
+        latest && (
+          <div class="record-tile">
+            <dt>{page.record.latest}</dt>
+            <dd class="record-date">
+              <time datetime={latest}>{formatDate(latest)}</time>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <!-- 2. The tracks: what the work is for, and how far each has got. -->
+    <ul class="mt-10 grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        tracks.map(({ track, done, total, percent }) => (
+          <li class="track">
+            <div class="flex items-baseline justify-between gap-3">
+              <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-lime">
+                {page.tracks[track].label}
+              </h2>
+              <p class="whitespace-nowrap font-mono text-[11px] tabular-nums tracking-wider text-faint">
+                {done}/{total}
+              </p>
+            </div>
+            {/*
+              The rail is SVG and its width is an attribute, not a style: an
+              inline `style` is blocked by `style-src 'self'`, and the CSS
+              variable version once rendered every rail full in production while
+              looking right in a local preview.
+            */}
+            <svg
+              class="rail"
+              viewBox="0 0 100 3"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={`${page.tracks[track].label}: ${done}/${total}`}
+            >
+              <rect class="rail-bed" x="0" y="0" width="100" height="3" />
+              <rect class="rail-done" x="0" y="0" width={percent.toFixed(2)} height="3" />
+            </svg>
+            <p class="mt-3 text-[13px] leading-relaxed text-muted">
+              {page.tracks[track].objective}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!--
+      3. The spine.
+
+      One ordered list for all of it. Each stage is a heading on the spine with
+      its items beneath; the shipped stage carries a sub-marker per day.
+    -->
+    <ol class="spine mt-16">
+      {
+        openWork.map(({ status, items }) => (
+          <li class="stage" data-status={status}>
+            <h2 class="stage-head">
+              <span class="stage-title">{page.statuses[status]}</span>
+              <span class="stage-count">
+                <span class="sr-only">, </span>
+                {items.length}
+              </span>
+            </h2>
+
+            <ol class="mt-6 flex flex-col gap-4">
+              {items.map((item) => (
+                <li class="card work">
+                  <div class="work-what">
+                    <p class="track-chip">{page.tracks[item.track].label}</p>
+                    <h3 class="mt-3 text-lg font-semibold leading-snug text-ink">{item.title}</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
+                  </div>
+                  {(item.needs || item.signal) && (
+                    <dl class="work-gates">
+                      {item.needs && (
+                        <div class="gate">
+                          <dt>{page.needsLabel}</dt>
+                          <dd>{item.needs}</dd>
+                        </div>
+                      )}
+                      {item.signal && (
+                        <div class="gate" data-signal>
+                          <dt>{page.signalLabel}</dt>
+                          <dd>{item.signal}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </li>
+        ))
+      }
+
+      <li class="stage" data-status="shipped">
+        <h2 class="stage-head">
+          <span class="stage-title">{page.statuses.shipped}</span>
+          <span class="stage-count">
+            <span class="sr-only">, </span>
+            {shipped.length}
+          </span>
+        </h2>
+        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{page.log.intro}</p>
+
+        <ol class="mt-8 flex flex-col gap-10">
+          {
+            days.slice(0, 2).map((day) => (
+              <li class="day">
+                <time datetime={day.date} class="day-date">
+                  {formatDate(day.date)}
+                </time>
+                <ul class="day-entries">
+                  {day.items.map((item) => (
+                    <li class="entry">
+                      <div class="entry-head">
+                        <h3 class="text-[15px] font-semibold leading-snug text-ink">
+                          {item.href ? (
+                            <a href={toolPath(item.href, locale)} class="entry-link">
+                              {item.title}
+                              <Icons name="arrow-up-right" size={12} />
+                            </a>
+                          ) : (
+                            item.title
+                          )}
+                        </h3>
+                        <p class="entry-track">{page.tracks[item.track].label}</p>
+                      </div>
+                      <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ol>
+        {
+          /* Sixteen shipped items today, doubling in a month: the older days fold. */
+          days.length > 2 && (
+            <details class="log-earlier mt-8">
+              <summary class="log-earlier-summary">
+                {page.earlier}
+                <span class="stage-count">
+                  <span class="sr-only">, </span>
+                  {days.slice(2).reduce((sum, day) => sum + day.items.length, 0)}
+                </span>
+              </summary>
+              <ol class="mt-6 flex flex-col gap-10">
+                {days.slice(2).map((day) => (
+                  <li class="day">
+                    <time datetime={day.date} class="day-date">
+                      {formatDate(day.date)}
+                    </time>
+                    <ul class="day-entries">
+                      {day.items.map((item) => (
+                        <li class="entry">
+                          <div class="entry-head">
+                            <h3 class="text-[15px] font-semibold leading-snug text-ink">
+                              {item.href ? (
+                                <a href={toolPath(item.href, locale)} class="entry-link">
+                                  {item.title}
+                                  <Icons name="arrow-up-right" size={12} />
+                                </a>
+                              ) : (
+                                item.title
+                              )}
+                            </h3>
+                            <p class="entry-track">{page.tracks[item.track].label}</p>
+                          </div>
+                          <p class="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          )
+        }
+      </li>
+    </ol>
+
+    <!-- The terms. Last, because they are only worth reading after the record. -->
+    <section class="mt-20 border-t border-line pt-10">
+      <h2 class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+        {page.terms.title}
+      </h2>
+      <ol class="mt-5 grid max-w-4xl gap-x-10 gap-y-4 sm:grid-cols-2">
+        {
+          page.terms.items.map((term, index) => (
+            <li class="flex gap-4">
+              <span class="mt-0.5 font-mono text-[11px] tabular-nums text-lime">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <p class="text-sm leading-relaxed text-faint">{term}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </div>
+</PageLayout>
+
+<style>
+  /* ---- the record: four equal tiles */
+  .record {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  @media (min-width: 40rem) {
+    .record {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .record-tile {
+    min-width: 0;
+    padding: 1.15rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--color-line);
+    border-left: 1px solid var(--color-line);
+  }
+  .record-tile:nth-child(-n + 2) {
+    border-top: 0;
+  }
+  .record-tile:nth-child(odd) {
+    border-left: 0;
+  }
+  @media (min-width: 40rem) {
+    .record-tile {
+      border-top: 0;
+    }
+    .record-tile:nth-child(odd) {
+      border-left: 1px solid var(--color-line);
+    }
+    .record-tile:first-child {
+      border-left: 0;
+    }
+  }
+  .record-tile dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  .record-count {
+    margin-top: 0.35rem;
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+  }
+  .record-date {
+    margin-top: 0.7rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  /* ---- the tracks */
+  .track {
+    min-width: 0;
+  }
+  /* Square ends: `preserveAspectRatio="none"` would stretch a radius unevenly. */
+  .rail {
+    display: block;
+    margin-top: 0.7rem;
+    height: 3px;
+    width: 100%;
+  }
+  .rail-bed {
+    fill: var(--color-line);
+  }
+  .rail-done {
+    fill: var(--color-lime);
+  }
+
+  .track-chip {
+    display: inline-block;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-lime) 14%, transparent);
+    padding: 0.2rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-lime);
+  }
+
+  /*
+   * ---- the spine
+   *
+   * A 2px line down the left with a marker per stage. The markers sit in the
+   * gutter the list reserves, so nothing else has to know about them.
+   */
+  .spine {
+    position: relative;
+    padding-left: 1.75rem;
+  }
+  .spine::before {
+    content: '';
+    position: absolute;
+    top: 0.6rem;
+    bottom: 0;
+    left: 5px;
+    width: 2px;
+    background: var(--color-line);
+  }
+  @media (min-width: 40rem) {
+    .spine {
+      padding-left: 2.5rem;
+    }
+  }
+  .stage {
+    position: relative;
+  }
+  .stage + .stage {
+    margin-top: 4rem;
+  }
+  .stage::before {
+    content: '';
+    position: absolute;
+    top: 0.45rem;
+    left: calc(-1.75rem + 1px);
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-lime);
+    box-shadow: 0 0 0 4px var(--color-void);
+  }
+  @media (min-width: 40rem) {
+    .stage::before {
+      left: calc(-2.5rem + 1px);
+    }
+  }
+  .stage[data-status='building']::before {
+    box-shadow:
+      0 0 0 4px var(--color-void),
+      0 0 0 7px color-mix(in srgb, var(--color-lime) 25%, transparent);
+  }
+  .stage[data-status='next']::before {
+    background: var(--color-lime-mid);
+  }
+  .stage[data-status='later']::before {
+    background: var(--color-void);
+    border: 2px solid var(--color-lime-mid);
+  }
+  .stage[data-status='shipped']::before {
+    background: var(--color-lime-deep);
+  }
+
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .stage-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--color-ink);
+  }
+  .stage-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-faint);
+  }
+
+  /* ---- an unshipped item: what it is, then what gates it */
+  .work {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+  @media (min-width: 40rem) {
+    .work {
+      padding: 1.5rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    .work {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 2rem;
+    }
+  }
+  .work-what {
+    min-width: 0;
+  }
+  .work-gates {
+    display: grid;
+    gap: 1rem;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .work-gates {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    .work-gates {
+      border-top: 0;
+      border-left: 1px solid var(--color-line);
+      padding-top: 0;
+      padding-left: 2rem;
+    }
+  }
+  .gate dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  .gate dd {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .gate[data-signal] dd {
+    color: var(--color-ink);
+  }
+
+  /*
+   * ---- shipped: a date, then its entries beside it
+   *
+   * On a wide screen the date has its own gutter so the eye can run down the
+   * dates alone and stop at one. Below 60rem it stacks — the same order, less
+   * width.
+   */
+  .day {
+    display: grid;
+    gap: 0.6rem 2rem;
+  }
+  .day-date {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-lime);
+  }
+  .day-entries {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line);
+  }
+  .entry {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.9rem 0;
+  }
+  /* Title, then track. Side by side once there is room for both on one line. */
+  .entry-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  @media (min-width: 40rem) {
+    .entry-head {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+  }
+  .entry-track {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-faint);
+  }
+  @media (min-width: 60rem) {
+    .day {
+      grid-template-columns: 10rem minmax(0, 1fr);
+    }
+    .day-date {
+      padding-top: 1rem;
+    }
+  }
+
+  .log-earlier-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    cursor: pointer;
+    list-style: none;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-lime);
+  }
+  .log-earlier-summary::-webkit-details-marker {
+    display: none;
+  }
+  .log-earlier-summary::before {
+    content: '+';
+    font-family: var(--font-display);
+    font-weight: 900;
+  }
+  .log-earlier[open] .log-earlier-summary::before {
+    content: '−';
+  }
+
+  /* The title is the link; a separate "take a look" line doubled every row. */
+  .entry-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-ink);
+    transition: color 0.15s ease;
+  }
+  .entry-link:hover {
+    color: var(--color-lime);
+  }
+  .entry-link :global(svg) {
+    color: var(--color-lime);
+    flex: none;
+  }
+  /* A standalone link on a touchscreen is a 44px target; on a mouse it is a word. */
+  @media (pointer: coarse) {
+    .entry-link {
+      min-height: 44px;
+    }
+  }
+</style>

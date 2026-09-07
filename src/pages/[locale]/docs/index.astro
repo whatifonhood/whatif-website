@@ -1,0 +1,11 @@
+---
+import DocsIndex from '../../../components/pages/DocsIndex.astro';
+
+/** The contents page in every language except English, served from the root. */
+import type { LocaleProps } from '../../../lib/routes.ts';
+export { localeStaticPaths as getStaticPaths } from '../../../lib/routes.ts';
+
+const { locale } = Astro.props as LocaleProps;
+---
+
+<DocsIndex locale={locale} />

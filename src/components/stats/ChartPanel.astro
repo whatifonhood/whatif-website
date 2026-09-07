@@ -1,0 +1,265 @@
+---
+import { TOKEN_SNAPSHOT, type Locale } from '../../config/site.ts';
+import { getCopy } from '../../content/index.ts';
+import { formatUsd } from '../../lib/format.ts';
+
+/**
+ * The price panel: the figure, the change chips, the toolbar, the chart itself,
+ * the OHLC reading line and the resize grip.
+ *
+ * Lifted out of Stats.astro, where it was 224 lines of the ~840 in that
+ * template and the only part of it with any behaviour behind it. The chart is
+ * now one thing in four files that name themselves — this markup,
+ * src/styles/chart.css, src/scripts/chart-draw.ts and
+ * src/scripts/chart-interaction.ts — instead of a quarter of a page component,
+ * a scoped style block, three global ones and the middle of initDashboard.
+ *
+ * It takes a locale and nothing else. Every hook the script needs is a data-
+ * attribute in here; dashboard.ts finds them by query, so nothing has to be
+ * threaded through as a prop.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.stats;
+---
+
+<div class="card overflow-hidden">
+  <div class="flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
+    <div>
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+        {page.chartTitle} · $IF / WETH
+      </p>
+      <p
+        data-metric="price"
+        class="mt-2 font-display text-[clamp(1.6rem,11vw,2.25rem)] font-black italic tabular-nums tracking-tight text-ink [overflow-wrap:anywhere] sm:text-6xl"
+      >
+        {formatUsd(TOKEN_SNAPSHOT.priceUsd, locale)}
+      </p>
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        {
+          (
+            [
+              ['h1', '1H'],
+              ['h6', '6H'],
+              ['h24', '24H'],
+            ] as const
+          ).map(([window, label]) => (
+            <span class="change-chip">
+              <span class="change-window">{label}</span>
+              <span data-change={window}>—</span>
+            </span>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTitle}>
+        {
+          (['day', 'week', 'month', 'quarter', 'all'] as const).map((frame) => (
+            <button
+              type="button"
+              data-timeframe={frame}
+              aria-pressed={frame === 'day' ? 'true' : 'false'}
+              class="tf-chip"
+            >
+              {page.timeframes[frame]}
+            </button>
+          ))
+        }
+      </div>
+
+      <!--
+          flex-wrap, not nowrap. Eight controls at a 44px touch target are
+          440px wide; the card is 333px on a phone and clips what does not fit,
+          so Avg, EMA and Log were rendered past the right edge and could not
+          be tapped. The clip is also why nothing looked wrong: the page never
+          scrolled sideways, the buttons were simply not there.
+        -->
+      <!--
+          Folded on touchscreens, always open on a mouse (dashboard.ts closes
+          it on coarse pointers; chart.css hides the summary on fine ones).
+          The chart used to sit a full screen below the fold on a phone behind
+          three rows of these.
+        -->
+      <details data-chart-more open class="chart-more">
+        <summary class="tf-chip chart-more-summary">{page.chartOptions}</summary>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-label={page.chartTypeLabel}>
+          {
+            (['candles', 'line'] as const).map((type) => (
+              <button
+                type="button"
+                data-chart-type={type}
+                aria-pressed={type === 'candles' ? 'true' : 'false'}
+                class="tf-chip tf-chip-icon"
+                title={page.chartTypes[type]}
+              >
+                {type === 'candles' ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M7 3v4M7 17v4M17 3v7M17 16v5"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <rect x="4.5" y="7" width="5" height="10" rx="1" fill="currentColor" />
+                    <rect x="14.5" y="10" width="5" height="6" rx="1" fill="currentColor" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M3 16l5-6 4 3 4-7 5 4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                )}
+                <span class="sr-only">{page.chartTypes[type]}</span>
+              </button>
+            ))
+          }
+          <button
+            type="button"
+            data-chart-zoom="out"
+            class="chart-toggle"
+            aria-label={page.zoomOut}
+            title={page.zoomOut}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            data-chart-zoom="in"
+            class="chart-toggle"
+            aria-label={page.zoomIn}
+            title={page.zoomIn}
+          >
+            +
+          </button>
+          <button
+            type="button"
+            data-chart-reset
+            class="chart-toggle chart-reset"
+            title={page.resetZoom}
+          >
+            {page.resetZoom}
+          </button>
+          <button
+            type="button"
+            data-chart-average
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.average}
+          >
+            {page.average}
+          </button>
+          <button
+            type="button"
+            data-chart-ema
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.ema}
+          >
+            {page.ema}
+          </button>
+          <button
+            type="button"
+            data-chart-log
+            aria-pressed="false"
+            class="chart-toggle"
+            title={page.logScale}
+          >
+            {page.logScale}
+          </button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!--
+      The reading line: open, high, low, close and volume for whichever candle
+      the pointer is on, or the most recent one when it is not. Every chart
+      worth using has one, and it is what makes the crosshair readable rather
+      than decorative.
+    -->
+  <div id="chart-ohlc" data-ohlc class="ohlc-bar" aria-live="off"></div>
+  <!-- Only when the live candles could not be fetched: says when these ones end. -->
+  <p data-chart-stale data-template={page.candlesAsOf} hidden class="chart-stale" role="status"></p>
+
+  <div data-chart-wrap class="chart-wrap relative border-t border-line">
+    <!--
+        Said, rather than left blank. When the price history cannot be
+        fetched the chart drew its frame and no candles, so the page showed an
+        empty dark rectangle under a full set of working controls and no
+        explanation at all.
+      -->
+    <p
+      data-chart-empty
+      hidden
+      class="absolute inset-0 z-10 grid place-items-center px-6 text-center font-mono text-[11px] uppercase tracking-wider text-faint"
+    >
+      {page.chartUnavailable}
+    </p>
+    <svg
+      data-chart
+      data-direction="up"
+      viewBox="0 0 1000 320"
+      preserveAspectRatio="none"
+      class="chart w-full"
+      role="img"
+      aria-label={`${page.chartTitle} chart`}
+      tabindex="0"
+      aria-describedby="chart-ohlc"
+    >
+      <!-- Behind everything: the price levels the scale on the right names. -->
+      <g data-grid></g>
+      <g data-candles></g>
+      <!-- Volume sits in its own lane under the price. -->
+      <g data-volume></g>
+      <!-- Overlays, drawn on the same scale as the price above. -->
+      <g data-average></g>
+      <g data-ema></g>
+      <g data-burn-marks></g>
+      <!-- The last close, so the current price is findable at a glance. -->
+      <line data-last-line class="last-line" x1="0" x2="1000" opacity="0"></line>
+      <line data-crosshair class="crosshair" x1="0" x2="0" y1="0" y2="320" opacity="0"></line>
+      <line data-crosshair-y class="crosshair" x1="0" x2="1000" y1="0" y2="0" opacity="0"></line>
+    </svg>
+
+    <!--
+        Both scales are HTML, not SVG text. The chart stretches to fill its
+        box (preserveAspectRatio="none"), which would squash any text drawn
+        inside it — the same reason the tooltip is HTML.
+      -->
+    <div data-price-scale class="price-scale" aria-hidden="true"></div>
+    <div data-time-axis class="time-axis" aria-hidden="true"></div>
+    <div data-tip class="chart-tip" hidden></div>
+  </div>
+  <!-- How to read it. The copy existed in four languages and was rendered nowhere. -->
+  <p class="chart-hint">{page.chartHint}</p>
+
+  <!--
+      Drag to resize. A real slider underneath, so it also works with a
+      keyboard and is announced properly — the grip is the visible handle.
+    -->
+  <div
+    data-chart-grip
+    role="slider"
+    tabindex="0"
+    aria-label={page.resizeChart}
+    aria-orientation="vertical"
+    aria-valuemin="240"
+    aria-valuemax="760"
+    aria-valuenow="320"
+    class="chart-grip"
+  >
+    <span class="chart-grip-bar" aria-hidden="true"></span>
+  </div>
+</div>

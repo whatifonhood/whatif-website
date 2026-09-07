@@ -1,0 +1,445 @@
+---
+import { localePath } from '../../config/navigation.ts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE, type Locale } from '../../config/site.ts';
+import { COINS, COIN_TIERS, COIN_TIER_ORDER } from '../../config/coins.ts';
+import { getCopy } from '../../content/index.ts';
+import Icons from '../../components/ui/Icons.astro';
+import Button from '../ui/Button.astro';
+
+/**
+ * The PFP generator, as a page of this site rather than a separate app.
+ *
+ * The whole pool is rendered server-side and locked with CSS; a coin unlocks
+ * when this browser has pulled it. That keeps the page useful without
+ * JavaScript (you can still see every coin exists) and means the grid needs no
+ * client-side templating.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const page = copy.pages.pfp;
+
+const tierLabels = {
+  common: page.tiers.common,
+  uncommon: page.tiers.uncommon,
+  rare: page.tiers.rare,
+  legendary: page.tiers.legendary,
+};
+
+/**
+ * The "found N of M" line has to be re-rendered in the browser as coins are
+ * pulled, so it is turned into a template here. Sentinel numbers that cannot
+ * appear in the translated string are swapped for placeholders.
+ */
+const foundTemplate = page.found(-1, -2).replace('-1', '{found}').replace('-2', '{total}');
+
+const byTier = COIN_TIER_ORDER.map((tier) => ({
+  tier,
+  label: tierLabels[tier],
+  weight: COIN_TIERS[tier].weight,
+  coins: COINS.filter((coin) => coin.tier === tier),
+}));
+---
+
+<PageLayout
+  locale={locale}
+  title={page.title}
+  description={page.intro}
+  eyebrow={copy.pfpTeaser.eyebrow}
+  heading={page.heading}
+  intro={page.intro}
+  socialImage={`${SITE.url}/og-pfp.jpg`}
+>
+  <p slot="header-extra" class="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
+    {page.subline}
+  </p>
+
+  <div
+    data-pfp
+    data-tiers={JSON.stringify(tierLabels)}
+    data-label-rolled={page.rolled}
+    data-label-backup-copied={page.backupCopied}
+    data-label-backup-selected={page.backupSelected}
+    data-label-backup-bad={page.backupBad}
+    data-label-backup-restored={page.backupRestored}
+    class="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8"
+  >
+    <!-- The coin -->
+    <div class="flex flex-col items-center">
+      <div class="pfp-stage" data-pfp-coin data-tier="none">
+        <img
+          data-pfp-img
+          src={`/coins/full/${COINS[0]!.slug}.webp`}
+          alt={COINS[0]!.name}
+          width="800"
+          height="800"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="pfp-coin-img"
+        />
+      </div>
+
+      <!-- Result -->
+      <p data-pfp-status role="status" aria-live="polite" class="sr-only"></p>
+      <div data-pfp-result hidden class="mt-5 flex flex-col items-center gap-3">
+        <h2 data-pfp-name class="display-heading text-3xl sm:text-4xl"></h2>
+        <span
+          data-pfp-tier
+          class="pfp-tier-chip rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em]"
+        ></span>
+      </div>
+
+      <Button
+        size="xl"
+        class="mt-5 aria-disabled:opacity-60"
+        data-pfp-generate
+        data-label-generate={page.generate}
+        data-label-again={page.again}
+      >
+        {page.generate}
+      </Button>
+
+      <p class="mt-4 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-faint">
+        {page.hint}
+      </p>
+
+      <div data-pfp-actions hidden class="mt-6 flex flex-wrap justify-center gap-3">
+        <Button href="#" data-pfp-download>{page.download}</Button>
+        <Button href="#" variant="secondary" data-pfp-card>
+          {page.shareCard}
+        </Button>
+        <Button
+          href="#"
+          variant="secondary"
+          external
+          externalLabel={copy.common.externalLink}
+          data-pfp-x
+          data-template={page.shareText('{name}', '{tier}')}
+        >
+          <Icons name="x" size={13} />
+          {page.postOnX}
+        </Button>
+      </div>
+
+      <!-- The share card, shown once there is one. It used to be a blind download. -->
+      <canvas
+        data-pfp-canvas
+        width="1200"
+        height="675"
+        hidden
+        role="img"
+        aria-label={page.shareCard}
+        class="mt-6 w-full max-w-xl rounded-xl border border-line bg-surface shadow-2xl"></canvas>
+    </div>
+
+    <!-- The pool -->
+    <div class="card mt-16 overflow-hidden">
+      <div class="flex items-center justify-between gap-4 px-5 py-4">
+        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+          <span class="text-lime">{copy.pfpTeaser.eyebrow}</span>
+          {' · '}
+          <span data-pfp-found data-template={foundTemplate}>
+            {page.found(0, COINS.length)}
+          </span>
+        </p>
+        <button
+          type="button"
+          data-pfp-pool-toggle
+          data-label-show={page.showPool}
+          data-label-hide={page.hidePool}
+          aria-expanded="false"
+          aria-controls="pfp-pool"
+          class="tap inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-lime"
+        >
+          <span data-pool-label>{page.showPool}</span>
+          <Icons name="chevron-down" size={12} />
+        </button>
+      </div>
+
+      <div id="pfp-pool" data-pfp-pool hidden class="border-t border-line px-5 py-6">
+        {
+          byTier.map((group) => (
+            <section class="mb-8 last:mb-0">
+              <h3 class="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+                <span data-tier-dot={group.tier} class="pfp-dot" />
+                {group.label} · {group.coins.length} · {group.weight}% {page.odds}
+              </h3>
+              <ul class="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+                {group.coins.map((coin) => (
+                  <li data-coin-slug={coin.slug} class="pfp-pool-item">
+                    {/*
+                      A coin nobody has pulled yet gives nothing away. Its
+                      picture, its name and its page are all held in data
+                      attributes and only moved into the real ones once it has
+                      been found — see paintFound in src/scripts/pfp.ts.
+
+                      This has to be done in the browser rather than here: the
+                      page is static and identical for everybody, so the server
+                      cannot know what any one visitor has pulled. Rendering the
+                      name into alt, title and an href, and then dimming the
+                      picture with a filter, put the whole pool one hover or one
+                      right-click away.
+                    */}
+                    <a
+                      data-pool-link
+                      data-href={localePath(`/pfp/${coin.slug}/`, locale)}
+                      class="pfp-pool-face block"
+                      aria-hidden="true"
+                    >
+                      <img
+                        data-pool-image
+                        data-src={`/coins/thumb/${coin.slug}.webp`}
+                        alt=""
+                        width="200"
+                        height="200"
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full rounded-full"
+                      />
+                      <span class="pfp-pool-lock">?</span>
+                    </a>
+                    <span data-pool-name class="sr-only">
+                      {page.locked}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+
+    <!--
+      Moving a collection to another browser.
+      What somebody has pulled lives only in this browser, so a cleared cache
+      or a new phone loses it. A copied string rather than a file: this site
+      has no upload anywhere and a text field keeps it that way.
+    -->
+    <details data-pfp-backup class="mt-6 rounded-2xl border border-line bg-surface p-6">
+      <summary
+        class="tap cursor-pointer list-none font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-lime"
+      >
+        {page.backupTitle}
+      </summary>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted">{page.backupIntro}</p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button type="button" data-pfp-export class="pfp-backup-button">
+          {page.backupCopy}
+        </button>
+        <button type="button" data-pfp-import class="pfp-backup-button">
+          {page.backupRestore}
+        </button>
+      </div>
+
+      <label class="mt-4 block">
+        <span class="sr-only">{page.backupFieldLabel}</span>
+        <textarea
+          data-pfp-code
+          rows="3"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder={page.backupPlaceholder}
+          class="w-full resize-none rounded-xl border border-field bg-void/60 px-4 py-3 font-mono text-base text-ink placeholder:text-faint focus:border-lime/50"
+        ></textarea>
+      </label>
+
+      <p
+        data-pfp-backup-status
+        role="status"
+        aria-live="polite"
+        class="mt-2 min-h-5 font-mono text-[11px] text-lime"
+      >
+      </p>
+    </details>
+  </div>
+</PageLayout>
+
+<style>
+  /* Backup controls. Secondary to the pull button, which stays the one
+     obviously primary thing on the page. */
+  .pfp-backup-button {
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    /* 33px with a mouse is fine; a thumb wants the whole 44. */
+    min-height: 44px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  @media (pointer: fine) {
+    .pfp-backup-button {
+      min-height: 0;
+    }
+  }
+  .pfp-backup-button:hover {
+    color: var(--color-lime);
+    border-color: color-mix(in oklab, var(--color-lime) 45%, transparent);
+  }
+
+  /* The coin sits in a perspective box so it can spin on its Y axis. */
+  .pfp-stage {
+    position: relative;
+    /* Capped against the viewport height too: at 380px the coin alone filled a
+       phone screen and the result and the button sat below the fold. */
+    width: min(100%, 380px, 42dvh);
+    aspect-ratio: 1;
+    perspective: 1100px;
+    display: grid;
+    place-items: center;
+  }
+  .pfp-stage::before {
+    content: '';
+    position: absolute;
+    inset: -12%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--tier-glow, color-mix(in srgb, var(--color-lime) 28%, transparent)),
+      transparent 68%
+    );
+    animation: glow 4s ease-in-out infinite;
+  }
+  .pfp-coin-img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transform: rotateY(var(--spin, 0deg));
+    filter: blur(var(--spin-blur, 0px));
+    /* WebKit drops border-radius clipping on 3D-transformed elements, so the
+       shape is enforced three ways. */
+    clip-path: circle(50% at 50% 50%);
+    -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+    will-change: transform;
+  }
+
+  /* Rarity tints the glow and the chip. */
+  [data-tier='uncommon'] {
+    --tier-glow: color-mix(in srgb, var(--color-lime-pale) 30%, transparent);
+  }
+  [data-tier='rare'] {
+    --tier-glow: color-mix(in srgb, var(--color-info) 32%, transparent);
+  }
+  [data-tier='legendary'] {
+    --tier-glow: color-mix(in srgb, var(--color-gold) 40%, transparent);
+  }
+  [data-tier='none'] {
+    --tier-glow: color-mix(in srgb, var(--color-lime) 12%, transparent);
+  }
+
+  .pfp-tier-chip[data-tier='common'] {
+    color: var(--color-lime);
+    border-color: color-mix(in srgb, var(--color-lime) 40%, transparent);
+  }
+  .pfp-tier-chip[data-tier='uncommon'] {
+    color: var(--color-lime-pale);
+    border-color: color-mix(in srgb, var(--color-lime-pale) 40%, transparent);
+  }
+  .pfp-tier-chip[data-tier='rare'] {
+    color: var(--color-info);
+    border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
+  }
+  .pfp-tier-chip[data-tier='legendary'] {
+    color: var(--color-gold);
+    border-color: color-mix(in srgb, var(--color-gold) 45%, transparent);
+  }
+
+  .pfp-dot {
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: var(--color-lime);
+  }
+  [data-tier-dot='uncommon'] {
+    background: var(--color-lime-pale);
+  }
+  [data-tier-dot='rare'] {
+    background: var(--color-info);
+  }
+  [data-tier-dot='legendary'] {
+    background: var(--color-gold);
+  }
+
+  /* Coins start locked and unlock once this browser has pulled them. */
+  .pfp-pool-item {
+    position: relative;
+  }
+  /* Nothing to see until it is found: the <img> has no src at all, so the
+     slot is an empty disc rather than a dimmed picture somebody can squint at. */
+  .pfp-pool-item img {
+    opacity: 0;
+    transition:
+      opacity 0.4s ease,
+      transform 0.4s var(--ease-out-expo);
+  }
+  .pfp-pool-face {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+  }
+  .pfp-pool-item[data-found] .pfp-pool-face {
+    background: none;
+    border-color: transparent;
+  }
+  .pfp-pool-lock {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: color-mix(in srgb, var(--color-lime) 45%, transparent);
+    pointer-events: none;
+  }
+  .pfp-pool-item[data-found] img {
+    opacity: 1;
+  }
+  /* A found coin's name, under it. */
+  .pfp-pool-caption {
+    display: block;
+    margin-top: 0.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .pfp-pool-item[data-found] .pfp-pool-lock {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pfp-pool-item[data-found]:hover img {
+      transform: scale(1.08);
+    }
+  }
+</style>
+
+<script>
+  import { initPfp } from '../../scripts/pfp.ts';
+  initPfp();
+</script>

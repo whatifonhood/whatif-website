@@ -1,0 +1,583 @@
+import type { SiteCopy } from './types.ts';
+
+export const tr: SiteCopy = {
+  htmlLang: 'tr',
+  ogLocale: 'tr_TR',
+
+  nav: {
+    primaryLabel: 'Ana menü',
+    links: [
+      { label: 'Fikir', href: '#thesis' },
+      { label: 'Rakamlar', href: '#numbers' },
+      { label: 'Nasıl alınır', href: '#buy' },
+      { label: 'SSS', href: '#faq' },
+    ],
+    toolsLabel: 'Araçlar',
+    tools: {
+      ask: { label: 'Daha iyi bir soru sor', blurb: 'Her soru iki kelimenin bir çeşitlemesi' },
+      pfp: { label: 'Kendi paranı bul', blurb: 'Dört nadirlik, biri senin' },
+      memes: { label: 'Kasa', blurb: 'Çalması serbest' },
+      stats: { label: 'Veriler', blurb: 'Her rakam canlı' },
+      holdings: { label: 'Cüzdan sorgusu', blurb: 'Bağlantı gerekmez' },
+      docs: { label: 'Teknik doküman', blurb: 'Her şey, yazılı hâlde' },
+      roadmap: { label: 'Yol haritası', blurb: 'Ne yapıldı, sırada ne var' },
+      brand: { label: 'Marka', blurb: 'Logolar ve görseller' },
+    },
+    toolGroups: { data: 'Rakamlar', play: 'Oyna', assets: 'Görseller', read: 'Oku' },
+    languageMenu: 'Dil',
+    buy: '$IF Al',
+    home: 'What $IF — ana sayfa',
+    pfp: 'Kendi paranı bul',
+    openMenu: 'Menüyü aç',
+    closeMenu: 'Menüyü kapat',
+    languageLabel: 'Dil',
+  },
+
+  hero: {
+    liveOn: 'Robinhood Chain üzerinde yayında',
+    titleLead: 'Ya',
+    titleTail: 'bu o ise?',
+    description:
+      'Sonsuz meraklılar için bir meme coin. Ya daha önce alsaydın? Ya elinde tutsaydın? Ya bu gerçekten o ise?',
+    buy: '$IF Al',
+    chart: 'Grafik',
+    riskNote:
+      'İçsel değeri olmayan, getiri beklentisi taşımayan bir meme coin. Yatırdığının tamamını kaybedebilirsin.',
+  },
+
+  posts: {
+    eyebrow: 'Akıştan',
+    readOnX: 'X’te oku',
+    heading: { lead: 'İnsanlar hâlâ', accent: 'soruyor.' },
+    intro:
+      'Bizim ve topluluğun paylaştıkları. Gömülmüyor, burada çiziliyor — takip kodu yok, iframe yok.',
+    follow: "X'te takip et",
+  },
+
+  marquee: [
+    'Ya $IF',
+    'daha önce alsaydın?',
+    'Ya',
+    'elinde tutsaydın?',
+    'Ya',
+    'bu o ise?',
+    'Ya',
+    'hiç satmasaydık?',
+  ],
+
+  cosmic: {
+    kicker: 'Ya',
+    statements: [
+      'Ya bir hayat kurtarabilseydim?',
+      'Ya bir dilekle kanseri yenebilseydim?',
+      'Ya aşk hepimizden uzun yaşasaydı?',
+      'Ya tek bir ses bir savaşı bitirebilseydi?',
+      'Ya kırılanlar inşa edenler olsaydı?',
+      'Ya umut hiç yalan olmasaydı?',
+      'Ya bir çocuğun hayali yarını yeniden yazsaydı?',
+      'Ya merhamet güçten daha kuvvetli olsaydı?',
+      'Ya her ismi hatırlasaydık?',
+      'Ya en karanlık gece şafağı saklasaydı?',
+      'Ya affetmek çare olsaydı?',
+      'Ya kimse yalnız yas tutmasaydı?',
+    ],
+  },
+
+  thesis: {
+    eyebrow: 'Fikir',
+    heading: { lead: 'Tek bir soru.', accent: 'Hiçbir vaat yok.' },
+    intro:
+      '$IF bir fayda tokeni değil, yönetişim tokeni de değil. Herkesin gece 3’te aklına gelen o düşüncenin, bu yaz açılan bir zincire kazınmış hâli.',
+    pillars: [
+      {
+        title: 'Her şey bir soruyla başlar',
+        body: 'Pişman olduğun her işlem “ya olsaydı?” ile başladı. $IF o düşüncenin basılmış hâli — bir hissin parası, sonrasının tahmini değil.',
+      },
+      {
+        title: 'Robinhood Chain üzerine kurulu',
+        body: 'Hızlı bloklar, ucuz gas ve bir nesli piyasaya çeken isim. Zincir birkaç haftalık ve $IF ikinci haftasında çıktı — bulunduğu yer bu, gideceği yerin tahmini değil.',
+      },
+      {
+        title: 'Çoktan yakıldı, geri gelmiyor',
+        body: '{burned} $IF — arzın {burnedPercent} kadarı — anahtarları kimsede olmayan bir adreste duruyor. Plan da değil takvim de: şu anda okuyabileceğin bir bakiye.',
+      },
+      {
+        title: 'Bu sayfaya güvenme',
+        body: 'Kontrat, havuz, yakım ve cüzdan sayısı tamamen açık; buradaki her rakam geldiği yere bağlanıyor. Kendin bak, sonra karar ver.',
+      },
+    ],
+  },
+
+  numbers: {
+    eyebrow: 'Rakamlar',
+    heading: { lead: 'Hile yok.', accent: 'Sadece matematik.' },
+    intro:
+      'Bir milyar token, açık bir kontrat ve herkesin denetleyebileceği bir yakma adresi. Bu bölümün kısa olmasının sebebi bu.',
+    contractLabel: 'Kontrat adresi',
+    verifyNote: 'Almadan önce her karakteri X ve Telegram hesabımızdakiyle karşılaştır.',
+    copy: 'Kopyala',
+    copied: 'Kopyalandı',
+    viewOnExplorer: "Blockscout'ta gör",
+    stats: {
+      price: 'Fiyat',
+      marketCap: 'Piyasa değeri',
+      liquidity: 'Likidite',
+      volume: '24s hacim',
+      supply: 'Toplam arz',
+      burned: 'Yakılan',
+      holders: 'Cüzdan',
+      chain: 'Zincir',
+    },
+    burnHeadline: 'yakıldı ve geri alınamaz',
+    burnBody:
+      'Özel anahtarı olmayan 0x…dEaD adresine gönderildi. Bu tokenleri kimse kıpırdatamaz — ekip de, sen de, hiç kimse.',
+    asOf: 'şu tarihte',
+    live: 'Canlı',
+  },
+
+  buy: {
+    eyebrow: 'Çantanı doldur',
+    heading: { lead: 'Üç adım.', accent: 'Hepsi bu.' },
+    intro:
+      "Arz ve yakım doğrudan Robinhood Chain'den okunur; fiyat ve likidite herkese açık piyasa API'lerinden gelir, her çağrı aşağıda gösterilir.",
+    steps: [
+      {
+        title: 'Bir cüzdan edin',
+        body: 'Bilgisayarda MetaMask, OKX veya Trust; telefonda Robinhood Wallet. Robinhood Chain’i kullanan bir sayfayı ilk açtığında cüzdanın ağı eklemeyi kendisi önerecek.',
+        action: 'MetaMask edin',
+      },
+      {
+        title: "Robinhood Chain'e ETH getir",
+        body: 'Robinhood uygulamasından ETH çek ve ağ olarak Robinhood Chain’i seç. ETH’in başka bir zincirde mi? Robinhood köprü yollarını kendi dokümanlarında yayınlıyor.',
+        action: 'Köprüleme rehberi',
+      },
+      {
+        title: "Uniswap'ta takas et",
+        body: 'Robinhood Chain üzerinde $IF önceden seçili olarak açılır. Onaylamadan önce oradaki adresi yukarıdakiyle karşılaştır.',
+        action: "Uniswap'ta takas et",
+      },
+    ],
+    venuesTitle: 'Takip et, grafiğe bak, doğrula',
+    venues: [
+      { label: 'Uniswap', blurb: 'Ana IF/WETH havuzu.' },
+      { label: 'DexScreener', blurb: 'Canlı fiyat ve likidite.' },
+      { label: 'CoinGecko', blurb: 'Piyasa verisi ve geçmiş.' },
+      { label: 'CoinMarketCap', blurb: 'Sıralama ve arz.' },
+      { label: 'Blockscout', blurb: 'Kontratın kendisi.' },
+    ],
+    safetyNote:
+      'Bu site senden asla cüzdan bağlamanı, bir mesaj imzalamanı veya kurtarma kelimelerini girmeni istemez. $IF olduğunu söyleyip bunu isteyen bir sayfa varsa, o biz değiliz.',
+  },
+
+  pfpTeaser: {
+    eyebrow: 'Havuz',
+    heading: { lead: 'Sana ait olan', accent: 'parayı bul.' },
+    body: 'El yapımı $IF paraları, dört nadirlik seviyesi. Bir kez dokun, kendininkini al, profil fotoğrafın yap. Cüzdan yok, kayıt yok, bağlanacak hiçbir şey yok.',
+    cta: 'Üreteci aç',
+  },
+
+  vaultTeaser: {
+    eyebrow: 'Kasa',
+    heading: { lead: 'Her meme.', accent: 'Çalması serbest.' },
+    body: 'Yaptığımız her meme, tam çözünürlükte, paylaşmaya hazır. Zaten bunun için varlar. Sağ tıkla, sorumluca.',
+    cta: 'Kasayı aç',
+  },
+
+  roadmap: {
+    stamp: 'Hâlâ soruyoruz.',
+  },
+
+  faq: {
+    eyebrow: 'Aptalca soru yoktur',
+    heading: { lead: 'Sorular,', accent: 'yanıtlandı.' },
+    items: [
+      {
+        q: '$IF nedir?',
+        a: '$IF, Robinhood Chain üzerinde, her yatırımcının gece 3’te kendine sorduğu tek soru etrafında kurulmuş bir meme coin: ya olsaydı? Ürün yol haritası yok, fayda vaadi yok. Bir soru, bir topluluk ve bir grafik var.',
+      },
+      {
+        q: "Robinhood Chain'e ETH nasıl getirilir?",
+        a: 'Yeni başlayanların çoğu burada takılıyor. En basit yol, Robinhood uygulamasından ETH çekip ağ olarak Robinhood Chain’i seçmek. ETH’in başka bir zincirdeyse, ona ulaşan köprüleri Robinhood kendi dokümanlarında listeliyor. Her hâlükârda gas için biraz ETH bırak.',
+      },
+      {
+        q: 'Nereden alınır?',
+        a: 'Robinhood Chain üzerindeki Uniswap’tan, bu sayfadaki kontrat adresini kullanarak. En derin piyasa IF/WETH havuzu. Adresi mutlaka karakter karakter karşılaştır — meme coin’ler taklitçi çeker ve tek bir yanlış karakter paranı bir yabancıya gönderir.',
+      },
+      {
+        q: 'Doğru tokeni aldığımı nasıl anlarım?',
+        a: 'Yayınlayacağımız tek adres 0x232CDFc415D10b673845D83Dc02ba2eaBe7e30d1 ve bu sayfada, X profilimizde ve Telegram’ımızda tam hâliyle görünür. Bir site sana kısaltılmış ya da farklı bir adres gösteriyorsa, kapat.',
+      },
+      {
+        q: 'Vergi var mı?',
+        a: '$IF kontratı işlemenin üstüne hiçbir şey eklemiyor — kontratın içinde hiç komisyon mantığı yok. Ana havuzda göreceğin %1, Uniswap’ın kendi komisyon kademesidir ve likidite pozisyonlarının kazancıdır. Bunların en büyüğü kalıcı olarak kilitli lansman pozisyonu ve onun payını, tokeni oluşturan launchpad süpürüyor: $IF tarafı yakılıyor, ETH tarafı yakılmıyor. Bunun hiçbiri bu topluluğa ulaşmıyor. Akışın tamamı teknik dokümanda.',
+      },
+      {
+        q: 'Ne kadarı yakıldı?',
+        a: '{burned} $IF — toplam arzın {burnedPercent}’i — özel anahtarını kimsenin bilmediği ve türetemediği 0x…dEaD adresinde duruyor. Bu tokenler bir daha asla hareket edemez. Bu, bir belgedeki iddia değil, blok gezgininde canlı duran bir bakiye.',
+      },
+      {
+        q: 'Topluluk nerede?',
+        a: 'X: @WhatIFonHOOD, Telegram: t.me/WhatIFonHoodChain. İkisi de aktif ve ikisini de parayı tutan insanlar yürütüyor. Herkes geliştiricidir.',
+      },
+      {
+        q: '$IF bir yatırım mı?',
+        a: 'Hayır. İçsel değeri, ekip vaadi ve yol haritası olmayan bir meme coin. Fiyat yükseldiği kadar kolay düşer ve meme coin’lerin çoğu sıfırda biter. Tamamını kaybetmeyi rahatça göze alamayacağın bir miktarı asla koyma.',
+      },
+    ],
+  },
+
+  footer: {
+    heading: { lead: 'Ya', accent: 'katılsaydın?' },
+    subtitle: 'Grafik orada. Soru burada.',
+    buy: '$IF Al',
+    telegram: "Telegram'a katıl",
+    follow: "X'te takip et",
+    chart: 'Grafik',
+    canonical: 'Tek resmî site whatifonhood.com. Geri kalan her şey başkasına ait.',
+    disclaimer:
+      '$IF, içsel değeri olmayan ve finansal getiri beklentisi taşımayan bir meme coin’dir. Buradaki hiçbir şey yatırım tavsiyesi değildir. Kendi araştırmanı yap.',
+    builtBy: 'Herkes geliştiricidir.',
+    reduceMotion: 'Hareketi azalt',
+    navLabel: 'Alt bilgi menüsü',
+  },
+
+  pages: {
+    memes: {
+      title: 'Kasa',
+      heading: { lead: 'Her meme.', accent: 'Çalması serbest.' },
+      intro:
+        'Her $IF meme’i, tam çözünürlükte, filigransız, atıf gerekmeden. Paylaş, bastır, yeniden karıştır. Zaten bunun için varlar.',
+      download: 'İndir',
+      all: 'Hepsi',
+      searchLabel: 'Meme ara',
+      empty: 'Eşleşen bir şey yok. Başka bir kelime dene.',
+      showAll: 'Hepsini göster',
+      count: 'meme',
+    },
+    brand: {
+      eyebrow: '$IF içeriği üreten herkes için',
+      fileNote: 'ZIP · {size} · lisans koşulları paketin içinde',
+      contractLabel: 'Kontrat',
+      questions: 'Sorun mu var, ya da burada olmayan bir şey mi lazım?',
+      title: 'Marka',
+      heading: { lead: 'İşaretler', accent: 've kullanımı.' },
+      intro:
+        'Tek marka, üç işaret: para tokeni, karakter dünyayı, kelime işareti ismi tanımlar. Neye ihtiyacın varsa al.',
+      download: 'İndir',
+      downloadMarks: 'Yalnızca işaretler · {size}',
+      kitNote:
+        'Logolar, avatar, vektör kelime işaretleri, bannerlar, karakter referans sayfası ve şeffaf pozlar — palet, tipografi ve kurallar bir readme dosyasında.',
+      rulesTitle: 'Önemli üç şey',
+      rules: [
+        'Para her zaman kenar çerçevesini korur. Onu para gibi gösteren şey odur.',
+        'Kontrat adresini asla bir başlık fontuyla dizme ve asla kısaltma.',
+        'Robinhood tüyü kullanılmaz. Yerine “on Robinhood Chain” yaz.',
+      ],
+    },
+    stats: {
+      chartTypeLabel: 'Grafik kontrolleri',
+      title: 'Veriler',
+      heading: { lead: 'Her rakam,', accent: 'canlı.' },
+      intro: 'Fiyat, likidite, arz ve yakılanlar — doğrudan Robinhood Chain’den.',
+      sourceNote:
+        'Fiyat, likidite ve hacim DexScreener’dan; sahipler ve yoğunlaşma GeckoTerminal’den; yakım doğrudan zincirden okunuyor. Bu sekme açık olduğu sürece her şey kendiliğinden yenilenir.',
+      poolLabel: 'Ana havuz',
+      openExplorer: 'Kontratı aç',
+      openChart: 'Grafiği aç',
+      timeframes: { day: '24S', week: '7G', month: '30G', quarter: '90G', all: 'TÜMÜ' },
+      resizeChart: 'Grafiği yeniden boyutlandırmak için sürükle',
+      zoomIn: 'Yakınlaştır',
+      zoomOut: 'Uzaklaştır',
+      resetZoom: 'Sıfırla',
+      average: 'Ort.',
+      ema: 'EMA',
+      chartHint: 'Yakınlaştırmak için kaydır · taşımak için sürükle · sıfırlamak için çift tıkla',
+      chartOptions: 'Seçenekler',
+      candlesAsOf: 'Mumlar {time} itibarıyla — canlı veri alınamadı',
+      concentrationNote:
+        'İlk on, yakım adresini ve likidite havuzunu içerir. İkisi de bir kişi değil.',
+      chartTypes: { candles: 'Mum', line: 'Çizgi' },
+      logScale: 'Log',
+      chartTitle: 'Fiyat',
+      feedTitle: 'Son işlemler',
+      biggestBuy: 'En büyük alım',
+      buys: 'Alım',
+      sells: 'Satım',
+      buyLabel: 'Alım',
+      sellLabel: 'Satım',
+      viewTx: 'Gör',
+      loading: 'Zincir okunuyor…',
+      feedUnavailable: 'Son işlemler okunamadı. Yeniden deneniyor.',
+      chartUnavailable: 'Fiyat geçmişi şu an mevcut değil.',
+      failed: 'Piyasa verisine şu an ulaşılamadı. Yukarıdaki rakamlar son derlemeden geliyor.',
+      feedNote: 'IF/WETH havuzundaki en son işlemler.',
+      biggestSell: 'En büyük satış',
+      windowHours: 'son {hours} saat içinde',
+      holdersTitle: 'Sahipler',
+      concentration: 'Kimin elinde',
+      bands: { top10: 'İlk 10', next20: '11–30', next20More: '31–50', rest: 'Diğer herkes' },
+      holdersUpdated: 'yeniden sayıldı',
+      pressureTitle: 'Alım ve satım baskısı',
+      pressureNote:
+        'Son bir günün saatlik hacmi, 500 dolar ve üzeri işlemler. Alımlar yukarı, satışlar aşağı.',
+      burnHistoryTitle: 'Her yakım',
+      burnHistoryNote: 'Zincirden okundu. Her basamak açabileceğin bir işlem.',
+      reproduceTitle: 'Her rakamı kendin kontrol et',
+      reproduceIntro:
+        'Bu sayfadaki her rakam herkese açık, anahtarsız, salt okunur bir çağrıdan geliyor. Her biri, tam olarak bizim yaptığımız hâliyle aşağıda. Herhangi birini bir terminale yapıştır.',
+      reproduceField: 'Rakamın yeri',
+      reproduceNote:
+        'Bunlar sayfanın kendi kullandığı adres ve uç noktalardan üretilir, dolayısıyla sessizce uyumsuz hâle gelemezler. Biri yukarıda gördüğünle çelişiyorsa sayfa yanlıştır ve bunu bilmek isteriz.',
+      reproduceLabels: {
+        price: 'Fiyat',
+        marketCap: 'Piyasa değeri',
+        liquidity: 'Likidite',
+        volume: '24 saatlik hacim',
+        holders: 'Sahip sayısı',
+        burned: 'Yakılan token',
+        supply: 'Toplam arz',
+        owner: 'Sözleşmeyi kim değiştirebilir',
+        trades: 'Son işlemler',
+        holderList: 'En büyük sahipler',
+      },
+      weekTitle: 'Son yedi gün',
+      weekPrice: 'Fiyat',
+      weekBurned: 'Yakıldı',
+      weekBurnCount: '{count} yakım boyunca',
+      weekLargest: 'En büyük tek yakım',
+      weekNote: '{date} tarihine kadar. Günlük yenilenir, canlı değil — yukarıdaki rakamlar canlı.',
+      holderTableTitle: 'Kim tutuyor',
+      holderTableIntro:
+        'En büyük on beş bakiye, tespit edilebilen her şey adlandırılmış. En büyüğü yakım adresi — o tokenlar tutulmuyor, yok edilmiş.',
+      holderTableNote: 'Blok gezgininden {date} tarihinde okundu. Her satır adrese bağlanır.',
+      holderAddress: 'Adres',
+      holderWhat: 'Nedir',
+      holderTokens: 'Token',
+      holderShare: 'Arzdaki payı',
+      holderKinds: { burn: 'Yakıldı', pool: 'Likidite havuzu', contract: 'Sözleşme', unknown: '—' },
+      latestBurnsTitle: 'Son yakımlar',
+      sinceLead: 'Son ziyaretinden bu yana, {ago}',
+      sincePrice: 'Fiyat {change} hareket etti, {price} oldu.',
+      sinceBurned: '{amount} $IF yakıldı.',
+      sinceHolders: 'Sahip sayısı {change} değişti, {total} oldu.',
+      sinceNothing: 'Pek bir şey yok. Hâlâ soruyoruz.',
+      trustTitle: 'Herkesin yapabileceği kontroller',
+      trustNote:
+        'Bunlardan ikisi bizim değil, üçüncü tarafların beyanıdır; diğer üçü bu sayfa yüklenirken doğrudan sözleşmeden okunur. Her biri kendin kontrol edebileceğiniz yere bağlanır ve okunamayan bir kontrol, geçti göstermek yerine bunu söyler.',
+      checks: {
+        verified: 'Listeleme doğrulandı',
+        honeypot: 'Honeypot kontrolü',
+        supply: 'Sabit arz, mint fonksiyonu yok',
+        burn: 'Yakım adresinin özel anahtarı yok',
+        owner: 'Sözleşmeyi kim değiştirebilir',
+      },
+      checkPass: 'Geçti',
+      burnMark: '{amount} yakıldı',
+      ownerNone: 'Owner fonksiyonu yok',
+      ownerSome: 'Sahibi',
+    },
+    pfp: {
+      title: 'PFP Üretici',
+      heading: { lead: 'Sana ait olan', accent: 'parayı bul.' },
+      intro:
+        "Üret'e bas, bir $IF parası al, profil fotoğrafın yap. Cüzdan yok, kayıt yok, bağlanacak hiçbir şey yok.",
+      subline: 'Dört nadirlik. Her çekiliş ücretsiz.',
+      generate: "$IF'imi üret",
+      again: 'Tekrar',
+      hint: 'Tek dokunuş. Hiçbir şey kendi tarayıcının dışına çıkmaz.',
+      tiers: { common: 'Sıradan', uncommon: 'Az bulunur', rare: 'Nadir', legendary: 'Efsanevi' },
+      found: (found, total) => `${total} paradan ${found} tanesi bulundu`,
+      showPool: 'Tüm paraları göster',
+      hidePool: 'Gizle',
+      rolled: '{name} — {tier} çıktı.',
+      backupTitle: 'Koleksiyonunu başka bir tarayıcıya taşı',
+      backupIntro:
+        'Çektiklerin yalnızca bu tarayıcıda tutulur; temizlersen ya da telefon değiştirirsen kaybolur. Aşağıdaki kodu kopyala, bir yere kaydet ve diğer cihazda buraya yapıştır.',
+      backupCopy: 'Kodumu kopyala',
+      backupRestore: 'Bir koddan geri yükle',
+      backupFieldLabel: 'Koleksiyon kodun',
+      backupPlaceholder: 'Geri yüklemek için buraya bir kod yapıştır',
+      backupCopied: 'Kopyalandı. Güvenli bir yerde sakla.',
+      backupSelected: 'Seçildi — kendin kopyala.',
+      backupBad: 'Bu bir koleksiyon kodu değil.',
+      backupRestored: 'Geri yüklendi. {count} coinin var.',
+      locked: 'Henüz bulunmadı',
+      download: 'PNG indir',
+      shareCard: 'Kartı paylaş',
+      postOnX: "X'te paylaş",
+      shareText: (name, tier) => `${name} çektim — ${tier}.\n\nYa bu seninkiyse?`,
+      odds: 'olasılık',
+      openGenerator: 'Kendi paranı çek',
+      inCollection: 'Koleksiyonunda',
+    },
+    ask: {
+      dailyArchiveTitle: 'Bugüne kadarki her gün',
+      dailyArchiveIntro: 'Günde bir soru, herkese aynısı. Hepsi burada.',
+      dailyAnswerCta: 'Buna cevap ver',
+      title: 'Daha iyi bir soru sor',
+      eyebrow: 'Üretici',
+      heading: { lead: 'Ya', accent: 'her şey mümkünse?' },
+      intro:
+        'Bütün coin tek bir sorudan ibaret. İşte o soru, tekrar tekrar, ve neredeyse hiç aynısı çıkmadan.',
+      again: 'Bir tane daha',
+      copyLink: 'Bağlantıyı kopyala',
+      copied: 'Kopyalandı.',
+      linkCopied: 'Bağlantı kopyalandı.',
+      today: 'Bugünün sorusu',
+      answerLabel: 'Senin cevabın',
+      answerPlaceholder: 'Ne düşündüğünü yaz. Kartın üstüne geçer.',
+      postOnX: "X'te paylaş",
+      download: 'Kartı indir',
+      possibilities: 'olası soru',
+      hint: 'yenisi için boşluğa bas',
+      ownLabel: 'Ya da kendin yaz',
+      ownPlaceholder: 'the dog one actually makes it',
+      ownButton: 'Kartı çiz',
+      shareText: '{question}\n\nHâlâ soruyoruz.',
+    },
+    docs: {
+      title: '$IF teknik dokümanı',
+      description:
+        '$IF nedir, ne değildir, nasıl alınır ve buradaki her rakamı kendin nasıl doğrularsın.',
+      eyebrow: 'Teknik doküman',
+      heading: { lead: '$IF hakkında her şey,', accent: 'yazılı hâlde' },
+      intro:
+        'Coin nedir, ne değildir, nasıl alınır ve buradaki hiçbir rakam için sözümüze güvenmeden hepsini kendin doğrulayabileceğin komutlar.',
+      contractLabel: 'Sözleşme',
+      contractNote:
+        'Robinhood Chain üzerinde tek bir adres. Bunun dışındaki hiçbir şey bu coin değildir.',
+      groups: {
+        coin: 'Coin',
+        proof: 'Kanıt',
+        underTheHood: 'Kaputun altı',
+        using: 'Kullanım',
+        straight: 'Net cevaplar',
+      },
+      backToContents: 'Teknik doküman',
+      contents: 'İçindekiler',
+      onThisPage: 'Bu sayfada',
+      figuresAsOf: 'Rakamlar {date} itibarıyla',
+      previous: 'Önceki',
+      next: 'Sonraki',
+      moreOfThePaper: 'Dokümanın devamı',
+    },
+    roadmap: {
+      title: 'Yol haritası',
+      eyebrow: 'Yol haritası',
+      heading: { lead: 'Ne yapıldı,', accent: 'sırada ne var.' },
+      intro:
+        'Yayına alınan her şey bu sayfada kalır. Yalnızca geleceği gösteren bir yol haritası, dilek listesidir.',
+      statuses: {
+        building: 'Şu anda yapılıyor',
+        next: 'Sırada',
+        later: 'Daha sonra',
+        shipped: 'Yayına alındı',
+      },
+      shippedCount: 'şey yayına alındı',
+      earlier: 'Daha önce',
+      record: { shipped: 'Yayına alındı', inProgress: 'Yapılıyor', latest: 'En yenisi' },
+      tracks: {
+        proof: {
+          label: 'Kanıt',
+          objective:
+            'Bu sitedeki her sayı, bize güvenmeyen biri tarafından zincirden yeniden üretilebilir.',
+        },
+        tools: {
+          label: 'Araçlar',
+          objective:
+            'Açmaya değer şeyler. Hiçbiri cüzdan bağlamanı ya da bir şey imzalamanı istemez.',
+        },
+        words: {
+          label: 'Metin',
+          objective:
+            'Düşündüğün dilde okunur — güvende kalmayla ilgili sayfalar, bizimle ilgili olanlardan önce gelir.',
+        },
+        craft: {
+          label: 'Zanaat',
+          objective: 'Eski bir telefonda, kötü bir bağlantıda, ilk denemede çalışması gerekir.',
+        },
+      },
+      needsLabel: 'Bekleniyor',
+      signalLabel: 'Bitiş şartı',
+      log: {
+        intro:
+          'Şimdiye kadar yapılmış her şey, en yenisi en üstte, her biri kendine bağlantı veriyor. Bir yol haritasının gerçekten test edilmiş kısmı burasıdır.',
+      },
+      terms: {
+        title: 'Bu yol haritasının yapmayacakları',
+        items: [
+          'Henüz gerçekleşmemiş hiçbir şeye tarih vermek. Yayına alınanlarda tarih var, çünkü onlar zaten oldu; geri kalanına verilecek tarih, kriptoda tutulması en kolay bozulan sözdür.',
+          'Fiyattan, piyasa değerinden ya da bir hedeften söz etmek. Bu sayfadaki hiçbir şey, herhangi bir şeyi satın almak için bir sebep değildir.',
+          'Var olmadan ve açılabilir hale gelmeden bir ortaklık, borsa listelenmesi ya da entegrasyon duyurmak.',
+          'Cüzdan bağlamanı ya da bir mesaj imzalamanı isteyen bir şey yayına almak. Bu bir gün değişirse, bir özellik olarak görünmeden önce bu sayfada bir satır olarak görünecek.',
+        ],
+      },
+    },
+    holdings: {
+      title: 'Cüzdan sorgusu',
+      eyebrow: 'Senin çantan',
+      heading: { lead: 'Ya bir', accent: 'baksaydın?' },
+      intro:
+        'Herhangi bir adresi yapıştır, ne tuttuğunu gör. Cüzdan bağlamak yok, imza yok, onaylanacak hiçbir şey yok.',
+      inputLabel: 'Cüzdan adresi',
+      check: 'Sorgula',
+      checking: 'Bakılıyor…',
+      privacy:
+        "Adresi sen yazarsın, hiçbir cüzdandan istenmez ve yalnızca zincirin herkese açık RPC'sine gönderilir. Değerlemede kullanılan fiyat, adres eklenmeden DexScreener'dan alınır. Hiçbir şey saklanmaz.",
+      download: 'Kartı indir',
+      postOnX: "X'te paylaş",
+      verify: "Blockscout'ta doğrula",
+      shareOfSupply: "Tüm $IF'in {share} kadarı",
+      shareText: '{tokens} {symbol} tutuyorum.\n\nHâlâ soruyoruz.',
+      bands: {
+        whale: 'Balina',
+        shark: 'Köpekbalığı',
+        holder: 'Sahip',
+        curious: 'Meraklı',
+        empty: 'Boş',
+        burn: 'Yakım adresi',
+        pool: 'Likidite havuzu',
+      },
+      verdicts: {
+        whale: 'Sen kımıldayınca grafik kımıldıyor.',
+        shark: 'İşte buna pozisyon denir.',
+        holder: 'İçindesin. Hem de tam anlamıyla.',
+        curious: 'Başlamak da başlamaktır.',
+        empty: 'Burada henüz hiçbir şey yok. Ya bu değişseydi?',
+        burn: 'Bu adresin anahtarı kimsede yok. Buradaki her şey sonsuza dek gitti.',
+        pool: 'Bu bir sahip değil, piyasanın kendisi. Her işlem buradan geçer.',
+      },
+      errors: {
+        empty: 'Önce bir adres yapıştır.',
+        ens: 'Bu tür isimler Robinhood Chain üzerinde çözümlenmiyor. 0x adresini kullan.',
+        txHash: "Bu bir işlem hash'i gibi görünüyor, adres değil — iki katı uzunlukta.",
+        prefix: 'Adresler 0x ile başlar.',
+        shape: 'Bu geçerli bir adres değil. Adresler 42 karakterdir ve 0x ile başlar.',
+        network: 'Şu anda zincire ulaşılamadı. Birazdan tekrar dene.',
+      },
+    },
+    notFound: {
+      title: 'Sayfa bulunamadı',
+      eyebrow: '404',
+      heading: { lead: 'Ya bu sayfa', accent: 'hiç var olmadıysa?' },
+      intro: 'Olmadı. Burada hiçbir şey taşınmadı — bu adres hiçbir zaman bizim olmadı.',
+      tryThese: 'Bunlar gerçekten var',
+    },
+    meme: {
+      intro: 'Tam çözünürlük, filigran yok, kaynak göstermeye gerek yok. Al götür.',
+      description: (title, series) =>
+        `${title} — ${series} serisinden bir $IF meme. Tam çözünürlük, serbestçe paylaş, kaynak gerekmez.`,
+      download: 'İndir',
+      postOnX: "X'te paylaş",
+      copyLink: 'Bağlantıyı kopyala',
+      more: 'Serinin devamı:',
+      backToVault: 'Kasaya dön',
+      shareText: (title) => `${title}\n\nHâlâ soruyoruz.`,
+    },
+  },
+
+  common: {
+    skipToContent: 'İçeriğe geç',
+    externalLink: 'yeni sekmede açılır',
+  },
+};

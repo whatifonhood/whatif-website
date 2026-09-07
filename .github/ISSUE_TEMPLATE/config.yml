@@ -1,0 +1,10 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security problem
+    url: https://github.com/whatifonhood/whatif-website/security/advisories/new
+    about: Report privately. Please do not open a public issue.
+  - name: Question about the token itself
+    url: https://whatifonhood.com/docs/
+    about: >
+      The white paper covers the supply, the burn, the liquidity and the risks,
+      and every figure links to something on-chain you can check.
