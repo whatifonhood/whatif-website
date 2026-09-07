@@ -1,6 +1,5 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import ChartPanel from '../stats/ChartPanel.astro';
 import '../../styles/chart.css';
 import { CHAIN, SITE, type Locale } from '../../config/site.ts';
 import { BURNED_PERCENT, MARKETS, TOKEN, TOKEN_SNAPSHOT } from '../../config/site.ts';
@@ -129,8 +128,39 @@ const metrics = [
     </p>
 
     <!-- Price and the chart. The ids are what the roadmap's shipped items open. -->
-    <div id="chart" class="scroll-mt-20">
-      <ChartPanel locale={locale} />
+    <!--
+      The chart is switched off for now at the owner's request: GeckoTerminal,
+      the candle feed, has been rate-limiting every browser, so the panel spent
+      most of its time showing yesterday's candles under a warning. The price
+      and its change chips stay; ChartPanel.astro is untouched for when it
+      comes back.
+    -->
+    <div id="chart" class="card scroll-mt-20 p-6 sm:p-8">
+      <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
+        {page.chartTitle} · $IF / WETH
+      </p>
+      <p
+        data-metric="price"
+        class="mt-2 font-display text-[clamp(1.6rem,11vw,2.25rem)] font-black italic tabular-nums tracking-tight text-ink [overflow-wrap:anywhere] sm:text-6xl"
+      >
+        {formatUsd(TOKEN_SNAPSHOT.priceUsd, locale)}
+      </p>
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        {
+          (
+            [
+              ['h1', '1H'],
+              ['h6', '6H'],
+              ['h24', '24H'],
+            ] as const
+          ).map(([window, label]) => (
+            <span class="change-chip">
+              <span class="change-window">{label}</span>
+              <span data-change={window}>—</span>
+            </span>
+          ))
+        }
+      </div>
     </div>
     <!-- Headline metrics -->
     <dl class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
