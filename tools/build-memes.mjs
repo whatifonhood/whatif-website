@@ -76,8 +76,18 @@ function seriesFor(slug) {
   return 'Classics';
 }
 
+/**
+ * Titles that the filename alone gets wrong. Two memes share the words
+ * "weather forecast" in different series; without this the vault showed the
+ * same title twice and a search for one found both.
+ */
+const TITLE_OVERRIDES = {
+  'meme-artefact-weather-forecast': 'Weather forecast (artefact)',
+};
+
 /** "meme-timeline-sold-vs-held" -> "Timeline sold vs held" */
 function titleFor(slug) {
+  if (TITLE_OVERRIDES[slug]) return TITLE_OVERRIDES[slug];
   const words = slug
     .replace(/^(meme|gm)-/, '')
     .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro)-/, '')
