@@ -2292,7 +2292,82 @@ export const BURNS: BurnEvent[] = [
     tokens: 9738,
     txHash: '0xdd3cf9137936029f11f8e1eabde943d413882af3144e552b1191f08d820a3366',
   },
+  {
+    time: 1788605494,
+    tokens: 12780,
+    txHash: '0xff3e8864bdb2944d1584f131e59717969ca336f05a59865254975b16cdb4cb45',
+  },
+  {
+    time: 1788623787,
+    tokens: 16819,
+    txHash: '0x2ff10beda7bc2f4f75ee36657c56a47544e5ad80e86c59ebf3a23f10560468a4',
+  },
+  {
+    time: 1788634103,
+    tokens: 36327,
+    txHash: '0x3457008a6885c41d264b4b906e475a8026397a564a81557c401283fb7295ea3f',
+  },
+  {
+    time: 1788650954,
+    tokens: 23437,
+    txHash: '0xe36fe1d6e0039b6317e9dc74ff3f3731afea2596f050361fa2f69ba2978f3e89',
+  },
+  {
+    time: 1788660679,
+    tokens: 16492,
+    txHash: '0x71cfa80b711eb65478ad8b13367cddf01423cb8027d5d56da4f09946a4ff5712',
+  },
+  {
+    time: 1788731188,
+    tokens: 65654,
+    txHash: '0x3fcd64dee07e0ea3a23bfa1f03ad609403cba81a741397e5137a067b45908706',
+  },
+  {
+    time: 1788747239,
+    tokens: 29755,
+    txHash: '0x6fdaa4d4b079dfd58122969014b2ac07c26e53f10cadb61414672f689420c889',
+  },
+  {
+    time: 1788754402,
+    tokens: 2486,
+    txHash: '0xc916924d2f0e501476a1eef21933a6ac8e8fbc2cb3268284da7ac870ab23be8e',
+  },
+  {
+    time: 1788757839,
+    tokens: 959,
+    txHash: '0x89efd71822d1b0c1f8c3f92b7c6f4ed3b8a897eb57bb5214445dbf1a1a18d1da',
+  },
+  {
+    time: 1788776306,
+    tokens: 14750,
+    txHash: '0xff4a8bb1d1a16ec678cdb22f43ff958745373c5f79164b3cfc892ae9708b1a38',
+  },
+  {
+    time: 1788776461,
+    tokens: 30,
+    txHash: '0xf0a4a5e10bb6a259af772166fde3493c51c408fc73d527d647641f69f0c70d0e',
+  },
+  {
+    time: 1788810357,
+    tokens: 34322,
+    txHash: '0x4d60da2334048c07ca56cbe82dbb677cb788c127e99ceaf46f13a45a4fcf5ed0',
+  },
+  {
+    time: 1788832582,
+    tokens: 42483,
+    txHash: '0x238c405f483fb6dbabb9225de29ab5c55c5be0f04179438ea275eb16a38cabfe',
+  },
+  {
+    time: 1788850199,
+    tokens: 16459,
+    txHash: '0x56d92f5d936fa9e5af5ca86b0f98c36f33f85bb0806d9182ff3ff9f5bc7be876',
+  },
+  {
+    time: 1788859465,
+    tokens: 6794,
+    txHash: '0x4117e76441bf21d2486332803b0feffcc4fd8863a5b9b0d538cc65464c253dbd',
+  },
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 54997235;
+export const BURNS_SCANNED_TO = 57588090;

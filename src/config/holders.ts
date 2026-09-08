@@ -16,7 +16,7 @@ export interface Holder {
 export const HOLDERS: Holder[] = [
   {
     address: '0x000000000000000000000000000000000000dEaD',
-    tokens: 94003382,
+    tokens: 94322935,
     kind: 'burn',
   },
   {
@@ -26,12 +26,12 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0xb64325a69cCD29C54b7d9e70b0F306fa9B2b2697',
-    tokens: 22580002,
+    tokens: 23941619,
     kind: 'contract',
   },
   {
     address: '0x39A200271525E9641e799127bdAB299DAeF21953',
-    tokens: 18666474,
+    tokens: 21829080,
     kind: 'pool',
   },
   {
@@ -56,7 +56,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x918FCe7Ee04C2f353746e571b4ddA2E663fE0735',
-    tokens: 12600460,
+    tokens: 12607494,
     kind: 'contract',
   },
   {
@@ -66,7 +66,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x7Ff8bbf9C8AB106db589e7863fb100525F61CCe5',
-    tokens: 9677356,
+    tokens: 10566703,
     kind: 'unknown',
   },
   {
@@ -76,7 +76,7 @@ export const HOLDERS: Holder[] = [
   },
   {
     address: '0x8EfC646EbE93feeBfDBd36359BeCfC62716d244e',
-    tokens: 9285375,
+    tokens: 9085375,
     kind: 'contract',
   },
   {
@@ -92,4 +92,4 @@ export const HOLDERS: Holder[] = [
 ];
 
 /** When this list was read, as YYYY-MM-DD. */
-export const HOLDERS_CAPTURED = '2026-09-05';
+export const HOLDERS_CAPTURED = '2026-09-08';
