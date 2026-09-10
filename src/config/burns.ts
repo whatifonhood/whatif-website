@@ -2407,7 +2407,12 @@ export const BURNS: BurnEvent[] = [
     tokens: 7411,
     txHash: '0xe5b629d0002f32982a1cac86f0dcf8a6c8574282d9fb13acb6965cd5db2455d3',
   },
+  {
+    time: 1788979291,
+    tokens: 41677,
+    txHash: '0x195973b320557a05ede2c37ae5acd13ebc6a0d61b28b4329a471524f20b07455',
+  },
 ];
 
 /** Block this history was scanned to; the page asks the chain for anything after. */
-export const BURNS_SCANNED_TO = 58446354;
+export const BURNS_SCANNED_TO = 59302292;
