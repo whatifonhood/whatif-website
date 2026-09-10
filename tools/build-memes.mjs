@@ -62,6 +62,8 @@ const FULL_QUALITY = 82;
 function seriesFor(slug) {
   if (slug.startsWith('gm-')) return 'gm';
   if (slug.startsWith('meme-macro-')) return 'What $IF';
+  if (slug.startsWith('meme-army-')) return 'The army';
+  if (slug.startsWith('meme-scene-')) return 'Scenes';
   if (slug.startsWith('meme-artefact-')) return 'Artefacts';
   if (slug.startsWith('meme-history-')) return 'History';
   if (slug.startsWith('meme-hood-') || slug.startsWith('rh-')) return 'Robinhood';
@@ -90,7 +92,7 @@ function titleFor(slug) {
   if (TITLE_OVERRIDES[slug]) return TITLE_OVERRIDES[slug];
   const words = slug
     .replace(/^(meme|gm)-/, '')
-    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro)-/, '')
+    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro|army|scene)-/, '')
     .split('-');
   const joined = words.join(' ');
   return joined.charAt(0).toUpperCase() + joined.slice(1);
@@ -166,6 +168,8 @@ for (const [index, file] of files.entries()) {
 const seriesOrder = [
   'Classics',
   'What $IF',
+  'The army',
+  'Scenes',
   'Artefacts',
   'History',
   'Real life',
