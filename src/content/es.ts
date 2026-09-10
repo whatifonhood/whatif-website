@@ -254,6 +254,11 @@ export const es: SiteCopy = {
     builtBy: 'Todos somos el dev.',
     reduceMotion: 'Reducir movimiento',
     navLabel: 'Pie de página',
+    contact: {
+      heading: 'Contacto',
+      body: 'Listados, alianzas, prensa y todo lo oficial.',
+      note: 'Solo escribimos desde esta dirección. Cualquier otro que diga ser nosotros no lo es.',
+    },
   },
 
   pages: {

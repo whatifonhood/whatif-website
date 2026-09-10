@@ -184,6 +184,8 @@ export interface SiteCopy {
     reduceMotion: string;
     /** Accessible name of the footer's <nav>. */
     navLabel: string;
+    /** Contact block: who the address is for, and what to expect. */
+    contact: { heading: string; body: string; note: string };
   };
 
   /** Page-level copy for the sub-pages. */

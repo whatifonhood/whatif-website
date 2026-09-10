@@ -236,6 +236,11 @@ export const zh: SiteCopy = {
     builtBy: '每个人都是开发者。',
     reduceMotion: '减少动效',
     navLabel: '页脚导航',
+    contact: {
+      heading: '联系我们',
+      body: '上币、合作、媒体及一切官方事务。',
+      note: '我们只会从这个邮箱发信。其他自称是我们的人都不是。',
+    },
   },
 
   pages: {

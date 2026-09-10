@@ -124,6 +124,32 @@ const headingTail = ` ${copy.footer.heading.accent}`;
         {copy.footer.canonical}
       </p>
 
+      <!--
+        Contact. One address, set next to the canonical-domain line because it
+        does the same anti-phishing job: this is where we write from, nowhere else.
+      -->
+      <section
+        aria-labelledby="footer-contact"
+        class="grid gap-3 border-t border-line pt-6 sm:grid-cols-[auto_1fr] sm:gap-x-10"
+      >
+        <h2
+          id="footer-contact"
+          class="font-mono text-[10px] uppercase tracking-[0.14em] text-faint sm:pt-1"
+        >
+          {copy.footer.contact.heading}
+        </h2>
+        <div class="min-w-0">
+          <a
+            href={`mailto:${LINKS.email}`}
+            class="tap inline-block break-all font-display text-xl font-bold text-ink hover:text-lime sm:text-2xl"
+          >
+            {LINKS.email}
+          </a>
+          <p class="mt-1 text-sm text-muted">{copy.footer.contact.body}</p>
+          <p class="mt-1 text-xs text-faint">{copy.footer.contact.note}</p>
+        </div>
+      </section>
+
       <div
         class="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-start sm:justify-between"
       >

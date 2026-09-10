@@ -239,6 +239,11 @@ export const en: SiteCopy = {
     builtBy: 'Everybody is the dev.',
     reduceMotion: 'Reduce motion',
     navLabel: 'Footer',
+    contact: {
+      heading: 'Contact',
+      body: 'Listings, partnerships, press and anything official.',
+      note: 'We only ever write from this address. Anyone else claiming to be us is not.',
+    },
   },
 
   pages: {

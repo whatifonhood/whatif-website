@@ -239,6 +239,11 @@ export const tr: SiteCopy = {
     builtBy: 'Herkes geliştiricidir.',
     reduceMotion: 'Hareketi azalt',
     navLabel: 'Alt bilgi menüsü',
+    contact: {
+      heading: 'İletişim',
+      body: 'Listelemeler, iş birlikleri, basın ve tüm resmi konular.',
+      note: 'Yalnızca bu adresten yazarız. Biz olduğunu söyleyen başka herkes biz değiliz.',
+    },
   },
 
   pages: {

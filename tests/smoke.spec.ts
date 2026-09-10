@@ -154,6 +154,14 @@ test.describe('promises the site makes', () => {
     expect(text).not.toContain('connect your wallet to');
   });
 
+  test('offers the one contact address in the footer', async ({ page }) => {
+    await page.goto('/');
+    const mail = page.locator('footer a[href^="mailto:"]');
+    await expect(mail).toHaveCount(1);
+    await expect(mail).toHaveAttribute('href', 'mailto:listings@whatifonhood.com');
+    await expect(mail).toHaveText('listings@whatifonhood.com');
+  });
+
   test('states the canonical domain in the footer', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('footer')).toContainText('whatifonhood.com');

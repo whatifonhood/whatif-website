@@ -92,7 +92,10 @@ function titleFor(slug) {
   if (TITLE_OVERRIDES[slug]) return TITLE_OVERRIDES[slug];
   const words = slug
     .replace(/^(meme|gm)-/, '')
-    .replace(/^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro|army|scene)-/, '')
+    .replace(
+      /^(figure|token|reactive|when|artefact|history|hood|life|face|card|macro|army|scene)-/,
+      '',
+    )
     .split('-');
   const joined = words.join(' ');
   return joined.charAt(0).toUpperCase() + joined.slice(1);
