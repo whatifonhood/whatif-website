@@ -69,8 +69,8 @@ export const LINKS = {
   xHandle: '@WhatIFonHOOD',
   telegram: 'https://t.me/WhatIFonHoodChain',
   telegramHandle: 't.me/WhatIFonHoodChain',
-  /** Listings, partnerships, press. Personal Gmail until a business address exists. */
-  email: 'sethwilliambusiness@gmail.com',
+  /** Listings, partnerships, press. The project's own mailbox. */
+  email: 'whatifonrobinhood@gmail.com',
 } as const;
 
 /** Where $IF can be traded, tracked and verified. */

@@ -158,8 +158,8 @@ test.describe('promises the site makes', () => {
     await page.goto('/');
     const mail = page.locator('footer a[href^="mailto:"]');
     await expect(mail).toHaveCount(1);
-    await expect(mail).toHaveAttribute('href', 'mailto:sethwilliambusiness@gmail.com');
-    await expect(mail).toHaveText('sethwilliambusiness@gmail.com');
+    await expect(mail).toHaveAttribute('href', 'mailto:whatifonrobinhood@gmail.com');
+    await expect(mail).toHaveText('whatifonrobinhood@gmail.com');
   });
 
   test('states the canonical domain in the footer', async ({ page }) => {
